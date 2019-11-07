@@ -1,0 +1,98 @@
+package com.diluv.api.utils;
+
+import com.nimbusds.jose.JWSAlgorithm;
+import org.apache.commons.io.IOUtils;
+import org.pac4j.core.client.direct.AnonymousClient;
+import org.pac4j.core.config.Config;
+import org.pac4j.http.client.direct.DirectFormClient;
+import org.pac4j.http.client.direct.HeaderClient;
+import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
+import org.pac4j.jwt.config.signature.RSASignatureConfiguration;
+import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Constants {
+    private static final PublicKey PUBLIC_KEY = getPublicKey("public.pem");
+    private static final PrivateKey PRIVATE_KEY = getPrivateKey("private.pem");
+    public static final RSASignatureConfiguration RSA_SIGNATURE_CONFIGURATION = new RSASignatureConfiguration(new KeyPair(PUBLIC_KEY, PRIVATE_KEY), JWSAlgorithm.ES256);
+    private static final HeaderClient HEADER_CLIENT = new HeaderClient("Authorization", "Bearer ", new JwtAuthenticator(RSA_SIGNATURE_CONFIGURATION));
+    private static final DirectFormClient DIRECT_FORM_CLIENT = new DirectFormClient(new SimpleTestUsernamePasswordAuthenticator());
+
+    public static final String DB_HOSTNAME = getValueOrDefault("DB_HOSTNAME", "jdbc:mariadb://localhost:3306/diluv");
+    public static final String DB_USERNAME = getValueOrDefault("DB_USERNAME", "root");
+    public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
+
+    public static final Config CONFIG = new Config(DIRECT_FORM_CLIENT, HEADER_CLIENT, new AnonymousClient());
+    public static final String REQUEST_LOGIN = "DirectFormClient";
+    public static final String REQUEST_JWT_REQUIRED = "HeaderClient";
+    public static final String REQUEST_JWT_OPTIONAL = "HeaderClient,AnonymousClient";
+
+
+    private static final Logger LOGGER = Logger.getLogger(Constants.class.getName());
+
+    private Constants() {
+    }
+
+    private static String getRequiredValue(String env) {
+        String value = System.getenv(env);
+        if (value == null) {
+            LOGGER.severe("Missing env variable");
+            System.exit(1);
+        }
+        return value;
+    }
+
+    private static String getValueOrDefault(String env, String defaultValue) {
+        String value = System.getenv(env);
+        if (value == null) {
+            return defaultValue;
+        }
+        return value;
+    }
+
+    public static PrivateKey getPrivateKey(String fileLocation) {
+        try {
+            String privateKey = getKey(fileLocation);
+            privateKey = privateKey.replace("-----BEGIN PRIVATE KEY-----", "");
+            privateKey = privateKey.replace("-----END PRIVATE KEY-----", "");
+            KeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey));
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePrivate(spec);
+        } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException e) {
+            LOGGER.log(Level.SEVERE, "Private Key", e);
+        }
+        System.exit(1); //TODO Handle better
+        return null;
+    }
+
+    public static PublicKey getPublicKey(String fileLocation) {
+        try {
+            String publicKey = getKey(fileLocation);
+            publicKey = publicKey.replace("-----BEGIN PUBLIC KEY-----", "");
+            publicKey = publicKey.replace("-----END PUBLIC KEY-----", "");
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey));
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePublic(spec);
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+            LOGGER.log(Level.SEVERE, "Public Key", e);
+        }
+        System.exit(1); //TODO Handle better
+        return null;
+    }
+
+    public static String getKey(String fileLocation) throws IOException {
+        FileInputStream fileInputStream = new FileInputStream(fileLocation);
+        return IOUtils.toString(fileInputStream, Charset.defaultCharset()).replaceAll("\n", "").replaceAll("\r", "");
+    }
+}
