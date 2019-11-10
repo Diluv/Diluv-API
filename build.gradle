@@ -15,7 +15,6 @@ targetCompatibility = 1.8
 
 repositories {
     jcenter()
-    maven { url "https://oss.jfrog.org/artifactory/libs-release" }
 }
 
 dependencies {
@@ -39,7 +38,7 @@ dependencies {
 jar {
     manifest {
         attributes 'Implementation-Title': 'DiluvAPI',
-                'Main-Class': 'com.diluv.api.DiluvAPI'
+            'Main-Class': 'com.diluv.api.DiluvAPI'
     }
 }
 
@@ -63,13 +62,18 @@ sonarqube {
     properties {
         property "sonar.projectName", "Diluv-API"
         property "sonar.projectKey", "Diluv-API"
+        property "sonar.organization", "diluv"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.login", System.getenv("SONAR_LOGIN")
     }
 }
 
+
 static String getBuildNumber() {
-    return System.getenv("TRAVIS_BUILD_NUMBER") ?: System.getenv("BUILD_NUMBER") ?: "0"
+    return System.getenv("BUILD_NUMBER") ?: "0"
 }
 
+//TODO Not implemented
 static String isSnapshot() {
     return System.getenv("TRAVIS_TAG") ? "" : "-snapshot"
 }
