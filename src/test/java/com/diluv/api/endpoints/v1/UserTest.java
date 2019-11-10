@@ -5,9 +5,9 @@ import java.io.IOException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import com.diluv.api.DiluvAPI;
 import com.diluv.api.database.GameTestDatabase;
@@ -24,7 +24,7 @@ public class UserTest {
     private static final String IP = "0.0.0.0";
     private static final int PORT = 4567;
 
-    @BeforeClass
+    @BeforeAll
     public static void setup () {
 
         GameDAO gameDAO = new GameTestDatabase();
@@ -52,6 +52,6 @@ public class UserTest {
 
     private void runTest (final CloseableHttpClient client, final String queryString, final String expected) throws IOException {
 
-        Assert.assertEquals(expected, HttpClientUtils.readResponse(client.execute(new HttpGet("http://" + IP + ":" + PORT + queryString))));
+        Assertions.assertEquals(expected, HttpClientUtils.readResponse(client.execute(new HttpGet("http://" + IP + ":" + PORT + queryString))));
     }
 }

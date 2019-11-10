@@ -1,29 +1,40 @@
 name: Staging CI
 
 on:
-    schedule:
-        - cron: "0 0 * * 0"
-    push:
-        branches:
-            - master
+  schedule:
+    - cron: "0 0 * * 0"
+  push:
+    branches:
+      - master
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v1
-            - name: Set up JDK 1.8
-              uses: actions/setup-java@v1
-              with:
-                  java-version: 1.8
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
 
-            - name: Generate build number
-              id: buildnumber
-              uses: einaregilsson/build-number@v1
-              with:
-                  token: ${{secrets.github_token}}
+      - name: Generate build number
+        id: buildnumber
+        uses: einaregilsson/build-number@v1
+        with:
+          token: ${{secrets.github_token}}
+      - name: Install packages
+        run: sudo apt install openssh-client
 
-            - name: Sonarcloud
-              run: ./gradlew sonarqube
+      - name: Generate private/public keys
+        run: |
+          openssl genrsa 2048 > rsa.private
+          openssl pkcs8 -topk8 -inform PEM -outform PEM -in rsa.private -nocrypt > private.pem
+          openssl rsa -inform PEM -in rsa.private -pubout > public.pem
 
-            - name: Build with Gradle
-              run: ./gradlew build
+      - name: Test
+        run: ./gradlew test
+
+      - name: Sonarcloud
+        run: ./gradlew sonarqube
+
+      - name: Build with Gradle
+        run: ./gradlew build
