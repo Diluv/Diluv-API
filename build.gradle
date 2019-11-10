@@ -63,7 +63,6 @@ sonarqube {
         property "sonar.projectKey", "Diluv-API"
         property "sonar.organization", "diluv"
         property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.login", System.getenv("SONAR_LOGIN")
     }
 }
 
