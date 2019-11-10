@@ -1,183 +1,182 @@
-CREATE TABLE user
+# This will be updated up until production
+CREATE TABLE users
 (
-    ID            BIGINT AUTO_INCREMENT,
-    USERNAME      VARCHAR(30)  NOT NULL,
-    EMAIL         VARCHAR(255) NOT NULL,
-    PASSWORD      CHAR(60)     NOT NULL,
-    PASSWORD_TYPE VARCHAR(30)  NOT NULL,
+    id            BIGINT AUTO_INCREMENT,
+    username      VARCHAR(30)  NOT NULL UNIQUE,
+    email         VARCHAR(255) NOT NULL UNIQUE,
+    password      CHAR(60)     NOT NULL,
+    password_type VARCHAR(30)  NOT NULL,
 
-    2FA           BOOL DEFAULT FALSE,
-    2FA_SECRET    VARCHAR(16)  NOT NULL,
+    mfa           BOOL DEFAULT FALSE,
+    mfa_secret    VARCHAR(16)  NOT NULL,
 
-    AVATAR_URL    VARCHAR(255) NOT NULL,
+    avatar_url    VARCHAR(255) NOT NULL,
 
-    PRIMARY KEY (ID),
-    UNIQUE (EMAIL),
-    UNIQUE (USERNAME)
+    PRIMARY KEY (id)
 );
 
-CREATE TABLE user_2fa_recovery
+CREATE TABLE user_mfa_recovery
 (
-    USER_ID  BIGINT       NOT NULL,
+    user_id  BIGINT       NOT NULL,
 
-    2FA_CODE VARCHAR(255) NOT NULL,
-    VALID    BOOL DEFAULT TRUE,
+    2fa_code VARCHAR(255) NOT NULL,
+    valid    BOOL DEFAULT TRUE,
 
-    PRIMARY KEY (USER_ID, 2FA_CODE),
-    FOREIGN KEY (USER_ID) REFERENCES user (ID)
+    PRIMARY KEY (user_id, 2fa_code),
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE game
 (
-    ID   BIGINT AUTO_INCREMENT,
+    id   BIGINT AUTO_INCREMENT,
 
-    NAME VARCHAR(255) NOT NULL,
-    URL  VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    url  VARCHAR(255) NOT NULL,
 
-    PRIMARY KEY (ID)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE game_modloader
 (
-    ID      BIGINT AUTO_INCREMENT,
+    id      BIGINT AUTO_INCREMENT,
 
-    GAME_ID BIGINT       NOT NULL,
-    NAME    VARCHAR(255) NOT NULL,
+    game_id BIGINT       NOT NULL,
+    name    VARCHAR(255) NOT NULL,
 
-    URL     VARCHAR(255) NOT NULL,
+    url     VARCHAR(255) NOT NULL,
 
-    PRIMARY KEY (ID),
-    FOREIGN KEY (GAME_ID) REFERENCES game (ID)
+    PRIMARY KEY (id),
+    FOREIGN KEY (game_id) REFERENCES game (id)
 );
 
 CREATE TABLE game_version
 (
-    ID      BIGINT AUTO_INCREMENT,
+    id      BIGINT AUTO_INCREMENT,
 
-    GAME_ID BIGINT       NOT NULL,
-    VERSION VARCHAR(255) NOT NULL,
+    game_id BIGINT       NOT NULL,
+    version VARCHAR(255) NOT NULL,
 
-    URL     VARCHAR(255) NOT NULL,
+    url     VARCHAR(255) NOT NULL,
 
-    PRIMARY KEY (ID),
-    FOREIGN KEY (GAME_ID) REFERENCES game (ID)
+    PRIMARY KEY (id),
+    FOREIGN KEY (game_id) REFERENCES game (id)
 );
 
 # Project
 CREATE TABLE project
 (
-    ID              BIGINT AUTO_INCREMENT,
-    TITLE           VARCHAR(255)    NOT NULL,
+    id              BIGINT AUTO_INCREMENT,
+    name            VARCHAR(255)    NOT NULL,
+    slug            VARCHAR(255)    NOT NULL,
+    summary         VARCHAR(255)    NOT NULL,
+    description     VARCHAR(255)    NOT NULL,
+    logo_url        VARCHAR(255)    NOT NULL,
+    cache_downloads BIGINT UNSIGNED NOT NULL,
 
-    SUMMARY         VARCHAR(255)    NOT NULL,
-    DESCRIPTION     VARCHAR(255)    NOT NULL,
-    LOGO_URL        VARCHAR(255)    NOT NULL,
-    CACHE_DOWNLOADS BIGINT UNSIGNED NOT NULL,
+    created_at      TIMESTAMP DEFAULT NOW(),
+    updated_at      TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
 
-    CREATED_AT      TIMESTAMP DEFAULT NOW(),
-    UPDATED_AT      TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
+    owner_id        BIGINT          NOT NULL,
+    game_id         BIGINT          NOT NULL,
 
-    OWNER_ID        BIGINT          NOT NULL,
-    GAME_ID         BIGINT          NOT NULL,
-
-    PRIMARY KEY (ID),
-    FOREIGN KEY (OWNER_ID) REFERENCES user (ID),
-    FOREIGN KEY (GAME_ID) REFERENCES game (ID)
+    PRIMARY KEY (id),
+    FOREIGN KEY (owner_id) REFERENCES users (id),
+    FOREIGN KEY (game_id) REFERENCES game (id)
 );
 
 CREATE TABLE project_author
 (
-    ID            BIGINT AUTO_INCREMENT,
+    id            BIGINT AUTO_INCREMENT,
 
-    PROJECT_ID    BIGINT       NOT NULL,
-    AUTHOR_ID     BIGINT       NOT NULL,
+    project_id    BIGINT       NOT NULL,
+    author_id     BIGINT       NOT NULL,
 
-    ROLE          VARCHAR(255) NOT NULL,
+    role          VARCHAR(255) NOT NULL,
 
-    UPLOADED_FILE BOOL DEFAULT FALSE,
-    PRIMARY KEY (ID),
-    FOREIGN KEY (PROJECT_ID) REFERENCES project (ID),
-    FOREIGN KEY (AUTHOR_ID) REFERENCES user (ID)
+    uploaded_file BOOL DEFAULT FALSE,
+    PRIMARY KEY (id),
+    FOREIGN KEY (project_id) REFERENCES project (id),
+    FOREIGN KEY (author_id) REFERENCES users (id)
 );
 
 CREATE TABLE project_author_permission
 (
-    PROJECT_AUTHOR_ID BIGINT       NOT NULL,
-    PERMISSION        VARCHAR(255) NOT NULL,
+    project_author_id BIGINT       NOT NULL,
+    permission        VARCHAR(255) NOT NULL,
 
-    PRIMARY KEY (PROJECT_AUTHOR_ID, PERMISSION),
-    FOREIGN KEY (PROJECT_AUTHOR_ID) REFERENCES project_author (ID)
+    PRIMARY KEY (project_author_id, permission),
+    FOREIGN KEY (project_author_id) REFERENCES project_author (id)
 );
 
 CREATE TABLE project_links
 (
-    PROJECT_ID BIGINT       NOT NULL,
-    TYPE       VARCHAR(255) NOT NULL,
-    URL        VARCHAR(255) NOT NULL,
+    project_id BIGINT       NOT NULL,
+    type       VARCHAR(255) NOT NULL,
+    url        VARCHAR(255) NOT NULL,
 
-    PRIMARY KEY (PROJECT_ID, TYPE),
-    FOREIGN KEY (PROJECT_ID) REFERENCES project (ID)
+    PRIMARY KEY (project_id, type),
+    FOREIGN KEY (project_id) REFERENCES project (id)
 );
 
 CREATE TABLE project_file
 (
-    ID         BIGINT AUTO_INCREMENT,
+    id         BIGINT AUTO_INCREMENT,
 
-    MD5        VARCHAR(255)    NOT NULL,
-    CRC32      VARCHAR(255)    NOT NULL,
-    SIZE       BIGINT UNSIGNED NOT NULL,
+    sha512     VARCHAR(255)    NOT NULL,
+    crc32      VARCHAR(255)    NOT NULL,
+    size       BIGINT UNSIGNED NOT NULL,
 
-    CHANGELOG  VARCHAR(255)    NOT NULL,
-    CREATED_AT TIMESTAMP DEFAULT NOW(),
-    UPDATED_AT TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
+    changelog  VARCHAR(255)    NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
 
-    REVIEWED   BOOL      DEFAULT FALSE,
-    RELEASED   BOOL      DEFAULT FALSE,
+    reviewed   BOOL      DEFAULT FALSE,
+    released   BOOL      DEFAULT FALSE,
 
-    PROJECT_ID BIGINT          NOT NULL,
-    USER_ID    BIGINT          NOT NULL,
+    project_id BIGINT          NOT NULL,
+    user_id    BIGINT          NOT NULL,
 
-    PRIMARY KEY (ID),
-    FOREIGN KEY (PROJECT_ID) REFERENCES project (ID),
-    FOREIGN KEY (USER_ID) REFERENCES user (ID)
+    PRIMARY KEY (id),
+    FOREIGN KEY (project_id) REFERENCES project (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE project_file_version
 (
-    PROJECT_FILE_ID BIGINT NOT NULL,
-    GAME_VERSION_ID BIGINT NOT NULL,
+    project_file_id BIGINT NOT NULL,
+    game_version_id BIGINT NOT NULL,
 
-    PRIMARY KEY (PROJECT_FILE_ID, GAME_VERSION_ID),
-    FOREIGN KEY (PROJECT_FILE_ID) REFERENCES project_file (ID),
-    FOREIGN KEY (GAME_VERSION_ID) REFERENCES game_version (ID)
+    PRIMARY KEY (project_file_id, game_version_id),
+    FOREIGN KEY (project_file_id) REFERENCES project_file (id),
+    FOREIGN KEY (game_version_id) REFERENCES game_version (id)
 );
 
 CREATE TABLE project_file_modloader
 (
-    PROJECT_FILE_ID BIGINT NOT NULL,
-    MODLOADER_ID    BIGINT NOT NULL,
+    project_file_id BIGINT NOT NULL,
+    modloader_id    BIGINT NOT NULL,
 
-    PRIMARY KEY (PROJECT_FILE_ID, MODLOADER_ID),
-    FOREIGN KEY (PROJECT_FILE_ID) REFERENCES project_file (ID),
-    FOREIGN KEY (MODLOADER_ID) REFERENCES game_modloader (ID)
+    PRIMARY KEY (project_file_id, modloader_id),
+    FOREIGN KEY (project_file_id) REFERENCES project_file (id),
+    FOREIGN KEY (modloader_id) REFERENCES game_modloader (id)
 );
 
 # Project File Queue
 CREATE TABLE project_file_queue
 (
-    PROJECT_FILE_ID BIGINT       NOT NULL,
-    PROCESS_NAME    VARCHAR(255) NOT NULL,
+    project_file_id BIGINT       NOT NULL,
+    process_name    VARCHAR(255) NOT NULL,
 
-    PRIMARY KEY (PROJECT_FILE_ID, PROCESS_NAME),
-    FOREIGN KEY (PROJECT_FILE_ID) REFERENCES project_file (ID)
+    PRIMARY KEY (project_file_id, process_name),
+    FOREIGN KEY (project_file_id) REFERENCES project_file (id)
 );
 
 CREATE TABLE nodecraft
 (
-    ID         VARCHAR(36) NOT NULL,
+    id         VARCHAR(36) NOT NULL,
 
-    CREATED_AT TIMESTAMP DEFAULT NOW(),
-    VALID      BOOL      DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    valid      BOOL      DEFAULT TRUE,
 
-    PRIMARY KEY (ID)
+    PRIMARY KEY (id)
 );
