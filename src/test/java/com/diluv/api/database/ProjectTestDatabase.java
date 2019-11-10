@@ -11,4 +11,16 @@ public class ProjectTestDatabase implements ProjectDAO {
 
         return null;
     }
+
+    @Override
+    public List<ProjectRecord> findAllByGameSlug (String gameSlug) {
+
+        return null;
+    }
+
+    @Override
+    public ProjectRecord findAllByGameSlugAndProjectSlug (String gameSlug, String projectSlug) {
+
+        return null;
+    }
 }

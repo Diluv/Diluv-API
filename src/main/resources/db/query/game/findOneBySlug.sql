@@ -1,0 +1,4 @@
+SELECT *
+FROM game
+WHERE slug = ?
+LIMIT 1

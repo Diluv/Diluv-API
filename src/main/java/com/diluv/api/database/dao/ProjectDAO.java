@@ -7,4 +7,6 @@ import com.diluv.api.database.record.ProjectRecord;
 public interface ProjectDAO {
 
     List<ProjectRecord> findAllByUserId (long userId);
+
+    List<ProjectRecord> findAllByGameSlug (String gameSlug);
 }

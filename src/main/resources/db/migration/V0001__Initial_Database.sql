@@ -28,38 +28,38 @@ CREATE TABLE user_mfa_recovery
 
 CREATE TABLE game
 (
-    id   BIGINT AUTO_INCREMENT,
+    slug VARCHAR(200) NOT NULL,
 
     name VARCHAR(255) NOT NULL,
     url  VARCHAR(255) NOT NULL,
 
-    PRIMARY KEY (id)
+    PRIMARY KEY (slug)
 );
 
 CREATE TABLE game_modloader
 (
-    id      BIGINT AUTO_INCREMENT,
+    id        BIGINT AUTO_INCREMENT,
 
-    game_id BIGINT       NOT NULL,
-    name    VARCHAR(255) NOT NULL,
+    game_slug VARCHAR(200) NOT NULL,
+    name      VARCHAR(255) NOT NULL,
 
-    url     VARCHAR(255) NOT NULL,
+    url       VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (game_id) REFERENCES game (id)
+    FOREIGN KEY (game_slug) REFERENCES game (slug)
 );
 
 CREATE TABLE game_version
 (
-    id      BIGINT AUTO_INCREMENT,
+    id        BIGINT AUTO_INCREMENT,
 
-    game_id BIGINT       NOT NULL,
-    version VARCHAR(255) NOT NULL,
+    game_slug VARCHAR(200) NOT NULL,
+    version   VARCHAR(255) NOT NULL,
 
-    url     VARCHAR(255) NOT NULL,
+    url       VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (game_id) REFERENCES game (id)
+    FOREIGN KEY (game_slug) REFERENCES game (slug)
 );
 
 # Project
@@ -77,11 +77,11 @@ CREATE TABLE project
     updated_at      TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
 
     owner_id        BIGINT          NOT NULL,
-    game_id         BIGINT          NOT NULL,
+    game_slug       VARCHAR(200)    NOT NULL,
 
     PRIMARY KEY (id),
     FOREIGN KEY (owner_id) REFERENCES users (id),
-    FOREIGN KEY (game_id) REFERENCES game (id)
+    FOREIGN KEY (game_slug) REFERENCES game (slug)
 );
 
 CREATE TABLE project_author

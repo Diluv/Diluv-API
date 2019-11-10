@@ -10,8 +10,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.diluv.api.DiluvAPI;
+import com.diluv.api.database.GameTestDatabase;
 import com.diluv.api.database.ProjectTestDatabase;
 import com.diluv.api.database.UserTestDatabase;
+import com.diluv.api.database.dao.GameDAO;
+import com.diluv.api.database.dao.ProjectDAO;
+import com.diluv.api.database.dao.UserDAO;
 import com.diluv.api.utils.HttpClientUtils;
 import io.undertow.Undertow;
 
@@ -23,12 +27,13 @@ public class UserTest {
     @BeforeClass
     public static void setup () {
 
-        UserTestDatabase userDAO = new UserTestDatabase();
-        ProjectTestDatabase projectDAO = new ProjectTestDatabase();
+        GameDAO gameDAO = new GameTestDatabase();
+        ProjectDAO projectDAO = new ProjectTestDatabase();
+        UserDAO userDAO = new UserTestDatabase();
 
         Undertow server = Undertow.builder()
             .addHttpListener(PORT, IP)
-            .setHandler(DiluvAPI.getHandler(userDAO, projectDAO))
+            .setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, userDAO))
             .build();
         server.start();
     }

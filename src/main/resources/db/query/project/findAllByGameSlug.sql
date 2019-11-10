@@ -11,11 +11,6 @@ SELECT p.name,
 FROM project p,
      game g,
      users u
-WHERE (owner_id=? OR EXISTS(
-        SELECT *
-        FROM project_author
-        WHERE author_id=?
-    ))
-  AND p.slug = g.slug
+WHERE (g.slug = ?)
   AND p.owner_id = u.id
 LIMIT 20;

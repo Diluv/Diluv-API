@@ -6,11 +6,14 @@ import java.util.logging.Logger;
 
 import org.flywaydb.core.Flyway;
 
+import com.diluv.api.database.GameDatabase;
 import com.diluv.api.database.ProjectDatabase;
 import com.diluv.api.database.UserDatabase;
+import com.diluv.api.database.dao.GameDAO;
 import com.diluv.api.database.dao.ProjectDAO;
 import com.diluv.api.database.dao.UserDAO;
 import com.diluv.api.endpoints.v1.auth.AuthAPI;
+import com.diluv.api.endpoints.v1.game.GameAPI;
 import com.diluv.api.endpoints.v1.user.UserAPI;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.cors.CorsHandler;
@@ -35,11 +38,13 @@ public class DiluvAPI {
     private void start () {
 
         migrate();
-        UserDAO userDAO = new UserDatabase();
+        GameDAO gameDAO = new GameDatabase();
         ProjectDAO projectDAO = new ProjectDatabase();
+        UserDAO userDAO = new UserDatabase();
+
         Undertow server = Undertow.builder()
             .addHttpListener(4567, "0.0.0.0")
-            .setHandler(DiluvAPI.getHandler(userDAO, projectDAO))
+            .setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, userDAO))
             .build();
         server.start();
 
@@ -70,11 +75,12 @@ public class DiluvAPI {
      * @param projectDAO The Project DAO to fetch project data
      * @return HttpHandler for all the routes, with cors.
      */
-    public static HttpHandler getHandler (UserDAO userDAO, ProjectDAO projectDAO) {
+    public static HttpHandler getHandler (GameDAO gameDAO, ProjectDAO projectDAO, UserDAO userDAO) {
 
         RoutingHandler routing = Handlers.routing();
         routing.addAll(new AuthAPI());
         routing.addAll(new UserAPI(userDAO, projectDAO));
+        routing.addAll(new GameAPI(gameDAO, projectDAO));
         return new ErrorHandler(new BlockingHandler(new CorsHandler(routing)));
     }
 
