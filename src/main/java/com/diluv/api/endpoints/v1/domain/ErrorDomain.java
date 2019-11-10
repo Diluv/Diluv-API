@@ -6,16 +6,19 @@ public class ErrorDomain implements Domain {
     private final ErrorType type;
     private final String message;
 
-    public ErrorDomain(ErrorType type, String message) {
+    public ErrorDomain (ErrorType type, String message) {
+
         this.type = type;
         this.message = message;
     }
 
-    public String getError() {
+    public String getError () {
+
         return type.getError();
     }
 
-    public String getMessage() {
+    public String getMessage () {
+
         return message;
     }
 }

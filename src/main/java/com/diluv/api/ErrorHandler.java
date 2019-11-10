@@ -7,12 +7,14 @@ public class ErrorHandler implements HttpHandler {
 
     private final HttpHandler next;
 
-    public ErrorHandler(final HttpHandler next) {
+    public ErrorHandler (final HttpHandler next) {
+
         this.next = next;
     }
 
     @Override
-    public void handleRequest(final HttpServerExchange ex) throws Exception {
+    public void handleRequest (final HttpServerExchange ex) throws Exception {
+
         ex.addDefaultResponseListener(exchange -> {
             if (!exchange.isResponseChannelAvailable()) {
                 return false;
@@ -21,10 +23,12 @@ public class ErrorHandler implements HttpHandler {
             if (code == 401) {
                 exchange.getResponseSender().send("ERROR_401");
                 return true;
-            } else if (code == 403) {
+            }
+            else if (code == 403) {
                 exchange.getResponseSender().send("ERROR_403");
                 return true;
-            } else if (code == 500) {
+            }
+            else if (code == 500) {
                 exchange.getResponseSender().send("ERROR_500");
                 return true;
             }

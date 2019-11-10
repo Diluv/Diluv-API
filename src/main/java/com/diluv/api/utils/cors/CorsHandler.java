@@ -20,15 +20,15 @@
  */
 package com.diluv.api.utils.cors;
 
+import java.util.Arrays;
+import java.util.List;
+
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static io.undertow.server.handlers.ResponseCodeHandler.HANDLE_200;
 
@@ -54,12 +54,14 @@ public class CorsHandler implements HttpHandler {
     //TODO Constants.ALLOW_ORIGIN
     private HttpHandler next;
 
-    public CorsHandler(HttpHandler next) {
+    public CorsHandler (HttpHandler next) {
+
         this.next = next;
     }
 
     @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
+    public void handleRequest (HttpServerExchange exchange) throws Exception {
+
         if (CorsUtil.isPreflightedRequest(exchange)) {
             handlePreflightRequest(exchange);
             return;
@@ -69,12 +71,14 @@ public class CorsHandler implements HttpHandler {
 
     }
 
-    private void handlePreflightRequest(HttpServerExchange exchange) throws Exception {
+    private void handlePreflightRequest (HttpServerExchange exchange) throws Exception {
+
         setCorsResponseHeaders(exchange);
         HANDLE_200.handleRequest(exchange);
     }
 
-    private void setCorsResponseHeaders(HttpServerExchange exchange) throws Exception {
+    private void setCorsResponseHeaders (HttpServerExchange exchange) throws Exception {
+
         HeaderMap headers = exchange.getRequestHeaders();
         if (headers.contains(Headers.ORIGIN) && CorsUtil.matchOrigin(exchange, allowedOrigins) != null) {
             exchange.getResponseHeaders().addAll(ACCESS_CONTROL_ALLOW_ORIGIN, headers.get(Headers.ORIGIN));
@@ -84,7 +88,8 @@ public class CorsHandler implements HttpHandler {
         HeaderValues requestedHeaders = headers.get(ACCESS_CONTROL_REQUEST_HEADERS);
         if (requestedHeaders != null && !requestedHeaders.isEmpty()) {
             exchange.getResponseHeaders().addAll(ACCESS_CONTROL_ALLOW_HEADERS, requestedHeaders);
-        } else {
+        }
+        else {
             exchange.getResponseHeaders().add(ACCESS_CONTROL_ALLOW_HEADERS, Headers.CONTENT_TYPE_STRING);
             exchange.getResponseHeaders().add(ACCESS_CONTROL_ALLOW_HEADERS, Headers.WWW_AUTHENTICATE_STRING);
             exchange.getResponseHeaders().add(ACCESS_CONTROL_ALLOW_HEADERS, Headers.AUTHORIZATION_STRING);

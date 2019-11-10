@@ -11,16 +11,19 @@ public enum ErrorType {
     int code;
     String error;
 
-    ErrorType(int code, String error) {
+    ErrorType (int code, String error) {
+
         this.code = code;
         this.error = error;
     }
 
-    public int getCode() {
+    public int getCode () {
+
         return code;
     }
 
-    public String getError() {
+    public String getError () {
+
         return error;
     }
 }

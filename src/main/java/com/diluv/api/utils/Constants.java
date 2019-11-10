@@ -1,6 +1,21 @@
 package com.diluv.api.utils;
 
-import com.nimbusds.jose.JWSAlgorithm;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.commons.io.IOUtils;
 import org.pac4j.core.client.direct.AnonymousClient;
 import org.pac4j.core.config.Config;
@@ -10,17 +25,7 @@ import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordA
 import org.pac4j.jwt.config.signature.RSASignatureConfiguration;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.nimbusds.jose.JWSAlgorithm;
 
 public class Constants {
     private static final PublicKey PUBLIC_KEY = getPublicKey("public.pem");
@@ -38,13 +43,14 @@ public class Constants {
     public static final String REQUEST_JWT_REQUIRED = "HeaderClient";
     public static final String REQUEST_JWT_OPTIONAL = "HeaderClient,AnonymousClient";
 
-
     private static final Logger LOGGER = Logger.getLogger(Constants.class.getName());
 
-    private Constants() {
+    private Constants () {
+
     }
 
-    private static String getRequiredValue(String env) {
+    private static String getRequiredValue (String env) {
+
         String value = System.getenv(env);
         if (value == null) {
             LOGGER.severe("Missing env variable");
@@ -53,7 +59,8 @@ public class Constants {
         return value;
     }
 
-    private static String getValueOrDefault(String env, String defaultValue) {
+    private static String getValueOrDefault (String env, String defaultValue) {
+
         String value = System.getenv(env);
         if (value == null) {
             return defaultValue;
@@ -61,7 +68,8 @@ public class Constants {
         return value;
     }
 
-    public static PrivateKey getPrivateKey(String fileLocation) {
+    public static PrivateKey getPrivateKey (String fileLocation) {
+
         try {
             String privateKey = getKey(fileLocation);
             privateKey = privateKey.replace("-----BEGIN PRIVATE KEY-----", "");
@@ -69,14 +77,16 @@ public class Constants {
             KeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey));
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return keyFactory.generatePrivate(spec);
-        } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException e) {
+        }
+        catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException e) {
             LOGGER.log(Level.SEVERE, "Private Key", e);
         }
         System.exit(1); //TODO Handle better
         return null;
     }
 
-    public static PublicKey getPublicKey(String fileLocation) {
+    public static PublicKey getPublicKey (String fileLocation) {
+
         try {
             String publicKey = getKey(fileLocation);
             publicKey = publicKey.replace("-----BEGIN PUBLIC KEY-----", "");
@@ -84,14 +94,16 @@ public class Constants {
             X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey));
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return keyFactory.generatePublic(spec);
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+        }
+        catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             LOGGER.log(Level.SEVERE, "Public Key", e);
         }
         System.exit(1); //TODO Handle better
         return null;
     }
 
-    public static String getKey(String fileLocation) throws IOException {
+    public static String getKey (String fileLocation) throws IOException {
+
         FileInputStream fileInputStream = new FileInputStream(fileLocation);
         return IOUtils.toString(fileInputStream, Charset.defaultCharset()).replaceAll("\n", "").replaceAll("\r", "");
     }

@@ -14,11 +14,13 @@ public class LoginDomain implements Domain {
      */
     private long expiredAt;
 
-    public LoginDomain(String accessToken) {
+    public LoginDomain (String accessToken) {
+
         this.accessToken = accessToken;
     }
 
-    public String getAccessToken() {
+    public String getAccessToken () {
+
         return accessToken;
     }
 }

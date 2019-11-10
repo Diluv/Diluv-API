@@ -20,15 +20,16 @@
  */
 package com.diluv.api.utils.cors;
 
+import java.util.Collection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Methods;
 import io.undertow.util.NetworkUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
 
 import static io.undertow.util.Headers.ORIGIN;
 
@@ -41,7 +42,8 @@ import static io.undertow.util.Headers.ORIGIN;
 public final class CorsUtil {
     private static final Logger logger = LoggerFactory.getLogger(CorsUtil.class);
 
-    private CorsUtil() {
+    private CorsUtil () {
+
     }
 
     /**
@@ -50,22 +52,24 @@ public final class CorsUtil {
      * @param headers The list of headers sent in the request
      * @return True if the request headers contains origins or access control headers
      */
-    public static boolean isCorsRequest(HeaderMap headers) {
+    public static boolean isCorsRequest (HeaderMap headers) {
+
         return headers.contains(ORIGIN)
-                || headers.contains(CorsHandler.ACCESS_CONTROL_REQUEST_HEADERS)
-                || headers.contains(CorsHandler.ACCESS_CONTROL_REQUEST_METHOD);
+            || headers.contains(CorsHandler.ACCESS_CONTROL_REQUEST_HEADERS)
+            || headers.contains(CorsHandler.ACCESS_CONTROL_REQUEST_METHOD);
     }
 
     /**
      * Match the Origin header with the allowed origins.
      * If it doesn't match then a 403 response code is set on the response and it returns null.
      *
-     * @param exchange       the current HttpExchange.
+     * @param exchange the current HttpExchange.
      * @param allowedOrigins list of sanitized allowed origins.
      * @return the first matching origin, null otherwise.
      * @throws Exception the checked exception
      */
-    public static String matchOrigin(HttpServerExchange exchange, Collection<String> allowedOrigins) throws Exception {
+    public static String matchOrigin (HttpServerExchange exchange, Collection<String> allowedOrigins) throws Exception {
+
         HeaderMap headers = exchange.getRequestHeaders();
         String[] origins = headers.get(ORIGIN).toArray();
         if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
@@ -94,7 +98,8 @@ public final class CorsUtil {
      * @param exchange the current HttpExchange.
      * @return the default origin (aka current server).
      */
-    public static String defaultOrigin(HttpServerExchange exchange) {
+    public static String defaultOrigin (HttpServerExchange exchange) {
+
         String host = NetworkUtils.formatPossibleIpv6Address(exchange.getHostName());
         String protocol = exchange.getRequestScheme();
         int port = exchange.getHostPort();
@@ -110,11 +115,12 @@ public final class CorsUtil {
     /**
      * Checks to see if the request is being made on the default port
      *
-     * @param port     The port the request is being made on
+     * @param port The port the request is being made on
      * @param protocol The protocol the request is using
      * @return True if the port and protocol port match else returns false
      */
-    private static boolean isDefaultPort(int port, String protocol) {
+    private static boolean isDefaultPort (int port, String protocol) {
+
         return (("http".equals(protocol) && 80 == port) || ("https".equals(protocol) && 443 == port));
     }
 
@@ -124,7 +130,8 @@ public final class CorsUtil {
      * @param url the url to be sanitized.
      * @return the sanitized url.
      */
-    public static String sanitizeDefaultPort(String url) {
+    public static String sanitizeDefaultPort (String url) {
+
         int afterSchemeIndex = url.indexOf("://");
         if (afterSchemeIndex < 0) {
             return url;
@@ -152,7 +159,8 @@ public final class CorsUtil {
      * @param exchange The request exchange
      * @return True if the request is a preflight request
      */
-    public static boolean isPreflightedRequest(HttpServerExchange exchange) {
+    public static boolean isPreflightedRequest (HttpServerExchange exchange) {
+
         return Methods.OPTIONS.equals(exchange.getRequestMethod()) && isCorsRequest(exchange.getRequestHeaders());
     }
 }
