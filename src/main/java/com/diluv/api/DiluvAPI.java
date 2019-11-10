@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import org.flywaydb.core.Flyway;
 
 import com.diluv.api.endpoints.v1.auth.AuthAPI;
+import com.diluv.api.endpoints.v1.user.UserAPI;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.cors.CorsHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,6 +68,7 @@ public class DiluvAPI {
 
         RoutingHandler routing = Handlers.routing();
         routing.addAll(new AuthAPI());
+        routing.addAll(new UserAPI());
         return new ErrorHandler(new BlockingHandler(new CorsHandler(routing)));
     }
 
