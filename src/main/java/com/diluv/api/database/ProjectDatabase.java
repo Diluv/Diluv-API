@@ -7,19 +7,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.diluv.api.DiluvAPI;
+import com.diluv.api.database.dao.ProjectDAO;
 import com.diluv.api.database.record.ProjectRecord;
 import com.diluv.api.utils.SQLHandler;
 
-public class ProjectDatabase {
+public class ProjectDatabase implements ProjectDAO {
 
     private static final String FIND_ALL_BY_USERID = SQLHandler.readFile("project/findAllByUserId");
 
-    public static List<ProjectRecord> findAllByUserId (String userId) {
+    @Override
+    public List<ProjectRecord> findAllByUserId (long userId) {
 
         List<ProjectRecord> projects = new ArrayList<>();
         try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(FIND_ALL_BY_USERID)) {
-            stmt.setString(1, userId);
-            stmt.setString(2, userId);
+            stmt.setLong(1, userId);
+            stmt.setLong(2, userId);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {

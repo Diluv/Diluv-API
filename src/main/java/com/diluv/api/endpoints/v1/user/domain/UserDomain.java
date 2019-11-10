@@ -1,9 +1,8 @@
 package com.diluv.api.endpoints.v1.user.domain;
 
 import com.diluv.api.database.record.UserRecord;
-import com.diluv.api.endpoints.v1.domain.Domain;
 
-public class UserDomain implements Domain {
+public class UserDomain {
     private final String username;
     private final String avatarUrl;
 

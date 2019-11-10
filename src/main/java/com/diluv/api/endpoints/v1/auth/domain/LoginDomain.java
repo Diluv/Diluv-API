@@ -1,8 +1,6 @@
 package com.diluv.api.endpoints.v1.auth.domain;
 
-import com.diluv.api.endpoints.v1.domain.Domain;
-
-public class LoginDomain implements Domain {
+public class LoginDomain {
 
     /**
      * Sent to the client, used to make future requests.

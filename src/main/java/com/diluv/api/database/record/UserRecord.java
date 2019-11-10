@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserRecord {
-    private final String id;
+    private final long id;
     private final String username;
     private final String email;
     private final String passwordType;
@@ -14,7 +14,7 @@ public class UserRecord {
 
     public UserRecord (ResultSet rs) throws SQLException {
 
-        this.id = rs.getString("id");
+        this.id = rs.getLong("id");
         this.username = rs.getString("username");
         this.email = rs.getString("email");
         this.passwordType = rs.getString("password_type");
@@ -23,7 +23,18 @@ public class UserRecord {
         this.avatarUrl = rs.getString("avatar_url");
     }
 
-    public String getId () {
+    public UserRecord (long id, String username, String email, String passwordType, boolean mfa, String mfaSecret, String avatarUrl) {
+
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.passwordType = passwordType;
+        this.mfa = mfa;
+        this.mfaSecret = mfaSecret;
+        this.avatarUrl = avatarUrl;
+    }
+
+    public long getId () {
 
         return this.id;
     }

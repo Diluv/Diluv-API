@@ -6,6 +6,10 @@ import java.util.logging.Logger;
 
 import org.flywaydb.core.Flyway;
 
+import com.diluv.api.database.ProjectDatabase;
+import com.diluv.api.database.UserDatabase;
+import com.diluv.api.database.dao.ProjectDAO;
+import com.diluv.api.database.dao.UserDAO;
 import com.diluv.api.endpoints.v1.auth.AuthAPI;
 import com.diluv.api.endpoints.v1.user.UserAPI;
 import com.diluv.api.utils.Constants;
@@ -20,9 +24,7 @@ import io.undertow.server.handlers.BlockingHandler;
 
 public class DiluvAPI {
     private static final Logger LOGGER = Logger.getLogger(DiluvAPI.class.getName());
-
     public static final ObjectMapper MAPPER = new ObjectMapper();
-
     private static Connection connection;
 
     public static void main (String[] args) {
@@ -33,9 +35,11 @@ public class DiluvAPI {
     private void start () {
 
         migrate();
+        UserDAO userDAO = new UserDatabase();
+        ProjectDAO projectDAO = new ProjectDatabase();
         Undertow server = Undertow.builder()
             .addHttpListener(4567, "0.0.0.0")
-            .setHandler(this.getHandler())
+            .setHandler(DiluvAPI.getHandler(userDAO, projectDAO))
             .build();
         server.start();
 
@@ -62,13 +66,15 @@ public class DiluvAPI {
     /**
      * Gets the routes and paths for requests
      *
+     * @param userDAO The User DAO to fetch user data
+     * @param projectDAO The Project DAO to fetch project data
      * @return HttpHandler for all the routes, with cors.
      */
-    public HttpHandler getHandler () {
+    public static HttpHandler getHandler (UserDAO userDAO, ProjectDAO projectDAO) {
 
         RoutingHandler routing = Handlers.routing();
         routing.addAll(new AuthAPI());
-        routing.addAll(new UserAPI());
+        routing.addAll(new UserAPI(userDAO, projectDAO));
         return new ErrorHandler(new BlockingHandler(new CorsHandler(routing)));
     }
 

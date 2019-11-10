@@ -3,11 +3,12 @@ package com.diluv.api.endpoints.v1.user;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.pac4j.core.profile.AnonymousProfile;
 import org.pac4j.undertow.account.Pac4jAccount;
 import org.pac4j.undertow.handler.SecurityHandler;
 
-import com.diluv.api.database.ProjectDatabase;
-import com.diluv.api.database.UserDatabase;
+import com.diluv.api.database.dao.ProjectDAO;
+import com.diluv.api.database.dao.UserDAO;
 import com.diluv.api.database.record.ProjectRecord;
 import com.diluv.api.database.record.UserRecord;
 import com.diluv.api.endpoints.v1.domain.Domain;
@@ -22,8 +23,13 @@ import io.undertow.server.RoutingHandler;
 
 public class UserAPI extends RoutingHandler {
 
-    public UserAPI () {
+    private final UserDAO userDAO;
+    private final ProjectDAO projectDAO;
 
+    public UserAPI (UserDAO userDAO, ProjectDAO projectDAO) {
+
+        this.userDAO = userDAO;
+        this.projectDAO = projectDAO;
         this.get("/v1/user/{username}", SecurityHandler.build(this::getUserByUsername, Constants.CONFIG, Constants.REQUEST_JWT_OPTIONAL));
         this.get("/v1/user/{username}/projects", SecurityHandler.build(this::getProjectsByUsername, Constants.CONFIG, Constants.REQUEST_JWT_OPTIONAL));
     }
@@ -32,7 +38,7 @@ public class UserAPI extends RoutingHandler {
 
         String usernameParam = RequestUtil.getParam(exchange, "username");
         if (usernameParam == null) {
-            // Error
+            // TODO Error, this probably shouldn't ever error, but check it in case
             return null;
         }
         boolean authorized = false;
@@ -40,29 +46,29 @@ public class UserAPI extends RoutingHandler {
         String username;
         if ("me".equalsIgnoreCase(usernameParam)) {
             Pac4jAccount account = RequestUtil.getAccount(exchange);
-            if (account != null) {
+            if (account != null && !(account.getProfile() instanceof AnonymousProfile)) {
                 username = account.getProfile().getUsername();
                 authorized = true;
             }
             else {
                 // TODO Error, means they were asking for "me", but didn't supply a valid access token
-                return null;
+                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
             }
         }
         else {
             username = usernameParam;
         }
         // Todo fetch user from me/username, if logged in fetch additional data
-        UserRecord userRecord = UserDatabase.findOneByUsername(username);
+        UserRecord userRecord = this.userDAO.findOneByUsername(username);
         if (userRecord == null) {
             // TODO Error, Database select error or a connection error, this should be logged as it could show a larger problem
-            return null;
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "User not found");
         }
 
         if (authorized) {
             return null;
         }
-        return new UserDomain(userRecord);
+        return ResponseUtil.successResponse(exchange, new UserDomain(userRecord));
     }
 
     private Domain getProjectsByUsername (HttpServerExchange exchange) {
@@ -70,7 +76,7 @@ public class UserAPI extends RoutingHandler {
         // TODO Implement a filter/pagination
         String usernameParam = RequestUtil.getParam(exchange, "username");
         if (usernameParam == null) {
-            // Error
+            // TODO Error, same as above. And move to this code to a central location
             return null;
         }
         String username;
@@ -89,8 +95,8 @@ public class UserAPI extends RoutingHandler {
         }
 
         // GET USER ID FROM USERNAME
-        String userId = UserDatabase.findUserIdByUsername(username);
-        List<ProjectRecord> projectRecords = ProjectDatabase.findAllByUserId(userId);
+        long userId = this.userDAO.findUserIdByUsername(username);
+        List<ProjectRecord> projectRecords = this.projectDAO.findAllByUserId(userId);
         List<ProjectDomain> projects = projectRecords.stream().map(ProjectDomain::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, projects);
     }
