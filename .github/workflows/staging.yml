@@ -33,11 +33,5 @@ jobs:
       - name: Test
         run: ./gradlew test
 
-      - name: Sonarcloud
-        run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_LOGIN }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-          SONAR_LOGIN: ${{ secrets.SONAR_LOGIN }}
-
-      - name: Build with Gradle
+so      - name: Build with Gradle
         run: ./gradlew build
