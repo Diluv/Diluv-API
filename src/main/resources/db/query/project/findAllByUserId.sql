@@ -8,12 +8,12 @@ SELECT p.name,
        p.updated_at,
        g.name     AS game_name,
        u.username as owner_username
-FROM project p,
-     game g,
+FROM projects p,
+     games g,
      users u
 WHERE (owner_id=? OR EXISTS(
         SELECT *
-        FROM project_author
+        FROM project_authors
         WHERE author_id=?
     ))
   AND p.slug = g.slug

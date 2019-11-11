@@ -1,4 +1,4 @@
 SELECT *
-FROM game
+FROM games
 WHERE slug = ?
 LIMIT 1

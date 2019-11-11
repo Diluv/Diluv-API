@@ -1,7 +1,7 @@
 # This will be updated up until production
 CREATE TABLE users
 (
-    id            BIGINT AUTO_INCREMENT,
+    id            BIGINT       NOT NULL AUTO_INCREMENT,
     username      VARCHAR(30)  NOT NULL UNIQUE,
     email         VARCHAR(255) NOT NULL UNIQUE,
     password      CHAR(60)     NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE users
     PRIMARY KEY (id)
 );
 
-CREATE TABLE user_mfa_recovery
+CREATE TABLE user_mfa_recoveries
 (
     user_id  BIGINT       NOT NULL,
 
@@ -26,7 +26,7 @@ CREATE TABLE user_mfa_recovery
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE TABLE game
+CREATE TABLE games
 (
     slug VARCHAR(200) NOT NULL,
 
@@ -36,9 +36,9 @@ CREATE TABLE game
     PRIMARY KEY (slug)
 );
 
-CREATE TABLE game_modloader
+CREATE TABLE game_modloaders
 (
-    id        BIGINT AUTO_INCREMENT,
+    id        BIGINT       NOT NULL AUTO_INCREMENT,
 
     game_slug VARCHAR(200) NOT NULL,
     name      VARCHAR(255) NOT NULL,
@@ -46,12 +46,12 @@ CREATE TABLE game_modloader
     url       VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (game_slug) REFERENCES game (slug)
+    FOREIGN KEY (game_slug) REFERENCES games (slug)
 );
 
-CREATE TABLE game_version
+CREATE TABLE game_versions
 (
-    id        BIGINT AUTO_INCREMENT,
+    id        BIGINT       NOT NULL AUTO_INCREMENT,
 
     game_slug VARCHAR(200) NOT NULL,
     version   VARCHAR(255) NOT NULL,
@@ -59,34 +59,47 @@ CREATE TABLE game_version
     url       VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (game_slug) REFERENCES game (slug)
+    FOREIGN KEY (game_slug) REFERENCES games (slug)
+);
+
+CREATE TABLE project_types
+(
+    slug      VARCHAR(200) NOT NULL,
+    name      VARCHAR(200) NOT NULL,
+
+    game_slug VARCHAR(200) NOT NULL,
+
+    PRIMARY KEY (slug),
+    FOREIGN KEY (game_slug) REFERENCES games (slug)
 );
 
 # Project
-CREATE TABLE project
+CREATE TABLE projects
 (
-    id              BIGINT AUTO_INCREMENT,
-    name            VARCHAR(255)    NOT NULL,
-    slug            VARCHAR(255)    NOT NULL,
-    summary         VARCHAR(255)    NOT NULL,
-    description     VARCHAR(255)    NOT NULL,
-    logo_url        VARCHAR(255)    NOT NULL,
-    cache_downloads BIGINT UNSIGNED NOT NULL,
+    id                BIGINT          NOT NULL AUTO_INCREMENT,
+    name              VARCHAR(255)    NOT NULL,
+    slug              VARCHAR(255)    NOT NULL,
+    summary           VARCHAR(255)    NOT NULL,
+    description       VARCHAR(255)    NOT NULL,
+    logo_url          VARCHAR(255)    NOT NULL,
+    cache_downloads   BIGINT UNSIGNED NOT NULL,
 
-    created_at      TIMESTAMP DEFAULT NOW(),
-    updated_at      TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
+    created_at        TIMESTAMP DEFAULT NOW(),
+    updated_at        TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
 
-    owner_id        BIGINT          NOT NULL,
-    game_slug       VARCHAR(200)    NOT NULL,
+    owner_id          BIGINT          NOT NULL,
+    project_type_slug VARCHAR(200)    NOT NULL,
 
     PRIMARY KEY (id),
     FOREIGN KEY (owner_id) REFERENCES users (id),
-    FOREIGN KEY (game_slug) REFERENCES game (slug)
+    FOREIGN KEY (project_type_slug) REFERENCES project_types (slug)
 );
 
-CREATE TABLE project_author
+
+
+CREATE TABLE project_authors
 (
-    id            BIGINT AUTO_INCREMENT,
+    id            BIGINT       NOT NULL AUTO_INCREMENT,
 
     project_id    BIGINT       NOT NULL,
     author_id     BIGINT       NOT NULL,
@@ -95,17 +108,17 @@ CREATE TABLE project_author
 
     uploaded_file BOOL DEFAULT FALSE,
     PRIMARY KEY (id),
-    FOREIGN KEY (project_id) REFERENCES project (id),
+    FOREIGN KEY (project_id) REFERENCES projects (id),
     FOREIGN KEY (author_id) REFERENCES users (id)
 );
 
-CREATE TABLE project_author_permission
+CREATE TABLE project_author_permissions
 (
     project_author_id BIGINT       NOT NULL,
     permission        VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (project_author_id, permission),
-    FOREIGN KEY (project_author_id) REFERENCES project_author (id)
+    FOREIGN KEY (project_author_id) REFERENCES project_authors (id)
 );
 
 CREATE TABLE project_links
@@ -115,12 +128,12 @@ CREATE TABLE project_links
     url        VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (project_id, type),
-    FOREIGN KEY (project_id) REFERENCES project (id)
+    FOREIGN KEY (project_id) REFERENCES projects (id)
 );
 
-CREATE TABLE project_file
+CREATE TABLE project_files
 (
-    id         BIGINT AUTO_INCREMENT,
+    id         BIGINT          NOT NULL AUTO_INCREMENT,
 
     sha512     VARCHAR(255)    NOT NULL,
     crc32      VARCHAR(255)    NOT NULL,
@@ -137,28 +150,28 @@ CREATE TABLE project_file
     user_id    BIGINT          NOT NULL,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (project_id) REFERENCES project (id),
+    FOREIGN KEY (project_id) REFERENCES projects (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE TABLE project_file_version
+CREATE TABLE project_file_versions
 (
     project_file_id BIGINT NOT NULL,
     game_version_id BIGINT NOT NULL,
 
     PRIMARY KEY (project_file_id, game_version_id),
-    FOREIGN KEY (project_file_id) REFERENCES project_file (id),
-    FOREIGN KEY (game_version_id) REFERENCES game_version (id)
+    FOREIGN KEY (project_file_id) REFERENCES project_files (id),
+    FOREIGN KEY (game_version_id) REFERENCES game_versions (id)
 );
 
-CREATE TABLE project_file_modloader
+CREATE TABLE project_file_modloaders
 (
     project_file_id BIGINT NOT NULL,
     modloader_id    BIGINT NOT NULL,
 
     PRIMARY KEY (project_file_id, modloader_id),
-    FOREIGN KEY (project_file_id) REFERENCES project_file (id),
-    FOREIGN KEY (modloader_id) REFERENCES game_modloader (id)
+    FOREIGN KEY (project_file_id) REFERENCES project_files (id),
+    FOREIGN KEY (modloader_id) REFERENCES game_modloaders (id)
 );
 
 # Project File Queue
@@ -168,10 +181,10 @@ CREATE TABLE project_file_queue
     process_name    VARCHAR(255) NOT NULL,
 
     PRIMARY KEY (project_file_id, process_name),
-    FOREIGN KEY (project_file_id) REFERENCES project_file (id)
+    FOREIGN KEY (project_file_id) REFERENCES project_files (id)
 );
 
-CREATE TABLE nodecraft
+CREATE TABLE nodecraft_commits
 (
     id         VARCHAR(36) NOT NULL,
 
