@@ -13,11 +13,13 @@ public class ProjectTestDatabase implements ProjectDAO {
 
     private final List<ProjectRecord> projectRecords;
     private final List<ProjectTypeRecord> projectTypeRecords;
+    private final List<ProjectFileRecord> projectFileRecords;
 
     public ProjectTestDatabase () {
 
         this.projectRecords = FileReader.readJsonFolder("projects", ProjectRecord.class);
         this.projectTypeRecords = FileReader.readJsonFolder("project_types", ProjectTypeRecord.class);
+        this.projectFileRecords = FileReader.readJsonFolder("project_files", ProjectFileRecord.class);
     }
 
     @Override
@@ -59,6 +61,10 @@ public class ProjectTestDatabase implements ProjectDAO {
     @Override
     public List<ProjectFileRecord> findAllProjectFilesByGameSlugAndProjectType (String gameSlug, String projectTypeSlug, String projectSlug) {
 
-        return null;
+        ProjectRecord project = this.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (project == null) {
+            return null;
+        }
+        return this.projectFileRecords.stream().filter(projectRecord -> projectRecord.getProjectId() == project.getId()).collect(Collectors.toList());
     }
 }

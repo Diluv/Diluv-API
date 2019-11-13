@@ -5,15 +5,23 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class ProjectFileRecord {
-    private final long id;
-    private final String sha512;
-    private final String crc32;
-    private final long size;
-    private final String changelog;
-    private final Timestamp createdAt;
-    private final Timestamp updatedAt;
-    private final boolean reviewed;
-    private final boolean released;
+
+    private long id;
+    private String sha512;
+    private String crc32;
+    private long size;
+    private String changelog;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
+    private boolean reviewed;
+    private boolean released;
+    private long projectId;
+    private long userId;
+
+
+    public ProjectFileRecord () {
+        
+    }
 
     public ProjectFileRecord (ResultSet rs) throws SQLException {
 
@@ -26,53 +34,62 @@ public class ProjectFileRecord {
         this.updatedAt = rs.getTimestamp("updated_at");
         this.reviewed = rs.getBoolean("reviewed");
         this.released = rs.getBoolean("released");
-//        this.id = rs.getString("project_id");
-//        this.id = rs.getString("user_id");
+        this.projectId = rs.getLong("project_id");
+        this.userId = rs.getLong("user_id");
     }
-
 
     public long getId () {
 
-       return this.id;
+        return this.id;
     }
 
     public String getSha512 () {
 
-       return this.sha512;
+        return this.sha512;
     }
 
     public String getCrc32 () {
 
-       return this.crc32;
+        return this.crc32;
     }
 
     public long getSize () {
 
-       return this.size;
+        return this.size;
     }
 
     public String getChangelog () {
 
-       return this.changelog;
+        return this.changelog;
     }
 
     public Timestamp getCreatedAt () {
 
-       return this.createdAt;
+        return this.createdAt;
     }
 
     public Timestamp getUpdatedAt () {
 
-       return this.updatedAt;
+        return this.updatedAt;
     }
 
     public boolean isReviewed () {
 
-       return this.reviewed;
+        return this.reviewed;
     }
 
     public boolean isReleased () {
 
-       return this.released;
+        return this.released;
+    }
+
+    public long getProjectId () {
+
+        return projectId;
+    }
+
+    public long getUserId () {
+
+        return userId;
     }
 }
