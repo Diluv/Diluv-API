@@ -33,5 +33,5 @@ jobs:
       - name: Test
         run: ./gradlew test
 
-so      - name: Build with Gradle
+      - name: Build with Gradle
         run: ./gradlew build

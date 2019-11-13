@@ -48,7 +48,7 @@ public class GameAPI extends RoutingHandler {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         if (gameSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
 
@@ -64,7 +64,7 @@ public class GameAPI extends RoutingHandler {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         if (gameSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
 
@@ -78,13 +78,13 @@ public class GameAPI extends RoutingHandler {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         if (gameSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
 
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
         if (projectTypeSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
 
@@ -101,12 +101,12 @@ public class GameAPI extends RoutingHandler {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         if (gameSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
         if (projectTypeSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
 
@@ -119,18 +119,18 @@ public class GameAPI extends RoutingHandler {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         if (gameSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
         if (projectTypeSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
 
         String projectSlug = RequestUtil.getParam(exchange, "project_slug");
         if (projectSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
 
@@ -146,18 +146,18 @@ public class GameAPI extends RoutingHandler {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         if (gameSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
         if (projectTypeSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
 
         String projectSlug = RequestUtil.getParam(exchange, "project_slug");
         if (projectSlug == null) {
-            // Error, shouldn't happen, but it can
+            // TODO Error, shouldn't happen, but it can
             return null;
         }
 

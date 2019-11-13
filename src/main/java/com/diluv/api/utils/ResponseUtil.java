@@ -34,7 +34,7 @@ public class ResponseUtil {
 
     public static Domain successResponse (HttpServerExchange exchange, Object data) {
 
-        return response(exchange, 200, new DataDomain(data));
+        return response(exchange, 200, new DataDomain<>(data));
     }
 
     public static Domain errorResponse (HttpServerExchange exchange, ErrorType errorType, String message) {
