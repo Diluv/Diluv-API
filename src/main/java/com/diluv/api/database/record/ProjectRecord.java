@@ -4,19 +4,26 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ProjectRecord {
-    private final String name;
-    private final String slug;
-    private final String summary;
-    private final String description;
-    private final String logoUrl;
-    private final long cachedDownloads;
-    private final long createdAt;
-    private final long updatedAt;
-    private final String game;
-    private final String username;
+    private long id;
+    private String name;
+    private String slug;
+    private String summary;
+    private String description;
+    private String logoUrl;
+    private long cachedDownloads;
+    private long createdAt;
+    private long updatedAt;
+    private long ownerId;
+    private String gameSlug;
+    private String projectTypeSlug;
+
+    public ProjectRecord () {
+
+    }
 
     public ProjectRecord (ResultSet rs) throws SQLException {
 
+        this.id = rs.getLong("id");
         this.name = rs.getString("name");
         this.slug = rs.getString("slug");
         this.summary = rs.getString("summary");
@@ -25,8 +32,14 @@ public class ProjectRecord {
         this.cachedDownloads = rs.getLong("cached_downloads");
         this.createdAt = rs.getTimestamp("created_at").getTime();
         this.updatedAt = rs.getTimestamp("updated_at").getTime();
-        this.game = rs.getString("game_name");
-        this.username = rs.getString("owner_username");
+        this.ownerId = rs.getLong("owner_id");
+        this.gameSlug = rs.getString("game_slug");
+        this.projectTypeSlug = rs.getString("project_type_slug");
+    }
+
+    public long getId () {
+
+        return this.id;
     }
 
     public String getName () {
@@ -69,13 +82,18 @@ public class ProjectRecord {
         return this.updatedAt;
     }
 
-    public String getGame () {
+    public long getOwnerId () {
 
-        return game;
+        return this.ownerId;
     }
 
-    public String getUsername () {
+    public String getGameSlug () {
 
-        return username;
+        return gameSlug;
+    }
+
+    public String getProjectTypeSlug () {
+
+        return projectTypeSlug;
     }
 }

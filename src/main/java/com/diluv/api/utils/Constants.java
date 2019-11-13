@@ -19,9 +19,7 @@ import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.pac4j.core.client.direct.AnonymousClient;
 import org.pac4j.core.config.Config;
-import org.pac4j.http.client.direct.DirectFormClient;
 import org.pac4j.http.client.direct.HeaderClient;
-import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
 import org.pac4j.jwt.config.signature.RSASignatureConfiguration;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 
@@ -30,16 +28,14 @@ import com.nimbusds.jose.JWSAlgorithm;
 public class Constants {
     private static final PublicKey PUBLIC_KEY = getPublicKey("public.pem");
     private static final PrivateKey PRIVATE_KEY = getPrivateKey("private.pem");
-    public static final RSASignatureConfiguration RSA_SIGNATURE_CONFIGURATION = new RSASignatureConfiguration(new KeyPair(PUBLIC_KEY, PRIVATE_KEY), JWSAlgorithm.ES256);
+    public static final RSASignatureConfiguration RSA_SIGNATURE_CONFIGURATION = new RSASignatureConfiguration(new KeyPair(PUBLIC_KEY, PRIVATE_KEY), JWSAlgorithm.RS512);
     private static final HeaderClient HEADER_CLIENT = new HeaderClient("Authorization", "Bearer ", new JwtAuthenticator(RSA_SIGNATURE_CONFIGURATION));
-    private static final DirectFormClient DIRECT_FORM_CLIENT = new DirectFormClient(new SimpleTestUsernamePasswordAuthenticator());
 
     public static final String DB_HOSTNAME = getValueOrDefault("DB_HOSTNAME", "jdbc:mariadb://localhost:3306/diluv");
     public static final String DB_USERNAME = getValueOrDefault("DB_USERNAME", "root");
     public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
 
-    public static final Config CONFIG = new Config(DIRECT_FORM_CLIENT, HEADER_CLIENT, new AnonymousClient());
-    public static final String REQUEST_LOGIN = "DirectFormClient";
+    public static final Config CONFIG = new Config(HEADER_CLIENT, new AnonymousClient());
     public static final String REQUEST_JWT_REQUIRED = "HeaderClient";
     public static final String REQUEST_JWT_OPTIONAL = "HeaderClient,AnonymousClient";
 

@@ -64,12 +64,12 @@ CREATE TABLE game_versions
 
 CREATE TABLE project_types
 (
+    game_slug VARCHAR(200) NOT NULL,
     slug      VARCHAR(200) NOT NULL,
+
     name      VARCHAR(200) NOT NULL,
 
-    game_slug VARCHAR(200) NOT NULL,
-
-    PRIMARY KEY (slug),
+    PRIMARY KEY (game_slug, slug),
     FOREIGN KEY (game_slug) REFERENCES games (slug)
 );
 
@@ -88,14 +88,13 @@ CREATE TABLE projects
     updated_at        TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
 
     owner_id          BIGINT          NOT NULL,
+    game_slug         VARCHAR(200)    NOT NULL,
     project_type_slug VARCHAR(200)    NOT NULL,
-
     PRIMARY KEY (id),
     FOREIGN KEY (owner_id) REFERENCES users (id),
-    FOREIGN KEY (project_type_slug) REFERENCES project_types (slug)
+    FOREIGN KEY (game_slug, project_type_slug) REFERENCES project_types (game_slug, slug),
+    FOREIGN KEY (game_slug) REFERENCES games (slug)
 );
-
-
 
 CREATE TABLE project_authors
 (
@@ -135,11 +134,12 @@ CREATE TABLE project_files
 (
     id         BIGINT          NOT NULL AUTO_INCREMENT,
 
-    sha512     VARCHAR(255)    NOT NULL,
-    crc32      VARCHAR(255)    NOT NULL,
+    name       VARCHAR(255)    NOT NULL,
+    sha512     VARCHAR(128)    NOT NULL,
+    crc32      VARCHAR(8)      NOT NULL,
     size       BIGINT UNSIGNED NOT NULL,
 
-    changelog  VARCHAR(255)    NOT NULL,
+    changelog  TEXT            NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
 

@@ -7,11 +7,11 @@ public class GameDomain {
     private final String name;
     private final String url;
 
-    public GameDomain (GameRecord gameRecord) {
+    public GameDomain (GameRecord rs) {
 
-        this.slug = gameRecord.getSlug();
-        this.name = gameRecord.getName();
-        this.url = gameRecord.getUrl();
+        this.slug = rs.getSlug();
+        this.name = rs.getName();
+        this.url = rs.getUrl();
     }
 
     public String getSlug () {

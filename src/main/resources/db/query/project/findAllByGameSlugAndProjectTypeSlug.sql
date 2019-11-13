@@ -11,6 +11,6 @@ SELECT p.name,
 FROM projects p,
      games g,
      users u
-WHERE (g.slug = ?)
+WHERE (p.game_slug=? AND p.project_type_slug=?)
   AND p.owner_id = u.id
 LIMIT 20;

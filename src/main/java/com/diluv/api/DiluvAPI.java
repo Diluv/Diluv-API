@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
+import com.diluv.api.utils.ErrorHandler;
 import org.flywaydb.core.Flyway;
 
 import com.diluv.api.database.GameDatabase;
@@ -78,7 +79,7 @@ public class DiluvAPI {
     public static HttpHandler getHandler (GameDAO gameDAO, ProjectDAO projectDAO, UserDAO userDAO) {
 
         RoutingHandler routing = Handlers.routing();
-        routing.addAll(new AuthAPI());
+        routing.addAll(new AuthAPI(userDAO));
         routing.addAll(new UserAPI(userDAO, projectDAO));
         routing.addAll(new GameAPI(gameDAO, projectDAO));
         return new ErrorHandler(new BlockingHandler(new CorsHandler(routing)));

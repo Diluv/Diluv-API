@@ -1,8 +1,10 @@
-package com.diluv.api;
+package com.diluv.api.utils;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 
+
+// TODO Temp actually handle properly
 public class ErrorHandler implements HttpHandler {
 
     private final HttpHandler next;

@@ -1,0 +1,10 @@
+{
+    "id": 0,
+    "username": "darkhax",
+    "email": "darkhax@example.com",
+    "password": "$2y$12$OD8opBnKUrk2XlhYoSMrk.3.A910emMHgtkc7TxnK7dHyj3K7H7xS",
+    "passwordType": "bcrypt",
+    "mfa": true,
+    "mfaSecret": "secret",
+    "avatarUrl": "https://via.placeholder.com/150"
+}

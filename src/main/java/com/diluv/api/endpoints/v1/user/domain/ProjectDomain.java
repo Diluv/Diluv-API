@@ -11,8 +11,6 @@ public class ProjectDomain {
     private final long cachedDownloads;
     private final long createdAt;
     private final long updatedAt;
-    private final String game;
-    private final String username;
 
     public ProjectDomain (ProjectRecord projectRecord) {
 
@@ -24,57 +22,45 @@ public class ProjectDomain {
         this.cachedDownloads = projectRecord.getCachedDownloads();
         this.createdAt = projectRecord.getCreatedAt();
         this.updatedAt = projectRecord.getUpdatedAt();
-        this.game = projectRecord.getGame();
-        this.username = projectRecord.getUsername();
     }
 
     public String getName () {
 
-        return name;
+        return this.name;
     }
 
     public String getSlug () {
 
-        return slug;
+        return this.slug;
     }
 
     public String getSummary () {
 
-        return summary;
+        return this.summary;
     }
 
     public String getDescription () {
 
-        return description;
+        return this.description;
     }
 
     public String getLogoUrl () {
 
-        return logoUrl;
+        return this.logoUrl;
     }
 
     public long getCachedDownloads () {
 
-        return cachedDownloads;
+        return this.cachedDownloads;
     }
 
     public long getCreatedAt () {
 
-        return createdAt;
+        return this.createdAt;
     }
 
     public long getUpdatedAt () {
 
-        return updatedAt;
-    }
-
-    public String getGame () {
-
-        return game;
-    }
-
-    public String getUsername () {
-
-        return username;
+        return this.updatedAt;
     }
 }

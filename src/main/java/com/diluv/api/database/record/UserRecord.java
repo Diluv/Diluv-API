@@ -4,30 +4,37 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserRecord {
-    private final long id;
-    private final String username;
-    private final String email;
-    private final String passwordType;
-    private final boolean mfa;
-    private final String mfaSecret;
-    private final String avatarUrl;
+    private long id;
+    private String username;
+    private String email;
+    private String password;
+    private String passwordType;
+    private boolean mfa;
+    private String mfaSecret;
+    private String avatarUrl;
+
+    public UserRecord () {
+
+    }
 
     public UserRecord (ResultSet rs) throws SQLException {
 
         this.id = rs.getLong("id");
         this.username = rs.getString("username");
         this.email = rs.getString("email");
+        this.password = rs.getString("password");
         this.passwordType = rs.getString("password_type");
         this.mfa = rs.getBoolean("mfa");
         this.mfaSecret = rs.getString("mfa_secret");
         this.avatarUrl = rs.getString("avatar_url");
     }
 
-    public UserRecord (long id, String username, String email, String passwordType, boolean mfa, String mfaSecret, String avatarUrl) {
+    public UserRecord (long id, String username, String email, String password, String passwordType, boolean mfa, String mfaSecret, String avatarUrl) {
 
         this.id = id;
         this.username = username;
         this.email = email;
+        this.password = password;
         this.passwordType = passwordType;
         this.mfa = mfa;
         this.mfaSecret = mfaSecret;
@@ -47,6 +54,11 @@ public class UserRecord {
     public String getEmail () {
 
         return this.email;
+    }
+
+    public String getPassword () {
+
+        return this.password;
     }
 
     public String getPasswordType () {

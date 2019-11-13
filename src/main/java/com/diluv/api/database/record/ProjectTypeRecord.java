@@ -3,25 +3,25 @@ package com.diluv.api.database.record;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class GameRecord {
+public class ProjectTypeRecord {
     private String slug;
     private String name;
-    private String url;
+    private String gameSlug;
 
-    public GameRecord () {
+    public ProjectTypeRecord () {
 
     }
 
-    public GameRecord (ResultSet rs) throws SQLException {
+    public ProjectTypeRecord (ResultSet rs) throws SQLException {
 
         this.slug = rs.getString("slug");
         this.name = rs.getString("name");
-        this.url = rs.getString("url");
+        this.gameSlug = rs.getString("game_slug");
     }
 
     public String getSlug () {
 
-        return slug;
+        return this.slug;
     }
 
     public String getName () {
@@ -29,8 +29,8 @@ public class GameRecord {
         return this.name;
     }
 
-    public String getUrl () {
+    public String getGameSlug () {
 
-        return this.url;
+        return this.gameSlug;
     }
 }

@@ -12,6 +12,7 @@ import com.diluv.api.database.dao.UserDAO;
 import com.diluv.api.database.record.ProjectRecord;
 import com.diluv.api.database.record.UserRecord;
 import com.diluv.api.endpoints.v1.domain.Domain;
+import com.diluv.api.endpoints.v1.user.domain.AuthorizedUserDomain;
 import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
 import com.diluv.api.endpoints.v1.user.domain.UserDomain;
 import com.diluv.api.utils.Constants;
@@ -30,8 +31,8 @@ public class UserAPI extends RoutingHandler {
 
         this.userDAO = userDAO;
         this.projectDAO = projectDAO;
-        this.get("/v1/user/{username}", SecurityHandler.build(this::getUserByUsername, Constants.CONFIG, Constants.REQUEST_JWT_OPTIONAL));
-        this.get("/v1/user/{username}/projects", SecurityHandler.build(this::getProjectsByUsername, Constants.CONFIG, Constants.REQUEST_JWT_OPTIONAL));
+        this.get("/v1/users/{username}", SecurityHandler.build(this::getUserByUsername, Constants.CONFIG, Constants.REQUEST_JWT_OPTIONAL));
+        this.get("/v1/users/{username}/projects", SecurityHandler.build(this::getProjectsByUsername, Constants.CONFIG, Constants.REQUEST_JWT_OPTIONAL));
     }
 
     private Domain getUserByUsername (HttpServerExchange exchange) {
@@ -43,21 +44,27 @@ public class UserAPI extends RoutingHandler {
         }
         boolean authorized = false;
 
-        String username;
-        if ("me".equalsIgnoreCase(usernameParam)) {
-            Pac4jAccount account = RequestUtil.getAccount(exchange);
-            if (account != null && !(account.getProfile() instanceof AnonymousProfile)) {
+        String username = usernameParam;
+        Pac4jAccount account = RequestUtil.getAccount(exchange);
+        if (account != null && !(account.getProfile() instanceof AnonymousProfile)) {
+            if ("me".equalsIgnoreCase(usernameParam)) {
                 username = account.getProfile().getUsername();
                 authorized = true;
             }
-            else {
-                // TODO Error, means they were asking for "me", but didn't supply a valid access token
-                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
+            else if (usernameParam.equals(account.getProfile().getUsername())) {
+                authorized = true;
             }
         }
-        else {
-            username = usernameParam;
+        else if ("me".equalsIgnoreCase(usernameParam)) {
+            // TODO Error, means they were asking for "me", but didn't supply a valid access token
+            return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
         }
+
+
+        if (username == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Invalid username param.");
+        }
+
         // Todo fetch user from me/username, if logged in fetch additional data
         UserRecord userRecord = this.userDAO.findOneByUsername(username);
         if (userRecord == null) {
@@ -66,7 +73,7 @@ public class UserAPI extends RoutingHandler {
         }
 
         if (authorized) {
-            return null;
+            return ResponseUtil.successResponse(exchange, new AuthorizedUserDomain(userRecord));
         }
         return ResponseUtil.successResponse(exchange, new UserDomain(userRecord));
     }
@@ -79,23 +86,33 @@ public class UserAPI extends RoutingHandler {
             // TODO Error, same as above. And move to this code to a central location
             return null;
         }
-        String username;
-        if ("me".equalsIgnoreCase(usernameParam)) {
-            Pac4jAccount account = RequestUtil.getAccount(exchange);
-            if (account != null) {
+        boolean authorized = false;
+        String username = usernameParam;
+        Pac4jAccount account = RequestUtil.getAccount(exchange);
+        if (account != null && !(account.getProfile() instanceof AnonymousProfile)) {
+            if ("me".equalsIgnoreCase(usernameParam)) {
                 username = account.getProfile().getUsername();
+                authorized = true;
             }
-            else {
-                // TODO Error, means they were asking for "me", but didn't supply a valid access token
-                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
+            else if (usernameParam.equals(account.getProfile().getUsername())) {
+                authorized = true;
             }
         }
-        else {
-            username = usernameParam;
+        else if ("me".equalsIgnoreCase(usernameParam)) {
+            // TODO Error, means they were asking for "me", but didn't supply a valid access token
+            return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
         }
 
-        // GET USER ID FROM USERNAME
-        long userId = this.userDAO.findUserIdByUsername(username);
+
+        if (username == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Invalid username param.");
+        }
+
+        Long userId = this.userDAO.findUserIdByUsername(username);
+        if (userId == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "User not found");
+        }
+        //TODO Maybe switch to a singular SQL statement
         List<ProjectRecord> projectRecords = this.projectDAO.findAllByUserId(userId);
         List<ProjectDomain> projects = projectRecords.stream().map(ProjectDomain::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, projects);

@@ -2,21 +2,34 @@ package com.diluv.api.endpoints.v1.auth;
 
 import java.util.Calendar;
 
+import org.pac4j.core.config.Config;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.http.client.direct.DirectFormClient;
 import org.pac4j.jwt.profile.JwtGenerator;
 import org.pac4j.undertow.account.Pac4jAccount;
 import org.pac4j.undertow.handler.SecurityHandler;
 
+import com.diluv.api.database.dao.UserDAO;
+import com.diluv.api.endpoints.v1.domain.Domain;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.RequestUtil;
+import com.diluv.api.utils.auth.UserAuthenticator;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 
 public class AuthAPI extends RoutingHandler {
 
-    public AuthAPI () {
+    public AuthAPI (UserDAO userDAO) {
 
-        this.post("/v1/auth/login", SecurityHandler.build(this::login, Constants.CONFIG, Constants.REQUEST_LOGIN));
+        final DirectFormClient directFormClient = new DirectFormClient(new UserAuthenticator(userDAO));
+        this.post("/v1/auth/register", this::register);
+        this.post("/v1/auth/login", SecurityHandler.build(this::login, new Config(directFormClient), "DirectFormClient"));
+    }
+
+    private Domain register (HttpServerExchange exchange) {
+
+        // TODO Write the register handler
+        return null;
     }
 
     /**
@@ -24,7 +37,7 @@ public class AuthAPI extends RoutingHandler {
      *
      * @param exchange The http request being made
      */
-    private void login (HttpServerExchange exchange) {
+    private Domain login (HttpServerExchange exchange) {
 
         String token;
         final Pac4jAccount account = RequestUtil.getAccount(exchange);
@@ -39,5 +52,8 @@ public class AuthAPI extends RoutingHandler {
             exchange.getResponseSender().send(token);
             exchange.endExchange();
         }
+
+        //TODO Error out properly, and respond.
+        return null;
     }
 }
