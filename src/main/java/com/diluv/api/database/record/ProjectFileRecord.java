@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 public class ProjectFileRecord {
 
     private long id;
+    private String name;
     private String sha512;
     private String crc32;
     private long size;
@@ -20,12 +21,13 @@ public class ProjectFileRecord {
 
 
     public ProjectFileRecord () {
-        
+
     }
 
     public ProjectFileRecord (ResultSet rs) throws SQLException {
 
         this.id = rs.getLong("id");
+        this.name = rs.getString("name");
         this.sha512 = rs.getString("sha512");
         this.crc32 = rs.getString("crc32");
         this.size = rs.getLong("size");
@@ -41,6 +43,11 @@ public class ProjectFileRecord {
     public long getId () {
 
         return this.id;
+    }
+
+    public String getName () {
+
+        return this.name;
     }
 
     public String getSha512 () {

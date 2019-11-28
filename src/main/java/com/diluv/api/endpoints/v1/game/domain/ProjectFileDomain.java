@@ -4,6 +4,7 @@ import com.diluv.api.database.record.ProjectFileRecord;
 
 public class ProjectFileDomain {
 
+    private final String name;
     private final String sha512;
     private final String crc32;
     private final long size;
@@ -13,7 +14,7 @@ public class ProjectFileDomain {
 
     public ProjectFileDomain (ProjectFileRecord rs) {
 
-        // TODO Add missing file name
+        this.name = rs.getName();
         this.sha512 = rs.getSha512();
         this.crc32 = rs.getCrc32();
         this.size = rs.getSize();
@@ -22,33 +23,38 @@ public class ProjectFileDomain {
         this.updatedAt = rs.getUpdatedAt().getTime();
     }
 
+    public String getName () {
+
+        return this.name;
+    }
+
     public String getSha512 () {
 
-        return sha512;
+        return this.sha512;
     }
 
     public String getCrc32 () {
 
-        return crc32;
+        return this.crc32;
     }
 
     public long getSize () {
 
-        return size;
+        return this.size;
     }
 
     public String getChangelog () {
 
-        return changelog;
+        return this.changelog;
     }
 
     public long getCreatedAt () {
 
-        return createdAt;
+        return this.createdAt;
     }
 
     public long getUpdatedAt () {
 
-        return updatedAt;
+        return this.updatedAt;
     }
 }
