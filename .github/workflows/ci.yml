@@ -33,5 +33,8 @@ jobs:
       - name: Test
         run: ./gradlew test
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Build and deploy with Jib
+        run: ./gradlew jib
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

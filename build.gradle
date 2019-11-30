@@ -5,7 +5,7 @@ plugins {
 //    id "checkstyle"
 }
 
-version = "${project_version}" + getBuildNumber() + isSnapshot()
+version = "${project_version}" + getBuildNumber() + (isSnapshot() ? "-snapshot" : '')
 group = "${project_group}"
 archivesBaseName = "${project_name}"
 
@@ -43,7 +43,7 @@ jar {
 jib {
     to {
         image = "diluv/diluv-api:" + version
-        tags = ['latest' + isSnapshot()]
+        tags = ['latest' + (isSnapshot() ? "-snapshot" : '')]
         auth {
             username = System.getenv("DOCKER_USERNAME")
             password = System.getenv("DOCKER_PASSWORD")
@@ -60,7 +60,10 @@ static String getBuildNumber() {
     return System.getenv("BUILD_NUMBER") ?: "0"
 }
 
-//TODO Not implemented
-static String isSnapshot() {
-    return System.getenv("TRAVIS_TAG") ? "" : "-snapshot"
+static boolean isSnapshot() {
+    String ref = System.getenv("GITHUB_REF");
+    if (ref != null && ref.startsWith("refs/tags/v")) {
+        return false
+    }
+    return true
 }
