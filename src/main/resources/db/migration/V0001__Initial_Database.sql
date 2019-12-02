@@ -196,4 +196,7 @@ CREATE TABLE nodecraft_commits
 
 # Insert default data
 INSERT INTO games(slug, name, url)
-VALUES ('minecraft', 'Minecraft', 'https://minecraft.net/')
+VALUES ('minecraft', 'Minecraft', 'https://minecraft.net/');
+
+INSERT INTO project_types(game_slug, slug, name)
+VALUES ('minecraft', 'mods', 'Mods')

@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
-import com.diluv.api.utils.ErrorHandler;
 import org.flywaydb.core.Flyway;
 
 import com.diluv.api.database.GameDatabase;
@@ -17,6 +16,7 @@ import com.diluv.api.endpoints.v1.auth.AuthAPI;
 import com.diluv.api.endpoints.v1.game.GameAPI;
 import com.diluv.api.endpoints.v1.user.UserAPI;
 import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.ErrorHandler;
 import com.diluv.api.utils.cors.CorsHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariDataSource;
@@ -29,7 +29,7 @@ import io.undertow.server.handlers.BlockingHandler;
 public class DiluvAPI {
     private static final Logger LOGGER = Logger.getLogger(DiluvAPI.class.getName());
     public static final ObjectMapper MAPPER = new ObjectMapper();
-    private static Connection connection;
+    private static HikariDataSource ds;
 
     public static void main (String[] args) {
 
@@ -54,20 +54,14 @@ public class DiluvAPI {
 
     private void migrate () {
 
-        HikariDataSource ds = new HikariDataSource();
+        ds = new HikariDataSource();
         ds.setJdbcUrl(Constants.DB_HOSTNAME);
         ds.setUsername(Constants.DB_USERNAME);
         ds.setPassword(Constants.DB_PASSWORD);
+        ds.addDataSourceProperty("autoReconnect", true);
         Flyway flyway = Flyway.configure().dataSource(ds).load();
         flyway.clean(); // TODO remove after release
         flyway.migrate();
-
-        try {
-            connection = ds.getConnection();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -86,8 +80,8 @@ public class DiluvAPI {
         return new ErrorHandler(new BlockingHandler(new CorsHandler(routing)));
     }
 
-    public static Connection connection () {
+    public static Connection connection () throws SQLException {
 
-        return connection;
+        return ds.getConnection();
     }
 }
