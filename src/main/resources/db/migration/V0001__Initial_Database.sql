@@ -193,3 +193,7 @@ CREATE TABLE nodecraft_commits
 
     PRIMARY KEY (id)
 );
+
+# Insert default data
+INSERT INTO games(slug, name, url)
+VALUES ('minecraft', 'Minecraft', 'https://minecraft.net/')
