@@ -59,6 +59,7 @@ public class DiluvAPI {
         ds.setUsername(Constants.DB_USERNAME);
         ds.setPassword(Constants.DB_PASSWORD);
         Flyway flyway = Flyway.configure().dataSource(ds).load();
+        flyway.clean(); // TODO remove after release
         flyway.migrate();
 
         try {
