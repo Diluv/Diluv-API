@@ -30,6 +30,7 @@ public class DiluvAPI {
     private static final Logger LOGGER = Logger.getLogger(DiluvAPI.class.getName());
     public static final ObjectMapper MAPPER = new ObjectMapper();
     private static HikariDataSource ds;
+    private static Connection connection;
 
     public static void main (String[] args) {
 
@@ -82,7 +83,8 @@ public class DiluvAPI {
     }
 
     public static Connection connection () throws SQLException {
-
-        return ds.getConnection();
+        if (connection == null || connection.isClosed())
+            connection = ds.getConnection();
+        return connection;
     }
 }
