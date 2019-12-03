@@ -58,7 +58,8 @@ public class DiluvAPI {
         ds.setJdbcUrl(Constants.DB_HOSTNAME);
         ds.setUsername(Constants.DB_USERNAME);
         ds.setPassword(Constants.DB_PASSWORD);
-        ds.addDataSourceProperty("autoReconnect", true);
+        ds.setMaxLifetime(300000);
+        ds.addDataSourceProperty("rewriteBatchedStatements", "true");
         Flyway flyway = Flyway.configure().dataSource(ds).load();
         flyway.clean(); // TODO remove after release
         flyway.migrate();
