@@ -1,18 +1,13 @@
 package com.diluv.api.endpoints.v1;
 
 import java.io.IOException;
-import java.util.Calendar;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.pac4j.core.context.Pac4jConstants;
-import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.jwt.profile.JwtGenerator;
 
-import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.TestUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 

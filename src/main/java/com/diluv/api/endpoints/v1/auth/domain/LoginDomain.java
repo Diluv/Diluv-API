@@ -12,13 +12,35 @@ public class LoginDomain {
      */
     private long expiredAt;
 
-    public LoginDomain (String accessToken) {
+    private String refreshToken;
+
+    private long refreshExpiredAt;
+
+    public LoginDomain (String accessToken, long expiredAt, String refreshToken, long refreshExpiredAt) {
 
         this.accessToken = accessToken;
+        this.expiredAt = expiredAt;
+        this.refreshToken = refreshToken;
+        this.refreshExpiredAt = refreshExpiredAt;
     }
 
     public String getAccessToken () {
 
-        return accessToken;
+        return this.accessToken;
+    }
+
+    public long getExpiredAt () {
+
+        return this.expiredAt;
+    }
+
+    public String getRefreshToken () {
+
+        return this.refreshToken;
+    }
+
+    public long getRefreshExpiredAt () {
+
+        return this.refreshExpiredAt;
     }
 }

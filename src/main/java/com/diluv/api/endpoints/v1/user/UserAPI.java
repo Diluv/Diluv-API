@@ -3,10 +3,6 @@ package com.diluv.api.endpoints.v1.user;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.pac4j.core.profile.AnonymousProfile;
-import org.pac4j.undertow.account.Pac4jAccount;
-import org.pac4j.undertow.handler.SecurityHandler;
-
 import com.diluv.api.database.dao.ProjectDAO;
 import com.diluv.api.database.dao.UserDAO;
 import com.diluv.api.database.record.ProjectRecord;
@@ -15,7 +11,6 @@ import com.diluv.api.endpoints.v1.domain.Domain;
 import com.diluv.api.endpoints.v1.user.domain.AuthorizedUserDomain;
 import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
 import com.diluv.api.endpoints.v1.user.domain.UserDomain;
-import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ErrorType;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
@@ -31,8 +26,8 @@ public class UserAPI extends RoutingHandler {
 
         this.userDAO = userDAO;
         this.projectDAO = projectDAO;
-        this.get("/v1/users/{username}", SecurityHandler.build(this::getUserByUsername, Constants.CONFIG, Constants.REQUEST_JWT_OPTIONAL));
-        this.get("/v1/users/{username}/projects", SecurityHandler.build(this::getProjectsByUsername, Constants.CONFIG, Constants.REQUEST_JWT_OPTIONAL));
+        this.get("/v1/users/{username}", this::getUserByUsername);
+        this.get("/v1/users/{username}/projects", this::getProjectsByUsername);
     }
 
     private Domain getUserByUsername (HttpServerExchange exchange) {
@@ -45,13 +40,13 @@ public class UserAPI extends RoutingHandler {
         boolean authorized = false;
 
         String username = usernameParam;
-        Pac4jAccount account = RequestUtil.getAccount(exchange);
-        if (account != null && !(account.getProfile() instanceof AnonymousProfile)) {
+        String authUsername = RequestUtil.getUsernameFromToken(exchange);
+        if (authUsername != null) {
             if ("me".equalsIgnoreCase(usernameParam)) {
-                username = account.getProfile().getUsername();
+                username = authUsername;
                 authorized = true;
             }
-            else if (usernameParam.equals(account.getProfile().getUsername())) {
+            else if (usernameParam.equalsIgnoreCase(authUsername)) {
                 authorized = true;
             }
         }
@@ -88,13 +83,14 @@ public class UserAPI extends RoutingHandler {
         }
         boolean authorized = false;
         String username = usernameParam;
-        Pac4jAccount account = RequestUtil.getAccount(exchange);
-        if (account != null && !(account.getProfile() instanceof AnonymousProfile)) {
+
+        String authUsername = RequestUtil.getUsernameFromToken(exchange);
+        if (authUsername != null) {
             if ("me".equalsIgnoreCase(usernameParam)) {
-                username = account.getProfile().getUsername();
+                username = authUsername;
                 authorized = true;
             }
-            else if (usernameParam.equals(account.getProfile().getUsername())) {
+            else if (usernameParam.equalsIgnoreCase(authUsername)) {
                 authorized = true;
             }
         }

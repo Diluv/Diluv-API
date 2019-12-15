@@ -1,5 +1,7 @@
 package com.diluv.api.database.dao;
 
+import java.sql.Timestamp;
+
 import com.diluv.api.database.record.UserRecord;
 
 public interface UserDAO {
@@ -15,4 +17,6 @@ public interface UserDAO {
     boolean existTempUserByUsername (String username);
 
     boolean insertTempUser (String username, String email, String password, String passwordType, String avatar, String verificationCode);
+
+    boolean insertUserRefresh (long userId, String randomKey, Timestamp time);
 }

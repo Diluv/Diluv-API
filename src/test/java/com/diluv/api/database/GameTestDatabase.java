@@ -5,7 +5,6 @@ import java.util.List;
 import com.diluv.api.database.dao.GameDAO;
 import com.diluv.api.database.record.GameRecord;
 import com.diluv.api.utils.FileReader;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class GameTestDatabase implements GameDAO {
 

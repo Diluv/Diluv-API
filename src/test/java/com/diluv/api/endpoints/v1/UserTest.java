@@ -8,9 +8,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.pac4j.core.context.Pac4jConstants;
-import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.jwt.profile.JwtGenerator;
 
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.TestUtil;
@@ -26,22 +23,22 @@ public class UserTest {
     @BeforeAll
     public static void setup () throws JsonProcessingException {
 
-        final JwtGenerator<CommonProfile> jwtGenerator = new JwtGenerator<>(Constants.RSA_SIGNATURE_CONFIGURATION);
-
-        // Makes the access expire in 30 minutes
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, 30);
-        jwtGenerator.setExpirationTime(calendar.getTime());
-
-        final CommonProfile validProfile = new CommonProfile();
-        validProfile.setId("darkhax");
-        validProfile.addAttribute(Pac4jConstants.USERNAME, "darkhax");
-        darkhaxToken = jwtGenerator.generate(validProfile);
-
-        final CommonProfile secondProfile = new CommonProfile();
-        secondProfile.setId("jaredlll08");
-        secondProfile.addAttribute(Pac4jConstants.USERNAME, "jaredlll08");
-        jaredlll08Token = jwtGenerator.generate(secondProfile);
+//        final JwtGenerator<CommonProfile> jwtGenerator = new JwtGenerator<>(Constants.RSA_SIGNATURE_CONFIGURATION);
+//
+//        // Makes the access expire in 30 minutes
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.add(Calendar.MINUTE, 30);
+//        jwtGenerator.setExpirationTime(calendar.getTime());
+//
+//        final CommonProfile validProfile = new CommonProfile();
+//        validProfile.setId("darkhax");
+//        validProfile.addAttribute(Pac4jConstants.USERNAME, "darkhax");
+//        darkhaxToken = jwtGenerator.generate(validProfile);
+//
+//        final CommonProfile secondProfile = new CommonProfile();
+//        secondProfile.setId("jaredlll08");
+//        secondProfile.addAttribute(Pac4jConstants.USERNAME, "jaredlll08");
+//        jaredlll08Token = jwtGenerator.generate(secondProfile);
 
         invalidToken = "broken token";
 

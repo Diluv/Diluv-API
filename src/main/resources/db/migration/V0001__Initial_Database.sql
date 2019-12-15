@@ -26,12 +26,23 @@ CREATE TABLE temp_users
     password_type    VARCHAR(30)  NOT NULL,
     avatar_url       VARCHAR(255) NOT NULL,
 
-    verificationCode CHAR (36)  NOT NULL,
+    verificationCode CHAR(36)     NOT NULL,
 
     created_at       TIMESTAMP DEFAULT NOW(),
 
     PRIMARY KEY (id)
 );
+
+CREATE TABLE user_refresh
+(
+    user_id   BIGINT   NOT NULL,
+    code      CHAR(36) NOT NULL,
+
+    expiredAt TIMESTAMP,
+
+    PRIMARY KEY (user_id, code)
+);
+
 
 CREATE TABLE user_mfa_recoveries
 (

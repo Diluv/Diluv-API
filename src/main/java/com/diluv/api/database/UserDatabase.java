@@ -3,6 +3,7 @@ package com.diluv.api.database;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import com.diluv.api.DiluvAPI;
 import com.diluv.api.database.dao.UserDAO;
@@ -17,6 +18,7 @@ public class UserDatabase implements UserDAO {
     private static final String EXIST_TEMP_USER_BY_EMAIL = SQLHandler.readFile("user/existTempUserByEmail");
     private static final String EXIST_TEMP_USER_BY_USERNAME = SQLHandler.readFile("user/existTempUserByUsername");
     private static final String INSERT_TEMP_USER = SQLHandler.readFile("user/insertTempUser");
+    private static final String INSERT_USER_REFRESH = SQLHandler.readFile("user/insertUserRefresh");
 
     @Override
     public Long findUserIdByEmail (String email) {
@@ -114,6 +116,22 @@ public class UserDatabase implements UserDAO {
             stmt.setString(4, passwordType);
             stmt.setString(5, avatar);
             stmt.setString(6, verificationCode);
+
+            return stmt.executeUpdate() == 1;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean insertUserRefresh (long userId, String randomKey, Timestamp time) {
+
+        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(INSERT_USER_REFRESH)) {
+            stmt.setLong(1, userId);
+            stmt.setString(2, randomKey);
+            stmt.setTimestamp(3, time);
 
             return stmt.executeUpdate() == 1;
         }

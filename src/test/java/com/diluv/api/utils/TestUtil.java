@@ -1,5 +1,11 @@
 package com.diluv.api.utils;
 
+import java.io.IOException;
+
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.junit.jupiter.api.Assertions;
+
 import com.diluv.api.DiluvAPI;
 import com.diluv.api.database.GameTestDatabase;
 import com.diluv.api.database.ProjectTestDatabase;
@@ -9,12 +15,6 @@ import com.diluv.api.database.dao.ProjectDAO;
 import com.diluv.api.database.dao.UserDAO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.undertow.Undertow;
-
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.junit.jupiter.api.Assertions;
-
-import java.io.IOException;
 
 public class TestUtil {
 
@@ -41,6 +41,7 @@ public class TestUtil {
     }
 
     public static void runTest (final CloseableHttpClient client, final String queryString, final String expected) throws IOException {
+
         runTokenTest(client, queryString, null, expected);
     }
 

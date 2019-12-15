@@ -1,5 +1,6 @@
 package com.diluv.api.database;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.diluv.api.database.dao.UserDAO;
@@ -65,6 +66,12 @@ public class UserTestDatabase implements UserDAO {
 
     @Override
     public boolean insertTempUser (String username, String email, String password, String passwordType, String avatar, String verificationCode) {
+
+        return false;
+    }
+
+    @Override
+    public boolean insertUserRefresh (long userId, String randomKey, Timestamp time) {
 
         return false;
     }

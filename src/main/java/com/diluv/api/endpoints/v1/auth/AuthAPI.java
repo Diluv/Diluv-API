@@ -3,26 +3,23 @@ package com.diluv.api.endpoints.v1.auth;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.UUID;
 
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
-import org.pac4j.core.config.Config;
-import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.http.client.direct.DirectFormClient;
-import org.pac4j.jwt.profile.JwtGenerator;
-import org.pac4j.undertow.account.Pac4jAccount;
-import org.pac4j.undertow.handler.SecurityHandler;
 
 import com.diluv.api.database.dao.UserDAO;
+import com.diluv.api.database.record.UserRecord;
+import com.diluv.api.endpoints.v1.auth.domain.LoginDomain;
 import com.diluv.api.endpoints.v1.domain.Domain;
-import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ErrorType;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
-import com.diluv.api.utils.auth.UserAuthenticator;
+import com.diluv.api.utils.auth.JWTUtil;
+import com.nimbusds.jose.JOSEException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.form.FormData;
@@ -31,15 +28,13 @@ import io.undertow.server.handlers.form.FormParserFactory;
 
 public class AuthAPI extends RoutingHandler {
 
-    private final SecureRandom RANDOM = new SecureRandom();
     private final UserDAO userDAO;
 
     public AuthAPI (UserDAO userDAO) {
 
         this.userDAO = userDAO;
-        final DirectFormClient directFormClient = new DirectFormClient(new UserAuthenticator(userDAO));
         this.post("/v1/auth/register", this::register);
-        this.post("/v1/auth/login", SecurityHandler.build(this::login, new Config(directFormClient), "DirectFormClient"));
+        this.post("/v1/auth/login", this::login);
     }
 
     private Domain register (HttpServerExchange exchange) {
@@ -102,28 +97,71 @@ public class AuthAPI extends RoutingHandler {
         return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Error");
     }
 
-    /**
-     * Handles the logic request using Pac4J
-     *
-     * @param exchange The http request being made
-     */
     private Domain login (HttpServerExchange exchange) {
 
-        String token;
-        final Pac4jAccount account = RequestUtil.getAccount(exchange);
-        if (account != null) {
-            final JwtGenerator<CommonProfile> jwtGenerator = new JwtGenerator<>(Constants.RSA_SIGNATURE_CONFIGURATION);
+        try (FormDataParser parser = FormParserFactory.builder().build().createParser(exchange)) {
+            FormData data = parser.parseBlocking();
+            String username = RequestUtil.getFormParam(data, "username");
+            String password = RequestUtil.getFormParam(data, "password");
+            String mfa = RequestUtil.getFormParam(data, "mfa");
 
-            // Makes the access expire in 30 minutes
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MINUTE, 30);
-            jwtGenerator.setExpirationTime(calendar.getTime());
-            token = jwtGenerator.generate(account.getProfile());
-            exchange.getResponseSender().send(token);
-            exchange.endExchange();
+            if (GenericValidator.isBlankOrNull(username)) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Invalid username.");
+            }
+
+            if (GenericValidator.isBlankOrNull(password)) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Invalid password");
+            }
+
+            String lowerUsername = username.toLowerCase();
+
+            UserRecord userRecord = this.userDAO.findOneByUsername(lowerUsername);
+            if (userRecord == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Username not found");
+            }
+
+            if (!userRecord.getPasswordType().equalsIgnoreCase("bcrypt")) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Invalid password type");
+            }
+
+            if (!OpenBSDBCrypt.checkPassword(userRecord.getPassword(), password.toCharArray())) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Password is wrong.");
+            }
+            if (userRecord.isMfa()) {
+                //TODO Handle
+                if (mfa == null) {
+                    //TODO New mfa
+                    return null;
+                }
+
+                //TODO Verify MFA
+                return null;
+            }
+
+            String randomKey = UUID.randomUUID().toString();
+
+            Calendar refreshTokenExpire = Calendar.getInstance();
+            refreshTokenExpire.add(Calendar.MONTH, 1);
+
+            if (!this.userDAO.insertUserRefresh(userRecord.getId(), randomKey, new Timestamp(refreshTokenExpire.getTimeInMillis()))) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Could not insert into DB.");
+            }
+
+            Calendar accessTokenExpire = Calendar.getInstance();
+            accessTokenExpire.add(Calendar.MINUTE, 30);
+
+            String accessToken = JWTUtil.generateAccessToken(userRecord.getId(), userRecord.getUsername(), accessTokenExpire.getTime());
+            String refreshToken = JWTUtil.generateRefreshToken(userRecord.getId(), refreshTokenExpire.getTime(), randomKey);
+
+            return ResponseUtil.successResponse(exchange, new LoginDomain(accessToken, accessTokenExpire.getTimeInMillis(), refreshToken, refreshTokenExpire.getTimeInMillis()));
         }
-
-        //TODO Error out properly, and respond.
-        return null;
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (JOSEException e) {
+            e.printStackTrace();
+        }
+        // TODO Error
+        return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Error");
     }
 }

@@ -1,12 +1,11 @@
 package com.diluv.api.utils;
 
+import java.text.ParseException;
 import java.util.Deque;
 import java.util.logging.Logger;
 
-import org.pac4j.undertow.account.Pac4jAccount;
-
-import io.undertow.security.api.SecurityContext;
-import io.undertow.security.idm.Account;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormData;
 
@@ -43,17 +42,21 @@ public class RequestUtil {
         return param.peek();
     }
 
-    public static Pac4jAccount getAccount (final HttpServerExchange exchange) {
+    public static String getUsernameFromToken (final HttpServerExchange exchange) {
 
-        final SecurityContext securityContext = exchange.getSecurityContext();
-        if (securityContext != null) {
-            final Account account = securityContext.getAuthenticatedAccount();
-            if (account instanceof Pac4jAccount) {
-                return (Pac4jAccount) account;
-            }
+        try {
+            String authorization = exchange.getRequestHeaders().getFirst("Authorization");
+
+            SignedJWT jwt = SignedJWT.parse(authorization);
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            if (!claims.getSubject().equalsIgnoreCase("accessToken"))
+                return null;
+
+            return claims.getStringClaim("username");
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
         }
         return null;
     }
-
-
 }
