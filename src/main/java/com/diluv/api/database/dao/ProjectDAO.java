@@ -14,7 +14,7 @@ public interface ProjectDAO {
 
     List<ProjectRecord> findAllProjectsByGameSlugAndProjectType (String gameSlug, String projectTypeSlug);
 
-    ProjectTypeRecord findOneProjectTypeByGameSlugAndProjectTypeSlug(String gameSlug, String projectTypeSlug);
+    ProjectTypeRecord findOneProjectTypeByGameSlugAndProjectTypeSlug (String gameSlug, String projectTypeSlug);
 
     ProjectRecord findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug (String gameSlug, String projectTypeSlug, String projectSlug);
 

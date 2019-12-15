@@ -7,10 +7,28 @@ CREATE TABLE users
     password      CHAR(60)     NOT NULL,
     password_type VARCHAR(30)  NOT NULL,
 
-    mfa           BOOL DEFAULT FALSE,
-    mfa_secret    VARCHAR(16)  NOT NULL,
+    mfa           BOOL      DEFAULT FALSE,
+    mfa_secret    VARCHAR(16),
 
     avatar_url    VARCHAR(255) NOT NULL,
+
+    created_at    TIMESTAMP DEFAULT NOW(),
+
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE temp_users
+(
+    id               BIGINT       NOT NULL AUTO_INCREMENT,
+    username         VARCHAR(30)  NOT NULL UNIQUE,
+    email            VARCHAR(255) NOT NULL UNIQUE,
+    password         CHAR(60)     NOT NULL,
+    password_type    VARCHAR(30)  NOT NULL,
+    avatar_url       VARCHAR(255) NOT NULL,
+
+    verificationCode CHAR (36)  NOT NULL,
+
+    created_at       TIMESTAMP DEFAULT NOW(),
 
     PRIMARY KEY (id)
 );

@@ -19,7 +19,7 @@ public class ProjectDatabase implements ProjectDAO {
     private static final String FIND_ALL_BY_GAMESLUG_AND_PROJECTYPESLUG = SQLHandler.readFile("project/findAllByGameSlugAndProjectTypeSlug");
     private static final String FIND_ONE_BY_GAMESLUG_AND_PROJECTYPESLUG_AND_PROJECTSLUG = SQLHandler.readFile("project/findOneByGameSlugAndProjectTypeSlugAndProjectSlug");
 
-    private static final String FIND_ONE_PROJECTTYPES_BY_GAMESLUG_AND_PROJECTYPESLUG= SQLHandler.readFile("project_types/findOneByGameSlugAndProjectTypeSlug");
+    private static final String FIND_ONE_PROJECTTYPES_BY_GAMESLUG_AND_PROJECTYPESLUG = SQLHandler.readFile("project_types/findOneByGameSlugAndProjectTypeSlug");
     private static final String FIND_ALL_PROJECTTYPES_BY_GAMESLUG = SQLHandler.readFile("project_types/findAllByGameSlug");
 
     private static final String FIND_ALL_PROJECTFILES_BY_GAMESLUG_AND_PROJECTYPESLUG_AND_PROJECTSLUG = SQLHandler.readFile("project_files/findAllByGameSlugAndProjectTypeAndProjectSlug");

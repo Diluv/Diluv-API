@@ -91,6 +91,7 @@ public class GameAPI extends RoutingHandler {
         ProjectTypeRecord projectTypesRecords = this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
 
         if (projectTypesRecords == null) {
+            // TODO Error
             return null;
         }
 
@@ -137,6 +138,7 @@ public class GameAPI extends RoutingHandler {
         ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
 
         if (projectRecord == null) {
+            // TODO Error
             return null;
         }
         return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));

@@ -8,6 +8,7 @@ import org.pac4j.undertow.account.Pac4jAccount;
 import io.undertow.security.api.SecurityContext;
 import io.undertow.security.idm.Account;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.form.FormData;
 
 // TODO Temp class name
 public class RequestUtil {
@@ -16,6 +17,20 @@ public class RequestUtil {
 
     private RequestUtil () {
 
+    }
+
+    public static String getFormParam (final FormData data, String paramName) {
+
+        Deque<FormData.FormValue> param = data.get(paramName);
+
+        if (param == null) {
+            return null;
+        }
+        FormData.FormValue formValue = param.peekFirst();
+        if (formValue == null) {
+            return null;
+        }
+        return formValue.getValue();
     }
 
     public static String getParam (final HttpServerExchange exchange, String paramName) {

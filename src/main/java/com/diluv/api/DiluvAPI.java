@@ -59,7 +59,6 @@ public class DiluvAPI {
         ds.setJdbcUrl(Constants.DB_HOSTNAME);
         ds.setUsername(Constants.DB_USERNAME);
         ds.setPassword(Constants.DB_PASSWORD);
-        ds.setMaxLifetime(300000);
         ds.addDataSourceProperty("rewriteBatchedStatements", "true");
         Flyway flyway = Flyway.configure().dataSource(ds).load();
         flyway.clean(); // TODO remove after release
@@ -83,6 +82,7 @@ public class DiluvAPI {
     }
 
     public static Connection connection () throws SQLException {
+
         if (connection == null || connection.isClosed())
             connection = ds.getConnection();
         return connection;

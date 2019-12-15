@@ -16,6 +16,18 @@ public class UserTestDatabase implements UserDAO {
     }
 
     @Override
+    public Long findUserIdByEmail (String email) {
+
+        for (UserRecord userRecord : userList) {
+            if (userRecord.getEmail().equals(email)) {
+                return userRecord.getId();
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public Long findUserIdByUsername (String username) {
 
         for (UserRecord userRecord : userList) {
@@ -37,5 +49,23 @@ public class UserTestDatabase implements UserDAO {
         }
 
         return null;
+    }
+
+    @Override
+    public boolean existTempUserByEmail (String email) {
+
+        return false;
+    }
+
+    @Override
+    public boolean existTempUserByUsername (String username) {
+
+        return false;
+    }
+
+    @Override
+    public boolean insertTempUser (String username, String email, String password, String passwordType, String avatar, String verificationCode) {
+
+        return false;
     }
 }
