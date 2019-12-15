@@ -53,26 +53,38 @@ public class UserTestDatabase implements UserDAO {
     }
 
     @Override
-    public boolean existTempUserByEmail (String email) {
-
-        return false;
-    }
-
-    @Override
-    public boolean existTempUserByUsername (String username) {
-
-        return false;
-    }
-
-    @Override
-    public boolean insertTempUser (String username, String email, String password, String passwordType, String avatar, String verificationCode) {
-
+    public boolean insertUser (String email, String username, String password, String passwordType, String avatar, Timestamp timestamp) {
+        // TODO
         return false;
     }
 
     @Override
     public boolean insertUserRefresh (long userId, String randomKey, Timestamp time) {
-
+// TODO
         return false;
+    }
+
+    @Override
+    public boolean existTempUserByEmail (String email) {
+// TODO
+        return false;
+    }
+
+    @Override
+    public boolean existTempUserByUsername (String username) {
+// TODO
+        return false;
+    }
+
+    @Override
+    public boolean insertTempUser (String email, String username, String password, String passwordType, String verificationCode) {
+// TODO
+        return false;
+    }
+
+    @Override
+    public UserRecord findTempUserByEmailAndUsernameAndCode (String email, String username, String code) {
+// TODO
+        return null;
     }
 }

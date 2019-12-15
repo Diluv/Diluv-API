@@ -9,7 +9,6 @@ CREATE TABLE users
 
     mfa           BOOL      DEFAULT FALSE,
     mfa_secret    VARCHAR(16),
-
     avatar_url    VARCHAR(255) NOT NULL,
 
     created_at    TIMESTAMP DEFAULT NOW(),
@@ -24,11 +23,9 @@ CREATE TABLE temp_users
     email            VARCHAR(255) NOT NULL UNIQUE,
     password         CHAR(60)     NOT NULL,
     password_type    VARCHAR(30)  NOT NULL,
-    avatar_url       VARCHAR(255) NOT NULL,
+    created_at       TIMESTAMP DEFAULT NOW(),
 
     verificationCode CHAR(36)     NOT NULL,
-
-    created_at       TIMESTAMP DEFAULT NOW(),
 
     PRIMARY KEY (id)
 );
