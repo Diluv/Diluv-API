@@ -13,6 +13,8 @@ import io.undertow.server.handlers.form.FormData;
 public class RequestUtil {
 
     private static final Logger LOGGER = Logger.getLogger(RequestUtil.class.getName());
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String BEARER = "Bearer ";
 
     private RequestUtil () {
 
@@ -45,9 +47,13 @@ public class RequestUtil {
     public static String getUsernameFromToken (final HttpServerExchange exchange) {
 
         try {
-            String authorization = exchange.getRequestHeaders().getFirst("Authorization");
+            String authorization = exchange.getRequestHeaders().getFirst(AUTHORIZATION);
 
-            SignedJWT jwt = SignedJWT.parse(authorization);
+            if (authorization == null || !isBearerToken(authorization)) {
+                return null;
+            }
+
+            SignedJWT jwt = SignedJWT.parse(authorization.substring(BEARER.length()));
             JWTClaimsSet claims = jwt.getJWTClaimsSet();
             if (!claims.getSubject().equalsIgnoreCase("accessToken"))
                 return null;
@@ -55,8 +61,12 @@ public class RequestUtil {
             return claims.getStringClaim("username");
         }
         catch (ParseException e) {
-            e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean isBearerToken (String token) {
+
+        return BEARER.regionMatches(true, 0, token, 0, BEARER.length());
     }
 }

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.diluv.api.utils.TestUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class GameTest {
 
@@ -18,7 +17,7 @@ public class GameTest {
     private static CloseableHttpClient httpClient;
 
     @BeforeAll
-    public static void setup () throws JsonProcessingException {
+    public static void setup () {
 
         httpClient = HttpClientBuilder.create().disableAutomaticRetries().build();
 

@@ -9,9 +9,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.TestUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.diluv.api.utils.auth.JWTUtil;
+import com.nimbusds.jose.JOSEException;
 
 public class UserTest {
     private static final String BASE_URL = "/v1/users";
@@ -21,24 +21,12 @@ public class UserTest {
     private static String invalidToken;
 
     @BeforeAll
-    public static void setup () throws JsonProcessingException {
+    public static void setup () throws JOSEException {
 
-//        final JwtGenerator<CommonProfile> jwtGenerator = new JwtGenerator<>(Constants.RSA_SIGNATURE_CONFIGURATION);
-//
-//        // Makes the access expire in 30 minutes
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.add(Calendar.MINUTE, 30);
-//        jwtGenerator.setExpirationTime(calendar.getTime());
-//
-//        final CommonProfile validProfile = new CommonProfile();
-//        validProfile.setId("darkhax");
-//        validProfile.addAttribute(Pac4jConstants.USERNAME, "darkhax");
-//        darkhaxToken = jwtGenerator.generate(validProfile);
-//
-//        final CommonProfile secondProfile = new CommonProfile();
-//        secondProfile.setId("jaredlll08");
-//        secondProfile.addAttribute(Pac4jConstants.USERNAME, "jaredlll08");
-//        jaredlll08Token = jwtGenerator.generate(secondProfile);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, 30);
+        darkhaxToken = JWTUtil.generateAccessToken(0, "darkhax", calendar.getTime());
+        jaredlll08Token = JWTUtil.generateAccessToken(1, "jaredlll08", calendar.getTime());
 
         invalidToken = "broken token";
 

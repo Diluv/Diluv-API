@@ -4,14 +4,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.KeyFactory;
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,23 +59,6 @@ public class Constants {
         }
         catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException e) {
             LOGGER.log(Level.SEVERE, "Private Key", e);
-        }
-        System.exit(1); //TODO Handle better
-        return null;
-    }
-
-    public static PublicKey getPublicKey (String fileLocation) {
-
-        try {
-            String publicKey = getKey(fileLocation);
-            publicKey = publicKey.replace("-----BEGIN PUBLIC KEY-----", "");
-            publicKey = publicKey.replace("-----END PUBLIC KEY-----", "");
-            X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKey));
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            return keyFactory.generatePublic(spec);
-        }
-        catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-            LOGGER.log(Level.SEVERE, "Public Key", e);
         }
         System.exit(1); //TODO Handle better
         return null;

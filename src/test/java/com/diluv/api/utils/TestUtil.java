@@ -13,7 +13,6 @@ import com.diluv.api.database.UserTestDatabase;
 import com.diluv.api.database.dao.GameDAO;
 import com.diluv.api.database.dao.ProjectDAO;
 import com.diluv.api.database.dao.UserDAO;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.undertow.Undertow;
 
 public class TestUtil {
@@ -22,7 +21,7 @@ public class TestUtil {
     public static final int PORT = 4567;
     private static Undertow server;
 
-    public static void start () throws JsonProcessingException {
+    public static void start () {
 
         GameDAO gameDAO = new GameTestDatabase();
         ProjectDAO projectDAO = new ProjectTestDatabase();
