@@ -60,31 +60,37 @@ public class UserTestDatabase implements UserDAO {
 
     @Override
     public boolean insertUserRefresh (long userId, String randomKey, Timestamp time) {
-// TODO
+        // TODO
         return false;
     }
 
     @Override
     public boolean existTempUserByEmail (String email) {
-// TODO
+        // TODO
         return false;
     }
 
     @Override
     public boolean existTempUserByUsername (String username) {
-// TODO
+        // TODO
         return false;
     }
 
     @Override
     public boolean insertTempUser (String email, String username, String password, String passwordType, String verificationCode) {
-// TODO
+        // TODO
         return false;
     }
 
     @Override
     public UserRecord findTempUserByEmailAndUsernameAndCode (String email, String username, String code) {
-// TODO
+        // TODO
         return null;
+    }
+
+    @Override
+    public boolean deleteTempUser (String email, String username) {
+        // TODO
+        return false;
     }
 }

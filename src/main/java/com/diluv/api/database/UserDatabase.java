@@ -23,6 +23,7 @@ public class UserDatabase implements UserDAO {
     private static final String EXIST_TEMPUSER_BY_USERNAME = SQLHandler.readFile("temp_user/existTempUserByUsername");
     private static final String INSERT_TEMPUSER = SQLHandler.readFile("temp_user/insertTempUser");
     private static final String FIND_TEMPUSER_BY_EMAIL_AND_USERNAME_AND_CODE = SQLHandler.readFile("temp_user/findTempUserByEmailAndUsernameAndCode");
+    private static final String DELETE_TEMPUSER = SQLHandler.readFile("temp_user/deleteTempUser");
 
     @Override
     public Long findUserIdByEmail (String email) {
@@ -181,5 +182,20 @@ public class UserDatabase implements UserDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public boolean deleteTempUser (String email, String username) {
+
+        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(DELETE_TEMPUSER)) {
+            stmt.setString(1, email);
+            stmt.setString(2, username);
+
+            return stmt.executeUpdate() == 1;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

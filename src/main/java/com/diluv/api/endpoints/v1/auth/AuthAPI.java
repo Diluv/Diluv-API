@@ -6,6 +6,7 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -21,6 +22,8 @@ import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.nimbusds.jose.JOSEException;
+import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.form.FormData;
@@ -29,6 +32,11 @@ import io.undertow.server.handlers.form.FormParserFactory;
 
 public class AuthAPI extends RoutingHandler {
 
+    private final GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder gacb =
+        new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder()
+            .setTimeStepSizeInMillis(TimeUnit.SECONDS.toMillis(30))
+            .setWindowSize(5);
+    private final GoogleAuthenticator ga = new GoogleAuthenticator(gacb.build());
     private final UserDAO userDAO;
 
     public AuthAPI (UserDAO userDAO) {
@@ -129,15 +137,20 @@ public class AuthAPI extends RoutingHandler {
             if (!OpenBSDBCrypt.checkPassword(userRecord.getPassword(), formPassword.toCharArray())) {
                 return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Password is wrong.");
             }
+
             if (userRecord.isMfa()) {
-                //TODO Handle
                 if (mfa == null) {
-                    //TODO New mfa
-                    return null;
+                    return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "MFA is required.");
                 }
 
-                //TODO Verify MFA
-                return null;
+                if (!GenericValidator.isInt(mfa)) {
+                    return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Invalid MFA code.");
+                }
+
+                if (!ga.authorize(userRecord.getMfaSecret(), Integer.parseInt(mfa))) {
+                    //TODO Code not valid and check scratch codes
+                    return null;
+                }
             }
 
             String randomKey = UUID.randomUUID().toString();
@@ -190,20 +203,28 @@ public class AuthAPI extends RoutingHandler {
             String email = formEmail.toLowerCase();
             String username = formUsername.toLowerCase();
 
-            BaseUserRecord userRecord = this.userDAO.findTempUserByEmailAndUsernameAndCode(email, username, formCode);
-            if (userRecord == null) {
+            BaseUserRecord tUserRecord = this.userDAO.findTempUserByEmailAndUsernameAndCode(email, username, formCode);
+            if (tUserRecord == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "User not found.");
             }
 
-            // TODO Make sure created at is less then 24 hours
-//            if(userRecord.getCreatedAt())
+            // Is the temp user older then 24 hours.
+            if (System.currentTimeMillis() - tUserRecord.getCreatedAt().getTime() > (1000 * 60 * 60 * 24)) {
+                if (!this.userDAO.deleteTempUser(tUserRecord.getEmail(), tUserRecord.getUsername())) {
+                    return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Failed to delete temp user.");
+                }
+                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "User not found.");
+            }
 
             // TODO Save avatar image from gravatar locally cache then set the logo to a sha of the image
-            if (!this.userDAO.insertUser(userRecord.getEmail(), userRecord.getUsername(), userRecord.getPassword(), userRecord.getPasswordType(), "avatar.png", userRecord.getCreatedAt())) {
+            if (!this.userDAO.insertUser(tUserRecord.getEmail(), tUserRecord.getUsername(), tUserRecord.getPassword(), tUserRecord.getPasswordType(), "avatar.png", tUserRecord.getCreatedAt())) {
                 return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Failed to insert.");
             }
 
-            //TODO Clean up temp user
+            if (!this.userDAO.deleteTempUser(tUserRecord.getEmail(), tUserRecord.getUsername())) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Failed to delete temp user.");
+            }
+
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (IOException e) {
