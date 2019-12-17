@@ -127,7 +127,10 @@ public class AuthAPI extends RoutingHandler {
 
             UserRecord userRecord = this.userDAO.findOneByUsername(username);
             if (userRecord == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Username not found");
+                if(this.userDAO.existTempUserByUsername(username)){
+                    return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Unverified user.");
+                }
+                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Username not found.");
             }
 
             if (!userRecord.getPasswordType().equalsIgnoreCase("bcrypt")) {
