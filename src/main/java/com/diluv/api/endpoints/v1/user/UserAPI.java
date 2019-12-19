@@ -38,32 +38,22 @@ public class UserAPI extends RoutingHandler {
             return null;
         }
 
-
-        boolean authorized = false;
-
         String username = usernameParam;
-        if (!RequestUtil.hasTokenOrValid(exchange)) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
-        }
+        boolean authorized = false;
+        String token = RequestUtil.getToken(exchange);
 
-        String authUsername = RequestUtil.getUsernameFromToken(exchange);
-        if (authUsername != null) {
-            if ("me".equalsIgnoreCase(usernameParam)) {
-                username = authUsername;
-                authorized = true;
+        if (token != null) {
+            String tokenUsername = RequestUtil.getUsernameFromToken(token);
+            if (tokenUsername == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
             }
-            else if (usernameParam.equalsIgnoreCase(authUsername)) {
+            if ("me".equalsIgnoreCase(usernameParam) || tokenUsername.equalsIgnoreCase(usernameParam)) {
+                username = tokenUsername;
                 authorized = true;
             }
         }
         else if ("me".equalsIgnoreCase(usernameParam)) {
-            // TODO Error, means they were asking for "me", but didn't supply a valid access token
             return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
-        }
-
-
-        if (username == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Invalid username param.");
         }
 
         // Todo fetch user from me/username, if logged in fetch additional data
@@ -87,29 +77,22 @@ public class UserAPI extends RoutingHandler {
             // TODO Error, same as above. And move to this code to a central location
             return null;
         }
-        boolean authorized = false;
         String username = usernameParam;
-        if (!RequestUtil.hasTokenOrValid(exchange)) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
-        }
-        String authUsername = RequestUtil.getUsernameFromToken(exchange);
-        if (authUsername != null) {
-            if ("me".equalsIgnoreCase(usernameParam)) {
-                username = authUsername;
-                authorized = true;
+        boolean authorized = false;
+        String token = RequestUtil.getToken(exchange);
+        if (token != null) {
+            String tokenUsername = RequestUtil.getUsernameFromToken(token);
+            if (tokenUsername == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
             }
-            else if (usernameParam.equalsIgnoreCase(authUsername)) {
+
+            if ("me".equalsIgnoreCase(usernameParam) || tokenUsername.equalsIgnoreCase(usernameParam)) {
+                username = tokenUsername;
                 authorized = true;
             }
         }
         else if ("me".equalsIgnoreCase(usernameParam)) {
-            // TODO Error, means they were asking for "me", but didn't supply a valid access token
             return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
-        }
-
-
-        if (username == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Invalid username param.");
         }
 
         Long userId = this.userDAO.findUserIdByUsername(username);

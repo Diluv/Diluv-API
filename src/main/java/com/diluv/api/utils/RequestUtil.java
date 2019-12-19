@@ -1,10 +1,9 @@
 package com.diluv.api.utils;
 
-import java.text.ParseException;
 import java.util.Deque;
 import java.util.logging.Logger;
 
-import com.nimbusds.jwt.JWTClaimsSet;
+import com.diluv.api.utils.auth.JWTUtil;
 import com.nimbusds.jwt.SignedJWT;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormData;
@@ -44,69 +43,23 @@ public class RequestUtil {
         return param.peek();
     }
 
-    public static String getUserIdFromToken (final HttpServerExchange exchange) {
-
-        try {
-            String authorization = exchange.getRequestHeaders().getFirst(AUTHORIZATION);
-
-            if (authorization == null || !isBearerToken(authorization)) {
-                return null;
+    public static Long getUserIdFromToken (String token) {
+        if (RequestUtil.isBearerToken(token)) {
+            SignedJWT jwt = JWTUtil.getJWT(token);
+            if (jwt != null) {
+                return JWTUtil.getUserId(jwt);
             }
-
-            SignedJWT jwt = SignedJWT.parse(authorization.substring(BEARER.length()));
-            JWTClaimsSet claims = jwt.getJWTClaimsSet();
-            if (!claims.getSubject().equalsIgnoreCase("accessToken"))
-                return null;
-
-            return claims.getAudience().get(0);
-        }
-        catch (ParseException e) {
         }
         return null;
     }
 
-    public static boolean hasTokenOrValid (final HttpServerExchange exchange) {
+    public static String getUsernameFromToken (String token) {
 
-        String authorization = exchange.getRequestHeaders().getFirst(AUTHORIZATION);
-
-        if (authorization == null) {
-            return true;
-        }
-
-        if (!isBearerToken(authorization)) {
-            return false;
-        }
-
-        try {
-            SignedJWT jwt = SignedJWT.parse(authorization.substring(BEARER.length()));
-            JWTClaimsSet claims = jwt.getJWTClaimsSet();
-            if (!claims.getSubject().equalsIgnoreCase("accessToken"))
-                return false;
-        }
-        catch (ParseException e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public static String getUsernameFromToken (final HttpServerExchange exchange) {
-
-        try {
-            String authorization = exchange.getRequestHeaders().getFirst(AUTHORIZATION);
-
-            if (authorization == null || !isBearerToken(authorization)) {
-                return null;
+        if (RequestUtil.isBearerToken(token)) {
+            SignedJWT jwt = JWTUtil.getJWT(token);
+            if (jwt != null) {
+                return JWTUtil.getUsername(jwt);
             }
-
-            SignedJWT jwt = SignedJWT.parse(authorization.substring(BEARER.length()));
-            JWTClaimsSet claims = jwt.getJWTClaimsSet();
-            if (!claims.getSubject().equalsIgnoreCase("accessToken"))
-                return null;
-
-            return claims.getStringClaim("username");
-        }
-        catch (ParseException e) {
         }
         return null;
     }
@@ -114,5 +67,10 @@ public class RequestUtil {
     public static boolean isBearerToken (String token) {
 
         return BEARER.regionMatches(true, 0, token, 0, BEARER.length());
+    }
+
+    public static String getToken (HttpServerExchange exchange) {
+
+        return exchange.getRequestHeaders().getFirst(AUTHORIZATION);
     }
 }

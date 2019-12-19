@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.validator.GenericValidator;
-
 import com.diluv.api.database.dao.GameDAO;
 import com.diluv.api.database.dao.ProjectDAO;
 import com.diluv.api.database.record.GameRecord;
@@ -225,9 +223,13 @@ public class GameAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Description is not valid.");
             }
 
-            String authId = RequestUtil.getUserIdFromToken(exchange);
-            if (authId == null || GenericValidator.isLong(authId)) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Requires token.");
+            String token = RequestUtil.getToken(exchange);
+            if (token == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
+            }
+            Long authId = RequestUtil.getUserIdFromToken(token);
+            if (authId == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token.");
             }
 
             String slug = slugify.slugify(formName);
@@ -238,7 +240,7 @@ public class GameAPI extends RoutingHandler {
             }
             //TODO Fix logo stuff
 
-            if (!this.projectDAO.insertProject(slug, formName, formSummary, formDescription, "logo.png", Long.parseLong(authId), gameSlug, projectTypeSlug)) {
+            if (!this.projectDAO.insertProject(slug, formName, formSummary, formDescription, "logo.png", authId, gameSlug, projectTypeSlug)) {
                 return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Invalid insert");
             }
             //TODO Response project stuff

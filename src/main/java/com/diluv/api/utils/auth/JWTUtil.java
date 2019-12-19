@@ -1,6 +1,9 @@
 package com.diluv.api.utils.auth;
 
+import java.text.ParseException;
 import java.util.Date;
+
+import org.apache.commons.validator.GenericValidator;
 
 import com.diluv.api.utils.Constants;
 import com.nimbusds.jose.JOSEException;
@@ -10,6 +13,8 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+
+import static com.diluv.api.utils.RequestUtil.BEARER;
 
 public class JWTUtil {
 
@@ -43,5 +48,55 @@ public class JWTUtil {
         final SignedJWT accessToken = new SignedJWT(new JWSHeader(JWSAlgorithm.RS512), builder.build());
         accessToken.sign(signer);
         return accessToken.serialize();
+    }
+
+    public static SignedJWT getJWT (String token) {
+
+        try {
+            SignedJWT jwt = SignedJWT.parse(token.substring(BEARER.length()));
+
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            if (!claims.getSubject().equalsIgnoreCase("accessToken"))
+                return null;
+
+            if (claims.getStringClaim("username") == null) {
+                return null;
+            }
+            return jwt;
+        }
+        catch (ParseException e) {
+        }
+        return null;
+    }
+
+    public static String getUsername (SignedJWT jwt) {
+
+        try {
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            if (!claims.getSubject().equalsIgnoreCase("accessToken"))
+                return null;
+
+            return claims.getStringClaim("username");
+        }
+        catch (ParseException e) {
+        }
+        return null;
+    }
+
+    public static Long getUserId (SignedJWT jwt) {
+
+        try {
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            if (claims.getAudience().isEmpty())
+                return null;
+
+            String id = claims.getAudience().get(0);
+            if (GenericValidator.isLong(id)) {
+                return Long.valueOf(id);
+            }
+        }
+        catch (ParseException e) {
+        }
+        return null;
     }
 }

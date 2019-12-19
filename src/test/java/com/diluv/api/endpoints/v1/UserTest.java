@@ -97,5 +97,4 @@ public class UserTest {
             TestUtil.getTestToken(httpClient, BASE_URL + "/jaredlll08/projects", darkhaxToken, FileReader.readJsonFileByListType("user_projects/jaredlll08", ProjectDomain.class));
         }
     }
-
 }
