@@ -21,6 +21,7 @@ import com.diluv.api.utils.ErrorType;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.auth.JWTUtil;
+import com.diluv.api.utils.auth.Validator;
 import com.nimbusds.jose.JOSEException;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
@@ -36,6 +37,8 @@ public class AuthAPI extends RoutingHandler {
         new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder()
             .setTimeStepSizeInMillis(TimeUnit.SECONDS.toMillis(30))
             .setWindowSize(5);
+    private SecureRandom secureRandom;
+
     private final GoogleAuthenticator ga = new GoogleAuthenticator(gacb.build());
     private final UserDAO userDAO;
 
@@ -64,11 +67,8 @@ public class AuthAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Invalid email");
             }
 
-            if (GenericValidator.isBlankOrNull(formUsername) || formUsername.length() > 50 || formUsername.length() < 3) {
+            if (Validator.validateUsername(formUsername)) {
                 return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Username is not valid.");
-            }
-            if (!GenericValidator.matchRegexp(formUsername, "([A-Za-z0-9-_]+)")) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Username must be A-Za-z0-9-_");
             }
 
             if (GenericValidator.isBlankOrNull(formPassword) || formPassword.length() > 70 || formPassword.length() < 8) {
@@ -86,7 +86,7 @@ public class AuthAPI extends RoutingHandler {
             }
 
             byte[] salt = new byte[16];
-            SecureRandom.getInstanceStrong().nextBytes(salt);
+            secureRandom.nextBytes(salt);
             String bcryptPassword = OpenBSDBCrypt.generate(formPassword.toCharArray(), salt, 14);
 
             String verificationCode = UUID.randomUUID().toString();
@@ -98,9 +98,6 @@ public class AuthAPI extends RoutingHandler {
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         // TODO Error
@@ -115,8 +112,8 @@ public class AuthAPI extends RoutingHandler {
             String formPassword = RequestUtil.getFormParam(data, "password");
             String mfa = RequestUtil.getFormParam(data, "mfa");
 
-            if (GenericValidator.isBlankOrNull(formUsername)) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Invalid username.");
+            if (Validator.validateUsername(formUsername)) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Username is not valid.");
             }
 
             if (GenericValidator.isBlankOrNull(formPassword)) {
@@ -127,7 +124,7 @@ public class AuthAPI extends RoutingHandler {
 
             UserRecord userRecord = this.userDAO.findOneByUsername(username);
             if (userRecord == null) {
-                if(this.userDAO.existTempUserByUsername(username)){
+                if (this.userDAO.existTempUserByUsername(username)) {
                     return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Unverified user.");
                 }
                 return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Username not found.");
@@ -158,15 +155,15 @@ public class AuthAPI extends RoutingHandler {
 
             String randomKey = UUID.randomUUID().toString();
 
+            Calendar accessTokenExpire = Calendar.getInstance();
+            accessTokenExpire.add(Calendar.MINUTE, 30);
+
             Calendar refreshTokenExpire = Calendar.getInstance();
             refreshTokenExpire.add(Calendar.MONTH, 1);
 
             if (!this.userDAO.insertUserRefresh(userRecord.getId(), randomKey, new Timestamp(refreshTokenExpire.getTimeInMillis()))) {
                 return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Could not insert into DB.");
             }
-
-            Calendar accessTokenExpire = Calendar.getInstance();
-            accessTokenExpire.add(Calendar.MINUTE, 30);
 
             String accessToken = JWTUtil.generateAccessToken(userRecord.getId(), userRecord.getUsername(), accessTokenExpire.getTime());
             String refreshToken = JWTUtil.generateRefreshToken(userRecord.getId(), refreshTokenExpire.getTime(), randomKey);
@@ -195,7 +192,7 @@ public class AuthAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Email is not valid.");
             }
 
-            if (GenericValidator.isBlankOrNull(formUsername)) {
+            if (Validator.validateUsername(formUsername)) {
                 return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Username is not valid.");
             }
 

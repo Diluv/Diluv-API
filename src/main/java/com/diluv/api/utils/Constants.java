@@ -60,6 +60,7 @@ public class Constants {
         catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException e) {
             LOGGER.log(Level.SEVERE, "Private Key", e);
         }
+
         System.exit(1); //TODO Handle better
         return null;
     }

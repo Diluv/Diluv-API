@@ -13,7 +13,7 @@ public class ProjectRecord {
     private long cachedDownloads;
     private long createdAt;
     private long updatedAt;
-    private long ownerId;
+    private long userId;
     private String gameSlug;
     private String projectTypeSlug;
 
@@ -32,7 +32,7 @@ public class ProjectRecord {
         this.cachedDownloads = rs.getLong("cached_downloads");
         this.createdAt = rs.getTimestamp("created_at").getTime();
         this.updatedAt = rs.getTimestamp("updated_at").getTime();
-        this.ownerId = rs.getLong("owner_id");
+        this.userId = rs.getLong("user_id");
         this.gameSlug = rs.getString("game_slug");
         this.projectTypeSlug = rs.getString("project_type_slug");
     }
@@ -82,9 +82,9 @@ public class ProjectRecord {
         return this.updatedAt;
     }
 
-    public long getOwnerId () {
+    public long getUserId () {
 
-        return this.ownerId;
+        return this.userId;
     }
 
     public String getGameSlug () {

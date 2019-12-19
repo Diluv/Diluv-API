@@ -25,7 +25,7 @@ public class ProjectTestDatabase implements ProjectDAO {
     @Override
     public List<ProjectRecord> findAllByUserId (long userId) {
 
-        return this.projectRecords.stream().filter(projectRecord -> projectRecord.getOwnerId() == userId).collect(Collectors.toList());
+        return this.projectRecords.stream().filter(projectRecord -> projectRecord.getUserId() == userId).collect(Collectors.toList());
     }
 
     @Override
@@ -66,5 +66,11 @@ public class ProjectTestDatabase implements ProjectDAO {
             return null;
         }
         return this.projectFileRecords.stream().filter(projectRecord -> projectRecord.getProjectId() == project.getId()).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean insertProject (String slug, String name, String summary, String description, String logo, long userId, String gameSlug, String projectTypeSlug) {
+        // TODO
+        return false;
     }
 }

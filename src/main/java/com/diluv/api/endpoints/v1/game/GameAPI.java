@@ -1,7 +1,10 @@
 package com.diluv.api.endpoints.v1.game;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.apache.commons.validator.GenericValidator;
 
 import com.diluv.api.database.dao.GameDAO;
 import com.diluv.api.database.dao.ProjectDAO;
@@ -14,15 +17,22 @@ import com.diluv.api.endpoints.v1.game.domain.GameDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectFileDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectTypeDomain;
 import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
+import com.diluv.api.utils.ErrorType;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.auth.Validator;
+import com.github.slugify.Slugify;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
+import io.undertow.server.handlers.form.FormData;
+import io.undertow.server.handlers.form.FormDataParser;
+import io.undertow.server.handlers.form.FormParserFactory;
 
 public class GameAPI extends RoutingHandler {
 
     private final GameDAO gameDAO;
     private final ProjectDAO projectDAO;
+    private final Slugify slugify = new Slugify();
 
     public GameAPI (GameDAO gameDAO, ProjectDAO projectDAO) {
 
@@ -35,6 +45,8 @@ public class GameAPI extends RoutingHandler {
         this.get("/v1/games/{game_slug}/{project_type_slug}/projects", this::getProjectsByGameSlugAndProjectType);
         this.get("/v1/games/{game_slug}/{project_type_slug}/{project_slug}", this::getProjectByGameSlugAndProjectTypeAndProjectSlug);
         this.get("/v1/games/{game_slug}/{project_type_slug}/{project_slug}/files", this::getProjectFilesByGameSlugAndProjectTypeAndProjectSlug);
+
+        this.post("/v1/games/{game_slug}/{project_type_slug}", this::postProjectTypesByGameSlugAndProjectType);
     }
 
     private Domain getGames (HttpServerExchange exchange) {
@@ -77,14 +89,10 @@ public class GameAPI extends RoutingHandler {
     private Domain getProjectTypesByGameSlugAndProjectType (HttpServerExchange exchange) {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
-        if (gameSlug == null) {
-            // TODO Error, shouldn't happen, but it can
-            return null;
-        }
-
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
-        if (projectTypeSlug == null) {
-            // TODO Error, shouldn't happen, but it can
+
+        if (gameSlug == null || projectTypeSlug == null) {
+            // TODO Error, shouldn't happen, but error anyway
             return null;
         }
 
@@ -101,13 +109,10 @@ public class GameAPI extends RoutingHandler {
     private Domain getProjectsByGameSlugAndProjectType (HttpServerExchange exchange) {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
-        if (gameSlug == null) {
-            // TODO Error, shouldn't happen, but it can
-            return null;
-        }
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
-        if (projectTypeSlug == null) {
-            // TODO Error, shouldn't happen, but it can
+
+        if (gameSlug == null || projectTypeSlug == null) {
+            // TODO Error, shouldn't happen, but error anyway
             return null;
         }
 
@@ -119,19 +124,11 @@ public class GameAPI extends RoutingHandler {
     private Domain getProjectByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
-        if (gameSlug == null) {
-            // TODO Error, shouldn't happen, but it can
-            return null;
-        }
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
-        if (projectTypeSlug == null) {
-            // TODO Error, shouldn't happen, but it can
-            return null;
-        }
-
         String projectSlug = RequestUtil.getParam(exchange, "project_slug");
-        if (projectSlug == null) {
-            // TODO Error, shouldn't happen, but it can
+
+        if (gameSlug == null || projectTypeSlug == null || projectSlug == null) {
+            // TODO Error, shouldn't happen, but error anyway
             return null;
         }
 
@@ -147,24 +144,71 @@ public class GameAPI extends RoutingHandler {
     private Domain getProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
-        if (gameSlug == null) {
-            // TODO Error, shouldn't happen, but it can
-            return null;
-        }
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
-        if (projectTypeSlug == null) {
-            // TODO Error, shouldn't happen, but it can
-            return null;
-        }
-
         String projectSlug = RequestUtil.getParam(exchange, "project_slug");
-        if (projectSlug == null) {
-            // TODO Error, shouldn't happen, but it can
+
+        if (gameSlug == null || projectTypeSlug == null || projectSlug == null) {
+            // TODO Error, shouldn't happen, but error anyway
             return null;
         }
 
         List<ProjectFileRecord> projectRecords = this.projectDAO.findAllProjectFilesByGameSlugAndProjectType(gameSlug, projectTypeSlug, projectSlug);
         List<ProjectFileDomain> projects = projectRecords.stream().map(ProjectFileDomain::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, projects);
+    }
+
+    private Domain postProjectTypesByGameSlugAndProjectType (HttpServerExchange exchange) {
+
+        String gameSlug = RequestUtil.getParam(exchange, "game_slug");
+        String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
+
+        if (gameSlug == null || projectTypeSlug == null) {
+            // TODO Error, shouldn't happen, but error anyway
+            return null;
+        }
+
+        try (FormDataParser parser = FormParserFactory.builder().build().createParser(exchange)) {
+            FormData data = parser.parseBlocking();
+            String formName = RequestUtil.getFormParam(data, "name");
+            String formSummary = RequestUtil.getFormParam(data, "summary");
+            String formDescription = RequestUtil.getFormParam(data, "description");
+            //TODO Logo
+
+            if (Validator.validateProjectName(formName)) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project name is not valid.");
+            }
+
+            if (Validator.validateProjectSummary(formSummary)) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Summary is not valid.");
+            }
+
+            if (Validator.validateProjectDescription(formDescription)) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Description is not valid.");
+            }
+
+            String authId = RequestUtil.getUserIdFromToken(exchange);
+            if (authId == null || GenericValidator.isLong(authId)) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Requires token.");
+            }
+
+            String slug = slugify.slugify(formName);
+
+            if (this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, slug) != null) {
+                //TODO Do we generate a new slug or just ask them to change project name?
+                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Slug already used? ");
+            }
+            //TODO Fix logo stuff
+
+            if (!this.projectDAO.insertProject(slug, formName, formSummary, formDescription, "logo.png", Long.parseLong(authId), gameSlug, projectTypeSlug)) {
+                return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Invalid insert");
+            }
+            //TODO Response project stuff
+            return ResponseUtil.successResponse(exchange, null);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        // TODO Error
+        return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Error");
     }
 }

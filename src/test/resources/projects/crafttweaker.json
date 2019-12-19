@@ -8,7 +8,7 @@
     "cachedDownloads": 43825671,
     "createdAt": 1573482589,
     "updatedAt": 1573482589,
-    "ownerId": 1,
+    "userId": 1,
     "gameSlug": "minecraft",
     "projectTypeSlug": "mods"
 }
