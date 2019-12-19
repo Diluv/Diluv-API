@@ -66,7 +66,7 @@ public class AuthAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Invalid email");
             }
 
-            if (Validator.validateUsername(formUsername)) {
+            if (!Validator.validateUsername(formUsername)) {
                 return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Username is not valid.");
             }
 
