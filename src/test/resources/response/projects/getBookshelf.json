@@ -1,0 +1,12 @@
+{
+    "data": {
+        "name": "Bookshelf",
+        "slug": "bookshelf",
+        "summary": "Bookshelf summary",
+        "description": "Bookshelf description",
+        "logoUrl": "https://via.placeholder.com/150",
+        "cachedDownloads": 32923285,
+        "createdAt": 1573482394,
+        "updatedAt": 1573482394
+    }
+}

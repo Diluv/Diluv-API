@@ -1,0 +1,14 @@
+{
+    "data": [
+        {
+            "slug": "minecraft",
+            "name": "Minecraft",
+            "url": "https://www.minecraft.net"
+        },
+        {
+            "slug": "stardew_valley",
+            "name": "Stardew Valley",
+            "url": "https://www.stardewvalley.net/"
+        }
+    ]
+}

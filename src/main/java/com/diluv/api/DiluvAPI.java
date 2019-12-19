@@ -19,6 +19,7 @@ import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ErrorHandler;
 import com.diluv.api.utils.cors.CorsHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.paranamer.ParanamerModule;
 import com.zaxxer.hikari.HikariDataSource;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -28,7 +29,8 @@ import io.undertow.server.handlers.BlockingHandler;
 
 public class DiluvAPI {
     private static final Logger LOGGER = Logger.getLogger(DiluvAPI.class.getName());
-    public static final ObjectMapper MAPPER = new ObjectMapper();
+    public static final ObjectMapper MAPPER = new ObjectMapper()
+        .registerModule(new ParanamerModule());
     private static HikariDataSource ds;
     private static Connection connection;
 

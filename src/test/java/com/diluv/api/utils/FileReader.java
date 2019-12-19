@@ -2,6 +2,7 @@ package com.diluv.api.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +10,9 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.diluv.api.DiluvAPI;
+import com.diluv.api.endpoints.v1.domain.DataDomain;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 public class FileReader {
 
@@ -30,6 +33,71 @@ public class FileReader {
         }
 
         return data;
+    }
+
+    public static <T> T readJsonFile (String file, Class<T> c) {
+
+        URL url = SQLHandler.class.getClassLoader().getResource("response/" + file + ".json");
+        if (url == null)
+            return null;
+        File f = new File(url.getFile());
+
+        String data = FileReader.readFile(f);
+
+        if (data == null)
+            return null;
+        try {
+            return DiluvAPI.MAPPER.readValue(data, c);
+        }
+        catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static <T> DataDomain<T> readJsonFileByType (String file, Class<T> c) {
+
+        URL url = SQLHandler.class.getClassLoader().getResource("response/" + file + ".json");
+        if (url == null)
+            return null;
+        File f = new File(url.getFile());
+
+        String data = FileReader.readFile(f);
+
+        if (data == null)
+            return null;
+        try {
+            return DiluvAPI.MAPPER.readValue(data, new TypeReference<DataDomain<T>>() {
+            });
+        }
+        catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static <T> DataDomain<List<T>> readJsonFileByListType (String file, Class<T> c) {
+
+        URL url = SQLHandler.class.getClassLoader().getResource("response/" + file + ".json");
+        if (url == null)
+            return null;
+        File f = new File(url.getFile());
+
+        String data = FileReader.readFile(f);
+
+        if (data == null)
+            return null;
+        try {
+            return DiluvAPI.MAPPER.readValue(data, new TypeReference<DataDomain<List<T>>>() {
+            });
+        }
+        catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public static String readFile (File file) {

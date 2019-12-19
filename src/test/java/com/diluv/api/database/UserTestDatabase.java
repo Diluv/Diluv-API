@@ -13,7 +13,7 @@ public class UserTestDatabase implements UserDAO {
 
     public UserTestDatabase () {
 
-        this.userList = FileReader.readJsonFolder("users", UserRecord.class);
+        this.userList = FileReader.readJsonFolder("records/users", UserRecord.class);
     }
 
     @Override

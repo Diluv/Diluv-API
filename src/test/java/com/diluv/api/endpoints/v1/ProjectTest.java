@@ -8,18 +8,23 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.diluv.api.endpoints.v1.domain.ErrorDomain;
+import com.diluv.api.endpoints.v1.game.domain.ProjectFileDomain;
+import com.diluv.api.endpoints.v1.game.domain.ProjectTypeDomain;
+import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
+import com.diluv.api.utils.FileReader;
 import com.diluv.api.utils.TestUtil;
 
 public class ProjectTest {
 
-    private static final String BASE_URL = "/v1/games";
+    private static final String URL = "/v1/games";
 
-    private static CloseableHttpClient httpClient;
+    private static CloseableHttpClient client;
 
     @BeforeAll
     public static void setup () {
 
-        httpClient = HttpClientBuilder.create().disableAutomaticRetries().build();
+        client = HttpClientBuilder.create().disableAutomaticRetries().build();
 
         TestUtil.start();
     }
@@ -33,28 +38,31 @@ public class ProjectTest {
     @Test
     public void testProjectTypesByGameSlugAndProjectType () throws IOException {
 
-        TestUtil.runTest(httpClient, BASE_URL + "/eco/mods", "{\"data\":{\"name\":\"Mods\",\"slug\":\"mods\",\"gameSlug\":\"eco\"}}");
-        TestUtil.runTest(httpClient, BASE_URL + "/minecraft/mods", "{\"data\":{\"name\":\"Mods\",\"slug\":\"mods\",\"gameSlug\":\"minecraft\"}}");
+        TestUtil.getTest(client, URL + "/eco/mods", FileReader.readJsonFile("game_types/getEcoMods", ErrorDomain.class));
+        TestUtil.getTest(client, URL + "/minecraft/mods", FileReader.readJsonFileByType("game_types/getMinecraftMods", ProjectTypeDomain.class));
     }
 
     @Test
     public void testProjectsByGameSlugAndProjectType () throws IOException {
 
-//        TestUtil.runTest(httpClient, BASE_URL + "/eco/mods/projects", "{\"data\":{\"name\":\"Mods\",\"slug\":\"mods\",\"gameSlug\":\"eco\"}}");
-        TestUtil.runTest(httpClient, BASE_URL + "/minecraft/mods/projects", "{\"data\":[{\"name\":\"Bookshelf\",\"slug\":\"bookshelf\",\"summary\":\"Bookshelf summary\",\"description\":\"Bookshelf description\",\"logoUrl\":\"https://via.placeholder.com/150\",\"cachedDownloads\":32923285,\"createdAt\":1573482394,\"updatedAt\":1573482394},{\"name\":\"Caliper\",\"slug\":\"caliper\",\"summary\":\"Caliper summary\",\"description\":\"Caliper description\",\"logoUrl\":\"https://via.placeholder.com/150\",\"cachedDownloads\":3176949,\"createdAt\":1573482589,\"updatedAt\":1573482589},{\"name\":\"CraftTweaker\",\"slug\":\"crafttweaker\",\"summary\":\"CraftTweaker summary\",\"description\":\"CraftTweaker description\",\"logoUrl\":\"https://via.placeholder.com/150\",\"cachedDownloads\":43825671,\"createdAt\":1573482589,\"updatedAt\":1573482589}]}");
+        TestUtil.getTest(client, URL + "/eco/mods/projects", FileReader.readJsonFile("errors/game_missing", ErrorDomain.class));
+        TestUtil.getTest(client, URL + "/minecraft/mods/projects", FileReader.readJsonFileByListType("projects/getMinecraftMods", ProjectDomain.class));
     }
 
     @Test
     public void testProjectByGameSlugAndProjectTypeAndProject () throws IOException {
 
-        TestUtil.runTest(httpClient, BASE_URL + "/minecraft/mods/crafttweaker/", "{\"data\":{\"name\":\"CraftTweaker\",\"slug\":\"crafttweaker\",\"summary\":\"CraftTweaker summary\",\"description\":\"CraftTweaker description\",\"logoUrl\":\"https://via.placeholder.com/150\",\"cachedDownloads\":43825671,\"createdAt\":1573482589,\"updatedAt\":1573482589}}");
-        TestUtil.runTest(httpClient, BASE_URL + "/minecraft/mods/bookshelf", "{\"data\":{\"name\":\"Bookshelf\",\"slug\":\"bookshelf\",\"summary\":\"Bookshelf summary\",\"description\":\"Bookshelf description\",\"logoUrl\":\"https://via.placeholder.com/150\",\"cachedDownloads\":32923285,\"createdAt\":1573482394,\"updatedAt\":1573482394}}");
+        TestUtil.getTest(client, URL + "/eco/mods/test", FileReader.readJsonFile("errors/game_missing", ErrorDomain.class));
+        TestUtil.getTest(client, URL + "/minecraft/maps/test", FileReader.readJsonFile("errors/projecttype_missing", ErrorDomain.class));
+        TestUtil.getTest(client, URL + "/minecraft/mods/test", FileReader.readJsonFile("errors/project_missing", ErrorDomain.class));
+        TestUtil.getTest(client, URL + "/minecraft/mods/bookshelf", FileReader.readJsonFileByType("projects/getBookshelf", ProjectDomain.class));
     }
 
     @Test
     public void testProjectFilesByGameSlugAndProjectTypeAndProject () throws IOException {
 
-        TestUtil.runTest(httpClient, BASE_URL + "/minecraft/mods/crafttweaker/files", "{\"data\":[]}");
-        TestUtil.runTest(httpClient, BASE_URL + "/minecraft/mods/bookshelf/files", "{\"data\":[{\"name\":\"Bookshelf-1.12.2-2.3.585.jar\",\"sha512\":\"50F5166D25155211D1A3D0AE5A4309B8EC5113D4AB920443F716B99E363012B24BA922840483158BE97A35FCB2A7A99389BDBD58839C89335A86215A29A3B09C\",\"crc32\":\"1c3b0d0a\",\"size\":270336,\"changelog\":\"Added a way to get the amount of experience points dropped by an entity.\",\"createdAt\":1573611851,\"updatedAt\":1573611851}]}");
+        TestUtil.getTest(client, URL + "/eco/mods/test/files", FileReader.readJsonFile("errors/game_missing", ErrorDomain.class));
+        TestUtil.getTest(client, URL + "/minecraft/mods/crafttweaker/files", FileReader.readJsonFileByListType("empty_data", ProjectFileDomain.class));
+        TestUtil.getTest(client, URL + "/minecraft/mods/bookshelf/files", FileReader.readJsonFileByListType("project_files/getBookshelfFiles", ProjectFileDomain.class));
     }
 }

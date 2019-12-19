@@ -65,6 +65,31 @@ public class RequestUtil {
         return null;
     }
 
+    public static boolean hasTokenOrValid (final HttpServerExchange exchange) {
+
+        String authorization = exchange.getRequestHeaders().getFirst(AUTHORIZATION);
+
+        if (authorization == null) {
+            return true;
+        }
+
+        if (!isBearerToken(authorization)) {
+            return false;
+        }
+
+        try {
+            SignedJWT jwt = SignedJWT.parse(authorization.substring(BEARER.length()));
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            if (!claims.getSubject().equalsIgnoreCase("accessToken"))
+                return false;
+        }
+        catch (ParseException e) {
+            return false;
+        }
+
+        return true;
+    }
+
     public static String getUsernameFromToken (final HttpServerExchange exchange) {
 
         try {

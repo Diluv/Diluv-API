@@ -67,7 +67,7 @@ public class GameAPI extends RoutingHandler {
         GameRecord gameRecord = this.gameDAO.findOneBySlug(gameSlug);
         if (gameRecord == null) {
             // TODO Error, Database select error or a connection error, this should be logged as it could show a larger problem
-            return null;
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
         }
         return ResponseUtil.successResponse(exchange, new GameDomain(gameRecord));
     }
@@ -78,6 +78,10 @@ public class GameAPI extends RoutingHandler {
         if (gameSlug == null) {
             // TODO Error, shouldn't happen, but it can
             return null;
+        }
+
+        if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
         }
 
         List<ProjectTypeRecord> projectTypesRecords = this.projectDAO.findAllProjectTypesByGameSlug(gameSlug);
@@ -96,11 +100,19 @@ public class GameAPI extends RoutingHandler {
             return null;
         }
 
+        if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
+        }
+
+        if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
+        }
+
         ProjectTypeRecord projectTypesRecords = this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
 
         if (projectTypesRecords == null) {
             // TODO Error
-            return null;
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
         }
 
         return ResponseUtil.successResponse(exchange, new ProjectTypeDomain(projectTypesRecords));
@@ -114,6 +126,14 @@ public class GameAPI extends RoutingHandler {
         if (gameSlug == null || projectTypeSlug == null) {
             // TODO Error, shouldn't happen, but error anyway
             return null;
+        }
+
+        if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
+        }
+
+        if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
         }
 
         List<ProjectRecord> projectRecords = this.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug);
@@ -132,11 +152,18 @@ public class GameAPI extends RoutingHandler {
             return null;
         }
 
+        if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
+        }
+
+        if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
+        }
+
         ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
 
         if (projectRecord == null) {
-            // TODO Error
-            return null;
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project does not exist.");
         }
         return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
     }
@@ -150,6 +177,18 @@ public class GameAPI extends RoutingHandler {
         if (gameSlug == null || projectTypeSlug == null || projectSlug == null) {
             // TODO Error, shouldn't happen, but error anyway
             return null;
+        }
+
+        if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
+        }
+
+        if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
+        }
+
+        if (this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
         }
 
         List<ProjectFileRecord> projectRecords = this.projectDAO.findAllProjectFilesByGameSlugAndProjectType(gameSlug, projectTypeSlug, projectSlug);

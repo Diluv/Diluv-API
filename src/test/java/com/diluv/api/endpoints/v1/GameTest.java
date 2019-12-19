@@ -8,6 +8,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.diluv.api.endpoints.v1.domain.ErrorDomain;
+import com.diluv.api.endpoints.v1.game.domain.GameDomain;
+import com.diluv.api.endpoints.v1.game.domain.ProjectTypeDomain;
+import com.diluv.api.utils.FileReader;
 import com.diluv.api.utils.TestUtil;
 
 public class GameTest {
@@ -33,20 +37,20 @@ public class GameTest {
     @Test
     public void testGame () throws IOException {
 
-        TestUtil.runTest(httpClient, BASE_URL, "{\"data\":[{\"slug\":\"eco\",\"name\":\"ECO\",\"url\":\"https://www.strangeloopgames.com/eco/\"},{\"slug\":\"minecraft\",\"name\":\"Minecraft\",\"url\":\"https://www.minecraft.net\"}]}");
+        TestUtil.getTest(httpClient, BASE_URL, FileReader.readJsonFileByType("games/getAllGames", GameDomain.class));
     }
 
     @Test
     public void testGameBySlug () throws IOException {
 
-        TestUtil.runTest(httpClient, BASE_URL + "/eco", "{\"data\":{\"slug\":\"eco\",\"name\":\"ECO\",\"url\":\"https://www.strangeloopgames.com/eco/\"}}");
-        TestUtil.runTest(httpClient, BASE_URL + "/minecraft", "{\"data\":{\"slug\":\"minecraft\",\"name\":\"Minecraft\",\"url\":\"https://www.minecraft.net\"}}");
+        TestUtil.getTest(httpClient, BASE_URL + "/eco", FileReader.readJsonFile("games/getECO", ErrorDomain.class));
+        TestUtil.getTest(httpClient, BASE_URL + "/minecraft", FileReader.readJsonFileByType("games/getMinecraft", GameDomain.class));
     }
 
     @Test
     public void testProjectTypesByGameSlug () throws IOException {
 
-        TestUtil.runTest(httpClient, BASE_URL + "/eco/types", "{\"data\":[{\"name\":\"Mods\",\"slug\":\"mods\",\"gameSlug\":\"eco\"}]}");
-        TestUtil.runTest(httpClient, BASE_URL + "/minecraft/types", "{\"data\":[{\"name\":\"Mods\",\"slug\":\"mods\",\"gameSlug\":\"minecraft\"},{\"name\":\"Resource Packs\",\"slug\":\"resourcepacks\",\"gameSlug\":\"minecraft\"}]}");
+        TestUtil.getTest(httpClient, BASE_URL + "/eco/types", FileReader.readJsonFile("game_types/getAllECO", ErrorDomain.class));
+        TestUtil.getTest(httpClient, BASE_URL + "/minecraft/types", FileReader.readJsonFileByListType("game_types/getAllMinecraft", ProjectTypeDomain.class));
     }
 }

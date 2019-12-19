@@ -1,12 +1,14 @@
 package com.diluv.api.endpoints.v1.game.domain;
 
 import com.diluv.api.database.record.ProjectTypeRecord;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class ProjectTypeDomain {
     private final String name;
     private final String slug;
     private final String gameSlug;
 
+    @JsonCreator
     public ProjectTypeDomain (ProjectTypeRecord rs) {
 
         this.name = rs.getName();

@@ -37,9 +37,15 @@ public class UserAPI extends RoutingHandler {
             // TODO Error, this probably shouldn't ever error, but check it in case
             return null;
         }
+
+
         boolean authorized = false;
 
         String username = usernameParam;
+        if (!RequestUtil.hasTokenOrValid(exchange)) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
+        }
+
         String authUsername = RequestUtil.getUsernameFromToken(exchange);
         if (authUsername != null) {
             if ("me".equalsIgnoreCase(usernameParam)) {
@@ -64,7 +70,7 @@ public class UserAPI extends RoutingHandler {
         UserRecord userRecord = this.userDAO.findOneByUsername(username);
         if (userRecord == null) {
             // TODO Error, Database select error or a connection error, this should be logged as it could show a larger problem
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "User not found");
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "User not found.");
         }
 
         if (authorized) {
@@ -83,7 +89,9 @@ public class UserAPI extends RoutingHandler {
         }
         boolean authorized = false;
         String username = usernameParam;
-
+        if (!RequestUtil.hasTokenOrValid(exchange)) {
+            return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
+        }
         String authUsername = RequestUtil.getUsernameFromToken(exchange);
         if (authUsername != null) {
             if ("me".equalsIgnoreCase(usernameParam)) {
@@ -106,7 +114,7 @@ public class UserAPI extends RoutingHandler {
 
         Long userId = this.userDAO.findUserIdByUsername(username);
         if (userId == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "User not found");
+            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "User not found.");
         }
         //TODO Maybe switch to a singular SQL statement
         List<ProjectRecord> projectRecords = this.projectDAO.findAllByUserId(userId);

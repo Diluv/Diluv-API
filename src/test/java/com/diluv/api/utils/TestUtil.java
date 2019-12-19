@@ -13,6 +13,7 @@ import com.diluv.api.database.UserTestDatabase;
 import com.diluv.api.database.dao.GameDAO;
 import com.diluv.api.database.dao.ProjectDAO;
 import com.diluv.api.database.dao.UserDAO;
+import com.diluv.api.endpoints.v1.domain.Domain;
 import io.undertow.Undertow;
 
 public class TestUtil {
@@ -39,17 +40,18 @@ public class TestUtil {
         TestUtil.server.stop();
     }
 
-    public static void runTest (final CloseableHttpClient client, final String queryString, final String expected) throws IOException {
+    public static void getTest (final CloseableHttpClient client, final String queryString, final Domain expected) throws IOException {
 
-        runTokenTest(client, queryString, null, expected);
+        getTestToken(client, queryString, null, expected);
     }
 
-    public static void runTokenTest (final CloseableHttpClient client, final String queryString, final String token, final String expected) throws IOException {
+    public static void getTestToken (final CloseableHttpClient client, final String queryString, final String token, final Domain expected) throws IOException {
 
         HttpGet httpGet = new HttpGet("http://" + TestUtil.IP + ":" + TestUtil.PORT + queryString);
         if (token != null) {
             httpGet.setHeader("Authorization", "Bearer " + token);
         }
-        Assertions.assertEquals(expected, HttpClientUtils.readResponse(client.execute(httpGet)));
+        String response = HttpClientUtils.readResponse(client.execute(httpGet));
+        Assertions.assertEquals(DiluvAPI.MAPPER.writeValueAsString(expected), response);
     }
 }
