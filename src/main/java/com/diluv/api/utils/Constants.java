@@ -9,9 +9,13 @@ import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 
@@ -21,6 +25,7 @@ public class Constants {
     public static final String DB_HOSTNAME = getValueOrDefault("DB_HOSTNAME", "jdbc:mariadb://localhost:3306/diluv");
     public static final String DB_USERNAME = getValueOrDefault("DB_USERNAME", "root");
     public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
+    public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaults("ALLOWED_ORIGINS", Collections.emptySet());
 
     private static final Logger LOGGER = Logger.getLogger(Constants.class.getName());
 
@@ -45,6 +50,15 @@ public class Constants {
             return defaultValue;
         }
         return value;
+    }
+
+    private static Set<String> getValuesOrDefaults (String env, Set<String> defaultValues) {
+
+        String value = System.getenv(env);
+        if (value == null) {
+            return defaultValues;
+        }
+        return Arrays.stream(value.split(",")).collect(Collectors.toSet());
     }
 
     public static PrivateKey getPrivateKey (String fileLocation) {

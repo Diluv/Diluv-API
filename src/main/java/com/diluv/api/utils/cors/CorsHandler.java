@@ -22,7 +22,9 @@ package com.diluv.api.utils.cors;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
+import com.diluv.api.utils.Constants;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
@@ -50,8 +52,8 @@ public class CorsHandler implements HttpHandler {
     private static final long ONE_HOUR_IN_SECONDS = 60L * 60L;
 
     private static final List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT");
-    private static final List<String> allowedOrigins = Arrays.asList("");
-    //TODO Constants.ALLOW_ORIGIN
+    private static final Set<String> allowedOrigins = Constants.ALLOWED_ORIGINS;
+
     private HttpHandler next;
 
     public CorsHandler (HttpHandler next) {
