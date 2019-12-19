@@ -224,3 +224,4 @@ pip-log.txt
 .gradle/
 build/
 *.pem
+rsa.private
