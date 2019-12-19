@@ -37,7 +37,6 @@ public class AuthAPI extends RoutingHandler {
         new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder()
             .setTimeStepSizeInMillis(TimeUnit.SECONDS.toMillis(30))
             .setWindowSize(5);
-    private SecureRandom secureRandom;
 
     private final GoogleAuthenticator ga = new GoogleAuthenticator(gacb.build());
     private final UserDAO userDAO;
@@ -86,7 +85,7 @@ public class AuthAPI extends RoutingHandler {
             }
 
             byte[] salt = new byte[16];
-            secureRandom.nextBytes(salt);
+            SecureRandom.getInstanceStrong().nextBytes(salt);
             String bcryptPassword = OpenBSDBCrypt.generate(formPassword.toCharArray(), salt, 14);
 
             String verificationCode = UUID.randomUUID().toString();
@@ -97,7 +96,7 @@ public class AuthAPI extends RoutingHandler {
             //TODO Send an email to verify
             return ResponseUtil.successResponse(exchange, null);
         }
-        catch (IOException e) {
+        catch (IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         // TODO Error
