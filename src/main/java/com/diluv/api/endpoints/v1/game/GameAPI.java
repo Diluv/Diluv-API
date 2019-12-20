@@ -15,10 +15,10 @@ import com.diluv.api.endpoints.v1.game.domain.GameDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectFileDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectTypeDomain;
 import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
-import com.diluv.api.utils.ErrorType;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.auth.Validator;
+import com.diluv.api.utils.error.ErrorResponse;
 import com.github.slugify.Slugify;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
@@ -65,7 +65,7 @@ public class GameAPI extends RoutingHandler {
         GameRecord gameRecord = this.gameDAO.findOneBySlug(gameSlug);
         if (gameRecord == null) {
             // TODO Error, Database select error or a connection error, this should be logged as it could show a larger problem
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_GAME);
         }
         return ResponseUtil.successResponse(exchange, new GameDomain(gameRecord));
     }
@@ -79,7 +79,7 @@ public class GameAPI extends RoutingHandler {
         }
 
         if (this.gameDAO.findOneBySlug(gameSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_GAME);
         }
 
         List<ProjectTypeRecord> projectTypesRecords = this.projectDAO.findAllProjectTypesByGameSlug(gameSlug);
@@ -99,18 +99,14 @@ public class GameAPI extends RoutingHandler {
         }
 
         if (this.gameDAO.findOneBySlug(gameSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
-        }
-
-        if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_GAME);
         }
 
         ProjectTypeRecord projectTypesRecords = this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
 
         if (projectTypesRecords == null) {
             // TODO Error
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT_TYPE);
         }
 
         return ResponseUtil.successResponse(exchange, new ProjectTypeDomain(projectTypesRecords));
@@ -127,11 +123,11 @@ public class GameAPI extends RoutingHandler {
         }
 
         if (this.gameDAO.findOneBySlug(gameSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_GAME);
         }
 
         if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT_TYPE);
         }
 
         List<ProjectRecord> projectRecords = this.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug);
@@ -151,17 +147,17 @@ public class GameAPI extends RoutingHandler {
         }
 
         if (this.gameDAO.findOneBySlug(gameSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_GAME);
         }
 
         if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT_TYPE);
         }
 
         ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
 
         if (projectRecord == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
         }
         return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
     }
@@ -178,15 +174,15 @@ public class GameAPI extends RoutingHandler {
         }
 
         if (this.gameDAO.findOneBySlug(gameSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Game does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_GAME);
         }
 
         if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT_TYPE);
         }
 
         if (this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project type does not exist.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
         }
 
         List<ProjectFileRecord> projectRecords = this.projectDAO.findAllProjectFilesByGameSlugAndProjectType(gameSlug, projectTypeSlug, projectSlug);
@@ -212,36 +208,36 @@ public class GameAPI extends RoutingHandler {
             //TODO Logo
 
             if (Validator.validateProjectName(formName)) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Project name is not valid.");
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_NAME);
             }
 
             if (Validator.validateProjectSummary(formSummary)) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Summary is not valid.");
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_SUMMARY);
             }
 
             if (Validator.validateProjectDescription(formDescription)) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Description is not valid.");
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_DESCRIPTION);
             }
 
             String token = RequestUtil.getToken(exchange);
             if (token == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
             }
             Long authId = RequestUtil.getUserIdFromToken(token);
             if (authId == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token.");
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
             }
 
             String slug = slugify.slugify(formName);
 
             if (this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, slug) != null) {
                 //TODO Do we generate a new slug or just ask them to change project name?
-                return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "Slug already used? ");
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.TAKEN_SLUG);
             }
             //TODO Fix logo stuff
 
             if (!this.projectDAO.insertProject(slug, formName, formSummary, formDescription, "logo.png", authId, gameSlug, projectTypeSlug)) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Invalid insert");
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT);
             }
             //TODO Response project stuff
             return ResponseUtil.successResponse(exchange, null);
@@ -250,6 +246,6 @@ public class GameAPI extends RoutingHandler {
             e.printStackTrace();
         }
         // TODO Error
-        return ResponseUtil.errorResponse(exchange, ErrorType.INTERNAL_SERVER_ERROR, "Error");
+        return ResponseUtil.errorResponse(exchange, ErrorResponse.INTERNAL_SERVER_ERROR);
     }
 }

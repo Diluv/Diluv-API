@@ -1,4 +1,4 @@
-package com.diluv.api.utils;
+package com.diluv.api.utils.error;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;

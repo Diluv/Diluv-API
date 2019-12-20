@@ -43,14 +43,14 @@ public class GameTest {
     @Test
     public void testGameBySlug () throws IOException {
 
-        TestUtil.getTest(httpClient, BASE_URL + "/eco", FileReader.readJsonFile("games/getECO", ErrorDomain.class));
+        TestUtil.getTest(httpClient, BASE_URL + "/eco", FileReader.readJsonFile("errors/notfound.game", ErrorDomain.class));
         TestUtil.getTest(httpClient, BASE_URL + "/minecraft", FileReader.readJsonFileByType("games/getMinecraft", GameDomain.class));
     }
 
     @Test
     public void testProjectTypesByGameSlug () throws IOException {
 
-        TestUtil.getTest(httpClient, BASE_URL + "/eco/types", FileReader.readJsonFile("game_types/getAllECO", ErrorDomain.class));
+        TestUtil.getTest(httpClient, BASE_URL + "/eco/types", FileReader.readJsonFile("errors/notfound.game", ErrorDomain.class));
         TestUtil.getTest(httpClient, BASE_URL + "/minecraft/types", FileReader.readJsonFileByListType("game_types/getAllMinecraft", ProjectTypeDomain.class));
     }
 }

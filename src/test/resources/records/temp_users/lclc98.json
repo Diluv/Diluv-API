@@ -4,7 +4,5 @@
     "email": "lclc98@example.com",
     "password": "$2y$12$q5V.5jjgFtUsezneRMeOI.pzcEUDdp0xZQSczPKKLId3YrfXfCR6m",
     "passwordType": "bcrypt",
-    "mfa": false,
-    "mfaSecret": null,
-    "avatarUrl": "https://via.placeholder.com/150"
+    "createdAt": 1923964145
 }

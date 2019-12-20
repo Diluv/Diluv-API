@@ -1,4 +1,4 @@
-package com.diluv.api.utils;
+package com.diluv.api.utils.error;
 
 import org.apache.http.HttpStatus;
 

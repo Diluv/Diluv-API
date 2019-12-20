@@ -44,6 +44,7 @@ public class RequestUtil {
     }
 
     public static Long getUserIdFromToken (String token) {
+
         if (RequestUtil.isBearerToken(token)) {
             SignedJWT jwt = JWTUtil.getJWT(token);
             if (jwt != null) {

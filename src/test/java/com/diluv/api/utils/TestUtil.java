@@ -1,8 +1,12 @@
 package com.diluv.api.utils;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.Assertions;
 
@@ -53,5 +57,21 @@ public class TestUtil {
         }
         String response = HttpClientUtils.readResponse(client.execute(httpGet));
         Assertions.assertEquals(DiluvAPI.MAPPER.writeValueAsString(expected), response);
+    }
+
+    public static void postTest (final CloseableHttpClient client, final String queryString, List<NameValuePair> body, final Domain expected) throws IOException {
+
+        postTestToken(client, queryString, body, null, expected);
+    }
+
+    public static void postTestToken (final CloseableHttpClient client, final String queryString, List<NameValuePair> body, final String token, final Domain expected) throws IOException {
+
+        HttpPost httpPost = new HttpPost("http://" + TestUtil.IP + ":" + TestUtil.PORT + queryString);
+        httpPost.setEntity(new UrlEncodedFormEntity(body));
+        if (token != null) {
+            httpPost.setHeader("Authorization", "Bearer " + token);
+        }
+        String response = HttpClientUtils.readResponse(client.execute(httpPost));
+        Assertions.assertEquals(expected == null ? "" : DiluvAPI.MAPPER.writeValueAsString(expected), response);
     }
 }

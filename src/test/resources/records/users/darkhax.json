@@ -2,7 +2,7 @@
     "id": 0,
     "username": "darkhax",
     "email": "darkhax@example.com",
-    "password": "$2y$12$OD8opBnKUrk2XlhYoSMrk.3.A910emMHgtkc7TxnK7dHyj3K7H7xS",
+    "password": "$2y$12$EOekQxPF3shOaXb2a2S3rusom7V6KTkMX8/gDHbXovHwKaOC4EBPu",
     "passwordType": "bcrypt",
     "mfa": true,
     "mfaSecret": "secret",

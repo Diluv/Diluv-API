@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public class BaseUserRecord {
     private long id;
     private String username;
@@ -26,6 +28,7 @@ public class BaseUserRecord {
         this.createdAt = rs.getTimestamp("created_at");
     }
 
+    @JsonCreator
     public BaseUserRecord (long id, String email, String username, String password, String passwordType, Timestamp createdAt) {
 
         this.id = id;

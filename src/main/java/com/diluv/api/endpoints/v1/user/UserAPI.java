@@ -11,9 +11,9 @@ import com.diluv.api.endpoints.v1.domain.Domain;
 import com.diluv.api.endpoints.v1.user.domain.AuthorizedUserDomain;
 import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
 import com.diluv.api.endpoints.v1.user.domain.UserDomain;
-import com.diluv.api.utils.ErrorType;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.error.ErrorResponse;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 
@@ -45,7 +45,7 @@ public class UserAPI extends RoutingHandler {
         if (token != null) {
             String tokenUsername = RequestUtil.getUsernameFromToken(token);
             if (tokenUsername == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
             }
             if ("me".equalsIgnoreCase(usernameParam) || tokenUsername.equalsIgnoreCase(usernameParam)) {
                 username = tokenUsername;
@@ -53,14 +53,14 @@ public class UserAPI extends RoutingHandler {
             }
         }
         else if ("me".equalsIgnoreCase(usernameParam)) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
         }
 
         // Todo fetch user from me/username, if logged in fetch additional data
         UserRecord userRecord = this.userDAO.findOneByUsername(username);
         if (userRecord == null) {
             // TODO Error, Database select error or a connection error, this should be logged as it could show a larger problem
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "User not found.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
         }
 
         if (authorized) {
@@ -83,7 +83,7 @@ public class UserAPI extends RoutingHandler {
         if (token != null) {
             String tokenUsername = RequestUtil.getUsernameFromToken(token);
             if (tokenUsername == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
             }
 
             if ("me".equalsIgnoreCase(usernameParam) || tokenUsername.equalsIgnoreCase(usernameParam)) {
@@ -92,12 +92,12 @@ public class UserAPI extends RoutingHandler {
             }
         }
         else if ("me".equalsIgnoreCase(usernameParam)) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.UNAUTHORIZED, "Invalid token");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
         }
 
         Long userId = this.userDAO.findUserIdByUsername(username);
         if (userId == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorType.BAD_REQUEST, "User not found.");
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
         }
         //TODO Maybe switch to a singular SQL statement
         List<ProjectRecord> projectRecords = this.projectDAO.findAllByUserId(userId);

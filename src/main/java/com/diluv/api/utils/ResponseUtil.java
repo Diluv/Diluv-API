@@ -7,6 +7,7 @@ import com.diluv.api.DiluvAPI;
 import com.diluv.api.endpoints.v1.domain.DataDomain;
 import com.diluv.api.endpoints.v1.domain.Domain;
 import com.diluv.api.endpoints.v1.domain.ErrorDomain;
+import com.diluv.api.utils.error.ErrorResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
@@ -37,8 +38,8 @@ public class ResponseUtil {
         return response(exchange, 200, data == null ? null : new DataDomain<>(data));
     }
 
-    public static Domain errorResponse (HttpServerExchange exchange, ErrorType errorType, String message) {
+    public static Domain errorResponse (HttpServerExchange exchange, ErrorResponse errorResponses) {
 
-        return response(exchange, errorType.getCode(), new ErrorDomain(errorType, message));
+        return response(exchange, errorResponses.getType().getCode(), new ErrorDomain(errorResponses.getType().getError(), errorResponses.getMessage()));
     }
 }

@@ -51,20 +51,20 @@ public class UserTest {
         builder.disableAutomaticRetries();
         try (CloseableHttpClient httpClient = builder.build()) {
             // /user/me tests
-            TestUtil.getTest(httpClient, BASE_URL + "/me", FileReader.readJsonFile("errors/invalid_token", ErrorDomain.class));
+            TestUtil.getTest(httpClient, BASE_URL + "/me", FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
             TestUtil.getTestToken(httpClient, BASE_URL + "/me", darkhaxToken, FileReader.readJsonFileByType("authorized_users/darkhax", AuthorizedUserDomain.class));
             TestUtil.getTestToken(httpClient, BASE_URL + "/me", jaredlll08Token, FileReader.readJsonFileByType("authorized_users/jaredlll08", AuthorizedUserDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/me", invalidToken, FileReader.readJsonFile("errors/invalid_token", ErrorDomain.class));
+            TestUtil.getTestToken(httpClient, BASE_URL + "/me", invalidToken, FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
 
             // Check for a non-existing user
-            TestUtil.getTest(httpClient, BASE_URL + "/abc", FileReader.readJsonFile("errors/user_missing", ErrorDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/abc", darkhaxToken, FileReader.readJsonFile("errors/user_missing", ErrorDomain.class));
+            TestUtil.getTest(httpClient, BASE_URL + "/abc", FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
+            TestUtil.getTestToken(httpClient, BASE_URL + "/abc", darkhaxToken, FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
 
             // Check for existing user with and without a token, and an invalid token
             TestUtil.getTest(httpClient, BASE_URL + "/darkhax", FileReader.readJsonFileByType("users/darkhax", UserDomain.class));
             TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax", darkhaxToken, FileReader.readJsonFileByType("authorized_users/darkhax", AuthorizedUserDomain.class));
             TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax", jaredlll08Token, FileReader.readJsonFileByType("users/darkhax", UserDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax", invalidToken, FileReader.readJsonFile("errors/invalid_token", ErrorDomain.class));
+            TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax", invalidToken, FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
 
             // Check for wrong authorization
             TestUtil.getTestToken(httpClient, BASE_URL + "/jaredlll08", darkhaxToken, FileReader.readJsonFileByType("users/jaredlll08", UserDomain.class));
@@ -78,20 +78,20 @@ public class UserTest {
         builder.disableAutomaticRetries();
         try (CloseableHttpClient httpClient = builder.build()) {
             // /user/me/projects tests
-            TestUtil.getTest(httpClient, BASE_URL + "/me/projects", FileReader.readJsonFile("errors/invalid_token", ErrorDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/me/projects", invalidToken, FileReader.readJsonFile("errors/invalid_token", ErrorDomain.class));
+            TestUtil.getTest(httpClient, BASE_URL + "/me/projects", FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
+            TestUtil.getTestToken(httpClient, BASE_URL + "/me/projects", invalidToken, FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
             TestUtil.getTestToken(httpClient, BASE_URL + "/me/projects", darkhaxToken, FileReader.readJsonFileByListType("user_projects/darkhax", ProjectDomain.class));
             TestUtil.getTestToken(httpClient, BASE_URL + "/me/projects", jaredlll08Token, FileReader.readJsonFileByListType("user_projects/jaredlll08", ProjectDomain.class));
 
             // Check for a non-existing user
-            TestUtil.getTest(httpClient, BASE_URL + "/abc/projects", FileReader.readJsonFile("errors/user_missing", ErrorDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/abc/projects", darkhaxToken, FileReader.readJsonFile("errors/user_missing", ErrorDomain.class));
+            TestUtil.getTest(httpClient, BASE_URL + "/abc/projects", FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
+            TestUtil.getTestToken(httpClient, BASE_URL + "/abc/projects", darkhaxToken, FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
 
             // Check for existing user with and without a token, and an invalid token
             TestUtil.getTest(httpClient, BASE_URL + "/darkhax/projects", FileReader.readJsonFileByListType("user_projects/darkhax", ProjectDomain.class));
             TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax/projects", darkhaxToken, FileReader.readJsonFileByListType("user_projects/darkhax", ProjectDomain.class));
             TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax/projects", jaredlll08Token, FileReader.readJsonFileByListType("user_projects/darkhax", ProjectDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax/projects", invalidToken, FileReader.readJsonFile("errors/invalid_token", ErrorDomain.class));
+            TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax/projects", invalidToken, FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
 
             // Check for wrong authorization
             TestUtil.getTestToken(httpClient, BASE_URL + "/jaredlll08/projects", darkhaxToken, FileReader.readJsonFileByListType("user_projects/jaredlll08", ProjectDomain.class));

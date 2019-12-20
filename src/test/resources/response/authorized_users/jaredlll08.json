@@ -3,6 +3,6 @@
         "username": "jaredlll08",
         "avatarUrl": "https://via.placeholder.com/150",
         "email": "jaredlll08@example.com",
-        "mfa": true
+        "mfa": false
     }
 }

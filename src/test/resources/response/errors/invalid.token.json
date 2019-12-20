@@ -1,4 +1,4 @@
 {
     "error": "Unauthorized",
-    "message": "Invalid token"
+    "message": "invalid.token"
 }
