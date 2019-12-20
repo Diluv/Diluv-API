@@ -67,11 +67,11 @@ public class AuthAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_USERNAME);
             }
 
-            if (!EmailValidator.getInstance().isValid(formEmail)) {
+            if (!Validator.validateEmail(formEmail)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_EMAIL);
             }
 
-            if (GenericValidator.isBlankOrNull(formPassword) || formPassword.length() > 70 || formPassword.length() < 8) {
+            if (!Validator.validatePassword(formPassword)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PASSWORD);
             }
 
@@ -100,7 +100,6 @@ public class AuthAPI extends RoutingHandler {
         catch (IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        // TODO Error
         return ResponseUtil.errorResponse(exchange,ErrorResponse.INTERNAL_SERVER_ERROR);
     }
 
@@ -116,8 +115,7 @@ public class AuthAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_USERNAME);
             }
 
-            //TODO validate password
-            if (GenericValidator.isBlankOrNull(formPassword)) {
+            if(!Validator.validatePassword(formPassword)){
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PASSWORD);
             }
 
@@ -177,7 +175,6 @@ public class AuthAPI extends RoutingHandler {
         catch (JOSEException e) {
             e.printStackTrace();
         }
-        // TODO Error
         return ResponseUtil.errorResponse(exchange, ErrorResponse.INTERNAL_SERVER_ERROR);
     }
 
@@ -189,8 +186,7 @@ public class AuthAPI extends RoutingHandler {
             String formUsername = RequestUtil.getFormParam(data, "username");
             String formCode = RequestUtil.getFormParam(data, "code");
 
-            //TODO Validate
-            if (GenericValidator.isBlankOrNull(formEmail)) {
+            if (!Validator.validateEmail(formEmail)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_EMAIL);
             }
 
@@ -232,7 +228,6 @@ public class AuthAPI extends RoutingHandler {
         catch (IOException e) {
             e.printStackTrace();
         }
-        // TODO Error
         return ResponseUtil.errorResponse(exchange, ErrorResponse.INTERNAL_SERVER_ERROR);
     }
 }

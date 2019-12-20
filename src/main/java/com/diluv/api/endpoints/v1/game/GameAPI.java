@@ -58,13 +58,11 @@ public class GameAPI extends RoutingHandler {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         if (gameSlug == null) {
-            // TODO Error, shouldn't happen, but it can
-            return null;
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_GAME);
         }
 
         GameRecord gameRecord = this.gameDAO.findOneBySlug(gameSlug);
         if (gameRecord == null) {
-            // TODO Error, Database select error or a connection error, this should be logged as it could show a larger problem
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_GAME);
         }
         return ResponseUtil.successResponse(exchange, new GameDomain(gameRecord));
@@ -74,8 +72,7 @@ public class GameAPI extends RoutingHandler {
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         if (gameSlug == null) {
-            // TODO Error, shouldn't happen, but it can
-            return null;
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_GAME);
         }
 
         if (this.gameDAO.findOneBySlug(gameSlug) == null) {
@@ -93,9 +90,11 @@ public class GameAPI extends RoutingHandler {
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
 
-        if (gameSlug == null || projectTypeSlug == null) {
-            // TODO Error, shouldn't happen, but error anyway
-            return null;
+        if (gameSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_GAME);
+        }
+        if (projectTypeSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_TYPE);
         }
 
         if (this.gameDAO.findOneBySlug(gameSlug) == null) {
@@ -117,9 +116,11 @@ public class GameAPI extends RoutingHandler {
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
 
-        if (gameSlug == null || projectTypeSlug == null) {
-            // TODO Error, shouldn't happen, but error anyway
-            return null;
+        if (gameSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_GAME);
+        }
+        if (projectTypeSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_TYPE);
         }
 
         if (this.gameDAO.findOneBySlug(gameSlug) == null) {
@@ -141,9 +142,16 @@ public class GameAPI extends RoutingHandler {
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
         String projectSlug = RequestUtil.getParam(exchange, "project_slug");
 
-        if (gameSlug == null || projectTypeSlug == null || projectSlug == null) {
-            // TODO Error, shouldn't happen, but error anyway
-            return null;
+        if (gameSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_GAME);
+        }
+
+        if (projectTypeSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_TYPE);
+        }
+
+        if (projectSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT);
         }
 
         if (this.gameDAO.findOneBySlug(gameSlug) == null) {
@@ -168,9 +176,16 @@ public class GameAPI extends RoutingHandler {
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
         String projectSlug = RequestUtil.getParam(exchange, "project_slug");
 
-        if (gameSlug == null || projectTypeSlug == null || projectSlug == null) {
-            // TODO Error, shouldn't happen, but error anyway
-            return null;
+        if (gameSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_GAME);
+        }
+
+        if (projectTypeSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_TYPE);
+        }
+
+        if (projectSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT);
         }
 
         if (this.gameDAO.findOneBySlug(gameSlug) == null) {
@@ -195,9 +210,12 @@ public class GameAPI extends RoutingHandler {
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
 
-        if (gameSlug == null || projectTypeSlug == null) {
-            // TODO Error, shouldn't happen, but error anyway
-            return null;
+        if (gameSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_GAME);
+        }
+
+        if (projectTypeSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_TYPE);
         }
 
         try (FormDataParser parser = FormParserFactory.builder().build().createParser(exchange)) {

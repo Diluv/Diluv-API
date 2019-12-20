@@ -1,8 +1,17 @@
 package com.diluv.api.utils.auth;
 
+import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.error.ErrorResponse;
+
 import org.apache.commons.validator.GenericValidator;
+import org.apache.commons.validator.routines.EmailValidator;
 
 public class Validator {
+
+    public static boolean validateEmail (String email) {
+
+        return EmailValidator.getInstance().isValid(email);
+    }
 
     public static boolean validateUsername (String username) {
 
@@ -10,6 +19,10 @@ public class Validator {
             return false;
         }
         return GenericValidator.matchRegexp(username, "([A-Za-z0-9-_]+)");
+    }
+
+    public static boolean validatePassword (String password) {
+        return !GenericValidator.isBlankOrNull(password) && password.length() <= 70 && password.length() >= 8;
     }
 
     public static boolean validateProjectName (String projectName) {

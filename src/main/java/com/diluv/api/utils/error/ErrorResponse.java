@@ -1,7 +1,5 @@
 package com.diluv.api.utils.error;
 
-import org.flywaydb.core.api.callback.Error;
-
 public enum ErrorResponse {
 
     INVALID_TERMS(ErrorType.BAD_REQUEST, "invalid.terms"),
@@ -12,6 +10,9 @@ public enum ErrorResponse {
     INVALID_PROJECT_SUMMARY(ErrorType.BAD_REQUEST, "invalid.project_summary"),
     INVALID_PROJECT_DESCRIPTION(ErrorType.BAD_REQUEST, "invalid.project_description"),
     INVALID_VERIFICATION_CODE(ErrorType.BAD_REQUEST, "invalid.verification_code"),
+    INVALID_GAME(ErrorType.BAD_REQUEST, "invalid.game"),
+    INVALID_PROJECT_TYPE(ErrorType.BAD_REQUEST, "invalid.project_type"),
+    INVALID_PROJECT(ErrorType.BAD_REQUEST, "invalid.project"),
     INVALID_MFA(ErrorType.BAD_REQUEST, "invalid.mfa"),
     REQUIRED_MFA(ErrorType.BAD_REQUEST, "required.mfa"),
 
@@ -37,9 +38,7 @@ public enum ErrorResponse {
     NOT_FOUND_PROJECT(ErrorType.BAD_REQUEST, "notfound.project"),
 
 
-    INTERNAL_SERVER_ERROR(ErrorType.INTERNAL_SERVER_ERROR, "error")
-
-    ;
+    INTERNAL_SERVER_ERROR(ErrorType.INTERNAL_SERVER_ERROR, "error");
     private final ErrorType type;
     private final String message;
 

@@ -34,8 +34,7 @@ public class UserAPI extends RoutingHandler {
 
         String usernameParam = RequestUtil.getParam(exchange, "username");
         if (usernameParam == null) {
-            // TODO Error, this probably shouldn't ever error, but check it in case
-            return null;
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_USERNAME);
         }
 
         String username = usernameParam;
@@ -56,10 +55,8 @@ public class UserAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
         }
 
-        // Todo fetch user from me/username, if logged in fetch additional data
         UserRecord userRecord = this.userDAO.findOneByUsername(username);
         if (userRecord == null) {
-            // TODO Error, Database select error or a connection error, this should be logged as it could show a larger problem
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
         }
 
@@ -74,8 +71,7 @@ public class UserAPI extends RoutingHandler {
         // TODO Implement a filter/pagination
         String usernameParam = RequestUtil.getParam(exchange, "username");
         if (usernameParam == null) {
-            // TODO Error, same as above. And move to this code to a central location
-            return null;
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_USERNAME);
         }
         String username = usernameParam;
         boolean authorized = false;
@@ -99,7 +95,7 @@ public class UserAPI extends RoutingHandler {
         if (userId == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
         }
-        //TODO Maybe switch to a singular SQL statement
+
         List<ProjectRecord> projectRecords = this.projectDAO.findAllByUserId(userId);
         List<ProjectDomain> projects = projectRecords.stream().map(ProjectDomain::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, projects);

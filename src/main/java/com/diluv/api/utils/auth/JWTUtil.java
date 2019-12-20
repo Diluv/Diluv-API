@@ -65,6 +65,7 @@ public class JWTUtil {
             return jwt;
         }
         catch (ParseException e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -79,6 +80,7 @@ public class JWTUtil {
             return claims.getStringClaim("username");
         }
         catch (ParseException e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -96,6 +98,7 @@ public class JWTUtil {
             }
         }
         catch (ParseException e) {
+            e.printStackTrace();
         }
         return null;
     }
