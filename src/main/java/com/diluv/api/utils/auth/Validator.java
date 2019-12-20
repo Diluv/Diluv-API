@@ -35,17 +35,11 @@ public class Validator {
 
     public static boolean validateProjectSummary (String projectSummary) {
 
-        if (GenericValidator.isBlankOrNull(projectSummary) || projectSummary.length() > 250 || projectSummary.length() < 10) {
-            return false;
-        }
-        return GenericValidator.matchRegexp(projectSummary, "([A-Za-z0-9-_:]+)");
+        return !GenericValidator.isBlankOrNull(projectSummary) && projectSummary.length() <= 250 && projectSummary.length() >= 10;
     }
 
     public static boolean validateProjectDescription (String projectDescription) {
 
-        if (GenericValidator.isBlankOrNull(projectDescription) || projectDescription.length() > 1000 || projectDescription.length() < 50) {
-            return false;
-        }
-        return GenericValidator.matchRegexp(projectDescription, "([A-Za-z0-9-_:]+)");
+        return !GenericValidator.isBlankOrNull(projectDescription) && projectDescription.length() <= 1000 && projectDescription.length() >= 50;
     }
 }

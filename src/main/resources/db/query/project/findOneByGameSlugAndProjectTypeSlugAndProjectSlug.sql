@@ -13,4 +13,4 @@ FROM projects p,
      users u
 WHERE (p.game_slug=? AND p.project_type_slug=? AND p.slug=?)
   AND p.user_id = u.id
-LIMIT 20;
+LIMIT 1;

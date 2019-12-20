@@ -70,7 +70,7 @@ public class ProjectTestDatabase implements ProjectDAO {
 
     @Override
     public boolean insertProject (String slug, String name, String summary, String description, String logo, long userId, String gameSlug, String projectTypeSlug) {
-        // TODO
-        return false;
+
+        return true;
     }
 }

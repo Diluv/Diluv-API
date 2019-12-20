@@ -104,7 +104,6 @@ public class GameAPI extends RoutingHandler {
         ProjectTypeRecord projectTypesRecords = this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
 
         if (projectTypesRecords == null) {
-            // TODO Error
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT_TYPE);
         }
 
@@ -218,6 +217,14 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_TYPE);
         }
 
+        if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_GAME);
+        }
+
+        if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT_TYPE);
+        }
+
         try (FormDataParser parser = FormParserFactory.builder().build().createParser(exchange)) {
             FormData data = parser.parseBlocking();
             String formName = RequestUtil.getFormParam(data, "name");
@@ -225,15 +232,15 @@ public class GameAPI extends RoutingHandler {
             String formDescription = RequestUtil.getFormParam(data, "description");
             //TODO Logo
 
-            if (Validator.validateProjectName(formName)) {
+            if (!Validator.validateProjectName(formName)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_NAME);
             }
 
-            if (Validator.validateProjectSummary(formSummary)) {
+            if (!Validator.validateProjectSummary(formSummary)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_SUMMARY);
             }
 
-            if (Validator.validateProjectDescription(formDescription)) {
+            if (!Validator.validateProjectDescription(formDescription)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_PROJECT_DESCRIPTION);
             }
 
@@ -246,24 +253,28 @@ public class GameAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
             }
 
-            String slug = slugify.slugify(formName);
+            String projectSlug = slugify.slugify(formName);
 
-            if (this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, slug) != null) {
+            if (this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) != null) {
                 //TODO Do we generate a new slug or just ask them to change project name?
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.TAKEN_SLUG);
             }
             //TODO Fix logo stuff
 
-            if (!this.projectDAO.insertProject(slug, formName, formSummary, formDescription, "logo.png", authId, gameSlug, projectTypeSlug)) {
+            if (!this.projectDAO.insertProject(projectSlug, formName, formSummary, formDescription, "logo.png", authId, gameSlug, projectTypeSlug)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT);
             }
-            //TODO Response project stuff
-            return ResponseUtil.successResponse(exchange, null);
+
+            ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+
+            if (projectRecord == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
+            }
+            return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
         }
         catch (IOException e) {
             e.printStackTrace();
         }
-        // TODO Error
         return ResponseUtil.errorResponse(exchange, ErrorResponse.INTERNAL_SERVER_ERROR);
     }
 }
