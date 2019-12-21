@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "data": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "slug": {
+                            "type": "string"
+                        },
+                        "gameSlug": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "slug",
+                        "gameSlug"
+                    ]
+                }
+            ]
+        }
+    },
+    "required": [
+        "data"
+    ]
+}

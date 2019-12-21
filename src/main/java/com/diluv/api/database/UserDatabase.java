@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 
 import com.diluv.api.DiluvAPI;
 import com.diluv.api.database.dao.UserDAO;
-import com.diluv.api.database.record.BaseUserRecord;
+import com.diluv.api.database.record.TempUserRecord;
 import com.diluv.api.database.record.UserRecord;
 import com.diluv.api.utils.SQLHandler;
 
@@ -165,7 +165,7 @@ public class UserDatabase implements UserDAO {
     }
 
     @Override
-    public BaseUserRecord findTempUserByEmailAndUsernameAndCode (String email, String username, String code) {
+    public TempUserRecord findTempUserByEmailAndUsernameAndCode (String email, String username, String code) {
 
         try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(FIND_TEMPUSER_BY_EMAIL_AND_USERNAME_AND_CODE)) {
             stmt.setString(1, email);
@@ -174,7 +174,7 @@ public class UserDatabase implements UserDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new BaseUserRecord(rs);
+                    return new TempUserRecord(rs);
                 }
             }
         }

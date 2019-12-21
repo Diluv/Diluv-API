@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "data": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "logoUrl": {
+                    "type": "string"
+                },
+                "cachedDownloads": {
+                    "type": "number"
+                },
+                "createdAt": {
+                    "type": "number"
+                },
+                "updatedAt": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "name",
+                "slug",
+                "summary",
+                "description",
+                "logoUrl",
+                "cachedDownloads",
+                "createdAt",
+                "updatedAt"
+            ]
+        }
+    },
+    "required": [
+        "data"
+    ]
+}

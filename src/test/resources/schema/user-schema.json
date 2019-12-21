@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "data": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "type": "string"
+                },
+                "avatarUrl": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "mfa": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "username",
+                "avatarUrl"
+            ]
+        }
+    },
+    "required": [
+        "data"
+    ]
+}

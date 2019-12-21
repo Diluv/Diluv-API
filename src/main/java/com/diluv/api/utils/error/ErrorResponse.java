@@ -2,29 +2,35 @@ package com.diluv.api.utils.error;
 
 public enum ErrorResponse {
 
-    INVALID_TERMS(ErrorType.BAD_REQUEST, "invalid.terms"),
-    INVALID_EMAIL(ErrorType.BAD_REQUEST, "invalid.email"),
-    INVALID_USERNAME(ErrorType.BAD_REQUEST, "invalid.username"),
-    INVALID_PASSWORD(ErrorType.BAD_REQUEST, "invalid.password"),
-    INVALID_PROJECT_NAME(ErrorType.BAD_REQUEST, "invalid.project_name"),
-    INVALID_PROJECT_SUMMARY(ErrorType.BAD_REQUEST, "invalid.project_summary"),
-    INVALID_PROJECT_DESCRIPTION(ErrorType.BAD_REQUEST, "invalid.project_description"),
-    INVALID_VERIFICATION_CODE(ErrorType.BAD_REQUEST, "invalid.verification_code"),
-    INVALID_GAME(ErrorType.BAD_REQUEST, "invalid.game"),
-    INVALID_PROJECT_TYPE(ErrorType.BAD_REQUEST, "invalid.project_type"),
-    INVALID_PROJECT(ErrorType.BAD_REQUEST, "invalid.project"),
-    INVALID_MFA(ErrorType.BAD_REQUEST, "invalid.mfa"),
-    REQUIRED_MFA(ErrorType.BAD_REQUEST, "required.mfa"),
+    // User Errors
+    USER_INVALID_MFA(ErrorType.BAD_REQUEST, "user.invalid.mfa"),
+    USER_INVALID_TERMS(ErrorType.BAD_REQUEST, "user.invalid.terms"),
+    USER_INVALID_EMAIL(ErrorType.BAD_REQUEST, "user.invalid.email"),
+    USER_INVALID_TOKEN(ErrorType.UNAUTHORIZED, "user.invalid.token"),
+    USER_INVALID_USERNAME(ErrorType.BAD_REQUEST, "user.invalid.username"),
+    USER_INVALID_PASSWORD(ErrorType.BAD_REQUEST, "user.invalid.password"),
+    USER_INVALID_VERIFICATION_CODE(ErrorType.BAD_REQUEST, "user.invalid.verification_code"),
+    USER_INVALID_PASSWORD_TYPE(ErrorType.INTERNAL_SERVER_ERROR, "user.invalid.password_type"),
+    USER_REQUIRED_TOKEN(ErrorType.UNAUTHORIZED, "user.required.token"),
+    USER_REQUIRED_MFA(ErrorType.BAD_REQUEST, "user.required.mfa"),
 
-    INVALID_TOKEN(ErrorType.UNAUTHORIZED, "invalid.token"),
+    USER_TAKEN_EMAIL(ErrorType.BAD_REQUEST, "user.taken.email"),
+    USER_TAKEN_USERNAME(ErrorType.BAD_REQUEST, "user.taken.username"),
+    USER_NOT_VERIFIED(ErrorType.BAD_REQUEST, "user.not_verified"),
+    USER_WRONG_PASSWORD(ErrorType.INTERNAL_SERVER_ERROR, "user.wrong.password"),
 
-    PASSWORD_MISMATCH(ErrorType.INTERNAL_SERVER_ERROR, "mismatch.password"),
-    INVALID_PASSWORD_TYPE(ErrorType.INTERNAL_SERVER_ERROR, "invalid.token"),
-    UNVERIFIED_USER(ErrorType.BAD_REQUEST, "unverified.user"),
+    // Game Errors
+    GAME_INVALID_SLUG(ErrorType.BAD_REQUEST, "game.invalid.slug"),
 
-    TAKEN_EMAIL(ErrorType.BAD_REQUEST, "taken.email"),
-    TAKEN_USERNAME(ErrorType.BAD_REQUEST, "taken.username"),
-    TAKEN_SLUG(ErrorType.BAD_REQUEST, "taken.slug"),
+    // Project Errors
+    PROJECT_INVALID_SLUG(ErrorType.BAD_REQUEST, "project.invalid.slug"),
+    PROJECT_INVALID_NAME(ErrorType.BAD_REQUEST, "project.invalid.name"),
+    PROJECT_INVALID_SUMMARY(ErrorType.BAD_REQUEST, "project.invalid.summary"),
+    PROJECT_INVALID_DESCRIPTION(ErrorType.BAD_REQUEST, "project.invalid.description"),
+    PROJECT_TAKEN_SLUG(ErrorType.BAD_REQUEST, "project.taken.slug"),
+
+    // Project Type Errors,
+    PROJECT_TYPE_INVALID_SLUG(ErrorType.BAD_REQUEST, "project_type.invalid.slug"),
 
     FAILED_CREATE_USER_REFRESH(ErrorType.INTERNAL_SERVER_ERROR, "database.create_user_refresh"),
     FAILED_CREATE_TEMP_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.create_temp_user"),
@@ -37,8 +43,10 @@ public enum ErrorResponse {
     NOT_FOUND_USER(ErrorType.BAD_REQUEST, "notfound.user"),
     NOT_FOUND_PROJECT(ErrorType.BAD_REQUEST, "notfound.project"),
 
-
-    INTERNAL_SERVER_ERROR(ErrorType.INTERNAL_SERVER_ERROR, "error");
+    FORM_INVALID(ErrorType.BAD_REQUEST, "form.invalid"),
+    ERROR_TOKEN(ErrorType.INTERNAL_SERVER_ERROR, "error.token"),
+    ERROR_ALGORITHM(ErrorType.INTERNAL_SERVER_ERROR, "error.algorithm"),
+    ;
     private final ErrorType type;
     private final String message;
 

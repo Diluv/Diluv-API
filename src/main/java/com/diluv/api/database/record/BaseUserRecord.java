@@ -14,11 +14,11 @@ public class BaseUserRecord {
     private String passwordType;
     private Timestamp createdAt;
 
-    public BaseUserRecord () {
+    protected BaseUserRecord () {
 
     }
 
-    public BaseUserRecord (ResultSet rs) throws SQLException {
+    protected BaseUserRecord (ResultSet rs) throws SQLException {
 
         this.id = rs.getLong("id");
         this.username = rs.getString("username");

@@ -1,25 +1,22 @@
 package com.diluv.api.endpoints.v1;
 
-import java.io.IOException;
 import java.util.Calendar;
 
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.diluv.api.endpoints.v1.domain.ErrorDomain;
-import com.diluv.api.endpoints.v1.user.domain.AuthorizedUserDomain;
-import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
-import com.diluv.api.endpoints.v1.user.domain.UserDomain;
-import com.diluv.api.utils.FileReader;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.auth.JWTUtil;
+import com.diluv.api.utils.error.ErrorResponse;
 import com.nimbusds.jose.JOSEException;
 
+import static io.restassured.RestAssured.given;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.hamcrest.Matchers.equalTo;
+
 public class UserTest {
-    private static final String BASE_URL = "/v1/users";
+    private static final String URL = "/v1/users";
 
     private static String darkhaxToken;
     private static String jaredlll08Token;
@@ -45,56 +42,129 @@ public class UserTest {
     }
 
     @Test
-    public void testUserByUsername () throws IOException {
+    public void testUserByUsername () {
 
-        HttpClientBuilder builder = HttpClientBuilder.create();
-        builder.disableAutomaticRetries();
-        try (CloseableHttpClient httpClient = builder.build()) {
-            // /user/me tests
-            TestUtil.getTest(httpClient, BASE_URL + "/me", FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/me", darkhaxToken, FileReader.readJsonFileByType("authorized_users/darkhax", AuthorizedUserDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/me", jaredlll08Token, FileReader.readJsonFileByType("authorized_users/jaredlll08", AuthorizedUserDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/me", invalidToken, FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
+        // /user/me tests
+        given()
+            .with().get(URL + "/me").then().assertThat().statusCode(401)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_REQUIRED_TOKEN.getMessage()));
 
-            // Check for a non-existing user
-            TestUtil.getTest(httpClient, BASE_URL + "/abc", FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/abc", darkhaxToken, FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
+        given()
+            .header("Authorization", "Bearer " + darkhaxToken)
+            .with().get(URL + "/me").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/user-schema.json"));
 
-            // Check for existing user with and without a token, and an invalid token
-            TestUtil.getTest(httpClient, BASE_URL + "/darkhax", FileReader.readJsonFileByType("users/darkhax", UserDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax", darkhaxToken, FileReader.readJsonFileByType("authorized_users/darkhax", AuthorizedUserDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax", jaredlll08Token, FileReader.readJsonFileByType("users/darkhax", UserDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax", invalidToken, FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
+        given()
+            .header("Authorization", "Bearer " + jaredlll08Token)
+            .with().get(URL + "/me").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/user-schema.json"));
 
-            // Check for wrong authorization
-            TestUtil.getTestToken(httpClient, BASE_URL + "/jaredlll08", darkhaxToken, FileReader.readJsonFileByType("users/jaredlll08", UserDomain.class));
-        }
+        given()
+            .header("Authorization", "Bearer " + invalidToken)
+            .with().get(URL + "/me").then().assertThat().statusCode(401)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_INVALID_TOKEN.getMessage()));
+
+        // Check for a non-existing user
+        given()
+            .with().get(URL + "/abc").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+        given()
+            .header("Authorization", "Bearer " + invalidToken)
+            .with().get(URL + "/abc").then().assertThat().statusCode(401)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_INVALID_TOKEN.getMessage()));
+        given()
+            .header("Authorization", "Bearer " + darkhaxToken)
+            .with().get(URL + "/abc").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+
+        // Check for existing user with and without a token, and an invalid token
+        given()
+            .with().get(URL + "/darkhax").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/user-schema.json"));
+        given()
+            .header("Authorization", "Bearer " + darkhaxToken)
+            .with().get(URL + "/darkhax").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/user-schema.json"));
+        given()
+            .header("Authorization", "Bearer " + jaredlll08Token)
+            .with().get(URL + "/darkhax").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/user-schema.json"));
+        given()
+            .header("Authorization", "Bearer " + invalidToken)
+            .with().get(URL + "/darkhax").then().assertThat().statusCode(401)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_INVALID_TOKEN.getMessage()));
+
+        // Check for wrong authorization
+        given()
+            .header("Authorization", "Bearer " + darkhaxToken)
+            .with().get(URL + "/jaredlll08").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/user-schema.json"));
     }
 
     @Test
-    public void testProjectsByUsername () throws IOException {
+    public void testProjectsByUsername () {
 
-        HttpClientBuilder builder = HttpClientBuilder.create();
-        builder.disableAutomaticRetries();
-        try (CloseableHttpClient httpClient = builder.build()) {
-            // /user/me/projects tests
-            TestUtil.getTest(httpClient, BASE_URL + "/me/projects", FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/me/projects", invalidToken, FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/me/projects", darkhaxToken, FileReader.readJsonFileByListType("user_projects/darkhax", ProjectDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/me/projects", jaredlll08Token, FileReader.readJsonFileByListType("user_projects/jaredlll08", ProjectDomain.class));
+        // /user/me/projects tests
+        given()
+            .with().get(URL + "/me/projects").then().assertThat().statusCode(401)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_REQUIRED_TOKEN.getMessage()));
 
-            // Check for a non-existing user
-            TestUtil.getTest(httpClient, BASE_URL + "/abc/projects", FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/abc/projects", darkhaxToken, FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
+        given()
+            .header("Authorization", "Bearer " + invalidToken)
+            .with().get(URL + "/me/projects").then().assertThat().statusCode(401)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_INVALID_TOKEN.getMessage()));
 
-            // Check for existing user with and without a token, and an invalid token
-            TestUtil.getTest(httpClient, BASE_URL + "/darkhax/projects", FileReader.readJsonFileByListType("user_projects/darkhax", ProjectDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax/projects", darkhaxToken, FileReader.readJsonFileByListType("user_projects/darkhax", ProjectDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax/projects", jaredlll08Token, FileReader.readJsonFileByListType("user_projects/darkhax", ProjectDomain.class));
-            TestUtil.getTestToken(httpClient, BASE_URL + "/darkhax/projects", invalidToken, FileReader.readJsonFile("errors/invalid.token", ErrorDomain.class));
+        given()
+            .header("Authorization", "Bearer " + darkhaxToken)
+            .with().get(URL + "/me/projects").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
+        given()
+            .header("Authorization", "Bearer " + jaredlll08Token)
+            .with().get(URL + "/me/projects").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
 
-            // Check for wrong authorization
-            TestUtil.getTestToken(httpClient, BASE_URL + "/jaredlll08/projects", darkhaxToken, FileReader.readJsonFileByListType("user_projects/jaredlll08", ProjectDomain.class));
-        }
+        // Check for a non-existing user
+        given()
+            .with().get(URL + "/abc/projects").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+
+        given()
+            .header("Authorization", "Bearer " + darkhaxToken)
+            .with().get(URL + "/abc/projects").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+
+        // Check for existing user with and without a token, and an invalid token
+        given()
+            .with().get(URL + "/darkhax/projects").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
+        given()
+            .header("Authorization", "Bearer " + darkhaxToken)
+            .with().get(URL + "/darkhax/projects").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
+        given()
+            .header("Authorization", "Bearer " + jaredlll08Token)
+            .with().get(URL + "/darkhax/projects").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
+        given()
+            .header("Authorization", "Bearer " + invalidToken)
+            .with().get(URL + "/darkhax/projects").then().assertThat().statusCode(401)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_INVALID_TOKEN.getMessage()));
+
+        // Check for wrong authorization
+        given()
+            .header("Authorization", "Bearer " + darkhaxToken)
+            .with().get(URL + "/jaredlll08/projects").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
     }
 }

@@ -1,31 +1,22 @@
 package com.diluv.api.endpoints.v1;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.diluv.api.endpoints.v1.domain.ErrorDomain;
-import com.diluv.api.utils.FileReader;
 import com.diluv.api.utils.TestUtil;
+import com.diluv.api.utils.error.ErrorResponse;
+
+import static io.restassured.RestAssured.given;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.hamcrest.Matchers.equalTo;
 
 public class AuthTest {
 
     private static final String URL = "/v1/auth";
 
-    private static CloseableHttpClient client;
-
     @BeforeAll
     public static void setup () {
-
-        client = HttpClientBuilder.create().disableAutomaticRetries().build();
 
         TestUtil.start();
     }
@@ -37,93 +28,110 @@ public class AuthTest {
     }
 
     @Test
-    public void testRegister () throws IOException {
+    public void testRegister () {
 
         // Valid user
-        List<NameValuePair> pairs = new ArrayList<>();
-        pairs.add(new BasicNameValuePair("email", "testing@example.com"));
-        pairs.add(new BasicNameValuePair("username", "testing"));
-        pairs.add(new BasicNameValuePair("password", "password"));
-        pairs.add(new BasicNameValuePair("terms", "true"));
-        TestUtil.postTest(client, URL + "/register", pairs, null);
-        pairs.clear();
+        given()
+            .formParam("email", "testing@example.com")
+            .formParam("username", "testing")
+            .formParam("password", "password")
+            .formParam("terms", "true")
+            .with().post(URL + "/register").then().assertThat().statusCode(200);
 
         // Email used
-        pairs.add(new BasicNameValuePair("email", "lclc98@example.com"));
-        pairs.add(new BasicNameValuePair("username", "testing"));
-        pairs.add(new BasicNameValuePair("password", "password"));
-        pairs.add(new BasicNameValuePair("terms", "true"));
-        TestUtil.postTest(client, URL + "/register", pairs, FileReader.readJsonFile("errors/taken.email", ErrorDomain.class));
-        pairs.clear();
+        given()
+            .formParam("email", "lclc98@example.com")
+            .formParam("username", "testing")
+            .formParam("password", "password")
+            .formParam("terms", "true")
+            .with().post(URL + "/register").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_TAKEN_EMAIL.getMessage()));
 
         // Username used
-        pairs.add(new BasicNameValuePair("email", "testing@example.com"));
-        pairs.add(new BasicNameValuePair("username", "lclc98"));
-        pairs.add(new BasicNameValuePair("password", "password"));
-        pairs.add(new BasicNameValuePair("terms", "true"));
-        TestUtil.postTest(client, URL + "/register", pairs, FileReader.readJsonFile("errors/taken.username", ErrorDomain.class));
-        pairs.clear();
+        given()
+            .formParam("email", "testing@example.com")
+            .formParam("username", "lclc98")
+            .formParam("password", "password")
+            .formParam("terms", "true")
+            .with().post(URL + "/register").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_TAKEN_USERNAME.getMessage()));
 
         // Terms false
-        pairs.add(new BasicNameValuePair("email", "lclc98@example.com"));
-        pairs.add(new BasicNameValuePair("username", "testing"));
-        pairs.add(new BasicNameValuePair("password", "password"));
-        pairs.add(new BasicNameValuePair("terms", "false"));
-        TestUtil.postTest(client, URL + "/register", pairs, FileReader.readJsonFile("errors/invalid.terms", ErrorDomain.class));
-        pairs.clear();
+        given()
+            .formParam("email", "testing@example.com")
+            .formParam("username", "lclc98")
+            .formParam("password", "password")
+            .formParam("terms", "false")
+            .with().post(URL + "/register").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_INVALID_TERMS.getMessage()));
     }
 
     @Test
-    public void testLogin () throws IOException {
+    public void testLogin () {
 
-        List<NameValuePair> pairs = new ArrayList<>();
-        pairs.add(new BasicNameValuePair("username", "darkhax"));
-        pairs.add(new BasicNameValuePair("password", "password"));
-        TestUtil.postTest(client, URL + "/login", pairs, FileReader.readJsonFile("errors/required.mfa", ErrorDomain.class));
-        pairs.clear();
+        given()
+            .formParam("username", "jaredlll08")
+            .formParam("password", "password")
+            .with().post(URL + "/login").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/login-schema.json"));
 
-        pairs.add(new BasicNameValuePair("username", "jaredlll08"));
-        pairs.add(new BasicNameValuePair("password", "password"));
-//        TestUtil.postTest(httpClient, BASE_URL + "/login", pairs, //TODO Fix matching);
-        pairs.clear();
+        given()
+            .formParam("username", "darkhax")
+            .formParam("password", "password")
+            .with().post(URL + "/login").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_REQUIRED_MFA.getMessage()));
 
-        pairs.add(new BasicNameValuePair("username", "lclc98"));
-        pairs.add(new BasicNameValuePair("password", "password"));
-        TestUtil.postTest(client, URL + "/login", pairs, FileReader.readJsonFile("errors/unverified.user", ErrorDomain.class));
-        pairs.clear();
 
-        pairs.add(new BasicNameValuePair("username", "testing"));
-        pairs.add(new BasicNameValuePair("password", "password"));
-        TestUtil.postTest(client, URL + "/login", pairs, FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
-        pairs.clear();
+        given()
+            .formParam("username", "lclc98")
+            .formParam("password", "password")
+            .with().post(URL + "/login").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_NOT_VERIFIED.getMessage()));
+
+        given()
+            .formParam("username", "testing")
+            .formParam("password", "password")
+            .with().post(URL + "/login").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
     }
 
     @Test
-    public void testVerify () throws IOException {
+    public void testVerify () {
 
-        List<NameValuePair> pairs = new ArrayList<>();
-        pairs.add(new BasicNameValuePair("email", "darkhax@example.com"));
-        pairs.add(new BasicNameValuePair("username", "darkhax"));
-        pairs.add(new BasicNameValuePair("code", "1"));
-        TestUtil.postTest(client, URL + "/verify", pairs, FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
-        pairs.clear();
+        given()
+            .formParam("email", "lclc98@example.com")
+            .formParam("username", "lclc98")
+            .formParam("code", "8f32d879-45b3-4b8b-ae44-999e59566125")
+            .with().post(URL + "/verify").then().assertThat().statusCode(200);
 
-        pairs.add(new BasicNameValuePair("email", "jaredlll08@example.com"));
-        pairs.add(new BasicNameValuePair("username", "jaredlll08"));
-        pairs.add(new BasicNameValuePair("code", "1"));
-//        TestUtil.postTest(httpClient, BASE_URL + "/login", pairs, //TODO Fix matching);
-        pairs.clear();
+        given()
+            .formParam("email", "darkhax@example.com")
+            .formParam("username", "darkhax")
+            .formParam("code", "1")
+            .with().post(URL + "/verify").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
 
-        pairs.add(new BasicNameValuePair("email", "lclc98@example.com"));
-        pairs.add(new BasicNameValuePair("username", "lclc98"));
-        pairs.add(new BasicNameValuePair("code", "8f32d879-45b3-4b8b-ae44-999e59566125"));
-        TestUtil.postTest(client, URL + "/verify", pairs, FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
-        pairs.clear();
+        given()
+            .formParam("email", "jaredlll08@example.com")
+            .formParam("username", "jaredlll08")
+            .formParam("code", "1")
+            .with().post(URL + "/verify").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
 
-        pairs.add(new BasicNameValuePair("email", "testing@example.com"));
-        pairs.add(new BasicNameValuePair("username", "testing"));
-        pairs.add(new BasicNameValuePair("code", "1"));
-        TestUtil.postTest(client, URL + "/verify", pairs, FileReader.readJsonFile("errors/notfound.user", ErrorDomain.class));
-        pairs.clear();
+        given()
+            .formParam("email", "testing@example.com")
+            .formParam("username", "testing")
+            .formParam("code", "1")
+            .with().post(URL + "/verify").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
     }
 }

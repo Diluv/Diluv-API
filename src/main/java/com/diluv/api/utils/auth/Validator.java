@@ -1,8 +1,5 @@
 package com.diluv.api.utils.auth;
 
-import com.diluv.api.utils.ResponseUtil;
-import com.diluv.api.utils.error.ErrorResponse;
-
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
 
@@ -22,6 +19,7 @@ public class Validator {
     }
 
     public static boolean validatePassword (String password) {
+
         return !GenericValidator.isBlankOrNull(password) && password.length() <= 70 && password.length() >= 8;
     }
 

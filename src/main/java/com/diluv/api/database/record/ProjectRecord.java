@@ -3,6 +3,8 @@ package com.diluv.api.database.record;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public class ProjectRecord {
     private long id;
     private String name;
@@ -35,6 +37,22 @@ public class ProjectRecord {
         this.userId = rs.getLong("user_id");
         this.gameSlug = rs.getString("game_slug");
         this.projectTypeSlug = rs.getString("project_type_slug");
+    }
+
+    @JsonCreator
+    public ProjectRecord (int id, String name, String slug, String summary, String description, String logo, long createdAt, long updatedAt, long currentTimeMillis1, long userId, String gameSlug, String projectTypeSlug) {
+
+        this.id = id;
+        this.name = name;
+        this.slug = slug;
+        this.summary = summary;
+        this.description = description;
+        this.logoUrl = logo;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.userId = userId;
+        this.gameSlug = gameSlug;
+        this.projectTypeSlug = projectTypeSlug;
     }
 
     public long getId () {

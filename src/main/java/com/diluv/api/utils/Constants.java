@@ -71,7 +71,7 @@ public class Constants {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return keyFactory.generatePrivate(spec);
         }
-        catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException e) {
+        catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
             LOGGER.log(Level.SEVERE, "Private Key", e);
         }
 

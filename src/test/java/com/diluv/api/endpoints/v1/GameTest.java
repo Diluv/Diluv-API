@@ -1,29 +1,22 @@
 package com.diluv.api.endpoints.v1;
 
-import java.io.IOException;
-
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.diluv.api.endpoints.v1.domain.ErrorDomain;
-import com.diluv.api.endpoints.v1.game.domain.GameDomain;
-import com.diluv.api.endpoints.v1.game.domain.ProjectTypeDomain;
-import com.diluv.api.utils.FileReader;
 import com.diluv.api.utils.TestUtil;
+import com.diluv.api.utils.error.ErrorResponse;
+
+import static io.restassured.RestAssured.get;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.hamcrest.Matchers.equalTo;
 
 public class GameTest {
 
-    private static final String BASE_URL = "/v1/games";
-
-    private static CloseableHttpClient httpClient;
+    private static final String URL = "/v1/games";
 
     @BeforeAll
     public static void setup () {
-
-        httpClient = HttpClientBuilder.create().disableAutomaticRetries().build();
 
         TestUtil.start();
     }
@@ -35,22 +28,27 @@ public class GameTest {
     }
 
     @Test
-    public void testGame () throws IOException {
+    public void testGame () {
 
-        TestUtil.getTest(httpClient, BASE_URL, FileReader.readJsonFileByType("games/getAllGames", GameDomain.class));
+        get(URL).then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/game-list-schema.json"));
     }
 
     @Test
-    public void testGameBySlug () throws IOException {
+    public void testGameBySlug () {
 
-        TestUtil.getTest(httpClient, BASE_URL + "/eco", FileReader.readJsonFile("errors/notfound.game", ErrorDomain.class));
-        TestUtil.getTest(httpClient, BASE_URL + "/minecraft", FileReader.readJsonFileByType("games/getMinecraft", GameDomain.class));
+        get(URL + "/eco").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.NOT_FOUND_GAME.getMessage()));
+        get(URL + "/minecraft").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/game-schema.json"));
     }
 
     @Test
-    public void testProjectTypesByGameSlug () throws IOException {
+    public void testProjectTypesByGameSlug () {
 
-        TestUtil.getTest(httpClient, BASE_URL + "/eco/types", FileReader.readJsonFile("errors/notfound.game", ErrorDomain.class));
-        TestUtil.getTest(httpClient, BASE_URL + "/minecraft/types", FileReader.readJsonFileByListType("game_types/getAllMinecraft", ProjectTypeDomain.class));
+        get(URL + "/eco/types").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.NOT_FOUND_GAME.getMessage()));
+
+        get(URL + "/minecraft/types").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-types-list-schema.json"));
     }
 }

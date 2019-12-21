@@ -1,8 +1,5 @@
 package com.diluv.api.endpoints.v1.user;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.diluv.api.database.dao.ProjectDAO;
 import com.diluv.api.database.dao.UserDAO;
 import com.diluv.api.database.record.ProjectRecord;
@@ -16,6 +13,9 @@ import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.error.ErrorResponse;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserAPI extends RoutingHandler {
 
@@ -34,7 +34,7 @@ public class UserAPI extends RoutingHandler {
 
         String usernameParam = RequestUtil.getParam(exchange, "username");
         if (usernameParam == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_USERNAME);
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
         }
 
         String username = usernameParam;
@@ -44,7 +44,7 @@ public class UserAPI extends RoutingHandler {
         if (token != null) {
             String tokenUsername = RequestUtil.getUsernameFromToken(token);
             if (tokenUsername == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
             }
             if ("me".equalsIgnoreCase(usernameParam) || tokenUsername.equalsIgnoreCase(usernameParam)) {
                 username = tokenUsername;
@@ -52,7 +52,7 @@ public class UserAPI extends RoutingHandler {
             }
         }
         else if ("me".equalsIgnoreCase(usernameParam)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
         }
 
         UserRecord userRecord = this.userDAO.findOneByUsername(username);
@@ -71,7 +71,7 @@ public class UserAPI extends RoutingHandler {
         // TODO Implement a filter/pagination
         String usernameParam = RequestUtil.getParam(exchange, "username");
         if (usernameParam == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_USERNAME);
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
         }
         String username = usernameParam;
         boolean authorized = false;
@@ -79,7 +79,7 @@ public class UserAPI extends RoutingHandler {
         if (token != null) {
             String tokenUsername = RequestUtil.getUsernameFromToken(token);
             if (tokenUsername == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
             }
 
             if ("me".equalsIgnoreCase(usernameParam) || tokenUsername.equalsIgnoreCase(usernameParam)) {
@@ -88,7 +88,7 @@ public class UserAPI extends RoutingHandler {
             }
         }
         else if ("me".equalsIgnoreCase(usernameParam)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.INVALID_TOKEN);
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
         }
 
         Long userId = this.userDAO.findUserIdByUsername(username);
