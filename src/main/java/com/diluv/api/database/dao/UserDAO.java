@@ -13,7 +13,7 @@ public interface UserDAO {
 
     UserRecord findOneByUsername (String username);
 
-    boolean insertUser (String email, String username, String password, String passwordType, String avatar, Timestamp createdAt);
+    boolean insertUser (String email, String username, String password, String passwordType,Timestamp createdAt);
 
     boolean insertUserRefresh (long userId, String randomKey, Timestamp time);
 

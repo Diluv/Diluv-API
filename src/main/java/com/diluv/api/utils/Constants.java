@@ -25,6 +25,7 @@ public class Constants {
     public static final String DB_HOSTNAME = getValueOrDefault("DB_HOSTNAME", "jdbc:mariadb://localhost:3306/diluv");
     public static final String DB_USERNAME = getValueOrDefault("DB_USERNAME", "root");
     public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
+    public static final String MEDIA_FOLDER = getValueOrDefault("MEDIA_FOLDER", "media");
     public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaults("ALLOWED_ORIGINS", Collections.emptySet());
 
     private static final Logger LOGGER = Logger.getLogger(Constants.class.getName());

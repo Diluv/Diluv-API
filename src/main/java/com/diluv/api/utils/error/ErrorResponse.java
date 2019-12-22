@@ -45,7 +45,10 @@ public enum ErrorResponse {
 
     FORM_INVALID(ErrorType.BAD_REQUEST, "form.invalid"),
     ERROR_TOKEN(ErrorType.INTERNAL_SERVER_ERROR, "error.token"),
+    ERROR_FOLDER(ErrorType.INTERNAL_SERVER_ERROR, "error.folder"),
+    ERROR_WRITING(ErrorType.INTERNAL_SERVER_ERROR, "error.writing"),
     ERROR_ALGORITHM(ErrorType.INTERNAL_SERVER_ERROR, "error.algorithm"),
+    ERROR_SAVING_AVATAR(ErrorType.INTERNAL_SERVER_ERROR, "error.saving_avatar"),
     ;
     private final ErrorType type;
     private final String message;

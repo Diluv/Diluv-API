@@ -56,7 +56,7 @@ public class UserTestDatabase implements UserDAO {
     }
 
     @Override
-    public boolean insertUser (String email, String username, String password, String passwordType, String avatar, Timestamp timestamp) {
+    public boolean insertUser (String email, String username, String password, String passwordType, Timestamp timestamp) {
 
         return true;
     }
@@ -100,10 +100,12 @@ public class UserTestDatabase implements UserDAO {
     @Override
     public TempUserRecord findTempUserByEmailAndUsernameAndCode (String email, String username, String code) {
 
-        if (email.equalsIgnoreCase("lclc98@example.com") &&
-            username.equalsIgnoreCase("lclc98") &&
-            code.equalsIgnoreCase("8f32d879-45b3-4b8b-ae44-999e59566125")) {
-            return this.tempUsersList.get(0);
+        for (TempUserRecord record : this.tempUsersList) {
+            if (record.getEmail().equalsIgnoreCase(email) &&
+                record.getUsername().equalsIgnoreCase(username) &&
+                record.getVerificationCode().equalsIgnoreCase(code)) {
+                return record;
+            }
         }
         return null;
     }

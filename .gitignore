@@ -1,4 +1,12 @@
 #################
+## Diluv
+#################
+
+*.pem
+rsa.private
+/media
+
+#################
 ## Eclipse
 #################
 
@@ -223,5 +231,3 @@ pip-log.txt
 
 .gradle/
 build/
-*.pem
-rsa.private

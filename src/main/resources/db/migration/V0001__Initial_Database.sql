@@ -9,7 +9,6 @@ CREATE TABLE users
 
     mfa           BOOL      DEFAULT FALSE,
     mfa_secret    VARCHAR(16),
-    avatar_url    VARCHAR(255)    NOT NULL,
 
     created_at    TIMESTAMP DEFAULT NOW(),
 

@@ -80,15 +80,14 @@ public class UserDatabase implements UserDAO {
     }
 
     @Override
-    public boolean insertUser (String email, String username, String password, String passwordType, String avatar, Timestamp createdAt) {
+    public boolean insertUser (String email, String username, String password, String passwordType,  Timestamp createdAt) {
 
         try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(INSERT_USER)) {
             stmt.setString(1, email);
             stmt.setString(2, username);
             stmt.setString(3, password);
             stmt.setString(4, passwordType);
-            stmt.setString(5, avatar);
-            stmt.setTimestamp(6, createdAt);
+            stmt.setTimestamp(5, createdAt);
 
             return stmt.executeUpdate() == 1;
         }

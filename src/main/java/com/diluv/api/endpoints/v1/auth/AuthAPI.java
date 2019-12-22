@@ -1,12 +1,17 @@
 package com.diluv.api.endpoints.v1.auth;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
@@ -16,6 +21,8 @@ import com.diluv.api.database.record.TempUserRecord;
 import com.diluv.api.database.record.UserRecord;
 import com.diluv.api.endpoints.v1.auth.domain.LoginDomain;
 import com.diluv.api.endpoints.v1.domain.Domain;
+import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.MD5Util;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.auth.JWTUtil;
@@ -163,20 +170,19 @@ public class AuthAPI extends RoutingHandler {
             if (!this.userDAO.insertUserRefresh(userRecord.getId(), randomKey, new Timestamp(refreshTokenExpire.getTimeInMillis()))) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_USER_REFRESH);
             }
-            try {
-                String accessToken = JWTUtil.generateAccessToken(userRecord.getId(), userRecord.getUsername(), accessTokenExpire.getTime());
-                String refreshToken = JWTUtil.generateRefreshToken(userRecord.getId(), refreshTokenExpire.getTime(), randomKey);
+            String accessToken = JWTUtil.generateAccessToken(userRecord.getId(), userRecord.getUsername(), accessTokenExpire.getTime());
+            String refreshToken = JWTUtil.generateRefreshToken(userRecord.getId(), refreshTokenExpire.getTime(), randomKey);
 
-                return ResponseUtil.successResponse(exchange, new LoginDomain(accessToken, accessTokenExpire.getTimeInMillis(), refreshToken, refreshTokenExpire.getTimeInMillis()));
-            }
-            catch (JOSEException e) {
-                e.printStackTrace();
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_TOKEN);
-            }
+            return ResponseUtil.successResponse(exchange, new LoginDomain(accessToken, accessTokenExpire.getTimeInMillis(), refreshToken, refreshTokenExpire.getTimeInMillis()));
+
         }
         catch (IOException e) {
             e.printStackTrace();
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
+        }
+        catch (JOSEException e) {
+            e.printStackTrace();
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_TOKEN);
         }
     }
 
@@ -209,15 +215,29 @@ public class AuthAPI extends RoutingHandler {
             }
 
             // Is the temp user older then 24 hours.
-            if (System.currentTimeMillis() - tUserRecord.getCreatedAt().getTime() <= (1000 * 60 * 60 * 24)) {
+            if (System.currentTimeMillis() - tUserRecord.getCreatedAt().getTime() >= (1000 * 60 * 60 * 24)) {
                 if (!this.userDAO.deleteTempUser(tUserRecord.getEmail(), tUserRecord.getUsername())) {
                     return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
                 }
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
             }
+            String emailHash = MD5Util.md5Hex(tUserRecord.getEmail());
 
-            // TODO Save avatar image from gravatar locally cache then set the logo to a sha of the image
-            if (!this.userDAO.insertUser(tUserRecord.getEmail(), tUserRecord.getUsername(), tUserRecord.getPassword(), tUserRecord.getPasswordType(), "avatar.png", tUserRecord.getCreatedAt())) {
+            try {
+                URL url = new URL("https://www.gravatar.com/avatar/" + emailHash + "?d=identicon");
+                BufferedImage image = ImageIO.read(url);
+                File file = new File(Constants.MEDIA_FOLDER, String.format("users/%d/avatar.png", tUserRecord.getId()));
+                file.getParentFile().mkdirs();
+                if (!ImageIO.write(image, "png", file)) {
+                    return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_AVATAR);
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_WRITING);
+            }
+
+            if (!this.userDAO.insertUser(tUserRecord.getEmail(), tUserRecord.getUsername(), tUserRecord.getPassword(), tUserRecord.getPasswordType(), tUserRecord.getCreatedAt())) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_USER);
             }
 
