@@ -5,8 +5,7 @@ SELECT id,
        password_type,
        mfa,
        mfa_secret,
-       avatar_url,
        created_at
 FROM users
 WHERE username=?
-LIMIT 1
+LIMIT 1;

@@ -106,7 +106,6 @@ CREATE TABLE projects
     slug              VARCHAR(255)    NOT NULL,
     summary           VARCHAR(255)    NOT NULL,
     description       VARCHAR(255)    NOT NULL,
-    logo_url          VARCHAR(255)    NOT NULL,
     cache_downloads   BIGINT UNSIGNED NOT NULL DEFAULT 0,
 
     reviewed          BOOL                     DEFAULT FALSE,

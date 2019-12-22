@@ -3,15 +3,12 @@ package com.diluv.api.endpoints.v1.auth;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import javax.imageio.ImageIO;
 
 import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
@@ -22,6 +19,7 @@ import com.diluv.api.database.record.UserRecord;
 import com.diluv.api.endpoints.v1.auth.domain.LoginDomain;
 import com.diluv.api.endpoints.v1.domain.Domain;
 import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.MD5Util;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
@@ -223,18 +221,13 @@ public class AuthAPI extends RoutingHandler {
             }
             String emailHash = MD5Util.md5Hex(tUserRecord.getEmail());
 
-            try {
-                URL url = new URL("https://www.gravatar.com/avatar/" + emailHash + "?d=identicon");
-                BufferedImage image = ImageIO.read(url);
-                File file = new File(Constants.MEDIA_FOLDER, String.format("users/%d/avatar.png", tUserRecord.getId()));
-                file.getParentFile().mkdirs();
-                if (!ImageIO.write(image, "png", file)) {
-                    return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_AVATAR);
-                }
+            BufferedImage image = ImageUtil.isValidImage("https://www.gravatar.com/avatar/" + emailHash + "?d=identicon");
+            if (image == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }
-            catch (IOException e) {
-                e.printStackTrace();
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_WRITING);
+            File file = new File(Constants.MEDIA_FOLDER, String.format("users/%d/avatar.png", tUserRecord.getId()));
+            if (!ImageUtil.saveImage(image, file)) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }
 
             if (!this.userDAO.insertUser(tUserRecord.getEmail(), tUserRecord.getUsername(), tUserRecord.getPassword(), tUserRecord.getPasswordType(), tUserRecord.getCreatedAt())) {

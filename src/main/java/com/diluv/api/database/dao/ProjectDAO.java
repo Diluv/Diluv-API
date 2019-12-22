@@ -20,5 +20,5 @@ public interface ProjectDAO {
 
     List<ProjectFileRecord> findAllProjectFilesByGameSlugAndProjectType (String gameSlug, String projectTypeSlug, String projectSlug);
 
-    boolean insertProject (String slug, String name, String summary, String description, String logo, long userId, String gameSlug, String projectTypeSlug);
+    boolean insertProject (String slug, String name, String summary, String description, long userId, String gameSlug, String projectTypeSlug);
 }

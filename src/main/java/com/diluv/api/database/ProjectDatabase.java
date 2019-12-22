@@ -147,17 +147,16 @@ public class ProjectDatabase implements ProjectDAO {
     }
 
     @Override
-    public boolean insertProject (String slug, String name, String summary, String description, String logo, long userId, String gameSlug, String projectTypeSlug) {
+    public boolean insertProject (String slug, String name, String summary, String description, long userId, String gameSlug, String projectTypeSlug) {
 
         try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(INSERT_PROJECT)) {
             stmt.setString(1, slug);
             stmt.setString(2, name);
             stmt.setString(3, summary);
             stmt.setString(4, description);
-            stmt.setString(5, logo);
-            stmt.setLong(6, userId);
-            stmt.setString(7, gameSlug);
-            stmt.setString(8, projectTypeSlug);
+            stmt.setLong(5, userId);
+            stmt.setString(6, gameSlug);
+            stmt.setString(7, projectTypeSlug);
 
             return stmt.executeUpdate() == 1;
         }

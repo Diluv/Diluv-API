@@ -17,9 +17,6 @@
                 "description": {
                     "type": "string"
                 },
-                "logoUrl": {
-                    "type": "string"
-                },
                 "cachedDownloads": {
                     "type": "number"
                 },
@@ -35,7 +32,6 @@
                 "slug",
                 "summary",
                 "description",
-                "logoUrl",
                 "cachedDownloads",
                 "createdAt",
                 "updatedAt"

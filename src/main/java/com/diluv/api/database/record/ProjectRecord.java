@@ -11,7 +11,6 @@ public class ProjectRecord {
     private String slug;
     private String summary;
     private String description;
-    private String logoUrl;
     private long cachedDownloads;
     private long createdAt;
     private long updatedAt;
@@ -30,7 +29,6 @@ public class ProjectRecord {
         this.slug = rs.getString("slug");
         this.summary = rs.getString("summary");
         this.description = rs.getString("description");
-        this.logoUrl = rs.getString("logo_url");
         this.cachedDownloads = rs.getLong("cached_downloads");
         this.createdAt = rs.getTimestamp("created_at").getTime();
         this.updatedAt = rs.getTimestamp("updated_at").getTime();
@@ -40,14 +38,14 @@ public class ProjectRecord {
     }
 
     @JsonCreator
-    public ProjectRecord (int id, String name, String slug, String summary, String description, String logo, long createdAt, long updatedAt, long currentTimeMillis1, long userId, String gameSlug, String projectTypeSlug) {
+    public ProjectRecord (int id, String name, String slug, String summary, String description, long cachedDownloads, long createdAt, long updatedAt, long userId, String gameSlug, String projectTypeSlug) {
 
         this.id = id;
         this.name = name;
         this.slug = slug;
         this.summary = summary;
         this.description = description;
-        this.logoUrl = logo;
+        this.cachedDownloads = cachedDownloads;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.userId = userId;
@@ -78,11 +76,6 @@ public class ProjectRecord {
     public String getDescription () {
 
         return this.description;
-    }
-
-    public String getLogoUrl () {
-
-        return this.logoUrl;
     }
 
     public long getCachedDownloads () {

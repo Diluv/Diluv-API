@@ -13,10 +13,12 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-
-import static com.diluv.api.utils.RequestUtil.BEARER;
+import io.undertow.server.HttpServerExchange;
 
 public class JWTUtil {
+
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String BEARER = "Bearer ";
 
     public static String generateAccessToken (long id, String username, Date time) throws JOSEException {
 
@@ -98,5 +100,37 @@ public class JWTUtil {
         catch (ParseException e) {
         }
         return null;
+    }
+
+    public static Long getUserIdFromToken (String token) {
+
+        if (JWTUtil.isBearerToken(token)) {
+            SignedJWT jwt = JWTUtil.getJWT(token);
+            if (jwt != null) {
+                return JWTUtil.getUserId(jwt);
+            }
+        }
+        return null;
+    }
+
+    public static String getUsernameFromToken (String token) {
+
+        if (JWTUtil.isBearerToken(token)) {
+            SignedJWT jwt = JWTUtil.getJWT(token);
+            if (jwt != null) {
+                return JWTUtil.getUsername(jwt);
+            }
+        }
+        return null;
+    }
+
+    public static boolean isBearerToken (String token) {
+
+        return BEARER.regionMatches(true, 0, token, 0, BEARER.length());
+    }
+
+    public static String getToken (HttpServerExchange exchange) {
+
+        return exchange.getRequestHeaders().getFirst(AUTHORIZATION);
     }
 }

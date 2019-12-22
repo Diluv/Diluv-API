@@ -1,6 +1,6 @@
-SELECT pt.name,
-       pt.slug,
-       pt.game_slug
-FROM project_types pt
-WHERE (pt.game_slug=?)
+SELECT name,
+       slug,
+       game_slug
+FROM project_types
+WHERE game_slug=?
 LIMIT 20;

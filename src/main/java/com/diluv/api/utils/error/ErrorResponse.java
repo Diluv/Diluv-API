@@ -25,6 +25,8 @@ public enum ErrorResponse {
     // Project Errors
     PROJECT_INVALID_SLUG(ErrorType.BAD_REQUEST, "project.invalid.slug"),
     PROJECT_INVALID_NAME(ErrorType.BAD_REQUEST, "project.invalid.name"),
+    PROJECT_INVALID_LOGO(ErrorType.BAD_REQUEST, "project.invalid.logo"),
+    PROJECT_INVALID_LOGO_SIZE(ErrorType.BAD_REQUEST, "project.invalid.logo_size"),
     PROJECT_INVALID_SUMMARY(ErrorType.BAD_REQUEST, "project.invalid.summary"),
     PROJECT_INVALID_DESCRIPTION(ErrorType.BAD_REQUEST, "project.invalid.description"),
     PROJECT_TAKEN_SLUG(ErrorType.BAD_REQUEST, "project.taken.slug"),
@@ -48,8 +50,8 @@ public enum ErrorResponse {
     ERROR_FOLDER(ErrorType.INTERNAL_SERVER_ERROR, "error.folder"),
     ERROR_WRITING(ErrorType.INTERNAL_SERVER_ERROR, "error.writing"),
     ERROR_ALGORITHM(ErrorType.INTERNAL_SERVER_ERROR, "error.algorithm"),
-    ERROR_SAVING_AVATAR(ErrorType.INTERNAL_SERVER_ERROR, "error.saving_avatar"),
-    ;
+    ERROR_SAVING_IMAGE(ErrorType.INTERNAL_SERVER_ERROR, "error.saving_image");
+
     private final ErrorType type;
     private final String message;
 

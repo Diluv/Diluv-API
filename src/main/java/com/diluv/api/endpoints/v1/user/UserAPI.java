@@ -10,6 +10,7 @@ import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
 import com.diluv.api.endpoints.v1.user.domain.UserDomain;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.error.ErrorResponse;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
@@ -39,10 +40,10 @@ public class UserAPI extends RoutingHandler {
 
         String username = usernameParam;
         boolean authorized = false;
-        String token = RequestUtil.getToken(exchange);
+        String token = JWTUtil.getToken(exchange);
 
         if (token != null) {
-            String tokenUsername = RequestUtil.getUsernameFromToken(token);
+            String tokenUsername = JWTUtil.getUsernameFromToken(token);
             if (tokenUsername == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
             }
@@ -75,9 +76,9 @@ public class UserAPI extends RoutingHandler {
         }
         String username = usernameParam;
         boolean authorized = false;
-        String token = RequestUtil.getToken(exchange);
+        String token = JWTUtil.getToken(exchange);
         if (token != null) {
-            String tokenUsername = RequestUtil.getUsernameFromToken(token);
+            String tokenUsername = JWTUtil.getUsernameFromToken(token);
             if (tokenUsername == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
             }

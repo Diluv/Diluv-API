@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
+import com.diluv.api.utils.error.ErrorHandler;
+
 import org.flywaydb.core.Flyway;
 
 import com.diluv.api.database.GameDatabase;
@@ -17,7 +19,6 @@ import com.diluv.api.endpoints.v1.game.GameAPI;
 import com.diluv.api.endpoints.v1.user.UserAPI;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.cors.CorsHandler;
-import com.diluv.api.utils.error.ErrorHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paranamer.ParanamerModule;
 import com.zaxxer.hikari.HikariDataSource;

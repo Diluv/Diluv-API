@@ -9,4 +9,4 @@ FROM temp_users
 WHERE email=?
   AND username=?
   AND verificationCode=?
-LIMIT 1
+LIMIT 1;

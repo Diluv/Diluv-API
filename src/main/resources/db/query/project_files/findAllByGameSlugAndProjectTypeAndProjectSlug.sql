@@ -11,6 +11,8 @@ SELECT pf.id,
        pf.user_id
 FROM project_files pf,
      projects p
-WHERE (p.game_slug=? AND p.project_type_slug=? AND p.slug=?)
-  AND pf.id = p.id
+WHERE pf.id = p.id
+  AND p.game_slug=?
+  AND p.project_type_slug=?
+  AND p.slug=?
 LIMIT 20;

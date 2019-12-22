@@ -8,7 +8,6 @@ public class ProjectDomain {
     private final String slug;
     private final String summary;
     private final String description;
-    private final String logoUrl;
     private final long cachedDownloads;
     private final long createdAt;
     private final long updatedAt;
@@ -20,7 +19,6 @@ public class ProjectDomain {
         this.slug = projectRecord.getSlug();
         this.summary = projectRecord.getSummary();
         this.description = projectRecord.getDescription();
-        this.logoUrl = projectRecord.getLogoUrl();
         this.cachedDownloads = projectRecord.getCachedDownloads();
         this.createdAt = projectRecord.getCreatedAt();
         this.updatedAt = projectRecord.getUpdatedAt();
@@ -44,11 +42,6 @@ public class ProjectDomain {
     public String getDescription () {
 
         return this.description;
-    }
-
-    public String getLogoUrl () {
-
-        return this.logoUrl;
     }
 
     public long getCachedDownloads () {

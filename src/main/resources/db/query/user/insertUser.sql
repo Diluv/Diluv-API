@@ -1,2 +1,2 @@
-INSERT INTO users (email, username, password, password_type, avatar_url, created_at)
-VALUES (?, ?, ?, ?, ?, ?)
+INSERT INTO users (email, username, password, password_type, created_at)
+VALUES (?, ?, ?, ?, ?);

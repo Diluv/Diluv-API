@@ -1,5 +1,7 @@
 package com.diluv.api.endpoints.v1.game;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,8 +17,11 @@ import com.diluv.api.endpoints.v1.game.domain.GameDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectFileDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectTypeDomain;
 import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
+import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.error.ErrorResponse;
 import com.github.slugify.Slugify;
@@ -206,6 +211,15 @@ public class GameAPI extends RoutingHandler {
 
     private Domain postProjectTypesByGameSlugAndProjectType (HttpServerExchange exchange) {
 
+        String token = JWTUtil.getToken(exchange);
+        if (token == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
+        }
+        Long authId = JWTUtil.getUserIdFromToken(token);
+        if (authId == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
+        }
+
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
 
@@ -230,7 +244,7 @@ public class GameAPI extends RoutingHandler {
             String formName = RequestUtil.getFormParam(data, "name");
             String formSummary = RequestUtil.getFormParam(data, "summary");
             String formDescription = RequestUtil.getFormParam(data, "description");
-            //TODO Logo
+            FormData.FileItem formLogo = RequestUtil.getFormFile(data, "logo");
 
             if (!Validator.validateProjectName(formName)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_NAME);
@@ -244,13 +258,16 @@ public class GameAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_DESCRIPTION);
             }
 
-            String token = RequestUtil.getToken(exchange);
-            if (token == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
+            if (formLogo == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO);
             }
-            Long authId = RequestUtil.getUserIdFromToken(token);
-            if (authId == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
+
+            if (formLogo.getFileSize() > 100000L) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO_SIZE);
+            }
+            BufferedImage image = ImageUtil.isValidImage(formLogo.getInputStream());
+            if (image == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO);
             }
 
             String projectSlug = slugify.slugify(formName);
@@ -259,9 +276,7 @@ public class GameAPI extends RoutingHandler {
                 //TODO Do we generate a new slug or just ask them to change project name?
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_TAKEN_SLUG);
             }
-            //TODO Fix logo stuff
-
-            if (!this.projectDAO.insertProject(projectSlug, formName, formSummary, formDescription, "logo.png", authId, gameSlug, projectTypeSlug)) {
+            if (!this.projectDAO.insertProject(projectSlug, formName, formSummary, formDescription, authId, gameSlug, projectTypeSlug)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT);
             }
 
@@ -269,6 +284,11 @@ public class GameAPI extends RoutingHandler {
 
             if (projectRecord == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
+            }
+
+            File file = new File(Constants.MEDIA_FOLDER, String.format("games/%s/%s/%s/logo.png", gameSlug, projectTypeSlug, projectSlug));
+            if (!ImageUtil.saveImage(image, file)) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }
             return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
         }

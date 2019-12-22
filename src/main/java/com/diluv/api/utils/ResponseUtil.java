@@ -22,6 +22,7 @@ public class ResponseUtil {
         if (domain != null) {
             try {
                 exchange.getResponseSender().send(DiluvAPI.MAPPER.writeValueAsString(domain));
+                exchange.endExchange();
             }
             catch (JsonProcessingException e) {
                 LOGGER.log(Level.SEVERE, "Error writing json", e);
