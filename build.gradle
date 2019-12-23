@@ -14,6 +14,7 @@ targetCompatibility = 1.8
 
 repositories {
     jcenter()
+    mavenCentral()
 }
 
 dependencies {
