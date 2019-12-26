@@ -23,6 +23,8 @@ public interface UserDAO {
 
     boolean insertTempUser (String email, String username, String password, String passwordType, String verificationCode);
 
+    TempUserRecord findTempUserByEmailAndUsername(String email, String username);
+
     TempUserRecord findTempUserByEmailAndUsernameAndCode (String email, String username, String code);
 
     boolean deleteTempUser (String email, String username);

@@ -51,6 +51,7 @@ public class AuthAPI extends RoutingHandler {
         this.post("/v1/auth/register", this::register);
         this.post("/v1/auth/login", this::login);
         this.post("/v1/auth/verify", this::verify);
+        this.post("/v1//auth/resend", this::resend);
         this.get("/v1/auth/checkusername/{username}", this::checkUsername);
     }
 
@@ -239,6 +240,46 @@ public class AuthAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
             }
 
+            return ResponseUtil.successResponse(exchange, null);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
+        }
+    }
+
+    private Domain resend (HttpServerExchange exchange) {
+
+        try (FormDataParser parser = FormParserFactory.builder().build().createParser(exchange)) {
+            FormData data = parser.parseBlocking();
+            String formEmail = RequestUtil.getFormParam(data, "email");
+            String formUsername = RequestUtil.getFormParam(data, "username");
+
+            if (!Validator.validateEmail(formEmail)) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_EMAIL);
+            }
+
+            if (!Validator.validateUsername(formUsername)) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
+            }
+
+            String email = formEmail.toLowerCase();
+            String username = formUsername.toLowerCase();
+
+            TempUserRecord tUserRecord = this.userDAO.findTempUserByEmailAndUsername(email, username);
+            if (tUserRecord == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
+            }
+
+            // Is the temp user older then 24 hours.
+            if (System.currentTimeMillis() - tUserRecord.getCreatedAt().getTime() >= (1000 * 60 * 60 * 24)) {
+                if (!this.userDAO.deleteTempUser(tUserRecord.getEmail(), tUserRecord.getUsername())) {
+                    return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
+                }
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
+            }
+            final String sendEmail = tUserRecord.getEmail();
+            //TODO Resend email
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (IOException e) {
