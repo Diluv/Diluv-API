@@ -110,13 +110,11 @@ public class AuthTest {
 
         given()
             .formParam("email", "lclc98@example.com")
-            .formParam("username", "lclc98")
             .formParam("code", "8f32d879-45b3-4b8b-ae44-999e59566125")
             .with().post(URL + "/verify").then().assertThat().statusCode(200);
 
         given()
             .formParam("email", "darkhax@example.com")
-            .formParam("username", "darkhax")
             .formParam("code", "1")
             .with().post(URL + "/verify").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
@@ -124,7 +122,6 @@ public class AuthTest {
 
         given()
             .formParam("email", "jaredlll08@example.com")
-            .formParam("username", "jaredlll08")
             .formParam("code", "1")
             .with().post(URL + "/verify").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
@@ -132,7 +129,6 @@ public class AuthTest {
 
         given()
             .formParam("email", "testing@example.com")
-            .formParam("username", "testing")
             .formParam("code", "1")
             .with().post(URL + "/verify").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))

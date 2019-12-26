@@ -25,7 +25,7 @@ public interface UserDAO {
 
     TempUserRecord findTempUserByEmailAndUsername(String email, String username);
 
-    TempUserRecord findTempUserByEmailAndUsernameAndCode (String email, String username, String code);
+    TempUserRecord findTempUserByEmailAndCode (String email, String code);
 
     boolean deleteTempUser (String email, String username);
 }

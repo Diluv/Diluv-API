@@ -191,15 +191,10 @@ public class AuthAPI extends RoutingHandler {
         try (FormDataParser parser = FormParserFactory.builder().build().createParser(exchange)) {
             FormData data = parser.parseBlocking();
             String formEmail = RequestUtil.getFormParam(data, "email");
-            String formUsername = RequestUtil.getFormParam(data, "username");
             String formCode = RequestUtil.getFormParam(data, "code");
 
             if (!Validator.validateEmail(formEmail)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_EMAIL);
-            }
-
-            if (!Validator.validateUsername(formUsername)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
             }
 
             if (GenericValidator.isBlankOrNull(formCode)) {
@@ -207,9 +202,8 @@ public class AuthAPI extends RoutingHandler {
             }
 
             String email = formEmail.toLowerCase();
-            String username = formUsername.toLowerCase();
 
-            TempUserRecord tUserRecord = this.userDAO.findTempUserByEmailAndUsernameAndCode(email, username, formCode);
+            TempUserRecord tUserRecord = this.userDAO.findTempUserByEmailAndCode(email, formCode);
             if (tUserRecord == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
             }

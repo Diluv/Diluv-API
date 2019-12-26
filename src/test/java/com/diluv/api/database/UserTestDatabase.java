@@ -110,11 +110,10 @@ public class UserTestDatabase implements UserDAO {
     }
 
     @Override
-    public TempUserRecord findTempUserByEmailAndUsernameAndCode (String email, String username, String code) {
+    public TempUserRecord findTempUserByEmailAndCode (String email, String code) {
 
         for (TempUserRecord record : this.tempUsersList) {
             if (record.getEmail().equalsIgnoreCase(email) &&
-                record.getUsername().equalsIgnoreCase(username) &&
                 record.getVerificationCode().equalsIgnoreCase(code)) {
                 return record;
             }

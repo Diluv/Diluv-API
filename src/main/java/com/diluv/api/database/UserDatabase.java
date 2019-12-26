@@ -23,7 +23,7 @@ public class UserDatabase implements UserDAO {
     private static final String EXIST_TEMPUSER_BY_USERNAME = SQLHandler.readFile("temp_user/existTempUserByUsername");
     private static final String INSERT_TEMPUSER = SQLHandler.readFile("temp_user/insertTempUser");
     private static final String FIND_TEMPUSER_BY_EMAIL_AND_USERNAME = SQLHandler.readFile("temp_user/findTempUserByEmailAndUsername");
-    private static final String FIND_TEMPUSER_BY_EMAIL_AND_USERNAME_AND_CODE = SQLHandler.readFile("temp_user/findTempUserByEmailAndUsernameAndCode");
+    private static final String FIND_TEMPUSER_BY_EMAIL_AND_CODE = SQLHandler.readFile("temp_user/findTempUserByEmailAndCode");
     private static final String DELETE_TEMPUSER = SQLHandler.readFile("temp_user/deleteTempUser");
 
     @Override
@@ -184,12 +184,11 @@ public class UserDatabase implements UserDAO {
     }
 
     @Override
-    public TempUserRecord findTempUserByEmailAndUsernameAndCode (String email, String username, String code) {
+    public TempUserRecord findTempUserByEmailAndCode (String email, String code) {
 
-        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(FIND_TEMPUSER_BY_EMAIL_AND_USERNAME_AND_CODE)) {
+        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(FIND_TEMPUSER_BY_EMAIL_AND_CODE)) {
             stmt.setString(1, email);
-            stmt.setString(2, username);
-            stmt.setString(3, code);
+            stmt.setString(2, code);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
