@@ -1,5 +1,9 @@
 package com.diluv.api.endpoints.v1;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
+import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -133,5 +137,22 @@ public class AuthTest {
             .with().post(URL + "/verify").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
             .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+    }
+
+    @Test
+    public void testCheckUsername () {
+
+        given()
+            .with().get(URL + "/checkusername/lclc98").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_TAKEN_USERNAME.getMessage()));
+
+        given()
+            .with().get(URL + "/checkusername/darkhax").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_TAKEN_USERNAME.getMessage()));
+
+        given()
+            .with().get(URL + "/checkusername/nonexisting").then().assertThat().statusCode(200);
     }
 }

@@ -51,6 +51,7 @@ public class AuthAPI extends RoutingHandler {
         this.post("/v1/auth/register", this::register);
         this.post("/v1/auth/login", this::login);
         this.post("/v1/auth/verify", this::verify);
+        this.get("/v1/auth/checkusername/{username}", this::checkUsername);
     }
 
     private Domain register (HttpServerExchange exchange) {
@@ -90,7 +91,7 @@ public class AuthAPI extends RoutingHandler {
 
             byte[] salt = new byte[16];
             SecureRandom.getInstanceStrong().nextBytes(salt);
-            String bcryptPassword = OpenBSDBCrypt.generate(formPassword.toCharArray(), salt, 14);
+            String bcryptPassword = OpenBSDBCrypt.generate(formPassword.toCharArray(), salt, Constants.BCRYPT_COST);
 
             String verificationCode = UUID.randomUUID().toString();
             if (!this.userDAO.insertTempUser(email, username, bcryptPassword, "bcrypt", verificationCode)) {
@@ -244,5 +245,19 @@ public class AuthAPI extends RoutingHandler {
             e.printStackTrace();
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
+    }
+
+    private Domain checkUsername (HttpServerExchange exchange) {
+
+        String username = RequestUtil.getParam(exchange, "username");
+        if (username == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
+        }
+
+        if (this.userDAO.findUserIdByUsername(username) != null || this.userDAO.existTempUserByUsername(username)) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_TAKEN_USERNAME);
+        }
+
+        return ResponseUtil.successResponse(exchange, null);
     }
 }

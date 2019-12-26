@@ -39,6 +39,13 @@ CREATE TABLE user_refresh
     PRIMARY KEY (user_id, code)
 );
 
+CREATE TABLE user_compromised_passwords
+(
+    password_hash CHAR(40) NOT NULL,
+    occurrences   BIGINT   NOT NULL,
+
+    PRIMARY KEY (password_hash)
+);
 
 CREATE TABLE user_mfa_recoveries
 (

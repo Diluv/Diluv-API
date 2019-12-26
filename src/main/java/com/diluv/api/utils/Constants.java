@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.validator.GenericValidator;
 
 public class Constants {
     public static final PrivateKey PRIVATE_KEY = getPrivateKey("private.pem");
@@ -27,6 +28,7 @@ public class Constants {
     public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
     public static final String MEDIA_FOLDER = getValueOrDefault("MEDIA_FOLDER", "media");
     public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaults("ALLOWED_ORIGINS", Collections.emptySet());
+    public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
 
     private static final Logger LOGGER = Logger.getLogger(Constants.class.getName());
 
@@ -60,6 +62,15 @@ public class Constants {
             return defaultValues;
         }
         return Arrays.stream(value.split(",")).collect(Collectors.toSet());
+    }
+
+    private static int getValueOrDefault (String env, int defaultValue) {
+
+        String value = System.getenv(env);
+        if (value == null || !GenericValidator.isInt(value)) {
+            return defaultValue;
+        }
+        return Integer.parseInt(value);
     }
 
     public static PrivateKey getPrivateKey (String fileLocation) {
