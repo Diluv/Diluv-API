@@ -16,6 +16,7 @@ public enum ErrorResponse {
 
     USER_TAKEN_EMAIL(ErrorType.BAD_REQUEST, "user.taken.email"),
     USER_TAKEN_USERNAME(ErrorType.BAD_REQUEST, "user.taken.username"),
+    USER_VERIFIED(ErrorType.BAD_REQUEST, "user.verified"),
     USER_NOT_VERIFIED(ErrorType.BAD_REQUEST, "user.not_verified"),
     USER_WRONG_PASSWORD(ErrorType.INTERNAL_SERVER_ERROR, "user.wrong.password"),
 

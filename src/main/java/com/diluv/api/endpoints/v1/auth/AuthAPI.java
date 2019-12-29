@@ -203,6 +203,10 @@ public class AuthAPI extends RoutingHandler {
 
             String email = formEmail.toLowerCase();
 
+            if (this.userDAO.findUserIdByEmail(email) != null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_VERIFIED);
+            }
+
             TempUserRecord tUserRecord = this.userDAO.findTempUserByEmailAndCode(email, formCode);
             if (tUserRecord == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
