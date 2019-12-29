@@ -7,7 +7,6 @@ import java.sql.Timestamp;
 public class UserRecord extends BaseUserRecord {
     private boolean mfa;
     private String mfaSecret;
-    private String avatarUrl;
 
     public UserRecord () {
 
@@ -18,15 +17,13 @@ public class UserRecord extends BaseUserRecord {
         super(rs);
         this.mfa = rs.getBoolean("mfa");
         this.mfaSecret = rs.getString("mfa_secret");
-        this.avatarUrl = rs.getString("avatar_url");
     }
 
-    public UserRecord (long id, String email, String username, String password, String passwordType, boolean mfa, String mfaSecret, String avatarUrl, Timestamp createdAt) {
+    public UserRecord (long id, String email, String username, String password, String passwordType, boolean mfa, String mfaSecret, Timestamp createdAt) {
 
         super(id, email, username, password, passwordType, createdAt);
         this.mfa = mfa;
         this.mfaSecret = mfaSecret;
-        this.avatarUrl = avatarUrl;
     }
 
     public boolean isMfa () {
@@ -37,10 +34,5 @@ public class UserRecord extends BaseUserRecord {
     public String getMfaSecret () {
 
         return this.mfaSecret;
-    }
-
-    public String getAvatarUrl () {
-
-        return this.avatarUrl;
     }
 }

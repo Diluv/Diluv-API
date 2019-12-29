@@ -5,6 +5,5 @@
     "password": "$2y$12$EOekQxPF3shOaXb2a2S3rusom7V6KTkMX8/gDHbXovHwKaOC4EBPu",
     "passwordType": "bcrypt",
     "mfa": true,
-    "mfaSecret": "secret",
-    "avatarUrl": "https://via.placeholder.com/150"
+    "mfaSecret": "secret"
 }
