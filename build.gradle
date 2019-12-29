@@ -6,8 +6,6 @@ plugins {
 }
 
 version = "${project_version}" + getBuildNumber() + (isSnapshot() ? "-snapshot" : '')
-group = "${project_group}"
-archivesBaseName = "${project_name}"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -43,8 +41,17 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'DiluvAPI',
-            'Main-Class': 'com.diluv.api.DiluvAPI'
+        attributes([
+            'Timestamp': System.currentTimeMillis(),
+            'Specification-Title': project.archivesBaseName,
+            'Specification-Vendor': project.vendor,
+            'Specification-Version': project.version,
+            'Implementation-Title': project.archivesBaseName,
+            'Implementation-Version': project.version,
+            'Implementation-Vendor' : project.vendor,
+            'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            'Built-On-Java': "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})"
+        ])
     }
 }
 
