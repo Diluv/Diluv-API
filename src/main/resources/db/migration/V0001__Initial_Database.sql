@@ -164,20 +164,38 @@ CREATE TABLE project_links
     FOREIGN KEY (project_id) REFERENCES projects (id)
 );
 
-CREATE TABLE project_files
+# Project File Queue
+CREATE TABLE project_file_queue
 (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     name       VARCHAR(255)    NOT NULL,
+
+    changelog  TEXT            NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    project_id BIGINT UNSIGNED NOT NULL,
+    user_id    BIGINT UNSIGNED NOT NULL,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (project_id) REFERENCES projects (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE project_files
+(
+    id         BIGINT UNSIGNED NOT NULL,
+
+    name       VARCHAR(255)    NOT NULL,
+    md5        VARCHAR(32)     NOT NULL,
+    sha256     VARCHAR(64)     NOT NULL,
     sha512     VARCHAR(128)    NOT NULL,
-    crc32      VARCHAR(8)      NOT NULL,
     size       BIGINT UNSIGNED NOT NULL,
 
     changelog  TEXT            NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
 
-    reviewed   BOOL      DEFAULT FALSE,
     released   BOOL      DEFAULT FALSE,
 
     project_id BIGINT UNSIGNED NOT NULL,
@@ -206,16 +224,6 @@ CREATE TABLE project_file_modloaders
     PRIMARY KEY (project_file_id, modloader_id),
     FOREIGN KEY (project_file_id) REFERENCES project_files (id),
     FOREIGN KEY (modloader_id) REFERENCES game_modloaders (id)
-);
-
-# Project File Queue
-CREATE TABLE project_file_queue
-(
-    project_file_id BIGINT UNSIGNED NOT NULL,
-    process_name    VARCHAR(255)    NOT NULL,
-
-    PRIMARY KEY (project_file_id, process_name),
-    FOREIGN KEY (project_file_id) REFERENCES project_files (id)
 );
 
 CREATE TABLE nodecraft_commits
