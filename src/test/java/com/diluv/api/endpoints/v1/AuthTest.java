@@ -118,14 +118,14 @@ public class AuthTest {
             .formParam("code", "1")
             .with().post(URL + "/verify").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
-            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+            .body("message", equalTo(ErrorResponse.USER_VERIFIED.getMessage()));
 
         given()
             .formParam("email", "jaredlll08@example.com")
             .formParam("code", "1")
             .with().post(URL + "/verify").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
-            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+            .body("message", equalTo(ErrorResponse.USER_VERIFIED.getMessage()));
 
         given()
             .formParam("email", "testing@example.com")
