@@ -1,9 +1,11 @@
 package com.diluv.api.utils;
 
 import com.diluv.api.DiluvAPI;
+import com.diluv.api.database.EmailTestDatabase;
 import com.diluv.api.database.GameTestDatabase;
 import com.diluv.api.database.ProjectTestDatabase;
 import com.diluv.api.database.UserTestDatabase;
+import com.diluv.api.database.dao.EmailDAO;
 import com.diluv.api.database.dao.GameDAO;
 import com.diluv.api.database.dao.ProjectDAO;
 import com.diluv.api.database.dao.UserDAO;
@@ -21,10 +23,11 @@ public class TestUtil {
         GameDAO gameDAO = new GameTestDatabase();
         ProjectDAO projectDAO = new ProjectTestDatabase();
         UserDAO userDAO = new UserTestDatabase();
+        EmailDAO emailDAO = new EmailTestDatabase();
 
         TestUtil.server = Undertow.builder()
             .addHttpListener(PORT, IP)
-            .setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, userDAO))
+            .setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, userDAO,emailDAO))
             .build();
         TestUtil.server.start();
 

@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
+import com.diluv.api.database.dao.EmailDAO;
 import com.diluv.api.database.dao.UserDAO;
 import com.diluv.api.database.record.TempUserRecord;
 import com.diluv.api.database.record.UserRecord;
@@ -44,10 +45,12 @@ public class AuthAPI extends RoutingHandler {
 
     private final GoogleAuthenticator ga = new GoogleAuthenticator(gacb.build());
     private final UserDAO userDAO;
+    private final EmailDAO emailDAO;
 
-    public AuthAPI (UserDAO userDAO) {
+    public AuthAPI (UserDAO userDAO, EmailDAO emailDAO) {
 
         this.userDAO = userDAO;
+        this.emailDAO = emailDAO;
         this.post("/v1/auth/register", this::register);
         this.post("/v1/auth/login", this::login);
         this.post("/v1/auth/verify", this::verify);
@@ -82,6 +85,11 @@ public class AuthAPI extends RoutingHandler {
 
             String email = formEmail.toLowerCase();
             String username = formUsername.toLowerCase();
+
+            String domain = email.split("@")[1];
+            if (this.emailDAO.existsBlacklist(email, domain)) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_BLACKLISTED_EMAIL);
+            }
 
             if (this.userDAO.findUserIdByUsername(username) != null || this.userDAO.existTempUserByUsername(username)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_TAKEN_USERNAME);

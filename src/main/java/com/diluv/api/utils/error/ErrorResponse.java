@@ -19,6 +19,7 @@ public enum ErrorResponse {
     USER_VERIFIED(ErrorType.BAD_REQUEST, "user.verified"),
     USER_NOT_VERIFIED(ErrorType.BAD_REQUEST, "user.not_verified"),
     USER_WRONG_PASSWORD(ErrorType.INTERNAL_SERVER_ERROR, "user.wrong.password"),
+    USER_BLACKLISTED_EMAIL(ErrorType.BAD_REQUEST, "user.blacklisted.email"),
 
     // Game Errors
     GAME_INVALID_SLUG(ErrorType.BAD_REQUEST, "game.invalid.slug"),

@@ -42,6 +42,25 @@ public class AuthTest {
             .formParam("terms", "true")
             .with().post(URL + "/register").then().assertThat().statusCode(200);
 
+        // Banned domains
+        given()
+            .formParam("email", "testing@banned.com")
+            .formParam("username", "testing")
+            .formParam("password", "password")
+            .formParam("terms", "true")
+            .with().post(URL + "/register").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_BLACKLISTED_EMAIL.getMessage()));
+
+        given()
+            .formParam("email", "test@banned2.com")
+            .formParam("username", "testing")
+            .formParam("password", "password")
+            .formParam("terms", "true")
+            .with().post(URL + "/register").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_BLACKLISTED_EMAIL.getMessage()));
+
         // Email used
         given()
             .formParam("email", "lclc98@example.com")

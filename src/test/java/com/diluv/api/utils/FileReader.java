@@ -37,7 +37,7 @@ public class FileReader {
 
     public static <T> T readJsonFile (String file, Class<T> c) {
 
-        URL url = SQLHandler.class.getClassLoader().getResource("response/" + file + ".json");
+        URL url = SQLHandler.class.getClassLoader().getResource("records/" + file + ".json");
         if (url == null)
             return null;
         File f = new File(url.getFile());
@@ -48,50 +48,6 @@ public class FileReader {
             return null;
         try {
             return DiluvAPI.MAPPER.readValue(data, c);
-        }
-        catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static <T> DataDomain<T> readJsonFileByType (String file, Class<T> c) {
-
-        URL url = SQLHandler.class.getClassLoader().getResource("response/" + file + ".json");
-        if (url == null)
-            return null;
-        File f = new File(url.getFile());
-
-        String data = FileReader.readFile(f);
-
-        if (data == null)
-            return null;
-        try {
-            return DiluvAPI.MAPPER.readValue(data, new TypeReference<DataDomain<T>>() {
-            });
-        }
-        catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static <T> DataDomain<List<T>> readJsonFileByListType (String file, Class<T> c) {
-
-        URL url = SQLHandler.class.getClassLoader().getResource("response/" + file + ".json");
-        if (url == null)
-            return null;
-        File f = new File(url.getFile());
-
-        String data = FileReader.readFile(f);
-
-        if (data == null)
-            return null;
-        try {
-            return DiluvAPI.MAPPER.readValue(data, new TypeReference<DataDomain<List<T>>>() {
-            });
         }
         catch (JsonProcessingException e) {
             e.printStackTrace();
