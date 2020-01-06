@@ -6,6 +6,6 @@ SELECT id,
        created_at,
        verificationCode
 FROM temp_users
-WHERE email=?
-  AND verificationCode=?
+WHERE email = ?
+  AND verificationCode = ?
 LIMIT 1;

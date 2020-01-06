@@ -11,7 +11,7 @@ FROM projects p,
      games g,
      users u
 WHERE p.user_id = u.id
-  AND p.game_slug=?
-  AND p.project_type_slug=?
+  AND p.game_slug = ?
+  AND p.project_type_slug = ?
   AND p.released = TRUE
 LIMIT 20;

@@ -7,5 +7,5 @@ SELECT id,
        mfa_secret,
        created_at
 FROM users
-WHERE username=?
+WHERE username = ?
 LIMIT 1;

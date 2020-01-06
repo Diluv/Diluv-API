@@ -1,4 +1,4 @@
 SELECT id
 FROM temp_users
-WHERE email=?
+WHERE email = ?
 LIMIT 1;

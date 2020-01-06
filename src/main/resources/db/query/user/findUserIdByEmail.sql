@@ -1,4 +1,4 @@
 SELECT id
 FROM users
-WHERE email=?
+WHERE email = ?
 LIMIT 1;

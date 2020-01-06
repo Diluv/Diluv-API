@@ -1,4 +1,4 @@
 SELECT id
 FROM temp_users
-WHERE username=?
+WHERE username = ?
 LIMIT 1

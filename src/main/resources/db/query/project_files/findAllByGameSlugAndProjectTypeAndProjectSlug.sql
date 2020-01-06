@@ -12,7 +12,7 @@ SELECT pf.id,
 FROM project_files pf,
      projects p
 WHERE pf.id = p.id
-  AND p.game_slug=?
-  AND p.project_type_slug=?
-  AND p.slug=?
+  AND p.game_slug = ?
+  AND p.project_type_slug = ?
+  AND p.slug = ?
 LIMIT 20;
