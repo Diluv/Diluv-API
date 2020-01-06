@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'io.undertow', name: 'undertow-core', version: '2.0.28.Final'
+    implementation group: 'io.undertow', name: 'undertow-core', version: '2.0.29.Final'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.13.0'
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
@@ -24,8 +24,8 @@ dependencies {
 
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '8.4'
     implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.64'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.1'
-    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-paranamer', version: '2.10.1'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.2'
+    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-paranamer', version: '2.10.2'
 
     implementation group: 'com.zaxxer', name: 'HikariCP', version: '3.4.1'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '6.1.3'
