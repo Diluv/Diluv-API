@@ -1,5 +1,8 @@
 package com.diluv.api.endpoints.v1.user;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.diluv.api.database.dao.ProjectDAO;
 import com.diluv.api.database.dao.UserDAO;
 import com.diluv.api.database.record.ProjectRecord;
@@ -14,9 +17,6 @@ import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.error.ErrorResponse;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserAPI extends RoutingHandler {
 

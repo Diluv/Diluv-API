@@ -2,6 +2,7 @@ package com.diluv.api.database.dao;
 
 import java.sql.Timestamp;
 
+import com.diluv.api.database.record.RefreshTokenRecord;
 import com.diluv.api.database.record.TempUserRecord;
 import com.diluv.api.database.record.UserRecord;
 
@@ -13,9 +14,7 @@ public interface UserDAO {
 
     UserRecord findOneByUsername (String username);
 
-    boolean insertUser (String email, String username, String password, String passwordType,Timestamp createdAt);
-
-    boolean insertUserRefresh (long userId, String randomKey, Timestamp time);
+    boolean insertUser (String email, String username, String password, String passwordType, Timestamp createdAt);
 
     boolean existTempUserByEmail (String email);
 
@@ -23,9 +22,15 @@ public interface UserDAO {
 
     boolean insertTempUser (String email, String username, String password, String passwordType, String verificationCode);
 
-    TempUserRecord findTempUserByEmailAndUsername(String email, String username);
+    TempUserRecord findTempUserByEmailAndUsername (String email, String username);
 
     TempUserRecord findTempUserByEmailAndCode (String email, String code);
 
     boolean deleteTempUser (String email, String username);
+
+    boolean insertRefreshToken (long userId, String randomKey, Timestamp time);
+
+    RefreshTokenRecord findRefreshTokenByUserIdAndKey (Long userId, String key);
+
+    boolean deleteRefreshTokenByUserIdAndKey (Long userId, String key);
 }

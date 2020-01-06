@@ -7,10 +7,10 @@ CREATE TABLE users
     password      CHAR(60)        NOT NULL,
     password_type VARCHAR(30)     NOT NULL,
 
-    mfa           BOOL      DEFAULT FALSE,
+    mfa           BOOL                     DEFAULT FALSE,
     mfa_secret    VARCHAR(16),
 
-    created_at    TIMESTAMP DEFAULT NOW(),
+    created_at    TIMESTAMP       NOT NULL DEFAULT NOW(),
 
     PRIMARY KEY (id)
 );
@@ -22,19 +22,19 @@ CREATE TABLE temp_users
     email            VARCHAR(255)    NOT NULL UNIQUE,
     password         CHAR(60)        NOT NULL,
     password_type    VARCHAR(30)     NOT NULL,
-    created_at       TIMESTAMP DEFAULT NOW(),
+    created_at       TIMESTAMP       NOT NULL DEFAULT NOW(),
 
     verificationCode CHAR(36)        NOT NULL,
 
     PRIMARY KEY (id)
 );
 
-CREATE TABLE user_refresh
+CREATE TABLE refresh_tokens
 (
-    user_id   BIGINT UNSIGNED NOT NULL,
-    code      CHAR(36)        NOT NULL,
+    user_id    BIGINT UNSIGNED NOT NULL,
+    code       CHAR(36)        NOT NULL,
 
-    expiredAt TIMESTAMP,
+    expired_at TIMESTAMP       NOT NULL NOT NULL,
 
     PRIMARY KEY (user_id, code)
 );
@@ -118,8 +118,8 @@ CREATE TABLE projects
     reviewed          BOOL                     DEFAULT FALSE,
     released          BOOL                     DEFAULT FALSE,
 
-    created_at        TIMESTAMP                DEFAULT NOW(),
-    updated_at        TIMESTAMP                DEFAULT NOW() ON UPDATE NOW(),
+    created_at        TIMESTAMP       NOT NULL DEFAULT NOW(),
+    updated_at        TIMESTAMP       NOT NULL DEFAULT NOW() ON UPDATE NOW(),
 
     user_id           BIGINT UNSIGNED NOT NULL,
     game_slug         VARCHAR(200)    NOT NULL,
@@ -139,7 +139,7 @@ CREATE TABLE project_authors
 
     role          VARCHAR(255)    NOT NULL,
 
-    uploaded_file BOOL DEFAULT FALSE,
+    uploaded_file BOOL            NOT NULL DEFAULT FALSE,
     PRIMARY KEY (id),
     FOREIGN KEY (project_id) REFERENCES projects (id),
     FOREIGN KEY (author_id) REFERENCES users (id)
@@ -172,7 +172,7 @@ CREATE TABLE project_file_queue
     name       VARCHAR(255)    NOT NULL,
 
     changelog  TEXT            NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP       NOT NULL DEFAULT NOW(),
 
     project_id BIGINT UNSIGNED NOT NULL,
     user_id    BIGINT UNSIGNED NOT NULL,
@@ -193,10 +193,10 @@ CREATE TABLE project_files
     size       BIGINT UNSIGNED NOT NULL,
 
     changelog  TEXT            NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW() ON UPDATE NOW(),
+    created_at TIMESTAMP       NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP       NOT NULL DEFAULT NOW() ON UPDATE NOW(),
 
-    released   BOOL      DEFAULT FALSE,
+    released   BOOL            NOT NULL DEFAULT FALSE,
 
     project_id BIGINT UNSIGNED NOT NULL,
     user_id    BIGINT UNSIGNED NOT NULL,
@@ -224,16 +224,6 @@ CREATE TABLE project_file_modloaders
     PRIMARY KEY (project_file_id, modloader_id),
     FOREIGN KEY (project_file_id) REFERENCES project_files (id),
     FOREIGN KEY (modloader_id) REFERENCES game_modloaders (id)
-);
-
-CREATE TABLE nodecraft_commits
-(
-    id         VARCHAR(36) NOT NULL,
-
-    created_at TIMESTAMP DEFAULT NOW(),
-    valid      BOOL      DEFAULT TRUE,
-
-    PRIMARY KEY (id)
 );
 
 # Insert default data

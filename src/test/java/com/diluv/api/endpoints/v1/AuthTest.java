@@ -1,15 +1,15 @@
 package com.diluv.api.endpoints.v1;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.util.Calendar;
 
-import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.diluv.api.utils.TestUtil;
+import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.error.ErrorResponse;
+import com.nimbusds.jose.JOSEException;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
@@ -18,9 +18,14 @@ import static org.hamcrest.Matchers.equalTo;
 public class AuthTest {
 
     private static final String URL = "/v1/auth";
+    private static String darkhaxRefreshToken;
 
     @BeforeAll
-    public static void setup () {
+    public static void setup () throws JOSEException {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, 30);
+        darkhaxRefreshToken = JWTUtil.generateRefreshToken(0, "darkhax", "cd65cb00-b9a6-4da1-9b23-d7edfe2f9fa5", calendar.getTime());
 
         TestUtil.start();
     }
@@ -152,6 +157,21 @@ public class AuthTest {
             .with().post(URL + "/verify").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
             .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+    }
+
+
+    @Test
+    public void testRefresh () {
+
+        given()
+            .with().post(URL + "/refresh").then().assertThat().statusCode(401)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_REQUIRED_TOKEN.getMessage()));
+
+        given()
+            .header("Authorization", "Bearer " + darkhaxRefreshToken)
+            .with().post(URL + "/refresh").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/login-schema.json"));
     }
 
     @Test

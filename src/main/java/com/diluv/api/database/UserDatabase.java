@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 
 import com.diluv.api.DiluvAPI;
 import com.diluv.api.database.dao.UserDAO;
+import com.diluv.api.database.record.RefreshTokenRecord;
 import com.diluv.api.database.record.TempUserRecord;
 import com.diluv.api.database.record.UserRecord;
 import com.diluv.api.utils.SQLHandler;
@@ -17,7 +18,6 @@ public class UserDatabase implements UserDAO {
     private static final String FIND_USERID_BY_USERNAME = SQLHandler.readFile("user/findUserIdByUsername");
     private static final String FIND_USER_BY_USERNAME = SQLHandler.readFile("user/findUserByUsername");
     private static final String INSERT_USER = SQLHandler.readFile("user/insertUser");
-    private static final String INSERT_USER_REFRESH = SQLHandler.readFile("user/insertUserRefresh");
 
     private static final String EXIST_TEMPUSER_BY_EMAIL = SQLHandler.readFile("temp_user/existTempUserByEmail");
     private static final String EXIST_TEMPUSER_BY_USERNAME = SQLHandler.readFile("temp_user/existTempUserByUsername");
@@ -25,6 +25,10 @@ public class UserDatabase implements UserDAO {
     private static final String FIND_TEMPUSER_BY_EMAIL_AND_USERNAME = SQLHandler.readFile("temp_user/findTempUserByEmailAndUsername");
     private static final String FIND_TEMPUSER_BY_EMAIL_AND_CODE = SQLHandler.readFile("temp_user/findTempUserByEmailAndCode");
     private static final String DELETE_TEMPUSER = SQLHandler.readFile("temp_user/deleteTempUser");
+
+    private static final String INSERT_REFRESHTOKEN = SQLHandler.readFile("user_refresh/insertUserRefresh");
+    private static final String FIND_REFRESHTOKEN_BY_USERID_AND_KEY = SQLHandler.readFile("user_refresh/findRefreshTokenByUserIdAndKey");
+    private static final String DELETE_REFRESHTOKEN_BY_USERID_AND_KEY = SQLHandler.readFile("user_refresh/deleteRefreshTokenByUserIdAndKey");
 
     @Override
     public Long findUserIdByEmail (String email) {
@@ -81,7 +85,7 @@ public class UserDatabase implements UserDAO {
     }
 
     @Override
-    public boolean insertUser (String email, String username, String password, String passwordType,  Timestamp createdAt) {
+    public boolean insertUser (String email, String username, String password, String passwordType, Timestamp createdAt) {
 
         try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(INSERT_USER)) {
             stmt.setString(1, email);
@@ -89,22 +93,6 @@ public class UserDatabase implements UserDAO {
             stmt.setString(3, password);
             stmt.setString(4, passwordType);
             stmt.setTimestamp(5, createdAt);
-
-            return stmt.executeUpdate() == 1;
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    @Override
-    public boolean insertUserRefresh (long userId, String randomKey, Timestamp time) {
-
-        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(INSERT_USER_REFRESH)) {
-            stmt.setLong(1, userId);
-            stmt.setString(2, randomKey);
-            stmt.setTimestamp(3, time);
 
             return stmt.executeUpdate() == 1;
         }
@@ -208,6 +196,56 @@ public class UserDatabase implements UserDAO {
         try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(DELETE_TEMPUSER)) {
             stmt.setString(1, email);
             stmt.setString(2, username);
+
+            return stmt.executeUpdate() == 1;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean insertRefreshToken (long userId, String randomKey, Timestamp time) {
+
+        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(INSERT_REFRESHTOKEN)) {
+            stmt.setLong(1, userId);
+            stmt.setString(2, randomKey);
+            stmt.setTimestamp(3, time);
+
+            return stmt.executeUpdate() == 1;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public RefreshTokenRecord findRefreshTokenByUserIdAndKey (Long userId, String key) {
+
+        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(FIND_REFRESHTOKEN_BY_USERID_AND_KEY)) {
+            stmt.setLong(1, userId);
+            stmt.setString(2, key);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new RefreshTokenRecord(rs);
+                }
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean deleteRefreshTokenByUserIdAndKey (Long userId, String key) {
+
+        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(DELETE_REFRESHTOKEN_BY_USERID_AND_KEY)) {
+            stmt.setLong(1, userId);
+            stmt.setString(2, key);
 
             return stmt.executeUpdate() == 1;
         }

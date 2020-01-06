@@ -2,7 +2,6 @@ package com.diluv.api.database.record;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 public class ProjectFileRecord {
 
@@ -12,8 +11,8 @@ public class ProjectFileRecord {
     private String crc32;
     private long size;
     private String changelog;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    private long createdAt;
+    private long updatedAt;
     private boolean reviewed;
     private boolean released;
     private long projectId;
@@ -32,8 +31,8 @@ public class ProjectFileRecord {
         this.crc32 = rs.getString("crc32");
         this.size = rs.getLong("size");
         this.changelog = rs.getString("changelog");
-        this.createdAt = rs.getTimestamp("created_at");
-        this.updatedAt = rs.getTimestamp("updated_at");
+        this.createdAt = rs.getTimestamp("created_at").getTime();
+        this.updatedAt = rs.getTimestamp("updated_at").getTime();
         this.reviewed = rs.getBoolean("reviewed");
         this.released = rs.getBoolean("released");
         this.projectId = rs.getLong("project_id");
@@ -70,12 +69,12 @@ public class ProjectFileRecord {
         return this.changelog;
     }
 
-    public Timestamp getCreatedAt () {
+    public long getCreatedAt () {
 
         return this.createdAt;
     }
 
-    public Timestamp getUpdatedAt () {
+    public long getUpdatedAt () {
 
         return this.updatedAt;
     }
@@ -92,11 +91,11 @@ public class ProjectFileRecord {
 
     public long getProjectId () {
 
-        return projectId;
+        return this.projectId;
     }
 
     public long getUserId () {
 
-        return userId;
+        return this.userId;
     }
 }

@@ -21,8 +21,8 @@ public class ProjectFileDomain {
         this.crc32 = rs.getCrc32();
         this.size = rs.getSize();
         this.changelog = rs.getChangelog();
-        this.createdAt = rs.getCreatedAt().getTime();
-        this.updatedAt = rs.getUpdatedAt().getTime();
+        this.createdAt = rs.getCreatedAt();
+        this.updatedAt = rs.getUpdatedAt();
     }
 
     public String getName () {

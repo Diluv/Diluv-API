@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import com.diluv.api.database.dao.UserDAO;
+import com.diluv.api.database.record.RefreshTokenRecord;
 import com.diluv.api.database.record.TempUserRecord;
 import com.diluv.api.database.record.UserRecord;
 import com.diluv.api.utils.FileReader;
@@ -12,11 +13,13 @@ public class UserTestDatabase implements UserDAO {
 
     private final List<UserRecord> userList;
     private final List<TempUserRecord> tempUsersList;
+    private final List<RefreshTokenRecord> refreshTokens;
 
     public UserTestDatabase () {
 
         this.userList = FileReader.readJsonFolder("records/users", UserRecord.class);
         this.tempUsersList = FileReader.readJsonFolder("records/temp_users", TempUserRecord.class);
+        this.refreshTokens = FileReader.readJsonFolder("records/refresh_token", RefreshTokenRecord.class);
     }
 
     @Override
@@ -57,12 +60,6 @@ public class UserTestDatabase implements UserDAO {
 
     @Override
     public boolean insertUser (String email, String username, String password, String passwordType, Timestamp timestamp) {
-
-        return true;
-    }
-
-    @Override
-    public boolean insertUserRefresh (long userId, String randomKey, Timestamp time) {
 
         return true;
     }
@@ -123,6 +120,29 @@ public class UserTestDatabase implements UserDAO {
 
     @Override
     public boolean deleteTempUser (String email, String username) {
+
+        return true;
+    }
+
+    @Override
+    public boolean insertRefreshToken (long userId, String randomKey, Timestamp time) {
+
+        return true;
+    }
+
+    @Override
+    public RefreshTokenRecord findRefreshTokenByUserIdAndKey (Long userId, String key) {
+
+        for (RefreshTokenRecord record : this.refreshTokens) {
+            if (record.getCode().equalsIgnoreCase(key) && record.getUserId() == userId) {
+                return record;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean deleteRefreshTokenByUserIdAndKey (Long userId, String key) {
 
         return true;
     }

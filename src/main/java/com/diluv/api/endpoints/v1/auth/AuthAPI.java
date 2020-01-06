@@ -15,6 +15,7 @@ import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import com.diluv.api.database.dao.EmailDAO;
 import com.diluv.api.database.dao.UserDAO;
+import com.diluv.api.database.record.RefreshTokenRecord;
 import com.diluv.api.database.record.TempUserRecord;
 import com.diluv.api.database.record.UserRecord;
 import com.diluv.api.endpoints.v1.auth.domain.LoginDomain;
@@ -54,7 +55,8 @@ public class AuthAPI extends RoutingHandler {
         this.post("/v1/auth/register", this::register);
         this.post("/v1/auth/login", this::login);
         this.post("/v1/auth/verify", this::verify);
-        this.post("/v1//auth/resend", this::resend);
+        this.post("/v1/auth/resend", this::resend);
+        this.post("/v1/auth/refresh", this::refresh);
         this.get("/v1/auth/checkusername/{username}", this::checkUsername);
     }
 
@@ -167,22 +169,7 @@ public class AuthAPI extends RoutingHandler {
                 }
             }
 
-            String randomKey = UUID.randomUUID().toString();
-
-            Calendar accessTokenExpire = Calendar.getInstance();
-            accessTokenExpire.add(Calendar.MINUTE, 30);
-
-            Calendar refreshTokenExpire = Calendar.getInstance();
-            refreshTokenExpire.add(Calendar.MONTH, 1);
-
-            if (!this.userDAO.insertUserRefresh(userRecord.getId(), randomKey, new Timestamp(refreshTokenExpire.getTimeInMillis()))) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_USER_REFRESH);
-            }
-            String accessToken = JWTUtil.generateAccessToken(userRecord.getId(), userRecord.getUsername(), accessTokenExpire.getTime());
-            String refreshToken = JWTUtil.generateRefreshToken(userRecord.getId(), refreshTokenExpire.getTime(), randomKey);
-
-            return ResponseUtil.successResponse(exchange, new LoginDomain(accessToken, accessTokenExpire.getTimeInMillis(), refreshToken, refreshTokenExpire.getTimeInMillis()));
-
+            return generateToken(exchange, userRecord.getId(), userRecord.getUsername());
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -215,34 +202,37 @@ public class AuthAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_VERIFIED);
             }
 
-            TempUserRecord tUserRecord = this.userDAO.findTempUserByEmailAndCode(email, formCode);
-            if (tUserRecord == null) {
+            TempUserRecord record = this.userDAO.findTempUserByEmailAndCode(email, formCode);
+            if (record == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
             }
 
             // Is the temp user older then 24 hours.
-            if (System.currentTimeMillis() - tUserRecord.getCreatedAt().getTime() >= (1000 * 60 * 60 * 24)) {
-                if (!this.userDAO.deleteTempUser(tUserRecord.getEmail(), tUserRecord.getUsername())) {
+            if (System.currentTimeMillis() - record.getCreatedAt() >= (1000 * 60 * 60 * 24)) {
+                if (!this.userDAO.deleteTempUser(record.getEmail(), record.getUsername())) {
                     return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
                 }
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
             }
-            String emailHash = MD5Util.md5Hex(tUserRecord.getEmail());
+            String emailHash = MD5Util.md5Hex(record.getEmail());
 
+            if (emailHash == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_ALGORITHM);
+            }
             BufferedImage image = ImageUtil.isValidImage("https://www.gravatar.com/avatar/" + emailHash + "?d=identicon");
             if (image == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }
-            File file = new File(Constants.MEDIA_FOLDER, String.format("users/%d/avatar.png", tUserRecord.getId()));
+            File file = new File(Constants.MEDIA_FOLDER, String.format("users/%d/avatar.png", record.getId()));
             if (!ImageUtil.saveImage(image, file)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }
 
-            if (!this.userDAO.insertUser(tUserRecord.getEmail(), tUserRecord.getUsername(), tUserRecord.getPassword(), tUserRecord.getPasswordType(), tUserRecord.getCreatedAt())) {
+            if (!this.userDAO.insertUser(record.getEmail(), record.getUsername(), record.getPassword(), record.getPasswordType(), new Timestamp(record.getCreatedAt()))) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_USER);
             }
 
-            if (!this.userDAO.deleteTempUser(tUserRecord.getEmail(), tUserRecord.getUsername())) {
+            if (!this.userDAO.deleteTempUser(record.getEmail(), record.getUsername())) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
             }
 
@@ -278,7 +268,7 @@ public class AuthAPI extends RoutingHandler {
             }
 
             // Is the temp user older then 24 hours.
-            if (System.currentTimeMillis() - tUserRecord.getCreatedAt().getTime() >= (1000 * 60 * 60 * 24)) {
+            if (System.currentTimeMillis() - tUserRecord.getCreatedAt() >= (1000 * 60 * 60 * 24)) {
                 if (!this.userDAO.deleteTempUser(tUserRecord.getEmail(), tUserRecord.getUsername())) {
                     return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
                 }
@@ -294,6 +284,43 @@ public class AuthAPI extends RoutingHandler {
         }
     }
 
+    private Domain refresh (HttpServerExchange exchange) {
+
+        try {
+            String token = JWTUtil.getToken(exchange);
+
+            if (token == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
+            }
+            Long userId = JWTUtil.getUserIdFromToken(token);
+            String username = JWTUtil.getUsernameFromToken(token);
+            String key = JWTUtil.getCodeFromRefreshToken(token);
+
+            if (key == null || userId == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_REFRESH_TOKEN);
+            }
+
+            RefreshTokenRecord record = this.userDAO.findRefreshTokenByUserIdAndKey(userId, key);
+            if (record == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER_REFRESH_TOKEN);
+            }
+
+            if (!this.userDAO.deleteRefreshTokenByUserIdAndKey(userId, key)) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_REFRESH_TOKEN);
+            }
+
+            System.out.println(System.currentTimeMillis() + ":" + record.getExpiredAt());
+            if (System.currentTimeMillis() >= record.getExpiredAt()) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER_REFRESH_TOKEN);
+            }
+            return generateToken(exchange, userId, username);
+        }
+        catch (JOSEException e) {
+            e.printStackTrace();
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_TOKEN);
+        }
+    }
+
     private Domain checkUsername (HttpServerExchange exchange) {
 
         String username = RequestUtil.getParam(exchange, "username");
@@ -306,5 +333,24 @@ public class AuthAPI extends RoutingHandler {
         }
 
         return ResponseUtil.successResponse(exchange, null);
+    }
+
+    private Domain generateToken (HttpServerExchange exchange, long userId, String username) throws JOSEException {
+
+        String randomKey = UUID.randomUUID().toString();
+
+        Calendar accessTokenExpire = Calendar.getInstance();
+        accessTokenExpire.add(Calendar.MINUTE, 30);
+
+        Calendar refreshTokenExpire = Calendar.getInstance();
+        refreshTokenExpire.add(Calendar.MONTH, 1);
+
+        if (!this.userDAO.insertRefreshToken(userId, randomKey, new Timestamp(refreshTokenExpire.getTimeInMillis()))) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_USER_REFRESH);
+        }
+        String accessToken = JWTUtil.generateAccessToken(userId, username, accessTokenExpire.getTime());
+        String refreshToken = JWTUtil.generateRefreshToken(userId, username, randomKey, refreshTokenExpire.getTime());
+
+        return ResponseUtil.successResponse(exchange, new LoginDomain(accessToken, accessTokenExpire.getTimeInMillis(), refreshToken, refreshTokenExpire.getTimeInMillis()));
     }
 }

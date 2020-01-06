@@ -36,7 +36,7 @@ public class JWTUtil {
         return accessToken.serialize();
     }
 
-    public static String generateRefreshToken (long id, Date time, String randomKey) throws JOSEException {
+    public static String generateRefreshToken (long id, String username, String randomKey, Date time) throws JOSEException {
 
         final JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder()
             .issuer("Diluv")
@@ -44,62 +44,13 @@ public class JWTUtil {
             .subject("refreshToken")
             .expirationTime(time)
             .issueTime(new Date())
-            .claim("key", randomKey);
+            .claim("key", randomKey)
+            .claim("username", username);
 
         final JWSSigner signer = new RSASSASigner(Constants.PRIVATE_KEY);
         final SignedJWT accessToken = new SignedJWT(new JWSHeader(JWSAlgorithm.RS512), builder.build());
         accessToken.sign(signer);
         return accessToken.serialize();
-    }
-
-    public static SignedJWT getJWT (String token) {
-
-        try {
-            SignedJWT jwt = SignedJWT.parse(token.substring(BEARER.length()));
-
-            JWTClaimsSet claims = jwt.getJWTClaimsSet();
-            if (!claims.getSubject().equalsIgnoreCase("accessToken"))
-                return null;
-
-            if (claims.getStringClaim("username") == null) {
-                return null;
-            }
-            return jwt;
-        }
-        catch (ParseException e) {
-        }
-        return null;
-    }
-
-    public static String getUsername (SignedJWT jwt) {
-
-        try {
-            JWTClaimsSet claims = jwt.getJWTClaimsSet();
-            if (!claims.getSubject().equalsIgnoreCase("accessToken"))
-                return null;
-
-            return claims.getStringClaim("username");
-        }
-        catch (ParseException e) {
-        }
-        return null;
-    }
-
-    public static Long getUserId (SignedJWT jwt) {
-
-        try {
-            JWTClaimsSet claims = jwt.getJWTClaimsSet();
-            if (claims.getAudience().isEmpty())
-                return null;
-
-            String id = claims.getAudience().get(0);
-            if (GenericValidator.isLong(id)) {
-                return Long.valueOf(id);
-            }
-        }
-        catch (ParseException e) {
-        }
-        return null;
     }
 
     public static Long getUserIdFromToken (String token) {
@@ -123,6 +74,80 @@ public class JWTUtil {
         }
         return null;
     }
+
+    public static String getCodeFromRefreshToken (String token) {
+
+        if (JWTUtil.isBearerToken(token)) {
+            SignedJWT jwt = JWTUtil.getJWT(token);
+            if (jwt != null) {
+                return JWTUtil.getKey(jwt);
+            }
+        }
+        return null;
+    }
+
+    private static SignedJWT getJWT (String token) {
+
+        try {
+            SignedJWT jwt = SignedJWT.parse(token.substring(BEARER.length()));
+
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+
+            if (claims.getStringClaim("username") == null) {
+                return null;
+            }
+            return jwt;
+        }
+        catch (ParseException e) {
+        }
+        return null;
+    }
+
+    private static String getUsername (SignedJWT jwt) {
+
+        try {
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            if (!claims.getSubject().equalsIgnoreCase("accessToken"))
+                return null;
+
+            return claims.getStringClaim("username");
+        }
+        catch (ParseException e) {
+        }
+        return null;
+    }
+
+    private static String getKey (SignedJWT jwt) {
+
+        try {
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            if (!claims.getSubject().equalsIgnoreCase("refreshToken"))
+                return null;
+
+            return claims.getStringClaim("key");
+        }
+        catch (ParseException e) {
+        }
+        return null;
+    }
+
+    private static Long getUserId (SignedJWT jwt) {
+
+        try {
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            if (claims.getAudience().isEmpty())
+                return null;
+
+            String id = claims.getAudience().get(0);
+            if (GenericValidator.isLong(id)) {
+                return Long.valueOf(id);
+            }
+        }
+        catch (ParseException e) {
+        }
+        return null;
+    }
+
 
     public static boolean isBearerToken (String token) {
 

@@ -12,7 +12,7 @@ public class BaseUserRecord {
     private String email;
     private String password;
     private String passwordType;
-    private Timestamp createdAt;
+    private long createdAt;
 
     protected BaseUserRecord () {
 
@@ -25,7 +25,7 @@ public class BaseUserRecord {
         this.email = rs.getString("email");
         this.password = rs.getString("password");
         this.passwordType = rs.getString("password_type");
-        this.createdAt = rs.getTimestamp("created_at");
+        this.createdAt = rs.getTimestamp("created_at").getTime();
     }
 
     @JsonCreator
@@ -36,7 +36,7 @@ public class BaseUserRecord {
         this.email = email;
         this.password = password;
         this.passwordType = passwordType;
-        this.createdAt = createdAt;
+        this.createdAt = createdAt.getTime();
     }
 
     public long getId () {
@@ -64,7 +64,7 @@ public class BaseUserRecord {
         return this.passwordType;
     }
 
-    public Timestamp getCreatedAt () {
+    public long getCreatedAt () {
 
         return this.createdAt;
     }
