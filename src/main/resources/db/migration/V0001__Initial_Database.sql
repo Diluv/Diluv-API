@@ -167,15 +167,18 @@ CREATE TABLE project_links
 # Project File Queue
 CREATE TABLE project_file_queue
 (
-    id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
-    name       VARCHAR(255)    NOT NULL,
+    name               VARCHAR(255)    NOT NULL,
 
-    changelog  TEXT            NOT NULL,
-    created_at TIMESTAMP       NOT NULL DEFAULT NOW(),
+    changelog          TEXT            NOT NULL,
+    created_at         TIMESTAMP       NOT NULL             DEFAULT NOW(),
 
-    project_id BIGINT UNSIGNED NOT NULL,
-    user_id    BIGINT UNSIGNED NOT NULL,
+    project_id         BIGINT UNSIGNED NOT NULL,
+    user_id            BIGINT UNSIGNED NOT NULL,
+
+    status             ENUM ('pending', 'running', 'error') DEFAULT 'pending',
+    status_change_time TIMESTAMP       NOT NULL             DEFAULT NOW(),
 
     PRIMARY KEY (id),
     FOREIGN KEY (project_id) REFERENCES projects (id),
