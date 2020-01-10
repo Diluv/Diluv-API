@@ -1,4 +1,4 @@
-name: Staging CI
+name: CI
 
 on:
   schedule:
@@ -29,9 +29,6 @@ jobs:
           openssl genrsa 2048 > rsa.private
           openssl pkcs8 -topk8 -inform PEM -outform PEM -in rsa.private -nocrypt > private.pem
           openssl rsa -inform PEM -in rsa.private -pubout > public.pem
-
-      - name: Test
-        run: ./gradlew test
 
       - name: Build and deploy with Jib
         run: ./gradlew jib
