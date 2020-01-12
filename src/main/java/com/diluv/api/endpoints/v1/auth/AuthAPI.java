@@ -296,7 +296,7 @@ public class AuthAPI extends RoutingHandler {
             String username = JWTUtil.getUsernameFromToken(token);
             String key = JWTUtil.getCodeFromRefreshToken(token);
 
-            if (key == null || userId == null) {
+            if (key == null || userId == null || username == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_REFRESH_TOKEN);
             }
 
@@ -309,10 +309,6 @@ public class AuthAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_REFRESH_TOKEN);
             }
 
-            System.out.println(System.currentTimeMillis() + ":" + record.getExpiredAt());
-            if (System.currentTimeMillis() >= record.getExpiredAt()) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER_REFRESH_TOKEN);
-            }
             return generateToken(exchange, userId, username);
         }
         catch (JOSEException e) {

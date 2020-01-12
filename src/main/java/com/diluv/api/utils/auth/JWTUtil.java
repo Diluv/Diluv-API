@@ -107,9 +107,6 @@ public class JWTUtil {
 
         try {
             JWTClaimsSet claims = jwt.getJWTClaimsSet();
-            if (!claims.getSubject().equalsIgnoreCase("accessToken"))
-                return null;
-
             return claims.getStringClaim("username");
         }
         catch (ParseException e) {
