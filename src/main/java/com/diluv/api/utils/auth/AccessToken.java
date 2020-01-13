@@ -1,5 +1,10 @@
 package com.diluv.api.utils.auth;
 
+import java.text.ParseException;
+import java.util.Date;
+
+import org.apache.commons.validator.GenericValidator;
+
 import com.diluv.api.utils.Constants;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -8,11 +13,6 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-
-import org.apache.commons.validator.GenericValidator;
-
-import java.text.ParseException;
-import java.util.Date;
 
 public class AccessToken {
     private final long userId;

@@ -18,13 +18,13 @@ public class EmailTestDatabase implements EmailDAO {
     public boolean existsBlacklist (String email, String domain) {
 
         for (String emailRecord : this.emailRecords) {
-            if(email.equalsIgnoreCase(emailRecord)){
+            if (email.equalsIgnoreCase(emailRecord)) {
                 return true;
             }
         }
 
         for (String domainRecord : this.domainRecords) {
-            if(domain.equalsIgnoreCase(domainRecord)){
+            if (domain.equalsIgnoreCase(domainRecord)) {
                 return true;
             }
         }

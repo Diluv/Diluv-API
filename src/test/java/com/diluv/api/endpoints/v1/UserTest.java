@@ -2,14 +2,12 @@ package com.diluv.api.endpoints.v1;
 
 import java.util.Calendar;
 
-import com.diluv.api.utils.auth.AccessToken;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.diluv.api.utils.TestUtil;
-import com.diluv.api.utils.auth.JWTUtil;
+import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.error.ErrorResponse;
 import com.nimbusds.jose.JOSEException;
 

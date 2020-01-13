@@ -1,5 +1,8 @@
 package com.diluv.api.utils;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.validator.GenericValidator;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -16,9 +19,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.validator.GenericValidator;
 
 public class Constants {
     public static final PrivateKey PRIVATE_KEY = getPrivateKey("private.pem");

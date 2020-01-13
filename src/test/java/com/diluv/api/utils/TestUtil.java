@@ -27,7 +27,7 @@ public class TestUtil {
 
         TestUtil.server = Undertow.builder()
             .addHttpListener(PORT, IP)
-            .setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, userDAO,emailDAO))
+            .setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, userDAO, emailDAO))
             .build();
         TestUtil.server.start();
 

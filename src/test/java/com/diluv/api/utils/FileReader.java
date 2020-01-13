@@ -10,9 +10,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.diluv.api.DiluvAPI;
-import com.diluv.api.endpoints.v1.domain.DataDomain;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 public class FileReader {
 

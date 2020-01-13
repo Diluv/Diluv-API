@@ -10,10 +10,6 @@ import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import com.diluv.api.utils.auth.AccessToken;
-
-import com.diluv.api.utils.auth.RefreshToken;
-
 import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
@@ -29,7 +25,9 @@ import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.MD5Util;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.auth.JWTUtil;
+import com.diluv.api.utils.auth.RefreshToken;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.error.ErrorResponse;
 import com.nimbusds.jose.JOSEException;
