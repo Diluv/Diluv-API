@@ -10,6 +10,10 @@ import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import com.diluv.api.utils.auth.AccessToken;
+
+import com.diluv.api.utils.auth.RefreshToken;
+
 import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
@@ -292,24 +296,23 @@ public class AuthAPI extends RoutingHandler {
             if (token == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
             }
-            Long userId = JWTUtil.getUserIdFromToken(token);
-            String username = JWTUtil.getUsernameFromToken(token);
-            String key = JWTUtil.getCodeFromRefreshToken(token);
 
-            if (key == null || userId == null || username == null) {
+            RefreshToken refreshToken = RefreshToken.getToken(token);
+
+            if (refreshToken == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_REFRESH_TOKEN);
             }
 
-            RefreshTokenRecord record = this.userDAO.findRefreshTokenByUserIdAndKey(userId, key);
+            RefreshTokenRecord record = this.userDAO.findRefreshTokenByUserIdAndCode(refreshToken.getUserId(), refreshToken.getCode());
             if (record == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER_REFRESH_TOKEN);
             }
 
-            if (!this.userDAO.deleteRefreshTokenByUserIdAndKey(userId, key)) {
+            if (!this.userDAO.deleteRefreshTokenByUserIdAndCode(refreshToken.getUserId(), refreshToken.getCode())) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_REFRESH_TOKEN);
             }
 
-            return generateToken(exchange, userId, username);
+            return generateToken(exchange, refreshToken.getUserId(), refreshToken.getUsername());
         }
         catch (JOSEException e) {
             e.printStackTrace();
@@ -333,7 +336,7 @@ public class AuthAPI extends RoutingHandler {
 
     private Domain generateToken (HttpServerExchange exchange, long userId, String username) throws JOSEException {
 
-        String randomKey = UUID.randomUUID().toString();
+        String code = UUID.randomUUID().toString();
 
         Calendar accessTokenExpire = Calendar.getInstance();
         accessTokenExpire.add(Calendar.MINUTE, 30);
@@ -341,11 +344,11 @@ public class AuthAPI extends RoutingHandler {
         Calendar refreshTokenExpire = Calendar.getInstance();
         refreshTokenExpire.add(Calendar.MONTH, 1);
 
-        if (!this.userDAO.insertRefreshToken(userId, randomKey, new Timestamp(refreshTokenExpire.getTimeInMillis()))) {
+        if (!this.userDAO.insertRefreshToken(userId, code, new Timestamp(refreshTokenExpire.getTimeInMillis()))) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_USER_REFRESH);
         }
-        String accessToken = JWTUtil.generateAccessToken(userId, username, accessTokenExpire.getTime());
-        String refreshToken = JWTUtil.generateRefreshToken(userId, username, randomKey, refreshTokenExpire.getTime());
+        String accessToken = new AccessToken(userId, username).generate(accessTokenExpire.getTime());
+        String refreshToken = new RefreshToken(userId, username, code).generate(refreshTokenExpire.getTime());
 
         return ResponseUtil.successResponse(exchange, new LoginDomain(accessToken, accessTokenExpire.getTimeInMillis(), refreshToken, refreshTokenExpire.getTimeInMillis()));
     }

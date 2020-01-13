@@ -2,6 +2,8 @@ package com.diluv.api.endpoints.v1;
 
 import java.util.Calendar;
 
+import com.diluv.api.utils.auth.AccessToken;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -27,8 +29,8 @@ public class UserTest {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, 30);
-        darkhaxToken = JWTUtil.generateAccessToken(0, "darkhax", calendar.getTime());
-        jaredlll08Token = JWTUtil.generateAccessToken(1, "jaredlll08", calendar.getTime());
+        darkhaxToken = new AccessToken(0, "darkhax").generate(calendar.getTime());
+        jaredlll08Token = new AccessToken(1, "jaredlll08").generate(calendar.getTime());
 
         invalidToken = "broken token";
 

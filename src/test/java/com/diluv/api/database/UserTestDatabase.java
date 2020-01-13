@@ -125,16 +125,16 @@ public class UserTestDatabase implements UserDAO {
     }
 
     @Override
-    public boolean insertRefreshToken (long userId, String randomKey, Timestamp time) {
+    public boolean insertRefreshToken (long userId, String code, Timestamp time) {
 
         return true;
     }
 
     @Override
-    public RefreshTokenRecord findRefreshTokenByUserIdAndKey (Long userId, String key) {
+    public RefreshTokenRecord findRefreshTokenByUserIdAndCode (Long userId, String code) {
 
         for (RefreshTokenRecord record : this.refreshTokens) {
-            if (record.getCode().equalsIgnoreCase(key) && record.getUserId() == userId) {
+            if (record.getCode().equalsIgnoreCase(code) && record.getUserId() == userId) {
                 return record;
             }
         }
@@ -142,7 +142,7 @@ public class UserTestDatabase implements UserDAO {
     }
 
     @Override
-    public boolean deleteRefreshTokenByUserIdAndKey (Long userId, String key) {
+    public boolean deleteRefreshTokenByUserIdAndCode (Long userId, String code) {
 
         return true;
     }

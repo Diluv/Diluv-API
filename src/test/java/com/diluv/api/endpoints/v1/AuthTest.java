@@ -2,6 +2,8 @@ package com.diluv.api.endpoints.v1;
 
 import java.util.Calendar;
 
+import com.diluv.api.utils.auth.RefreshToken;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,7 @@ public class AuthTest {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, 30);
-        darkhaxRefreshToken = JWTUtil.generateRefreshToken(0, "darkhax", "cd65cb00-b9a6-4da1-9b23-d7edfe2f9fa5", calendar.getTime());
+        darkhaxRefreshToken = new RefreshToken(0, "darkhax", "cd65cb00-b9a6-4da1-9b23-d7edfe2f9fa5").generate(calendar.getTime());
 
         TestUtil.start();
     }

@@ -27,8 +27,8 @@ public class UserDatabase implements UserDAO {
     private static final String DELETE_TEMPUSER = SQLHandler.readFile("temp_user/deleteTempUser");
 
     private static final String INSERT_REFRESHTOKEN = SQLHandler.readFile("user_refresh/insertUserRefresh");
-    private static final String FIND_REFRESHTOKEN_BY_USERID_AND_KEY = SQLHandler.readFile("user_refresh/findRefreshTokenByUserIdAndKey");
-    private static final String DELETE_REFRESHTOKEN_BY_USERID_AND_KEY = SQLHandler.readFile("user_refresh/deleteRefreshTokenByUserIdAndKey");
+    private static final String FIND_REFRESHTOKEN_BY_USERID_AND_CODE = SQLHandler.readFile("user_refresh/findRefreshTokenByUserIdAndCode");
+    private static final String DELETE_REFRESHTOKEN_BY_USERID_AND_CODE = SQLHandler.readFile("user_refresh/deleteRefreshTokenByUserIdAndCode");
 
     @Override
     public Long findUserIdByEmail (String email) {
@@ -206,11 +206,11 @@ public class UserDatabase implements UserDAO {
     }
 
     @Override
-    public boolean insertRefreshToken (long userId, String randomKey, Timestamp time) {
+    public boolean insertRefreshToken (long userId, String code, Timestamp time) {
 
         try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(INSERT_REFRESHTOKEN)) {
             stmt.setLong(1, userId);
-            stmt.setString(2, randomKey);
+            stmt.setString(2, code);
             stmt.setTimestamp(3, time);
 
             return stmt.executeUpdate() == 1;
@@ -222,11 +222,11 @@ public class UserDatabase implements UserDAO {
     }
 
     @Override
-    public RefreshTokenRecord findRefreshTokenByUserIdAndKey (Long userId, String key) {
+    public RefreshTokenRecord findRefreshTokenByUserIdAndCode (Long userId, String code) {
 
-        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(FIND_REFRESHTOKEN_BY_USERID_AND_KEY)) {
+        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(FIND_REFRESHTOKEN_BY_USERID_AND_CODE)) {
             stmt.setLong(1, userId);
-            stmt.setString(2, key);
+            stmt.setString(2, code);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -241,11 +241,11 @@ public class UserDatabase implements UserDAO {
     }
 
     @Override
-    public boolean deleteRefreshTokenByUserIdAndKey (Long userId, String key) {
+    public boolean deleteRefreshTokenByUserIdAndCode (Long userId, String code) {
 
-        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(DELETE_REFRESHTOKEN_BY_USERID_AND_KEY)) {
+        try (PreparedStatement stmt = DiluvAPI.connection().prepareStatement(DELETE_REFRESHTOKEN_BY_USERID_AND_CODE)) {
             stmt.setLong(1, userId);
-            stmt.setString(2, key);
+            stmt.setString(2, code);
 
             return stmt.executeUpdate() == 1;
         }

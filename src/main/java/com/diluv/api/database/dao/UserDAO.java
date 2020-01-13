@@ -28,9 +28,9 @@ public interface UserDAO {
 
     boolean deleteTempUser (String email, String username);
 
-    boolean insertRefreshToken (long userId, String randomKey, Timestamp time);
+    boolean insertRefreshToken (long userId, String code, Timestamp time);
 
-    RefreshTokenRecord findRefreshTokenByUserIdAndKey (Long userId, String key);
+    RefreshTokenRecord findRefreshTokenByUserIdAndCode (Long userId, String code);
 
-    boolean deleteRefreshTokenByUserIdAndKey (Long userId, String key);
+    boolean deleteRefreshTokenByUserIdAndCode (Long userId, String code);
 }

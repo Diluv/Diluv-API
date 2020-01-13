@@ -1,5 +1,6 @@
 package com.diluv.api.endpoints.v1.user;
 
+import java.lang.reflect.AccessibleObject;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,7 @@ import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
 import com.diluv.api.endpoints.v1.user.domain.UserDomain;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.error.ErrorResponse;
 import io.undertow.server.HttpServerExchange;
@@ -43,12 +45,12 @@ public class UserAPI extends RoutingHandler {
         String token = JWTUtil.getToken(exchange);
 
         if (token != null) {
-            String tokenUsername = JWTUtil.getUsernameFromToken(token);
-            if (tokenUsername == null) {
+            AccessToken accessToken = AccessToken.getToken(token);
+            if (accessToken == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
             }
-            if ("me".equalsIgnoreCase(usernameParam) || tokenUsername.equalsIgnoreCase(usernameParam)) {
-                username = tokenUsername;
+            if ("me".equalsIgnoreCase(usernameParam) || accessToken.getUsername().equalsIgnoreCase(usernameParam)) {
+                username = accessToken.getUsername();
                 authorized = true;
             }
         }
@@ -78,13 +80,13 @@ public class UserAPI extends RoutingHandler {
         boolean authorized = false;
         String token = JWTUtil.getToken(exchange);
         if (token != null) {
-            String tokenUsername = JWTUtil.getUsernameFromToken(token);
-            if (tokenUsername == null) {
+            AccessToken accessToken = AccessToken.getToken(token);
+            if (accessToken == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
             }
 
-            if ("me".equalsIgnoreCase(usernameParam) || tokenUsername.equalsIgnoreCase(usernameParam)) {
-                username = tokenUsername;
+            if ("me".equalsIgnoreCase(usernameParam) || accessToken.getUsername().equalsIgnoreCase(usernameParam)) {
+                username = accessToken.getUsername();
                 authorized = true;
             }
         }

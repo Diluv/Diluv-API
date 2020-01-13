@@ -21,6 +21,7 @@ import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.error.ErrorResponse;
@@ -215,8 +216,8 @@ public class GameAPI extends RoutingHandler {
         if (token == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
         }
-        Long authId = JWTUtil.getUserIdFromToken(token);
-        if (authId == null) {
+        AccessToken accessToken = AccessToken.getToken(token);
+        if (accessToken == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
         }
 
@@ -276,7 +277,7 @@ public class GameAPI extends RoutingHandler {
                 //TODO Do we generate a new slug or just ask them to change project name?
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_TAKEN_SLUG);
             }
-            if (!this.projectDAO.insertProject(projectSlug, formName, formSummary, formDescription, authId, gameSlug, projectTypeSlug)) {
+            if (!this.projectDAO.insertProject(projectSlug, formName, formSummary, formDescription, accessToken.getUserId(), gameSlug, projectTypeSlug)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT);
             }
 

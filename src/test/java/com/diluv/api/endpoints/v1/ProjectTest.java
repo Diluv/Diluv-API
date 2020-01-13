@@ -3,6 +3,8 @@ package com.diluv.api.endpoints.v1;
 import java.io.File;
 import java.util.Calendar;
 
+import com.diluv.api.utils.auth.AccessToken;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ public class ProjectTest {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, 30);
-        darkhaxToken = JWTUtil.generateAccessToken(0, "darkhax", calendar.getTime());
+        darkhaxToken = new AccessToken(0, "darkhax").generate(calendar.getTime());
 
         TestUtil.start();
     }
