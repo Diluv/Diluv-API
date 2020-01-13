@@ -39,7 +39,8 @@ import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.BlockingHandler;
 
 public class DiluvAPI {
-    private static final Logger LOGGER = Logger.getLogger(DiluvAPI.class.getName());
+	
+    public static final Logger LOGGER = Logger.getLogger(DiluvAPI.class.getName());
     public static final ObjectMapper MAPPER = new ObjectMapper()
         .registerModule(new ParanamerModule());
     private static HikariDataSource ds;

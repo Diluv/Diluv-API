@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
+import com.diluv.api.DiluvAPI;
 import com.diluv.api.database.dao.EmailDAO;
 import com.diluv.api.database.dao.UserDAO;
 import com.diluv.api.database.record.RefreshTokenRecord;
@@ -174,11 +175,11 @@ public class AuthAPI extends RoutingHandler {
             return generateToken(exchange, userRecord.getId(), userRecord.getUsername());
         }
         catch (IOException e) {
-            e.printStackTrace();
+            DiluvAPI.LOGGER.throwing(AuthAPI.class.getName(), "login (HttpServerExchange exchange)", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
         catch (JOSEException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(AuthAPI.class.getName(), "login (HttpServerExchange exchange)", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_TOKEN);
         }
     }
@@ -241,7 +242,7 @@ public class AuthAPI extends RoutingHandler {
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (IOException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(AuthAPI.class.getName(), "verify (HttpServerExchange exchange)", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
     }
@@ -281,7 +282,7 @@ public class AuthAPI extends RoutingHandler {
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            DiluvAPI.LOGGER.throwing(AuthAPI.class.getName(), "resend (HttpServerExchange exchange)", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
     }
@@ -313,7 +314,7 @@ public class AuthAPI extends RoutingHandler {
             return generateToken(exchange, refreshToken.getUserId(), refreshToken.getUsername());
         }
         catch (JOSEException e) {
-            e.printStackTrace();
+            DiluvAPI.LOGGER.throwing(AuthAPI.class.getName(), "refresh (HttpServerExchange exchange)", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_TOKEN);
         }
     }

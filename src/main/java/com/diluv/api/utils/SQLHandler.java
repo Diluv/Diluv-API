@@ -6,6 +6,8 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.io.FileUtils;
 
+import com.diluv.api.DiluvAPI;
+
 public final class SQLHandler {
     private SQLHandler () {
 
@@ -18,7 +20,7 @@ public final class SQLHandler {
             return FileUtils.readFileToString(f, Charset.defaultCharset());
         }
         catch (IOException e) {
-            e.printStackTrace();
+            DiluvAPI.LOGGER.throwing(SQLHandler.class.getName(), "readFile (String filename)", e);
             //TODO Throw exception(crash?)
         }
         return null;

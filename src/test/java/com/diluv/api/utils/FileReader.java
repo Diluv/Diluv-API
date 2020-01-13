@@ -27,7 +27,7 @@ public class FileReader {
             }
         }
         catch (JsonProcessingException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(FileReader.class.getName(), "readJsonFolder (String folderName, Class<T> c)", e);
         }
 
         return data;
@@ -48,7 +48,7 @@ public class FileReader {
             return DiluvAPI.MAPPER.readValue(data, c);
         }
         catch (JsonProcessingException e) {
-            e.printStackTrace();
+            DiluvAPI.LOGGER.throwing(FileReader.class.getName(), "readJsonFile (String file, Class<T> c)", e);
         }
 
         return null;
@@ -60,7 +60,7 @@ public class FileReader {
             return FileUtils.readFileToString(file, Charset.defaultCharset());
         }
         catch (IOException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(FileReader.class.getName(), "readFile (File file)", e);
             //TODO Throw exception(crash?)
         }
         return null;

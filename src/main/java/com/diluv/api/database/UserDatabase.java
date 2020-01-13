@@ -43,7 +43,7 @@ public class UserDatabase implements UserDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "findUserIdByEmail (String email)", e);
         }
         return null;
     }
@@ -61,7 +61,7 @@ public class UserDatabase implements UserDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "findUserIdByUsername (String username)", e);
         }
         return null;
     }
@@ -79,7 +79,7 @@ public class UserDatabase implements UserDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "findOneByUsername (String username)", e);
         }
         return null;
     }
@@ -97,7 +97,7 @@ public class UserDatabase implements UserDAO {
             return stmt.executeUpdate() == 1;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "insertUser (String email, String username, String password, String passwordType, Timestamp createdAt)", e);
         }
         return false;
     }
@@ -113,7 +113,7 @@ public class UserDatabase implements UserDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "existTempUserByEmail (String email)", e);
         }
         return true;
     }
@@ -129,7 +129,7 @@ public class UserDatabase implements UserDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "existTempUserByUsername (String username)", e);
         }
         return true;
     }
@@ -147,7 +147,7 @@ public class UserDatabase implements UserDAO {
             return stmt.executeUpdate() == 1;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "insertTempUser (String email, String username, String password, String passwordType, String verificationCode)", e);
         }
         return false;
     }
@@ -166,7 +166,8 @@ public class UserDatabase implements UserDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "findTempUserByEmailAndUsername (String email, String username)", e);
         }
         return null;
     }
@@ -185,7 +186,7 @@ public class UserDatabase implements UserDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "findTempUserByEmailAndCode (String email, String code)", e);
         }
         return null;
     }
@@ -200,7 +201,7 @@ public class UserDatabase implements UserDAO {
             return stmt.executeUpdate() == 1;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "deleteTempUser (String email, String username)", e);
         }
         return false;
     }
@@ -216,7 +217,7 @@ public class UserDatabase implements UserDAO {
             return stmt.executeUpdate() == 1;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "insertRefreshToken (long userId, String code, Timestamp time)", e);
         }
         return false;
     }
@@ -235,7 +236,7 @@ public class UserDatabase implements UserDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "findRefreshTokenByUserIdAndCode (Long userId, String code)", e);
         }
         return null;
     }
@@ -250,7 +251,7 @@ public class UserDatabase implements UserDAO {
             return stmt.executeUpdate() == 1;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.throwing(UserDatabase.class.getName(), "deleteRefreshTokenByUserIdAndCode (Long userId, String code)", e);
         }
         return false;
     }
