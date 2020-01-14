@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
 import org.flywaydb.core.Flyway;
 
 import com.diluv.api.database.EmailDatabase;
@@ -39,6 +40,8 @@ import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.BlockingHandler;
 
 public class DiluvAPI {
+	
+	public static final org.apache.logging.log4j.Logger LOG = LogManager.getLogger("API");
 	
     public static final Logger LOGGER = Logger.getLogger(DiluvAPI.class.getName());
     public static final ObjectMapper MAPPER = new ObjectMapper()
