@@ -1,8 +1,5 @@
 package com.diluv.api.utils;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.validator.GenericValidator;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -16,9 +13,12 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.validator.GenericValidator;
+
+import com.diluv.api.DiluvAPI;
 
 public class Constants {
     public static final PrivateKey PRIVATE_KEY = getPrivateKey("private.pem");
@@ -30,8 +30,6 @@ public class Constants {
     public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaults("ALLOWED_ORIGINS", Collections.emptySet());
     public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
 
-    private static final Logger LOGGER = Logger.getLogger(Constants.class.getName());
-
     private Constants () {
 
     }
@@ -40,7 +38,7 @@ public class Constants {
 
         String value = System.getenv(env);
         if (value == null) {
-            LOGGER.severe("Missing env variable");
+            DiluvAPI.LOG.error("Missing required environment variable {}.", env);
             System.exit(1);
         }
         return value;
@@ -84,7 +82,9 @@ public class Constants {
             return keyFactory.generatePrivate(spec);
         }
         catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
-            LOGGER.log(Level.SEVERE, "Private Key", e);
+        	
+        	DiluvAPI.LOG.error("Could not find valid RSA private key {}.", fileLocation);
+        	DiluvAPI.LOG.catching(e);
         }
 
         System.exit(1); //TODO Handle better
