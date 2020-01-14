@@ -31,7 +31,7 @@ public final class Constants {
 	public static final String DB_USERNAME = getValueOrDefault("DB_USERNAME", "root");
 	public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
 	public static final String MEDIA_FOLDER = getValueOrDefault("MEDIA_FOLDER", "media");
-	public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaults("ALLOWED_ORIGINS", Collections.emptySet());
+	public static final ImmutableSet<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.emptySet());
 	public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
 
 	/**
