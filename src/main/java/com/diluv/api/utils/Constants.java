@@ -21,7 +21,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.validator.GenericValidator;
 
 import com.diluv.api.DiluvAPI;
-import com.google.common.collect.ImmutableSet;
 
 public final class Constants {
 	
@@ -31,7 +30,7 @@ public final class Constants {
 	public static final String DB_USERNAME = getValueOrDefault("DB_USERNAME", "root");
 	public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
 	public static final String MEDIA_FOLDER = getValueOrDefault("MEDIA_FOLDER", "media");
-	public static final ImmutableSet<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.emptySet());
+	public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.emptySet());
 	public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
 
 	/**
@@ -81,9 +80,9 @@ public final class Constants {
 	 * @return An immutable set of values read from the environment, or the default
 	 *         values if that can not be used.
 	 */
-	private static ImmutableSet<String> getValuesOrDefaultImmutable(String name, Set<String> defaultValues) {
+	private static Set<String> getValuesOrDefaultImmutable(String name, Set<String> defaultValues) {
 
-		return ImmutableSet.copyOf(getValuesOrDefaults(name, defaultValues));
+		return Collections.unmodifiableSet(getValuesOrDefaults(name, defaultValues));
 	}
 
 	/**
