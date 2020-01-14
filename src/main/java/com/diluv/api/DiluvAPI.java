@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -38,12 +37,12 @@ import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.BlockingHandler;
+import org.apache.logging.log4j.Logger;
 
 public class DiluvAPI {
 	
-	public static final org.apache.logging.log4j.Logger LOG = LogManager.getLogger("API");
+	public static final Logger LOGGER = LogManager.getLogger("API");
 	
-    public static final Logger LOGGER = Logger.getLogger(DiluvAPI.class.getName());
     public static final ObjectMapper MAPPER = new ObjectMapper()
         .registerModule(new ParanamerModule());
     private static HikariDataSource ds;
@@ -51,10 +50,10 @@ public class DiluvAPI {
 
     public static void main (String[] args) {
 
-        new DiluvAPI().start();
+        new DiluvAPI().start("0.0.0.0", 4567);
     }
 
-    private void start () {
+    private void start (String host, int port) {
 
         migrate();
         GameDAO gameDAO = new GameDatabase();
@@ -63,12 +62,12 @@ public class DiluvAPI {
         EmailDAO emailDAO = new EmailDatabase();
 
         Undertow server = Undertow.builder()
-            .addHttpListener(4567, "0.0.0.0")
+            .addHttpListener(port, host)
             .setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, userDAO, emailDAO))
             .build();
         server.start();
 
-        LOGGER.info("Server starting");
+        LOGGER.info("Server starting on {}:{}", host, port);
     }
 
     private void migrate () {
@@ -99,7 +98,7 @@ public class DiluvAPI {
             stmt.executeLargeBatch();
         }
         catch (IOException | SQLException e) {
-            LOGGER.throwing(this.getClass().getName(), "blacklistDomains()", e);
+        	LOGGER.error("Failed to insert domain blacklist.", e);
         }
     }
 

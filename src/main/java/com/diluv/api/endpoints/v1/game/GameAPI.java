@@ -295,7 +295,7 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
         }
         catch (IOException e) {
-        	DiluvAPI.LOGGER.throwing(GameAPI.class.getName(), "postProjectTypesByGameSlugAndProjectType (HttpServerExchange exchange)", e);
+        	DiluvAPI.LOGGER.error("Failed to postProjectTypesByGameSlugAndProjectType.", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
     }

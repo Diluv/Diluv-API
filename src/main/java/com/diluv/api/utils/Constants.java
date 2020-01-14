@@ -47,7 +47,7 @@ public final class Constants {
 
 		if (value == null) {
 
-			DiluvAPI.LOG.error("Missing required environment variable {}.", name);
+			DiluvAPI.LOGGER.error("Missing required environment variable {}.", name);
 			System.exit(1);
 		}
 
@@ -150,7 +150,7 @@ public final class Constants {
 
 		catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
 
-			DiluvAPI.LOG.error("Failed to read valid private key {} with algorithm {}.", fileLocation, algorithm, e);
+			DiluvAPI.LOGGER.error("Failed to read valid private key {} with algorithm {}.", fileLocation, algorithm, e);
 		}
 
 		if (required) {
@@ -189,7 +189,7 @@ public final class Constants {
 
 		catch (IOException e) {
 
-			DiluvAPI.LOG.error("Failed to read file {} as string.", fileLocation, e);
+			DiluvAPI.LOGGER.error("Failed to read file {} as string.", fileLocation, e);
 		}
 
 		return null;
