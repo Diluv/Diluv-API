@@ -25,7 +25,7 @@ public class EmailDatabase implements EmailDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to check domain {} against database email blacklist.", e);
         }
         return false;
     }

@@ -27,7 +27,7 @@ public class FileReader {
             }
         }
         catch (JsonProcessingException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to read json folder from {}.", folderName, e);
         }
 
         return data;
@@ -48,7 +48,7 @@ public class FileReader {
             return DiluvAPI.MAPPER.readValue(data, c);
         }
         catch (JsonProcessingException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to read json file {}.", file, e);
         }
 
         return null;
@@ -60,7 +60,7 @@ public class FileReader {
             return FileUtils.readFileToString(file, Charset.defaultCharset());
         }
         catch (IOException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to read file {}.", file.getName(), e);
             //TODO Throw exception(crash?)
         }
         return null;

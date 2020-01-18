@@ -19,6 +19,8 @@ public class JWTUtil {
             }
         }
         catch (ParseException e) {
+        	
+        	// Skip over invalid JWT without logging an error.
         }
         return null;
     }

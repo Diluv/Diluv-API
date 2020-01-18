@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
+import com.diluv.api.DiluvAPI;
 import com.diluv.api.database.dao.EmailDAO;
 import com.diluv.api.database.dao.UserDAO;
 import com.diluv.api.database.record.RefreshTokenRecord;
@@ -174,11 +175,12 @@ public class AuthAPI extends RoutingHandler {
             return generateToken(exchange, userRecord.getId(), userRecord.getUsername());
         }
         catch (IOException e) {
-            e.printStackTrace();
+        	
+            DiluvAPI.LOGGER.error("Failed to login.", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
         catch (JOSEException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to login.");
             return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_TOKEN);
         }
     }
@@ -241,7 +243,7 @@ public class AuthAPI extends RoutingHandler {
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (IOException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to verify.", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
     }
@@ -281,7 +283,7 @@ public class AuthAPI extends RoutingHandler {
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (IOException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to resend.", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
     }
@@ -313,7 +315,8 @@ public class AuthAPI extends RoutingHandler {
             return generateToken(exchange, refreshToken.getUserId(), refreshToken.getUsername());
         }
         catch (JOSEException e) {
-            e.printStackTrace();
+        	
+            DiluvAPI.LOGGER.error("Failed to refresh", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_TOKEN);
         }
     }

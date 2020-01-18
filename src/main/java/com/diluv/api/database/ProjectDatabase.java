@@ -41,7 +41,7 @@ public class ProjectDatabase implements ProjectDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to run findAllByUserId database script for user {}.", userId, e);
         }
         return projects;
     }
@@ -60,7 +60,7 @@ public class ProjectDatabase implements ProjectDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to run findAllProjectTypesByGameSlug database script for game slug {}.", gameSlug, e);
         }
         return projects;
     }
@@ -80,7 +80,7 @@ public class ProjectDatabase implements ProjectDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to run findAllProjectsByGameSlugAndProjectType script for game {} and type {}.", gameSlug, projectTypeSlug, e);
         }
         return projects;
     }
@@ -99,7 +99,7 @@ public class ProjectDatabase implements ProjectDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to run findOneProjectTypeByGameSlugAndProjectTypeSlug script for game {} and type {}.", gameSlug, projectTypeSlug, e);
         }
         return null;
     }
@@ -119,7 +119,7 @@ public class ProjectDatabase implements ProjectDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to run findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug script for game {}, type {}, and project {}.", gameSlug, projectTypeSlug, projectSlug, e);
         }
         return null;
     }
@@ -141,7 +141,7 @@ public class ProjectDatabase implements ProjectDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to run findAllProjectFilesByGameSlugAndProjectType script for game {}, type {}, and project {}.", gameSlug, projectTypeSlug, projectSlug, e);
         }
         return projects;
     }
@@ -161,7 +161,7 @@ public class ProjectDatabase implements ProjectDAO {
             return stmt.executeUpdate() == 1;
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to run insertProject script for project {} with name {} by {}.", slug, name, userId, e);
         }
         return false;
     }

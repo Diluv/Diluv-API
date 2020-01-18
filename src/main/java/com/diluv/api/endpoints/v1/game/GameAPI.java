@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.diluv.api.DiluvAPI;
 import com.diluv.api.database.dao.GameDAO;
 import com.diluv.api.database.dao.ProjectDAO;
 import com.diluv.api.database.record.GameRecord;
@@ -294,7 +295,7 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
         }
         catch (IOException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to postProjectTypesByGameSlugAndProjectType.", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
     }

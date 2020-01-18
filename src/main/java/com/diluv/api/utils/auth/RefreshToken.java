@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.apache.commons.validator.GenericValidator;
 
+import com.diluv.api.DiluvAPI;
 import com.diluv.api.utils.Constants;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -50,7 +51,7 @@ public class RefreshToken {
             return new RefreshToken(userId, username, code);
         }
         catch (ParseException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.warn("Failed to get refresh token.", e);
         }
         return null;
     }

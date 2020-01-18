@@ -28,7 +28,7 @@ public class GameDatabase implements GameDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to run findAll games database script.", e);
         }
         return gameRecords;
     }
@@ -46,7 +46,7 @@ public class GameDatabase implements GameDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+        	DiluvAPI.LOGGER.error("Failed to run findOneBySlug game database script with game {}.", name, e);
         }
         return null;
     }

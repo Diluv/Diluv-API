@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.apache.commons.validator.GenericValidator;
 
+import com.diluv.api.DiluvAPI;
 import com.diluv.api.utils.Constants;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -43,7 +44,8 @@ public class AccessToken {
             return new AccessToken(userId, username);
         }
         catch (ParseException e) {
-            e.printStackTrace();
+        	
+        	DiluvAPI.LOGGER.warn("Failed to parse access token.", e);
         }
         return null;
     }
