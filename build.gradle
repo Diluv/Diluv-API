@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'jacoco'
     id 'com.google.cloud.tools.jib' version '1.8.0'
-//    id "checkstyle"
+    //    id "checkstyle"
 }
 
 version = "${project_version}" + getBuildNumber() + (isSnapshot() ? "-snapshot" : '')
@@ -34,6 +34,8 @@ dependencies {
     implementation group: 'com.warrenstrange', name: 'googleauth', version: '1.4.0'
     implementation group: 'com.github.slugify', name: 'slugify', version: '2.4'
     implementation group: 'com.wildbit.java', name: 'postmark', version: '1.2.4'
+
+    implementation group: 'com.github.spotbugs', name: 'spotbugs', version: '4.0.0-beta5'
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.2'
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.1.2'
