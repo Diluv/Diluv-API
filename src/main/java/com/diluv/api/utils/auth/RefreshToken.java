@@ -51,7 +51,7 @@ public class RefreshToken {
             return new RefreshToken(userId, username, code);
         }
         catch (ParseException e) {
-        	DiluvAPI.LOGGER.warn("Failed to get refresh token.", e);
+            DiluvAPI.LOGGER.warn("Failed to get refresh token.", e);
         }
         return null;
     }

@@ -23,174 +23,174 @@ import org.apache.commons.validator.GenericValidator;
 import com.diluv.api.DiluvAPI;
 
 public final class Constants {
-	
-	public static final PrivateKey PRIVATE_KEY = getPrivateKey("private.pem", "RSA", true);
 
-	public static final String DB_HOSTNAME = getValueOrDefault("DB_HOSTNAME", "jdbc:mariadb://localhost:3306/diluv");
-	public static final String DB_USERNAME = getValueOrDefault("DB_USERNAME", "root");
-	public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
-	public static final String MEDIA_FOLDER = getValueOrDefault("MEDIA_FOLDER", "media");
-	public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.emptySet());
-	public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
+    public static final PrivateKey PRIVATE_KEY = getPrivateKey("private.pem", "RSA", true);
 
-	/**
-	 * Reads a string from an environment variable. If the variable can not be found
-	 * the program will terminate.
-	 * 
-	 * @param name The name of the environment variable to read.
-	 * @return The value that was read.
-	 */
-	private static String getRequiredValue(String name) {
+    public static final String DB_HOSTNAME = getValueOrDefault("DB_HOSTNAME", "jdbc:mariadb://localhost:3306/diluv");
+    public static final String DB_USERNAME = getValueOrDefault("DB_USERNAME", "root");
+    public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
+    public static final String MEDIA_FOLDER = getValueOrDefault("MEDIA_FOLDER", "media");
+    public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.emptySet());
+    public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
 
-		final String value = System.getenv(name);
+    /**
+     * Reads a string from an environment variable. If the variable can not be found
+     * the program will terminate.
+     *
+     * @param name The name of the environment variable to read.
+     * @return The value that was read.
+     */
+    private static String getRequiredValue (String name) {
 
-		if (value == null) {
+        final String value = System.getenv(name);
 
-			DiluvAPI.LOGGER.error("Missing required environment variable {}.", name);
-			System.exit(1);
-		}
+        if (value == null) {
 
-		return value;
-	}
+            DiluvAPI.LOGGER.error("Missing required environment variable {}.", name);
+            System.exit(1);
+        }
 
-	/**
-	 * Reads a string from an environment variable. If the variable can not be found
-	 * or is not readable the default value will be returned.
-	 * 
-	 * @param name         The name of the environment variable.
-	 * @param defaultValue The default value to use when the variable is missing or
-	 *                     can not be used.
-	 * @return The string that was read from the environment, or the default value
-	 *         if that can not be used.
-	 */
-	private static String getValueOrDefault(String name, String defaultValue) {
+        return value;
+    }
 
-		final String value = System.getenv(name);
-		return value == null ? defaultValue : value;
-	}
+    /**
+     * Reads a string from an environment variable. If the variable can not be found
+     * or is not readable the default value will be returned.
+     *
+     * @param name The name of the environment variable.
+     * @param defaultValue The default value to use when the variable is missing or
+     *     can not be used.
+     * @return The string that was read from the environment, or the default value
+     *     if that can not be used.
+     */
+    private static String getValueOrDefault (String name, String defaultValue) {
 
-	/**
-	 * Reads an immutable set of strings from an environment variable. If the
-	 * variable can not be found or is not mapped to a valid value the default
-	 * values will be returned.
-	 * 
-	 * @param name          The name of the environment variable.
-	 * @param defaultValues The default values to use when the variable is missing
-	 *                      or can not be used.
-	 * @return An immutable set of values read from the environment, or the default
-	 *         values if that can not be used.
-	 */
-	private static Set<String> getValuesOrDefaultImmutable(String name, Set<String> defaultValues) {
+        final String value = System.getenv(name);
+        return value == null ? defaultValue : value;
+    }
 
-		return Collections.unmodifiableSet(getValuesOrDefaults(name, defaultValues));
-	}
+    /**
+     * Reads an immutable set of strings from an environment variable. If the
+     * variable can not be found or is not mapped to a valid value the default
+     * values will be returned.
+     *
+     * @param name The name of the environment variable.
+     * @param defaultValues The default values to use when the variable is missing
+     *     or can not be used.
+     * @return An immutable set of values read from the environment, or the default
+     *     values if that can not be used.
+     */
+    private static Set<String> getValuesOrDefaultImmutable (String name, Set<String> defaultValues) {
 
-	/**
-	 * Reads a set of strings from an environment variable. If the variable can not
-	 * be found or is not mapped to a valid value the default values will be
-	 * returned.
-	 * 
-	 * @param name          The name of the environment variable.
-	 * @param defaultValues The default values to use when the variable is missing
-	 *                      or can not be used.
-	 * @return A set of values read from the environment, or the default values if
-	 *         that can not be used.
-	 */
-	private static Set<String> getValuesOrDefaults(String name, Set<String> defaultValues) {
+        return Collections.unmodifiableSet(getValuesOrDefaults(name, defaultValues));
+    }
 
-		final String value = System.getenv(name);
-		return value == null ? defaultValues : Arrays.stream(value.split(",")).collect(Collectors.toSet());
-	}
+    /**
+     * Reads a set of strings from an environment variable. If the variable can not
+     * be found or is not mapped to a valid value the default values will be
+     * returned.
+     *
+     * @param name The name of the environment variable.
+     * @param defaultValues The default values to use when the variable is missing
+     *     or can not be used.
+     * @return A set of values read from the environment, or the default values if
+     *     that can not be used.
+     */
+    private static Set<String> getValuesOrDefaults (String name, Set<String> defaultValues) {
 
-	/**
-	 * Reads an integer from a system environment variable. If the variable can not
-	 * be found or is not mapped to a valid integer a default value will be
-	 * returned.
-	 * 
-	 * @param name         The name of the environment variable.
-	 * @param defaultValue The default value to use when the variable is missing or
-	 *                     can not be used.
-	 * @return The integer variable, or the default value if it is not usable.
-	 */
-	private static int getValueOrDefault(String name, int defaultValue) {
+        final String value = System.getenv(name);
+        return value == null ? defaultValues : Arrays.stream(value.split(",")).collect(Collectors.toSet());
+    }
 
-		final String value = System.getenv(name);
-		return (value == null || !GenericValidator.isInt(value)) ? defaultValue : Integer.parseInt(value);
-	}
+    /**
+     * Reads an integer from a system environment variable. If the variable can not
+     * be found or is not mapped to a valid integer a default value will be
+     * returned.
+     *
+     * @param name The name of the environment variable.
+     * @param defaultValue The default value to use when the variable is missing or
+     *     can not be used.
+     * @return The integer variable, or the default value if it is not usable.
+     */
+    private static int getValueOrDefault (String name, int defaultValue) {
 
-	/**
-	 * Reads a private key from a file. If the key can not be read an error will be
-	 * logged and a null value will be returned.
-	 * 
-	 * @param fileLocation The location of the file to read.
-	 * @param required     Whether or not this is a required key. If true the
-	 *                     program will terminate on a null value.
-	 * @return The private key read from the provided file. If no key can be loaded
-	 *         this will return null.
-	 */
-	@Nullable
-	public static PrivateKey getPrivateKey(String fileLocation, String algorithm, boolean required) {
+        final String value = System.getenv(name);
+        return (value == null || !GenericValidator.isInt(value)) ? defaultValue : Integer.parseInt(value);
+    }
 
-		try {
+    /**
+     * Reads a private key from a file. If the key can not be read an error will be
+     * logged and a null value will be returned.
+     *
+     * @param fileLocation The location of the file to read.
+     * @param required Whether or not this is a required key. If true the
+     *     program will terminate on a null value.
+     * @return The private key read from the provided file. If no key can be loaded
+     *     this will return null.
+     */
+    @Nullable
+    public static PrivateKey getPrivateKey (String fileLocation, String algorithm, boolean required) {
 
-			String privateKey = readFileToString(fileLocation, true);
+        try {
 
-			if (privateKey != null) {
+            String privateKey = readFileToString(fileLocation, true);
 
-				privateKey = privateKey.replace("-----BEGIN PRIVATE KEY-----", "");
-				privateKey = privateKey.replace("-----END PRIVATE KEY-----", "");
+            if (privateKey != null) {
 
-				final KeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey));
-				final KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+                privateKey = privateKey.replace("-----BEGIN PRIVATE KEY-----", "");
+                privateKey = privateKey.replace("-----END PRIVATE KEY-----", "");
 
-				return keyFactory.generatePrivate(spec);
-			}
-		}
+                final KeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey));
+                final KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
 
-		catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+                return keyFactory.generatePrivate(spec);
+            }
+        }
 
-			DiluvAPI.LOGGER.error("Failed to read valid private key {} with algorithm {}.", fileLocation, algorithm, e);
-		}
+        catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
 
-		if (required) {
+            DiluvAPI.LOGGER.error("Failed to read valid private key {} with algorithm {}.", fileLocation, algorithm, e);
+        }
 
-			System.exit(1);
-		}
+        if (required) {
 
-		return null;
-	}
+            System.exit(1);
+        }
 
-	/**
-	 * Attempts to read the contents of a file as a string. If the file can not be
-	 * read for any reason an error will be logged and a null value will be
-	 * returned.
-	 * 
-	 * @param fileLocation The location of the file to read.
-	 * @param stripNewline Whether or not newline characters should be stripped from
-	 *                     the file.
-	 * @return The contents of the file read as a string. If the file could not be
-	 *         read null will be returned.
-	 */
-	@Nullable
-	public static String readFileToString(String fileLocation, boolean stripNewline) {
+        return null;
+    }
 
-		try (final FileInputStream fileInputStream = new FileInputStream(fileLocation)) {
+    /**
+     * Attempts to read the contents of a file as a string. If the file can not be
+     * read for any reason an error will be logged and a null value will be
+     * returned.
+     *
+     * @param fileLocation The location of the file to read.
+     * @param stripNewline Whether or not newline characters should be stripped from
+     *     the file.
+     * @return The contents of the file read as a string. If the file could not be
+     *     read null will be returned.
+     */
+    @Nullable
+    public static String readFileToString (String fileLocation, boolean stripNewline) {
 
-			String contents = IOUtils.toString(fileInputStream, Charset.defaultCharset());
+        try (final FileInputStream fileInputStream = new FileInputStream(fileLocation)) {
 
-			if (stripNewline) {
+            String contents = IOUtils.toString(fileInputStream, Charset.defaultCharset());
 
-				contents = contents.replaceAll("\\r|\\n", "");
-			}
+            if (stripNewline) {
 
-			return contents;
-		}
+                contents = contents.replaceAll("\\r|\\n", "");
+            }
 
-		catch (IOException e) {
+            return contents;
+        }
 
-			DiluvAPI.LOGGER.error("Failed to read file {} as string.", fileLocation, e);
-		}
+        catch (IOException e) {
 
-		return null;
-	}
+            DiluvAPI.LOGGER.error("Failed to read file {} as string.", fileLocation, e);
+        }
+
+        return null;
+    }
 }

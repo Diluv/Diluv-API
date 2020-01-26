@@ -7,12 +7,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.diluv.api.DiluvAPI;
-import com.diluv.api.database.dao.GameDAO;
-import com.diluv.api.database.dao.ProjectDAO;
-import com.diluv.api.database.record.GameRecord;
-import com.diluv.api.database.record.ProjectFileRecord;
-import com.diluv.api.database.record.ProjectRecord;
-import com.diluv.api.database.record.ProjectTypeRecord;
 import com.diluv.api.endpoints.v1.domain.Domain;
 import com.diluv.api.endpoints.v1.game.domain.GameDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectFileDomain;
@@ -26,6 +20,13 @@ import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.error.ErrorResponse;
+import com.diluv.confluencia.database.dao.FileDAO;
+import com.diluv.confluencia.database.dao.GameDAO;
+import com.diluv.confluencia.database.dao.ProjectDAO;
+import com.diluv.confluencia.database.record.GameRecord;
+import com.diluv.confluencia.database.record.ProjectFileRecord;
+import com.diluv.confluencia.database.record.ProjectRecord;
+import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.github.slugify.Slugify;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
@@ -35,23 +36,25 @@ import io.undertow.server.handlers.form.FormParserFactory;
 
 public class GameAPI extends RoutingHandler {
 
+    private final Slugify slugify = new Slugify();
     private final GameDAO gameDAO;
     private final ProjectDAO projectDAO;
-    private final Slugify slugify = new Slugify();
+    private final FileDAO fileDAO;
 
-    public GameAPI (GameDAO gameDAO, ProjectDAO projectDAO) {
+    public GameAPI (GameDAO gameDAO, ProjectDAO projectDAO, FileDAO fileDAO) {
 
         this.gameDAO = gameDAO;
         this.projectDAO = projectDAO;
-        this.get("/v1/games", this::getGames);
-        this.get("/v1/games/{game_slug}", this::getGameBySlug);
-        this.get("/v1/games/{game_slug}/types", this::getProjectTypesByGameSlug);
-        this.get("/v1/games/{game_slug}/{project_type_slug}", this::getProjectTypesByGameSlugAndProjectType);
-        this.get("/v1/games/{game_slug}/{project_type_slug}/projects", this::getProjectsByGameSlugAndProjectType);
-        this.get("/v1/games/{game_slug}/{project_type_slug}/{project_slug}", this::getProjectByGameSlugAndProjectTypeAndProjectSlug);
-        this.get("/v1/games/{game_slug}/{project_type_slug}/{project_slug}/files", this::getProjectFilesByGameSlugAndProjectTypeAndProjectSlug);
+        this.fileDAO = fileDAO;
+        this.get("/", this::getGames);
+        this.get("/{game_slug}", this::getGameBySlug);
+        this.get("/{game_slug}/types", this::getProjectTypesByGameSlug);
+        this.get("/{game_slug}/{project_type_slug}", this::getProjectTypesByGameSlugAndProjectType);
+        this.get("/{game_slug}/{project_type_slug}/projects", this::getProjectsByGameSlugAndProjectType);
+        this.get("/{game_slug}/{project_type_slug}/{project_slug}", this::getProjectByGameSlugAndProjectTypeAndProjectSlug);
+        this.get("/{game_slug}/{project_type_slug}/{project_slug}/files", this::getProjectFilesByGameSlugAndProjectTypeAndProjectSlug);
 
-        this.post("/v1/games/{game_slug}/{project_type_slug}", this::postProjectTypesByGameSlugAndProjectType);
+        this.post("/{game_slug}/{project_type_slug}", this::postProjectTypesByGameSlugAndProjectType);
     }
 
     private Domain getGames (HttpServerExchange exchange) {
@@ -206,7 +209,7 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
         }
 
-        List<ProjectFileRecord> projectRecords = this.projectDAO.findAllProjectFilesByGameSlugAndProjectType(gameSlug, projectTypeSlug, projectSlug);
+        List<ProjectFileRecord> projectRecords = this.fileDAO.findAllProjectFilesByGameSlugAndProjectType(gameSlug, projectTypeSlug, projectSlug);
         List<ProjectFileDomain> projects = projectRecords.stream().map(ProjectFileDomain::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, projects);
     }
@@ -295,7 +298,7 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
         }
         catch (IOException e) {
-        	DiluvAPI.LOGGER.error("Failed to postProjectTypesByGameSlugAndProjectType.", e);
+            DiluvAPI.LOGGER.error("Failed to postProjectTypesByGameSlugAndProjectType.", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
     }

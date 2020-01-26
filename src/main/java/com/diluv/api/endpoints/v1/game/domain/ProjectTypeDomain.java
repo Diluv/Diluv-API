@@ -1,6 +1,6 @@
 package com.diluv.api.endpoints.v1.game.domain;
 
-import com.diluv.api.database.record.ProjectTypeRecord;
+import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class ProjectTypeDomain {

@@ -1,13 +1,12 @@
 package com.diluv.api.endpoints.v1.game.domain;
 
-import com.diluv.api.database.record.ProjectFileRecord;
+import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class ProjectFileDomain {
 
     private final String name;
     private final String sha512;
-    private final String crc32;
     private final long size;
     private final String changelog;
     private final long createdAt;
@@ -18,7 +17,6 @@ public class ProjectFileDomain {
 
         this.name = rs.getName();
         this.sha512 = rs.getSha512();
-        this.crc32 = rs.getCrc32();
         this.size = rs.getSize();
         this.changelog = rs.getChangelog();
         this.createdAt = rs.getCreatedAt();
@@ -33,11 +31,6 @@ public class ProjectFileDomain {
     public String getSha512 () {
 
         return this.sha512;
-    }
-
-    public String getCrc32 () {
-
-        return this.crc32;
     }
 
     public long getSize () {

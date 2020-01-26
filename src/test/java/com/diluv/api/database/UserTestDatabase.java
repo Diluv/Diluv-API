@@ -3,11 +3,11 @@ package com.diluv.api.database;
 import java.sql.Timestamp;
 import java.util.List;
 
-import com.diluv.api.database.dao.UserDAO;
-import com.diluv.api.database.record.RefreshTokenRecord;
-import com.diluv.api.database.record.TempUserRecord;
-import com.diluv.api.database.record.UserRecord;
 import com.diluv.api.utils.FileReader;
+import com.diluv.confluencia.database.dao.UserDAO;
+import com.diluv.confluencia.database.record.RefreshTokenRecord;
+import com.diluv.confluencia.database.record.TempUserRecord;
+import com.diluv.confluencia.database.record.UserRecord;
 
 public class UserTestDatabase implements UserDAO {
 
@@ -131,7 +131,7 @@ public class UserTestDatabase implements UserDAO {
     }
 
     @Override
-    public RefreshTokenRecord findRefreshTokenByUserIdAndCode (Long userId, String code) {
+    public RefreshTokenRecord findRefreshTokenByUserIdAndCode (long userId, String code) {
 
         for (RefreshTokenRecord record : this.refreshTokens) {
             if (record.getCode().equalsIgnoreCase(code) && record.getUserId() == userId) {
@@ -142,7 +142,7 @@ public class UserTestDatabase implements UserDAO {
     }
 
     @Override
-    public boolean deleteRefreshTokenByUserIdAndCode (Long userId, String code) {
+    public boolean deleteRefreshTokenByUserIdAndCode (long userId, String code) {
 
         return true;
     }

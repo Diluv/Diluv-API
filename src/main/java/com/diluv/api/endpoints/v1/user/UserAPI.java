@@ -3,10 +3,6 @@ package com.diluv.api.endpoints.v1.user;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.diluv.api.database.dao.ProjectDAO;
-import com.diluv.api.database.dao.UserDAO;
-import com.diluv.api.database.record.ProjectRecord;
-import com.diluv.api.database.record.UserRecord;
 import com.diluv.api.endpoints.v1.domain.Domain;
 import com.diluv.api.endpoints.v1.user.domain.AuthorizedUserDomain;
 import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
@@ -16,6 +12,10 @@ import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.error.ErrorResponse;
+import com.diluv.confluencia.database.dao.ProjectDAO;
+import com.diluv.confluencia.database.dao.UserDAO;
+import com.diluv.confluencia.database.record.ProjectRecord;
+import com.diluv.confluencia.database.record.UserRecord;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 
@@ -28,8 +28,8 @@ public class UserAPI extends RoutingHandler {
 
         this.userDAO = userDAO;
         this.projectDAO = projectDAO;
-        this.get("/v1/users/{username}", this::getUserByUsername);
-        this.get("/v1/users/{username}/projects", this::getProjectsByUsername);
+        this.get("/{username}", this::getUserByUsername);
+        this.get("/{username}/projects", this::getProjectsByUsername);
     }
 
     private Domain getUserByUsername (HttpServerExchange exchange) {
@@ -93,12 +93,7 @@ public class UserAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
         }
 
-        Long userId = this.userDAO.findUserIdByUsername(username);
-        if (userId == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
-        }
-
-        List<ProjectRecord> projectRecords = this.projectDAO.findAllByUserId(userId);
+        List<ProjectRecord> projectRecords = this.projectDAO.findAllByUsername(username);
         List<ProjectDomain> projects = projectRecords.stream().map(ProjectDomain::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, projects);
     }

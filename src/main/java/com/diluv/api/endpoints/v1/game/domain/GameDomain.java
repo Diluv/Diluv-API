@@ -1,6 +1,6 @@
 package com.diluv.api.endpoints.v1.game.domain;
 
-import com.diluv.api.database.record.GameRecord;
+import com.diluv.confluencia.database.record.GameRecord;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class GameDomain {

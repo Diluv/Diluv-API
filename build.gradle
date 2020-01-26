@@ -5,7 +5,7 @@ plugins {
     //    id "checkstyle"
 }
 
-version = "${project_version}" + getBuildNumber() + (isSnapshot() ? "-snapshot" : '')
+version = "${project_version}" + (isSnapshot() ? '.' + getBuildNumber() : '')
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -27,9 +27,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.2'
     implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-paranamer', version: '2.10.2'
 
-    implementation group: 'com.zaxxer', name: 'HikariCP', version: '3.4.2'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '6.1.4'
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.3'
+    implementation group: 'com.diluv.confluencia', name: 'Confluencia', version: '0.2.1'
 
     implementation group: 'com.warrenstrange', name: 'googleauth', version: '1.4.0'
     implementation group: 'com.github.slugify', name: 'slugify', version: '2.4'

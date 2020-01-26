@@ -133,15 +133,13 @@ public class UserTest {
 
         // Check for a non-existing user
         given()
-            .with().get(URL + "/abc/projects").then().assertThat().statusCode(400)
-            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
-            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+            .with().get(URL + "/abc/projects").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
 
         given()
             .header("Authorization", "Bearer " + darkhaxToken)
-            .with().get(URL + "/abc/projects").then().assertThat().statusCode(400)
-            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
-            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+            .with().get(URL + "/abc/projects").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
 
         // Check for existing user with and without a token, and an invalid token
         given()

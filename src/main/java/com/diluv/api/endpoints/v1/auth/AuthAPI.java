@@ -14,11 +14,6 @@ import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import com.diluv.api.DiluvAPI;
-import com.diluv.api.database.dao.EmailDAO;
-import com.diluv.api.database.dao.UserDAO;
-import com.diluv.api.database.record.RefreshTokenRecord;
-import com.diluv.api.database.record.TempUserRecord;
-import com.diluv.api.database.record.UserRecord;
 import com.diluv.api.endpoints.v1.auth.domain.LoginDomain;
 import com.diluv.api.endpoints.v1.domain.Domain;
 import com.diluv.api.utils.Constants;
@@ -31,6 +26,11 @@ import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.RefreshToken;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.error.ErrorResponse;
+import com.diluv.confluencia.database.dao.EmailDAO;
+import com.diluv.confluencia.database.dao.UserDAO;
+import com.diluv.confluencia.database.record.RefreshTokenRecord;
+import com.diluv.confluencia.database.record.TempUserRecord;
+import com.diluv.confluencia.database.record.UserRecord;
 import com.nimbusds.jose.JOSEException;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
@@ -55,12 +55,12 @@ public class AuthAPI extends RoutingHandler {
 
         this.userDAO = userDAO;
         this.emailDAO = emailDAO;
-        this.post("/v1/auth/register", this::register);
-        this.post("/v1/auth/login", this::login);
-        this.post("/v1/auth/verify", this::verify);
-        this.post("/v1/auth/resend", this::resend);
-        this.post("/v1/auth/refresh", this::refresh);
-        this.get("/v1/auth/checkusername/{username}", this::checkUsername);
+        this.post("/register", this::register);
+        this.post("/login", this::login);
+        this.post("/verify", this::verify);
+        this.post("/resend", this::resend);
+        this.post("/refresh", this::refresh);
+        this.get("/checkusername/{username}", this::checkUsername);
     }
 
     private Domain register (HttpServerExchange exchange) {
@@ -175,12 +175,13 @@ public class AuthAPI extends RoutingHandler {
             return generateToken(exchange, userRecord.getId(), userRecord.getUsername());
         }
         catch (IOException e) {
-        	
+
             DiluvAPI.LOGGER.error("Failed to login.", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
         catch (JOSEException e) {
-        	DiluvAPI.LOGGER.error("Failed to login.");
+
+            DiluvAPI.LOGGER.error("Failed to login.");
             return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_TOKEN);
         }
     }
@@ -243,7 +244,8 @@ public class AuthAPI extends RoutingHandler {
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (IOException e) {
-        	DiluvAPI.LOGGER.error("Failed to verify.", e);
+
+            DiluvAPI.LOGGER.error("Failed to verify.", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
     }
@@ -283,7 +285,8 @@ public class AuthAPI extends RoutingHandler {
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (IOException e) {
-        	DiluvAPI.LOGGER.error("Failed to resend.", e);
+
+            DiluvAPI.LOGGER.error("Failed to resend.", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
     }
@@ -315,7 +318,7 @@ public class AuthAPI extends RoutingHandler {
             return generateToken(exchange, refreshToken.getUserId(), refreshToken.getUsername());
         }
         catch (JOSEException e) {
-        	
+
             DiluvAPI.LOGGER.error("Failed to refresh", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_TOKEN);
         }

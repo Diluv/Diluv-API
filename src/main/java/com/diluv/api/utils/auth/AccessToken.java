@@ -44,8 +44,8 @@ public class AccessToken {
             return new AccessToken(userId, username);
         }
         catch (ParseException e) {
-        	
-        	DiluvAPI.LOGGER.warn("Failed to parse access token.", e);
+
+            DiluvAPI.LOGGER.warn("Failed to parse access token.", e);
         }
         return null;
     }

@@ -1,31 +1,34 @@
 package com.diluv.api.database;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.diluv.api.database.dao.ProjectDAO;
-import com.diluv.api.database.record.ProjectFileRecord;
-import com.diluv.api.database.record.ProjectRecord;
-import com.diluv.api.database.record.ProjectTypeRecord;
 import com.diluv.api.utils.FileReader;
+import com.diluv.api.utils.TestUtil;
+import com.diluv.confluencia.database.dao.ProjectDAO;
+import com.diluv.confluencia.database.record.ProjectRecord;
+import com.diluv.confluencia.database.record.ProjectTypeRecord;
+import com.diluv.confluencia.database.record.UserRecord;
 
 public class ProjectTestDatabase implements ProjectDAO {
 
     private final List<ProjectRecord> projectRecords;
     private final List<ProjectTypeRecord> projectTypeRecords;
-    private final List<ProjectFileRecord> projectFileRecords;
 
     public ProjectTestDatabase () {
 
         this.projectRecords = FileReader.readJsonFolder("records/projects", ProjectRecord.class);
         this.projectTypeRecords = FileReader.readJsonFolder("records/project_types", ProjectTypeRecord.class);
-        this.projectFileRecords = FileReader.readJsonFolder("records/project_files", ProjectFileRecord.class);
     }
 
     @Override
-    public List<ProjectRecord> findAllByUserId (long userId) {
+    public List<ProjectRecord> findAllByUsername (String username) {
 
-        return this.projectRecords.stream().filter(projectRecord -> projectRecord.getUserId() == userId).collect(Collectors.toList());
+        UserRecord user = TestUtil.USER_DAO.findOneByUsername(username);
+        if (user == null)
+            return new ArrayList<>();
+        return this.projectRecords.stream().filter(projectRecord -> projectRecord.getUserId() == user.getId()).collect(Collectors.toList());
     }
 
     @Override
@@ -59,19 +62,9 @@ public class ProjectTestDatabase implements ProjectDAO {
     }
 
     @Override
-    public List<ProjectFileRecord> findAllProjectFilesByGameSlugAndProjectType (String gameSlug, String projectTypeSlug, String projectSlug) {
-
-        ProjectRecord project = this.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-        if (project == null) {
-            return null;
-        }
-        return this.projectFileRecords.stream().filter(projectRecord -> projectRecord.getProjectId() == project.getId()).collect(Collectors.toList());
-    }
-
-    @Override
     public boolean insertProject (String slug, String name, String summary, String description, long userId, String gameSlug, String projectTypeSlug) {
 
-        this.projectRecords.add(new ProjectRecord(this.projectRecords.size(), name, slug, summary, description, 0L, System.currentTimeMillis(), System.currentTimeMillis(), userId, gameSlug, projectTypeSlug));
+        this.projectRecords.add(new ProjectRecord(name, slug, summary, description, 0L, System.currentTimeMillis(), System.currentTimeMillis(), gameSlug, projectTypeSlug, false, true, userId));
         return true;
     }
 }

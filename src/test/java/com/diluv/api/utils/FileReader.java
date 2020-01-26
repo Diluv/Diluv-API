@@ -18,7 +18,7 @@ public class FileReader {
 
         List<T> data = new ArrayList<>();
         try {
-            File folder = new File(SQLHandler.class.getClassLoader().getResource(folderName).getFile());
+            File folder = new File(FileReader.class.getClassLoader().getResource(folderName).getFile());
             File[] files = folder.listFiles();
             if (files != null) {
                 for (File file : files) {
@@ -27,7 +27,7 @@ public class FileReader {
             }
         }
         catch (JsonProcessingException e) {
-        	DiluvAPI.LOGGER.error("Failed to read json folder from {}.", folderName, e);
+            DiluvAPI.LOGGER.error("Failed to read json folder from {}.", folderName, e);
         }
 
         return data;
@@ -35,7 +35,7 @@ public class FileReader {
 
     public static <T> T readJsonFile (String file, Class<T> c) {
 
-        URL url = SQLHandler.class.getClassLoader().getResource("records/" + file + ".json");
+        URL url = FileReader.class.getClassLoader().getResource("records/" + file + ".json");
         if (url == null)
             return null;
         File f = new File(url.getFile());
@@ -48,7 +48,7 @@ public class FileReader {
             return DiluvAPI.MAPPER.readValue(data, c);
         }
         catch (JsonProcessingException e) {
-        	DiluvAPI.LOGGER.error("Failed to read json file {}.", file, e);
+            DiluvAPI.LOGGER.error("Failed to read json file {}.", file, e);
         }
 
         return null;
@@ -60,7 +60,7 @@ public class FileReader {
             return FileUtils.readFileToString(file, Charset.defaultCharset());
         }
         catch (IOException e) {
-        	DiluvAPI.LOGGER.error("Failed to read file {}.", file.getName(), e);
+            DiluvAPI.LOGGER.error("Failed to read file {}.", file.getName(), e);
             //TODO Throw exception(crash?)
         }
         return null;

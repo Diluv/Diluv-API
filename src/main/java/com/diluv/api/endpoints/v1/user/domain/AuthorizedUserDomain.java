@@ -1,6 +1,6 @@
 package com.diluv.api.endpoints.v1.user.domain;
 
-import com.diluv.api.database.record.UserRecord;
+import com.diluv.confluencia.database.record.UserRecord;
 
 public class AuthorizedUserDomain extends UserDomain {
     private final String email;
