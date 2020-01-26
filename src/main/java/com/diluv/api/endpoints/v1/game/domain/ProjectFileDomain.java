@@ -1,7 +1,6 @@
 package com.diluv.api.endpoints.v1.game.domain;
 
 import com.diluv.confluencia.database.record.ProjectFileRecord;
-import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class ProjectFileDomain {
 
@@ -12,7 +11,6 @@ public class ProjectFileDomain {
     private final long createdAt;
     private final long updatedAt;
 
-    @JsonCreator
     public ProjectFileDomain (ProjectFileRecord rs) {
 
         this.name = rs.getName();

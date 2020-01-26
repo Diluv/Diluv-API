@@ -10,24 +10,18 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.diluv.api.DiluvAPI;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class FileReader {
 
     public static <T> List<T> readJsonFolder (String folderName, Class<T> c) {
 
         List<T> data = new ArrayList<>();
-        try {
-            File folder = new File(FileReader.class.getClassLoader().getResource(folderName).getFile());
-            File[] files = folder.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    data.add(DiluvAPI.MAPPER.readValue(FileReader.readFile(file), c));
-                }
+        File folder = new File(FileReader.class.getClassLoader().getResource(folderName).getFile());
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                data.add(DiluvAPI.GSON.fromJson(FileReader.readFile(file), c));
             }
-        }
-        catch (JsonProcessingException e) {
-            DiluvAPI.LOGGER.error("Failed to read json folder from {}.", folderName, e);
         }
 
         return data;
@@ -44,14 +38,7 @@ public class FileReader {
 
         if (data == null)
             return null;
-        try {
-            return DiluvAPI.MAPPER.readValue(data, c);
-        }
-        catch (JsonProcessingException e) {
-            DiluvAPI.LOGGER.error("Failed to read json file {}.", file, e);
-        }
-
-        return null;
+        return DiluvAPI.GSON.fromJson(data, c);
     }
 
     public static String readFile (File file) {

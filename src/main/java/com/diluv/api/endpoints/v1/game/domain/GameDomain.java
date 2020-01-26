@@ -1,14 +1,12 @@
 package com.diluv.api.endpoints.v1.game.domain;
 
 import com.diluv.confluencia.database.record.GameRecord;
-import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class GameDomain {
     private final String slug;
     private final String name;
     private final String url;
 
-    @JsonCreator
     public GameDomain (GameRecord rs) {
 
         this.slug = rs.getSlug();

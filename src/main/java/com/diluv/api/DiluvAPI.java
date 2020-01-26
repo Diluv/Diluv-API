@@ -27,8 +27,8 @@ import com.diluv.confluencia.database.dao.FileDAO;
 import com.diluv.confluencia.database.dao.GameDAO;
 import com.diluv.confluencia.database.dao.ProjectDAO;
 import com.diluv.confluencia.database.dao.UserDAO;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.paranamer.ParanamerModule;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
@@ -40,8 +40,7 @@ import io.undertow.server.handlers.resource.ResourceHandler;
 public class DiluvAPI {
 
     public static final Logger LOGGER = LogManager.getLogger("API");
-    public static final ObjectMapper MAPPER = new ObjectMapper()
-        .registerModule(new ParanamerModule());
+    public static final Gson GSON = new GsonBuilder().create();
 
     public static void main (String[] args) {
 
