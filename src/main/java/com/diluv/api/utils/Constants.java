@@ -29,7 +29,8 @@ public final class Constants {
     public static final String DB_HOSTNAME = getValueOrDefault("DB_HOSTNAME", "jdbc:mariadb://localhost:3306/diluv");
     public static final String DB_USERNAME = getValueOrDefault("DB_USERNAME", "root");
     public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
-    public static final String MEDIA_FOLDER = getValueOrDefault("MEDIA_FOLDER", "media");
+    public static final String PUBLIC_URL = getValueOrDefault("PUBLIC_URL", "https://cdn.diluv.com/");
+    public static final String PUBLIC_FOLDER = getValueOrDefault("PUBLIC_FOLDER", "public");
     public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.emptySet());
     public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
 
@@ -192,5 +193,10 @@ public final class Constants {
         }
 
         return null;
+    }
+
+    public static String getUserAvatar (String username) {
+
+        return String.format("%s/users/%s/avatar.png", PUBLIC_URL, username);
     }
 }

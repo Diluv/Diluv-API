@@ -228,7 +228,7 @@ public class AuthAPI extends RoutingHandler {
             if (image == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }
-            File file = new File(Constants.MEDIA_FOLDER, String.format("users/%d/avatar.png", record.getId()));
+            File file = new File(Constants.PUBLIC_FOLDER, String.format("users/%s/avatar.png", record.getUsername()));
             if (!ImageUtil.saveImage(image, file)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }

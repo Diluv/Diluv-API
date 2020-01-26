@@ -8,6 +8,12 @@
                 "username": {
                     "type": "string"
                 },
+                "avatarURL": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "number"
+                },
                 "email": {
                     "type": "string"
                 },
@@ -16,7 +22,9 @@
                 }
             },
             "required": [
-                "username"
+                "username",
+                "createdAt",
+                "avatarURL"
             ]
         }
     },

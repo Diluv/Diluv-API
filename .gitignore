@@ -4,7 +4,7 @@
 
 *.pem
 rsa.private
-/media
+/public
 
 #################
 ## Eclipse
@@ -230,4 +230,3 @@ pip-log.txt
 .mr.developer.cfg
 
 .gradle/
-build/

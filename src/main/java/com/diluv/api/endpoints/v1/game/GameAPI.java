@@ -291,7 +291,7 @@ public class GameAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
             }
 
-            File file = new File(Constants.MEDIA_FOLDER, String.format("games/%s/%s/%s/logo.png", gameSlug, projectTypeSlug, projectSlug));
+            File file = new File(Constants.PUBLIC_FOLDER, String.format("games/%s/%s/%s/logo.png", gameSlug, projectTypeSlug, projectSlug));
             if (!ImageUtil.saveImage(image, file)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }
