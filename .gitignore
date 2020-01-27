@@ -5,6 +5,7 @@
 *.pem
 rsa.private
 /public
+/processing
 
 #################
 ## Eclipse

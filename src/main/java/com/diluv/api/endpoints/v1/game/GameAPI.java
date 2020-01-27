@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
+
 import com.diluv.api.DiluvAPI;
 import com.diluv.api.endpoints.v1.domain.Domain;
 import com.diluv.api.endpoints.v1.game.domain.GameDomain;
@@ -55,6 +57,7 @@ public class GameAPI extends RoutingHandler {
         this.get("/{game_slug}/{project_type_slug}/{project_slug}/files", this::getProjectFilesByGameSlugAndProjectTypeAndProjectSlug);
 
         this.post("/{game_slug}/{project_type_slug}", this::postProjectTypesByGameSlugAndProjectType);
+        this.post("/{game_slug}/{project_type_slug}/{project_slug}/files", this::postProjectFilesByGameSlugAndProjectTypeAndProjectSlug);
     }
 
     private Domain getGames (HttpServerExchange exchange) {
@@ -295,6 +298,84 @@ public class GameAPI extends RoutingHandler {
             if (!ImageUtil.saveImage(image, file)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }
+            return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
+        }
+        catch (IOException e) {
+            DiluvAPI.LOGGER.error("Failed to postProjectTypesByGameSlugAndProjectType.", e);
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
+        }
+    }
+
+    private Domain postProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) {
+
+        String token = JWTUtil.getToken(exchange);
+        if (token == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
+        }
+        AccessToken accessToken = AccessToken.getToken(token);
+        if (accessToken == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
+        }
+
+        String gameSlug = RequestUtil.getParam(exchange, "game_slug");
+        String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
+        String projectSlug = RequestUtil.getParam(exchange, "project_slug");
+
+        if (gameSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.GAME_INVALID_SLUG);
+        }
+
+        if (projectTypeSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_TYPE_INVALID_SLUG);
+        }
+
+        if (projectSlug == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_SLUG);
+        }
+
+        if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_GAME);
+        }
+
+        ProjectTypeRecord projectTypeRecord = this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        if (projectTypeRecord == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT_TYPE);
+        }
+
+        ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (projectRecord == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT_TYPE);
+        }
+
+        //TODO Needs to be moved to check the user permissions in the future
+        if (projectRecord.getUserId() != accessToken.getUserId()) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_NOT_AUTHORIZED);
+        }
+        try (FormDataParser parser = FormParserFactory.builder().build().createParser(exchange)) {
+            FormData data = parser.parseBlocking();
+            String formChangelog = RequestUtil.getFormParam(data, "changelog");
+            FormData.FileItem formFile = RequestUtil.getFormFile(data, "file");
+
+            if (!Validator.validateProjectFileChangelog(formChangelog)) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_FILE_INVALID_CHANGELOG);
+            }
+
+            if (formFile == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_FILE_INVALID_FILE);
+            }
+
+            if (formFile.getFileSize() > projectTypeRecord.getMaxSize()) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_FILE_INVALID_SIZE);
+            }
+
+            String fileName = formFile.getFile().getFileName().toString();
+            Long id = this.fileDAO.insertProjectFileQueue(fileName, formChangelog, projectRecord.getId(), accessToken.getUserId());
+            if (id == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT_FILE);
+            }
+
+            File file = new File(Constants.PROCESSING_FOLDER, String.format("%s/%s/%s/%s/%s", gameSlug, projectTypeSlug, projectSlug, id, fileName));
+            FileUtils.copyInputStreamToFile(formFile.getInputStream(), file);
             return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
         }
         catch (IOException e) {

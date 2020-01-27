@@ -31,6 +31,7 @@ public final class Constants {
     public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
     public static final String PUBLIC_URL = getValueOrDefault("PUBLIC_URL", "https://cdn.diluv.com/");
     public static final String PUBLIC_FOLDER = getValueOrDefault("PUBLIC_FOLDER", "public");
+    public static final String PROCESSING_FOLDER = getValueOrDefault("PROCESSING_FOLDER", "processing");
     public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.emptySet());
     public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
 

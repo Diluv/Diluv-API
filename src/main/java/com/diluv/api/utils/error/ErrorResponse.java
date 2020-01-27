@@ -14,6 +14,7 @@ public enum ErrorResponse {
     USER_INVALID_PASSWORD_TYPE(ErrorType.INTERNAL_SERVER_ERROR, "user.invalid.password_type"),
     USER_REQUIRED_TOKEN(ErrorType.UNAUTHORIZED, "user.required.token"),
     USER_REQUIRED_MFA(ErrorType.BAD_REQUEST, "user.required.mfa"),
+    USER_NOT_AUTHORIZED(ErrorType.UNAUTHORIZED, "user.unauthorized"),
 
     USER_TAKEN_EMAIL(ErrorType.BAD_REQUEST, "user.taken.email"),
     USER_TAKEN_USERNAME(ErrorType.BAD_REQUEST, "user.taken.username"),
@@ -34,6 +35,10 @@ public enum ErrorResponse {
     PROJECT_INVALID_DESCRIPTION(ErrorType.BAD_REQUEST, "project.invalid.description"),
     PROJECT_TAKEN_SLUG(ErrorType.BAD_REQUEST, "project.taken.slug"),
 
+    PROJECT_FILE_INVALID_CHANGELOG(ErrorType.BAD_REQUEST, "project_file.invalid.changelog"),
+    PROJECT_FILE_INVALID_FILE(ErrorType.BAD_REQUEST, "project_file.invalid.file"),
+    PROJECT_FILE_INVALID_SIZE(ErrorType.BAD_REQUEST, "project_file.invalid.size"),
+
     // Project Type Errors,
     PROJECT_TYPE_INVALID_SLUG(ErrorType.BAD_REQUEST, "project_type.invalid.slug"),
 
@@ -41,6 +46,7 @@ public enum ErrorResponse {
     FAILED_CREATE_TEMP_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.create_temp_user"),
     FAILED_CREATE_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.create_user"),
     FAILED_CREATE_PROJECT(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project"),
+    FAILED_CREATE_PROJECT_FILE(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_file"),
     FAILED_DELETE_TEMP_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_temp_user"),
     FAILED_DELETE_REFRESH_TOKEN(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_refresh_token"),
 

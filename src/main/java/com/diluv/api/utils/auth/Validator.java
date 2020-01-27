@@ -40,4 +40,10 @@ public class Validator {
 
         return !GenericValidator.isBlankOrNull(projectDescription) && projectDescription.length() <= 1000 && projectDescription.length() >= 50;
     }
+
+    public static boolean validateProjectFileChangelog (String formChangelog) {
+
+        //TODO
+        return true;
+    }
 }
