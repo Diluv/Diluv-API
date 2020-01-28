@@ -64,7 +64,7 @@ public class ProjectTestDatabase implements ProjectDAO {
     @Override
     public boolean insertProject (String slug, String name, String summary, String description, long userId, String gameSlug, String projectTypeSlug) {
 
-        this.projectRecords.add(new ProjectRecord(name, slug, summary, description, 0L, System.currentTimeMillis(), System.currentTimeMillis(), gameSlug, projectTypeSlug, false, true, userId));
+        this.projectRecords.add(new ProjectRecord(this.projectRecords.size(), name, slug, summary, description, 0L, System.currentTimeMillis(), System.currentTimeMillis(), gameSlug, projectTypeSlug, false, true, userId));
         return true;
     }
 }

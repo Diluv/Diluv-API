@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.FileDAO;
-import com.diluv.confluencia.database.record.FileQueueRecord;
+import com.diluv.confluencia.database.record.ProjectFileQueueRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 
 public class FileTestDatabase implements FileDAO {
@@ -20,7 +20,7 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public List<FileQueueRecord> findAllWherePending (int amount) {
+    public List<ProjectFileQueueRecord> findAllWherePending (int amount) {
 
         //TODO
         return new ArrayList<>();
@@ -33,7 +33,7 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public List<FileQueueRecord> getLatestFileQueueRecord (int amount) throws SQLException {
+    public List<ProjectFileQueueRecord> getLatestFileQueueRecord (int amount) throws SQLException {
 
         //TODO
         return new ArrayList<>();
@@ -49,5 +49,11 @@ public class FileTestDatabase implements FileDAO {
 //        return this.projectFileRecords.stream().filter(projectRecord -> projectRecord.getProjectId() == projectSlug).collect(Collectors.toList());
         //TODO
         return new ArrayList<>();
+    }
+
+    @Override
+    public Long insertProjectFileQueue (String name, String changelog, long projectId, long userId) {
+//TODO
+        return null;
     }
 }
