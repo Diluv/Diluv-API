@@ -17,33 +17,33 @@ public class UserTestDatabase implements UserDAO {
 
     public UserTestDatabase () {
 
-        this.userList = FileReader.readJsonFolder("records/users", UserRecord.class);
-        this.tempUsersList = FileReader.readJsonFolder("records/temp_users", TempUserRecord.class);
-        this.refreshTokens = FileReader.readJsonFolder("records/refresh_token", RefreshTokenRecord.class);
+        this.userList = FileReader.readJsonFolder("users", UserRecord.class);
+        this.tempUsersList = FileReader.readJsonFolder("temp_users", TempUserRecord.class);
+        this.refreshTokens = FileReader.readJsonFolder("refresh_token", RefreshTokenRecord.class);
     }
 
     @Override
-    public Long findUserIdByEmail (String email) {
+    public boolean existsUserByEmail (String email) {
 
         for (UserRecord userRecord : userList) {
             if (userRecord.getEmail().equals(email)) {
-                return userRecord.getId();
+                return true;
             }
         }
 
-        return null;
+        return false;
     }
 
     @Override
-    public Long findUserIdByUsername (String username) {
+    public boolean existsUserByUsername (String username) {
 
         for (UserRecord userRecord : userList) {
             if (userRecord.getUsername().equals(username)) {
-                return userRecord.getId();
+                return true;
             }
         }
 
-        return null;
+        return false;
     }
 
     @Override
@@ -61,11 +61,12 @@ public class UserTestDatabase implements UserDAO {
     @Override
     public boolean insertUser (String email, String username, String password, String passwordType, Timestamp timestamp) {
 
+        this.userList.add(new UserRecord(this.userList.size(), email, username, password, passwordType, false, null, timestamp));
         return true;
     }
 
     @Override
-    public boolean existTempUserByEmail (String email) {
+    public boolean existsTempUserByEmail (String email) {
 
         for (TempUserRecord userRecord : this.tempUsersList) {
             if (userRecord.getEmail().equals(email)) {
@@ -77,7 +78,7 @@ public class UserTestDatabase implements UserDAO {
     }
 
     @Override
-    public boolean existTempUserByUsername (String username) {
+    public boolean existsTempUserByUsername (String username) {
 
         for (TempUserRecord userRecord : this.tempUsersList) {
             if (userRecord.getUsername().equals(username)) {
@@ -91,7 +92,26 @@ public class UserTestDatabase implements UserDAO {
     @Override
     public boolean insertTempUser (String email, String username, String password, String passwordType, String verificationCode) {
 
+        this.tempUsersList.add(new TempUserRecord(this.tempUsersList.size(), email, username, password, passwordType, new Timestamp(System.currentTimeMillis()), verificationCode));
         return true;
+    }
+
+    @Override
+    public boolean updateTempUser (String email, String username, String verificationCode) {
+
+        TempUserRecord record = null;
+        for (TempUserRecord userRecord : this.tempUsersList) {
+            if (userRecord.getUsername().equals(username) && userRecord.getEmail().equals(email)) {
+                record = userRecord;
+                break;
+            }
+        }
+
+        if (record != null) {
+            this.tempUsersList.remove(record);
+            this.tempUsersList.add(new TempUserRecord(record.getId(), record.getEmail(), record.getUsername(), record.getPassword(), record.getPasswordType(), new Timestamp(record.getCreatedAt()), record.getVerificationCode()));
+        }
+        return false;
     }
 
     @Override

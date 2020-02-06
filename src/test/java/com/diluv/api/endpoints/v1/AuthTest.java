@@ -69,7 +69,7 @@ public class AuthTest {
         // Email used
         given()
             .formParam("email", "lclc98@example.com")
-            .formParam("username", "testing")
+            .formParam("username", "testing2")
             .formParam("password", "password")
             .formParam("terms", "true")
             .with().post(URL + "/register").then().assertThat().statusCode(400)

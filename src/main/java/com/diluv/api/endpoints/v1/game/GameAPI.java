@@ -270,7 +270,8 @@ public class GameAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO);
             }
 
-            if (formLogo.getFileSize() > 100000L) {
+            // Defaults to 1MB should be database stored
+            if (formLogo.getFileSize() > 1000000L) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO_SIZE);
             }
             BufferedImage image = ImageUtil.isValidImage(formLogo.getInputStream());
@@ -294,7 +295,7 @@ public class GameAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
             }
 
-            File file = new File(Constants.PUBLIC_FOLDER, String.format("games/%s/%s/%s/logo.png", gameSlug, projectTypeSlug, projectSlug));
+            File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%s/logo.png", gameSlug, projectTypeSlug, projectSlug));
             if (!ImageUtil.saveImage(image, file)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }

@@ -26,14 +26,24 @@ public final class Constants {
 
     public static final PrivateKey PRIVATE_KEY = getPrivateKey("private.pem", "RSA", true);
 
+    public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
+    public static final String WEBSITE_URL = getValueOrDefault("WEBSITE_URL", "https://diluv.com");
+    public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.singleton(WEBSITE_URL));
+
+    // Database
     public static final String DB_HOSTNAME = getValueOrDefault("DB_HOSTNAME", "jdbc:mariadb://localhost:3306/diluv");
     public static final String DB_USERNAME = getValueOrDefault("DB_USERNAME", "root");
     public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
-    public static final String PUBLIC_URL = getValueOrDefault("PUBLIC_URL", "https://cdn.diluv.com/");
-    public static final String PUBLIC_FOLDER = getValueOrDefault("PUBLIC_FOLDER", "public");
+
+    // CDN
+    public static final String CDN_URL = getValueOrDefault("CDN_URL", "https://cdn.diluv.com");
+    public static final String CDN_FOLDER = getValueOrDefault("CDN_FOLDER", "public");
     public static final String PROCESSING_FOLDER = getValueOrDefault("PROCESSING_FOLDER", "processing");
-    public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.emptySet());
-    public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
+
+    // Emails
+    public static final String POSTMARK_API_TOKEN = getValueOrDefault("POSTMARK_API_TOKEN", null);
+    public static final String NOREPLY_EMAIL = getValueOrDefault("NOREPLY_EMAIL", "noreply@diluv.co");
+    public static final String EMAIL_VERIFICATION = Constants.readResourceFileToString("/templates/email_verification.html", false);
 
     /**
      * Reads a string from an environment variable. If the variable can not be found
@@ -174,6 +184,39 @@ public final class Constants {
      *     read null will be returned.
      */
     @Nullable
+    public static String readResourceFileToString (String fileLocation, boolean stripNewline) {
+
+        try {
+            String contents = IOUtils.resourceToString(fileLocation, Charset.defaultCharset());
+
+            if (stripNewline) {
+
+                contents = contents.replaceAll("\\r|\\n", "");
+            }
+
+            return contents;
+        }
+
+        catch (IOException e) {
+
+            DiluvAPI.LOGGER.error("Failed to read file {} as string.", fileLocation, e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Attempts to read the contents of a file as a string. If the file can not be
+     * read for any reason an error will be logged and a null value will be
+     * returned.
+     *
+     * @param fileLocation The location of the file to read.
+     * @param stripNewline Whether or not newline characters should be stripped from
+     *     the file.
+     * @return The contents of the file read as a string. If the file could not be
+     *     read null will be returned.
+     */
+    @Nullable
     public static String readFileToString (String fileLocation, boolean stripNewline) {
 
         try (final FileInputStream fileInputStream = new FileInputStream(fileLocation)) {
@@ -198,6 +241,6 @@ public final class Constants {
 
     public static String getUserAvatar (String username) {
 
-        return String.format("%s/users/%s/avatar.png", PUBLIC_URL, username);
+        return String.format("%s/users/%s/avatar.png", CDN_URL, username);
     }
 }

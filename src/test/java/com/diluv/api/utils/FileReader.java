@@ -16,7 +16,7 @@ public class FileReader {
     public static <T> List<T> readJsonFolder (String folderName, Class<T> c) {
 
         List<T> data = new ArrayList<>();
-        File folder = new File(FileReader.class.getClassLoader().getResource(folderName).getFile());
+        File folder = new File(TestUtil.class.getClassLoader().getResource("records/" + folderName).getFile());
         File[] files = folder.listFiles();
         if (files != null) {
             for (File file : files) {

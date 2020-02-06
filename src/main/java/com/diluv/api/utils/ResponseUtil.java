@@ -1,7 +1,5 @@
 package com.diluv.api.utils;
 
-import java.util.logging.Logger;
-
 import com.diluv.api.DiluvAPI;
 import com.diluv.api.endpoints.v1.domain.DataDomain;
 import com.diluv.api.endpoints.v1.domain.Domain;

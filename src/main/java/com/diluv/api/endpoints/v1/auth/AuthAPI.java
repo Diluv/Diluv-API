@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -25,15 +26,18 @@ import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.RefreshToken;
 import com.diluv.api.utils.auth.Validator;
+import com.diluv.api.utils.email.EmailUtil;
 import com.diluv.api.utils.error.ErrorResponse;
 import com.diluv.confluencia.database.dao.EmailDAO;
 import com.diluv.confluencia.database.dao.UserDAO;
+import com.diluv.confluencia.database.record.EmailSendRecord;
 import com.diluv.confluencia.database.record.RefreshTokenRecord;
 import com.diluv.confluencia.database.record.TempUserRecord;
 import com.diluv.confluencia.database.record.UserRecord;
 import com.nimbusds.jose.JOSEException;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
+import com.wildbit.java.postmark.client.data.model.message.MessageResponse;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.form.FormData;
@@ -96,10 +100,10 @@ public class AuthAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_BLACKLISTED_EMAIL);
             }
 
-            if (this.userDAO.findUserIdByUsername(username) != null || this.userDAO.existTempUserByUsername(username)) {
+            if (this.userDAO.existsUserByUsername(username) || this.userDAO.existsTempUserByUsername(username)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_TAKEN_USERNAME);
             }
-            if (this.userDAO.findUserIdByEmail(email) != null || this.userDAO.existTempUserByEmail(email)) {
+            if (this.userDAO.existsUserByEmail(email) || this.userDAO.existsTempUserByEmail(email)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_TAKEN_EMAIL);
             }
 
@@ -112,7 +116,16 @@ public class AuthAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_TEMP_USER);
             }
 
-            //TODO Send an email to verify
+            if (Constants.POSTMARK_API_TOKEN != null) {
+                MessageResponse emailResponse = EmailUtil.sendVerificationEmail(email, verificationCode);
+                if (emailResponse == null) {
+                    return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_SEND_EMAIL);
+                }
+
+                if (!this.emailDAO.insertEmailSent(emailResponse.getMessageId(), email, "verification")) {
+                    return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_EMAIL_SEND);
+                }
+            }
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (IOException e) {
@@ -143,7 +156,7 @@ public class AuthAPI extends RoutingHandler {
 
             UserRecord userRecord = this.userDAO.findOneByUsername(username);
             if (userRecord == null) {
-                if (this.userDAO.existTempUserByUsername(username)) {
+                if (this.userDAO.existsTempUserByUsername(username)) {
                     return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_NOT_VERIFIED);
                 }
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
@@ -203,7 +216,7 @@ public class AuthAPI extends RoutingHandler {
 
             String email = formEmail.toLowerCase();
 
-            if (this.userDAO.findUserIdByEmail(email) != null) {
+            if (this.userDAO.existsUserByEmail(email)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_VERIFIED);
             }
 
@@ -213,7 +226,7 @@ public class AuthAPI extends RoutingHandler {
             }
 
             // Is the temp user older then 24 hours.
-            if (System.currentTimeMillis() - record.getCreatedAt() >= (1000 * 60 * 60 * 24)) {
+            if (System.currentTimeMillis() - record.getCreatedAt() >= Duration.ofDays(1).toMillis()) {
                 if (!this.userDAO.deleteTempUser(record.getEmail(), record.getUsername())) {
                     return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
                 }
@@ -228,7 +241,7 @@ public class AuthAPI extends RoutingHandler {
             if (image == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }
-            File file = new File(Constants.PUBLIC_FOLDER, String.format("users/%s/avatar.png", record.getUsername()));
+            File file = new File(Constants.CDN_FOLDER, String.format("users/%s/avatar.png", record.getUsername()));
             if (!ImageUtil.saveImage(image, file)) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
             }
@@ -265,23 +278,47 @@ public class AuthAPI extends RoutingHandler {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
             }
 
-            String email = formEmail.toLowerCase();
+            String tempEmail = formEmail.toLowerCase();
             String username = formUsername.toLowerCase();
 
-            TempUserRecord tUserRecord = this.userDAO.findTempUserByEmailAndUsername(email, username);
+            TempUserRecord tUserRecord = this.userDAO.findTempUserByEmailAndUsername(tempEmail, username);
             if (tUserRecord == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
             }
 
             // Is the temp user older then 24 hours.
-            if (System.currentTimeMillis() - tUserRecord.getCreatedAt() >= (1000 * 60 * 60 * 24)) {
+            if (System.currentTimeMillis() - tUserRecord.getCreatedAt() >= Duration.ofDays(1).toMillis()) {
                 if (!this.userDAO.deleteTempUser(tUserRecord.getEmail(), tUserRecord.getUsername())) {
                     return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
                 }
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
             }
-            final String sendEmail = tUserRecord.getEmail();
-            //TODO Resend email
+
+            String verificationCode = UUID.randomUUID().toString();
+
+            // User record is fetched from the database to prevent ways to spoof emails.
+            final String email = tUserRecord.getEmail();
+
+            if (!this.userDAO.updateTempUser(email, username, verificationCode)) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_TEMP_USER);
+            }
+
+            EmailSendRecord emailSendRecord = this.emailDAO.findEmailSentByEmailAndType(email, "verficiation");
+            if (emailSendRecord != null) {
+                if (System.currentTimeMillis() - tUserRecord.getCreatedAt() <= (Duration.ofHours(1).toMillis())) {
+                    return ResponseUtil.errorResponse(exchange, ErrorResponse.COOLDOWN_EMAIL);
+                }
+            }
+            if (Constants.POSTMARK_API_TOKEN != null) {
+                MessageResponse emailResponse = EmailUtil.sendVerificationEmail(email, verificationCode);
+                if (emailResponse == null) {
+                    return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_SEND_EMAIL);
+                }
+
+                if (!this.emailDAO.insertEmailSent(emailResponse.getMessageId(), email, "verification")) {
+                    return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_EMAIL_SEND);
+                }
+            }
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (IOException e) {
@@ -331,7 +368,7 @@ public class AuthAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
         }
 
-        if (this.userDAO.findUserIdByUsername(username) != null || this.userDAO.existTempUserByUsername(username)) {
+        if (this.userDAO.existsUserByUsername(username) || this.userDAO.existsTempUserByUsername(username)) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_TAKEN_USERNAME);
         }
 

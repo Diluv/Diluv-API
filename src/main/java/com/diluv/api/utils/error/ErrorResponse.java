@@ -39,7 +39,7 @@ public enum ErrorResponse {
     PROJECT_FILE_INVALID_FILE(ErrorType.BAD_REQUEST, "project_file.invalid.file"),
     PROJECT_FILE_INVALID_SIZE(ErrorType.BAD_REQUEST, "project_file.invalid.size"),
 
-    // Project Type Errors,
+    // Project Type Errors
     PROJECT_TYPE_INVALID_SLUG(ErrorType.BAD_REQUEST, "project_type.invalid.slug"),
 
     FAILED_CREATE_USER_REFRESH(ErrorType.INTERNAL_SERVER_ERROR, "database.create_user_refresh"),
@@ -49,6 +49,9 @@ public enum ErrorResponse {
     FAILED_CREATE_PROJECT_FILE(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_file"),
     FAILED_DELETE_TEMP_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_temp_user"),
     FAILED_DELETE_REFRESH_TOKEN(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_refresh_token"),
+
+    FAILED_CREATE_EMAIL_SEND(ErrorType.INTERNAL_SERVER_ERROR, "database.create_email_sent"),
+    FAILED_SEND_EMAIL(ErrorType.INTERNAL_SERVER_ERROR, "email.send"),
 
     NOT_FOUND_GAME(ErrorType.BAD_REQUEST, "notfound.game"),
     NOT_FOUND_PROJECT_TYPE(ErrorType.BAD_REQUEST, "notfound.project_type"),
@@ -61,7 +64,9 @@ public enum ErrorResponse {
     ERROR_FOLDER(ErrorType.INTERNAL_SERVER_ERROR, "error.folder"),
     ERROR_WRITING(ErrorType.INTERNAL_SERVER_ERROR, "error.writing"),
     ERROR_ALGORITHM(ErrorType.INTERNAL_SERVER_ERROR, "error.algorithm"),
-    ERROR_SAVING_IMAGE(ErrorType.INTERNAL_SERVER_ERROR, "error.saving_image");
+    ERROR_SAVING_IMAGE(ErrorType.INTERNAL_SERVER_ERROR, "error.saving_image"),
+
+    COOLDOWN_EMAIL(ErrorType.BAD_REQUEST, "cooldown.email");
 
     private final ErrorType type;
     private final String message;

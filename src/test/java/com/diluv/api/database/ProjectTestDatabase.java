@@ -18,8 +18,8 @@ public class ProjectTestDatabase implements ProjectDAO {
 
     public ProjectTestDatabase () {
 
-        this.projectRecords = FileReader.readJsonFolder("records/projects", ProjectRecord.class);
-        this.projectTypeRecords = FileReader.readJsonFolder("records/project_types", ProjectTypeRecord.class);
+        this.projectRecords = FileReader.readJsonFolder("projects", ProjectRecord.class);
+        this.projectTypeRecords = FileReader.readJsonFolder("project_types", ProjectTypeRecord.class);
     }
 
     @Override

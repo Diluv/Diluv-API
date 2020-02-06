@@ -13,10 +13,9 @@ public class FileTestDatabase implements FileDAO {
 
     private final List<ProjectFileRecord> projectFileRecords;
 
-
     public FileTestDatabase () {
 
-        this.projectFileRecords = FileReader.readJsonFolder("records/project_files", ProjectFileRecord.class);
+        this.projectFileRecords = FileReader.readJsonFolder("project_files", ProjectFileRecord.class);
     }
 
     @Override

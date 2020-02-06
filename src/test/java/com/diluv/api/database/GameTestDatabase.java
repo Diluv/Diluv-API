@@ -12,7 +12,7 @@ public class GameTestDatabase implements GameDAO {
 
     public GameTestDatabase () {
 
-        this.gameRecords = FileReader.readJsonFolder("records/games", GameRecord.class);
+        this.gameRecords = FileReader.readJsonFolder("games", GameRecord.class);
     }
 
     @Override
