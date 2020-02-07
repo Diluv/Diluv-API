@@ -30,7 +30,7 @@ dependencies {
 
     implementation group: 'com.warrenstrange', name: 'googleauth', version: '1.4.0'
     implementation group: 'com.github.slugify', name: 'slugify', version: '2.4'
-    implementation group: 'com.wildbit.java', name: 'postmark', version: '1.2.4'
+    implementation group: 'com.wildbit.java', name: 'postmark', version: '1.2.5'
 
     implementation group: 'com.github.spotbugs', name: 'spotbugs', version: '4.0.0-beta5'
 
