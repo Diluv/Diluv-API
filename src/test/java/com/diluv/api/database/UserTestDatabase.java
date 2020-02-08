@@ -61,7 +61,6 @@ public class UserTestDatabase implements UserDAO {
     @Override
     public boolean insertUser (String email, String username, String password, String passwordType, Timestamp timestamp) {
 
-        this.userList.add(new UserRecord(this.userList.size(), email, username, password, passwordType, false, null, timestamp));
         return true;
     }
 
@@ -92,26 +91,13 @@ public class UserTestDatabase implements UserDAO {
     @Override
     public boolean insertTempUser (String email, String username, String password, String passwordType, String verificationCode) {
 
-        this.tempUsersList.add(new TempUserRecord(this.tempUsersList.size(), email, username, password, passwordType, new Timestamp(System.currentTimeMillis()), verificationCode));
         return true;
     }
 
     @Override
     public boolean updateTempUser (String email, String username, String verificationCode) {
 
-        TempUserRecord record = null;
-        for (TempUserRecord userRecord : this.tempUsersList) {
-            if (userRecord.getUsername().equals(username) && userRecord.getEmail().equals(email)) {
-                record = userRecord;
-                break;
-            }
-        }
-
-        if (record != null) {
-            this.tempUsersList.remove(record);
-            this.tempUsersList.add(new TempUserRecord(record.getId(), record.getEmail(), record.getUsername(), record.getPassword(), record.getPasswordType(), new Timestamp(record.getCreatedAt()), record.getVerificationCode()));
-        }
-        return false;
+        return true;
     }
 
     @Override

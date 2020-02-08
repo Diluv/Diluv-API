@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
-import java.time.Duration;
 import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -226,7 +225,7 @@ public class AuthAPI extends RoutingHandler {
             }
 
             // Is the temp user older then 24 hours.
-            if (System.currentTimeMillis() - record.getCreatedAt() >= Duration.ofDays(1).toMillis()) {
+            if (System.currentTimeMillis() - record.getCreatedAt() >= TimeUnit.DAYS.toMillis(1)) {
                 if (!this.userDAO.deleteTempUser(record.getEmail(), record.getUsername())) {
                     return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
                 }
@@ -287,7 +286,7 @@ public class AuthAPI extends RoutingHandler {
             }
 
             // Is the temp user older then 24 hours.
-            if (System.currentTimeMillis() - tUserRecord.getCreatedAt() >= Duration.ofDays(1).toMillis()) {
+            if (System.currentTimeMillis() - tUserRecord.getCreatedAt() >= TimeUnit.DAYS.toMillis(1)) {
                 if (!this.userDAO.deleteTempUser(tUserRecord.getEmail(), tUserRecord.getUsername())) {
                     return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
                 }
@@ -305,7 +304,7 @@ public class AuthAPI extends RoutingHandler {
 
             EmailSendRecord emailSendRecord = this.emailDAO.findEmailSentByEmailAndType(email, "verficiation");
             if (emailSendRecord != null) {
-                if (System.currentTimeMillis() - tUserRecord.getCreatedAt() <= (Duration.ofHours(1).toMillis())) {
+                if (System.currentTimeMillis() - tUserRecord.getCreatedAt() <= TimeUnit.HOURS.toMillis(1)) {
                     return ResponseUtil.errorResponse(exchange, ErrorResponse.COOLDOWN_EMAIL);
                 }
             }

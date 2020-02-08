@@ -26,6 +26,7 @@ import com.diluv.confluencia.database.dao.FileDAO;
 import com.diluv.confluencia.database.dao.GameDAO;
 import com.diluv.confluencia.database.dao.ProjectDAO;
 import com.diluv.confluencia.database.record.GameRecord;
+import com.diluv.confluencia.database.record.ProjectFileQueueRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
@@ -56,7 +57,7 @@ public class GameAPI extends RoutingHandler {
         this.get("/{game_slug}/{project_type_slug}/{project_slug}", this::getProjectByGameSlugAndProjectTypeAndProjectSlug);
         this.get("/{game_slug}/{project_type_slug}/{project_slug}/files", this::getProjectFilesByGameSlugAndProjectTypeAndProjectSlug);
 
-        this.post("/{game_slug}/{project_type_slug}", this::postProjectTypesByGameSlugAndProjectType);
+        this.post("/{game_slug}/{project_type_slug}", this::postProjectByGameSlugAndProjectType);
         this.post("/{game_slug}/{project_type_slug}/{project_slug}/files", this::postProjectFilesByGameSlugAndProjectTypeAndProjectSlug);
     }
 
@@ -213,11 +214,11 @@ public class GameAPI extends RoutingHandler {
         }
 
         List<ProjectFileRecord> projectRecords = this.fileDAO.findAllProjectFilesByGameSlugAndProjectType(gameSlug, projectTypeSlug, projectSlug);
-        List<ProjectFileDomain> projects = projectRecords.stream().map(ProjectFileDomain::new).collect(Collectors.toList());
+        List<ProjectFileDomain> projects = projectRecords.stream().map((ProjectFileRecord rs) -> new ProjectFileDomain(rs, projectSlug, projectTypeSlug, gameSlug)).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, projects);
     }
 
-    private Domain postProjectTypesByGameSlugAndProjectType (HttpServerExchange exchange) {
+    private Domain postProjectByGameSlugAndProjectType (HttpServerExchange exchange) {
 
         String token = JWTUtil.getToken(exchange);
         if (token == null) {
@@ -302,7 +303,7 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
         }
         catch (IOException e) {
-            DiluvAPI.LOGGER.error("Failed to postProjectTypesByGameSlugAndProjectType.", e);
+            DiluvAPI.LOGGER.error("Failed to postProjectByGameSlugAndProjectType.", e);
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
     }
@@ -370,14 +371,16 @@ public class GameAPI extends RoutingHandler {
             }
 
             String fileName = formFile.getFile().getFileName().toString();
-            Long id = this.fileDAO.insertProjectFileQueue(fileName, formChangelog, projectRecord.getId(), accessToken.getUserId());
+            Long id = this.fileDAO.insertProjectFileQueue(fileName, formFile.getFileSize(), formChangelog, projectRecord.getId(), accessToken.getUserId());
             if (id == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT_FILE);
             }
 
             File file = new File(Constants.PROCESSING_FOLDER, String.format("%s/%s/%s/%s/%s", gameSlug, projectTypeSlug, projectSlug, id, fileName));
             FileUtils.copyInputStreamToFile(formFile.getInputStream(), file);
-            return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
+
+            ProjectFileQueueRecord record = this.fileDAO.findOneProjectFileQueueByFileId(id);
+            return ResponseUtil.successResponse(exchange, new ProjectFileQueueDomain(record, projectSlug, projectTypeSlug, gameSlug));
         }
         catch (IOException e) {
             DiluvAPI.LOGGER.error("Failed to postProjectTypesByGameSlugAndProjectType.", e);

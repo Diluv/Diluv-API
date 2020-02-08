@@ -51,8 +51,14 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public Long insertProjectFileQueue (String name, String changelog, long projectId, long userId) {
-//TODO
+    public Long insertProjectFileQueue (String name, long size, String changelog, long projectId, long userId) {
+
+        return null;
+    }
+
+    @Override
+    public ProjectFileQueueRecord findOneProjectFileQueueByFileId (long fileId) {
+
         return null;
     }
 }
