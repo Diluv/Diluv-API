@@ -69,6 +69,9 @@ public class AuthAPI extends RoutingHandler {
     private Domain register (HttpServerExchange exchange) {
 
         try (FormDataParser parser = FormParserFactory.builder().build().createParser(exchange)) {
+            if (parser == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
+            }
             FormData data = parser.parseBlocking();
             String formUsername = RequestUtil.getFormParam(data, "username");
             String formEmail = RequestUtil.getFormParam(data, "email");

@@ -1,6 +1,5 @@
-package com.diluv.api.endpoints.v1.game;
+package com.diluv.api.endpoints.v1.game.domain;
 
-import com.diluv.api.endpoints.v1.game.domain.BaseProjectFileDomain;
 import com.diluv.confluencia.database.record.ProjectFileQueueRecord;
 
 public class ProjectFileQueueDomain extends BaseProjectFileDomain {
