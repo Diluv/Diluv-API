@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.FileDAO;
-import com.diluv.confluencia.database.record.ProjectFileQueueRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 
 public class FileTestDatabase implements FileDAO {
@@ -19,7 +18,7 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public List<ProjectFileQueueRecord> findAllWherePending (int amount) {
+    public List<ProjectFileRecord> findAllWherePending (int amount) {
 
         //TODO
         return new ArrayList<>();
@@ -32,14 +31,14 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public List<ProjectFileQueueRecord> getLatestFileQueueRecord (int amount) throws SQLException {
+    public List<ProjectFileRecord> getLatestFileQueueRecord (int amount) throws SQLException {
 
         //TODO
         return new ArrayList<>();
     }
 
     @Override
-    public List<ProjectFileRecord> findAllProjectFilesByGameSlugAndProjectType (String gameSlug, String projectTypeSlug, String projectSlug) {
+    public List<ProjectFileRecord> findAllProjectFilesByGameSlugAndProjectTypeAndProjectSlug (String gameSlug, String projectTypeSlug, String projectSlug) {
 
 //        ProjectRecord project = this.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
 //        if (project == null) {
@@ -51,13 +50,19 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public Long insertProjectFileQueue (String name, long size, String changelog, long projectId, long userId) {
+    public List<ProjectFileRecord> findAllProjectFilesByGameSlugAndProjectTypeAndProjectSlugAuthorized (String gameSlug, String projectTypeSlug, String projectSlug) {
+
+        return new ArrayList<>();
+    }
+
+    @Override
+    public Long insertProjectFile (String name, long size, String changelog, long projectId, long userId) {
 
         return null;
     }
 
     @Override
-    public ProjectFileQueueRecord findOneProjectFileQueueByFileId (long fileId) {
+    public ProjectFileRecord findOneProjectFileQueueByFileId (long fileId) {
 
         return null;
     }

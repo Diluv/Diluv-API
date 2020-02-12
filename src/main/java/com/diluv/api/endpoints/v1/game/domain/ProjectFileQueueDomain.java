@@ -1,15 +1,15 @@
 package com.diluv.api.endpoints.v1.game.domain;
 
-import com.diluv.confluencia.database.record.ProjectFileQueueRecord;
+import com.diluv.confluencia.database.record.ProjectFileRecord;
 
 public class ProjectFileQueueDomain extends BaseProjectFileDomain {
 
     private final String status;
     private final long statusChangeTime;
 
-    public ProjectFileQueueDomain (ProjectFileQueueRecord record, String projectSlug, String projectTypeSlug, String gameSlug) {
+    public ProjectFileQueueDomain (ProjectFileRecord record, String gameSlug, String projectTypeSlug, String projectSlug) {
 
-        super(record, projectSlug, projectTypeSlug, gameSlug);
+        super(record, gameSlug, projectTypeSlug, projectSlug);
         this.status = record.getStatus();
         this.statusChangeTime = record.getStatusChangeTime();
     }

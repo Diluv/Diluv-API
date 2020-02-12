@@ -92,8 +92,13 @@ public class UserAPI extends RoutingHandler {
         else if ("me".equalsIgnoreCase(usernameParam)) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
         }
-
-        List<ProjectRecord> projectRecords = this.projectDAO.findAllByUsername(username);
+        List<ProjectRecord> projectRecords;
+        if (authorized) {
+            projectRecords = this.projectDAO.findAllByUsernameWhereAuthorized(username);
+        }
+        else {
+            projectRecords = this.projectDAO.findAllByUsername(username);
+        }
         List<ProjectDomain> projects = projectRecords.stream().map(ProjectDomain::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, projects);
     }

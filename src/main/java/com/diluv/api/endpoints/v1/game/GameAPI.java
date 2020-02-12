@@ -3,17 +3,18 @@ package com.diluv.api.endpoints.v1.game;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.diluv.api.endpoints.v1.game.domain.ProjectFileQueueDomain;
 
 import org.apache.commons.io.FileUtils;
 
 import com.diluv.api.DiluvAPI;
 import com.diluv.api.endpoints.v1.domain.Domain;
+import com.diluv.api.endpoints.v1.game.domain.BaseProjectFileDomain;
 import com.diluv.api.endpoints.v1.game.domain.GameDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectFileDomain;
+import com.diluv.api.endpoints.v1.game.domain.ProjectFileQueueDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectTypeDomain;
 import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
 import com.diluv.api.utils.Constants;
@@ -28,7 +29,6 @@ import com.diluv.confluencia.database.dao.FileDAO;
 import com.diluv.confluencia.database.dao.GameDAO;
 import com.diluv.confluencia.database.dao.ProjectDAO;
 import com.diluv.confluencia.database.record.GameRecord;
-import com.diluv.confluencia.database.record.ProjectFileQueueRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
@@ -211,12 +211,39 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT_TYPE);
         }
 
-        if (this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) == null) {
+        ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (projectRecord == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
         }
 
-        List<ProjectFileRecord> projectRecords = this.fileDAO.findAllProjectFilesByGameSlugAndProjectType(gameSlug, projectTypeSlug, projectSlug);
-        List<ProjectFileDomain> projects = projectRecords.stream().map((ProjectFileRecord rs) -> new ProjectFileDomain(rs, projectSlug, projectTypeSlug, gameSlug)).collect(Collectors.toList());
+        Long id = null;
+        String token = JWTUtil.getToken(exchange);
+        if (token != null) {
+            AccessToken accessToken = AccessToken.getToken(token);
+            if (accessToken == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
+            }
+            id = accessToken.getUserId();
+        }
+
+        List<ProjectFileRecord> projectRecords;
+
+        //TODO Check permissions
+        if (id != null && projectRecord.getUserId() == id) {
+            projectRecords = this.fileDAO.findAllProjectFilesByGameSlugAndProjectTypeAndProjectSlugAuthorized(gameSlug, projectTypeSlug, projectSlug);
+        }
+        else {
+            projectRecords = this.fileDAO.findAllProjectFilesByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        }
+        List<BaseProjectFileDomain> projects = new ArrayList<>();
+        for (ProjectFileRecord record : projectRecords) {
+            if (record.getSha512() == null) {
+                projects.add(new ProjectFileQueueDomain(record, gameSlug, projectTypeSlug, projectSlug));
+            }
+            else {
+                projects.add(new ProjectFileDomain(record, gameSlug, projectTypeSlug, projectSlug));
+            }
+        }
         return ResponseUtil.successResponse(exchange, projects);
     }
 
@@ -373,7 +400,7 @@ public class GameAPI extends RoutingHandler {
             }
 
             String fileName = formFile.getFile().getFileName().toString();
-            Long id = this.fileDAO.insertProjectFileQueue(fileName, formFile.getFileSize(), formChangelog, projectRecord.getId(), accessToken.getUserId());
+            Long id = this.fileDAO.insertProjectFile(fileName, formFile.getFileSize(), formChangelog, projectRecord.getId(), accessToken.getUserId());
             if (id == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT_FILE);
             }
@@ -381,8 +408,8 @@ public class GameAPI extends RoutingHandler {
             File file = new File(Constants.PROCESSING_FOLDER, String.format("%s/%s/%s/%s/%s", gameSlug, projectTypeSlug, projectSlug, id, fileName));
             FileUtils.copyInputStreamToFile(formFile.getInputStream(), file);
 
-            ProjectFileQueueRecord record = this.fileDAO.findOneProjectFileQueueByFileId(id);
-            return ResponseUtil.successResponse(exchange, new ProjectFileQueueDomain(record, projectSlug, projectTypeSlug, gameSlug));
+            ProjectFileRecord record = this.fileDAO.findOneProjectFileQueueByFileId(id);
+            return ResponseUtil.successResponse(exchange, new ProjectFileQueueDomain(record, gameSlug, projectTypeSlug, projectSlug));
         }
         catch (IOException e) {
             DiluvAPI.LOGGER.error("Failed to postProjectTypesByGameSlugAndProjectType.", e);

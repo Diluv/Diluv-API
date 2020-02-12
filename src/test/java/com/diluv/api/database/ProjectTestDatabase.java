@@ -28,6 +28,15 @@ public class ProjectTestDatabase implements ProjectDAO {
         UserRecord user = TestUtil.USER_DAO.findOneByUsername(username);
         if (user == null)
             return new ArrayList<>();
+        return this.projectRecords.stream().filter(projectRecord -> projectRecord.getUserId() == user.getId() && projectRecord.isReleased()).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProjectRecord> findAllByUsernameWhereAuthorized (String username) {
+
+        UserRecord user = TestUtil.USER_DAO.findOneByUsername(username);
+        if (user == null)
+            return new ArrayList<>();
         return this.projectRecords.stream().filter(projectRecord -> projectRecord.getUserId() == user.getId()).collect(Collectors.toList());
     }
 
