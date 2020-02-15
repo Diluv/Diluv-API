@@ -25,7 +25,7 @@ public class Validator {
 
     public static boolean validateProjectName (String projectName) {
 
-        if (GenericValidator.isBlankOrNull(projectName) || projectName.length() > 50 || projectName.length() < 3) {
+        if (GenericValidator.isBlankOrNull(projectName) || projectName.length() > 50 || projectName.length() < 5) {
             return false;
         }
         return GenericValidator.matchRegexp(projectName, "([A-Za-z0-9-_:]+)");

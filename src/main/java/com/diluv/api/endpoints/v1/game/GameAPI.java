@@ -7,9 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.diluv.api.DiluvAPI;
+
 import org.apache.commons.io.FileUtils;
 
-import com.diluv.api.DiluvAPI;
 import com.diluv.api.endpoints.v1.domain.Domain;
 import com.diluv.api.endpoints.v1.game.domain.BaseProjectFileDomain;
 import com.diluv.api.endpoints.v1.game.domain.GameDomain;
@@ -18,6 +19,7 @@ import com.diluv.api.endpoints.v1.game.domain.ProjectFileQueueDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectTypeDomain;
 import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
 import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.FormUtil;
 import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
@@ -36,8 +38,6 @@ import com.github.slugify.Slugify;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.form.FormData;
-import io.undertow.server.handlers.form.FormDataParser;
-import io.undertow.server.handlers.form.FormParserFactory;
 
 public class GameAPI extends RoutingHandler {
 
@@ -277,64 +277,62 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT_TYPE);
         }
 
-        try (FormDataParser parser = FormParserFactory.builder().build().createParser(exchange)) {
-            FormData data = parser.parseBlocking();
-            String formName = RequestUtil.getFormParam(data, "name");
-            String formSummary = RequestUtil.getFormParam(data, "summary");
-            String formDescription = RequestUtil.getFormParam(data, "description");
-            FormData.FileItem formLogo = RequestUtil.getFormFile(data, "logo");
-
-            if (!Validator.validateProjectName(formName)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_NAME);
-            }
-
-            if (!Validator.validateProjectSummary(formSummary)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_SUMMARY);
-            }
-
-            if (!Validator.validateProjectDescription(formDescription)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_DESCRIPTION);
-            }
-
-            if (formLogo == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO);
-            }
-
-            // Defaults to 1MB should be database stored
-            if (formLogo.getFileSize() > 1000000L) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO_SIZE);
-            }
-            BufferedImage image = ImageUtil.isValidImage(formLogo.getInputStream());
-            if (image == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO);
-            }
-
-            String projectSlug = slugify.slugify(formName);
-
-            if (this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) != null) {
-                //TODO Do we generate a new slug or just ask them to change project name?
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_TAKEN_SLUG);
-            }
-            if (!this.projectDAO.insertProject(projectSlug, formName, formSummary, formDescription, accessToken.getUserId(), gameSlug, projectTypeSlug)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT);
-            }
-
-            ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-
-            if (projectRecord == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
-            }
-
-            File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%s/logo.png", gameSlug, projectTypeSlug, projectSlug));
-            if (!ImageUtil.saveImage(image, file)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
-            }
-            return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
-        }
-        catch (IOException e) {
-            DiluvAPI.LOGGER.error("Failed to postProjectByGameSlugAndProjectType.", e);
+        FormData data = FormUtil.getForm(exchange);
+        if (data == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
+        String formName = RequestUtil.getFormParam(data, "name");
+        String formSummary = RequestUtil.getFormParam(data, "summary");
+        String formDescription = RequestUtil.getFormParam(data, "description");
+        FormData.FileItem formLogo = RequestUtil.getFormFile(data, "logo");
+
+        if (!Validator.validateProjectName(formName)) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_NAME);
+        }
+
+        if (!Validator.validateProjectSummary(formSummary)) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_SUMMARY);
+        }
+
+        if (!Validator.validateProjectDescription(formDescription)) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_DESCRIPTION);
+        }
+
+        if (formLogo == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO);
+        }
+
+        Long imageSize = ImageUtil.getSize(formLogo);
+        // Defaults to 1MB should be database stored
+        if (imageSize == null || imageSize > 1000000L) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO_SIZE);
+        }
+
+        BufferedImage image = ImageUtil.isValidImage(formLogo);
+        if (image == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO);
+        }
+        String projectSlug = slugify.slugify(formName);
+
+        if (this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) != null) {
+            //TODO Do we generate a new slug or just ask them to change project name?
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_TAKEN_SLUG);
+        }
+        if (!this.projectDAO.insertProject(projectSlug, formName, formSummary, formDescription, 1, gameSlug, projectTypeSlug)) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT);
+        }
+
+        ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+
+        if (projectRecord == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
+        }
+
+        File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%s/logo.png", gameSlug, projectTypeSlug, projectSlug));
+        if (!ImageUtil.saveImage(image, file)) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
+        }
+        return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
     }
 
     private Domain postProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) {
@@ -382,38 +380,43 @@ public class GameAPI extends RoutingHandler {
         if (projectRecord.getUserId() != accessToken.getUserId()) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_NOT_AUTHORIZED);
         }
-        try (FormDataParser parser = FormParserFactory.builder().build().createParser(exchange)) {
-            FormData data = parser.parseBlocking();
-            String formChangelog = RequestUtil.getFormParam(data, "changelog");
-            FormData.FileItem formFile = RequestUtil.getFormFile(data, "file");
-
-            if (!Validator.validateProjectFileChangelog(formChangelog)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_FILE_INVALID_CHANGELOG);
-            }
-
-            if (formFile == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_FILE_INVALID_FILE);
-            }
-
-            if (formFile.getFileSize() > projectTypeRecord.getMaxSize()) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_FILE_INVALID_SIZE);
-            }
-
-            String fileName = formFile.getFile().getFileName().toString();
-            Long id = this.fileDAO.insertProjectFile(fileName, formFile.getFileSize(), formChangelog, projectRecord.getId(), accessToken.getUserId());
-            if (id == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT_FILE);
-            }
-
-            File file = new File(Constants.PROCESSING_FOLDER, String.format("%s/%s/%s/%s/%s", gameSlug, projectTypeSlug, projectSlug, id, fileName));
-            FileUtils.copyInputStreamToFile(formFile.getInputStream(), file);
-
-            ProjectFileRecord record = this.fileDAO.findOneProjectFileQueueByFileId(id);
-            return ResponseUtil.successResponse(exchange, new ProjectFileQueueDomain(record, gameSlug, projectTypeSlug, projectSlug));
-        }
-        catch (IOException e) {
-            DiluvAPI.LOGGER.error("Failed to postProjectTypesByGameSlugAndProjectType.", e);
+        FormData data = FormUtil.getForm(exchange);
+        if (data == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
+
+        String formChangelog = RequestUtil.getFormParam(data, "changelog");
+        FormData.FileItem formFile = RequestUtil.getFormFile(data, "file");
+
+        if (!Validator.validateProjectFileChangelog(formChangelog)) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_FILE_INVALID_CHANGELOG);
+        }
+
+        if (formFile == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_FILE_INVALID_FILE);
+        }
+
+        Long fileSize = ImageUtil.getSize(formFile);
+        if (fileSize == null || fileSize > projectTypeRecord.getMaxSize()) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_FILE_INVALID_SIZE);
+        }
+
+        String fileName = formFile.getFile().getFileName().toString();
+        Long id = this.fileDAO.insertProjectFile(fileName, fileSize, formChangelog, projectRecord.getId(), accessToken.getUserId());
+        if (id == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT_FILE);
+        }
+
+        File file = new File(Constants.PROCESSING_FOLDER, String.format("%s/%s/%s/%s/%s", gameSlug, projectTypeSlug, projectSlug, id, fileName));
+        try {
+            FileUtils.copyInputStreamToFile(formFile.getInputStream(), file);
+        }
+        catch (IOException e) {
+            DiluvAPI.LOGGER.error("Failed to postProjectFilesByGameSlugAndProjectTypeAndProjectSlug.", e);
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_WRITING);
+        }
+
+        ProjectFileRecord record = this.fileDAO.findOneProjectFileQueueByFileId(id);
+        return ResponseUtil.successResponse(exchange, new ProjectFileQueueDomain(record, gameSlug, projectTypeSlug, projectSlug));
     }
 }

@@ -3,12 +3,23 @@ package com.diluv.api.utils;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import io.undertow.server.handlers.form.FormData;
+
 public class ImageUtil {
+
+    public static Long getSize (FormData.FileItem fileItem) {
+
+        try {
+            return fileItem.getFileSize();
+        }
+        catch (IOException e) {
+            return null;
+        }
+    }
 
     public static BufferedImage isValidImage (String url) {
 
@@ -20,10 +31,10 @@ public class ImageUtil {
         }
     }
 
-    public static BufferedImage isValidImage (InputStream inputStream) {
+    public static BufferedImage isValidImage (FormData.FileItem fileItem) {
 
         try {
-            return ImageIO.read(inputStream);
+            return ImageIO.read(fileItem.getInputStream());
         }
         catch (IOException e) {
             return null;
