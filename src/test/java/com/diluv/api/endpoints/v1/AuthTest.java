@@ -190,4 +190,20 @@ public class AuthTest {
         given()
             .with().get(URL + "/checkusername/nonexisting").then().assertThat().statusCode(200);
     }
+
+    @Test
+    public void testResend () {
+
+        given()
+            .formParam("username", "jaredlll08")
+            .formParam("email", "jaredlll08@example.com")
+            .with().post(URL + "/resend").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+
+        given()
+            .formParam("username", "lclc98")
+            .formParam("email", "lclc98@example.com")
+            .with().post(URL + "/resend").then().assertThat().statusCode(200);
+    }
 }

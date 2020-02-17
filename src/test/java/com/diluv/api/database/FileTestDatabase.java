@@ -52,18 +52,19 @@ public class FileTestDatabase implements FileDAO {
     @Override
     public List<ProjectFileRecord> findAllProjectFilesByGameSlugAndProjectTypeAndProjectSlugAuthorized (String gameSlug, String projectTypeSlug, String projectSlug) {
 
-        return new ArrayList<>();
+        // TODO
+        return this.projectFileRecords;
     }
 
     @Override
     public Long insertProjectFile (String name, long size, String changelog, long projectId, long userId) {
 
-        return null;
+        return (long) this.projectFileRecords.size();
     }
 
     @Override
     public ProjectFileRecord findOneProjectFileQueueByFileId (long fileId) {
 
-        return null;
+        return this.projectFileRecords.get(0);
     }
 }

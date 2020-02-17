@@ -1,5 +1,6 @@
 {
     "slug": "mods",
     "name": "Mods",
-    "gameSlug": "minecraft"
+    "gameSlug": "minecraft",
+    "maxSize": 10000000
 }

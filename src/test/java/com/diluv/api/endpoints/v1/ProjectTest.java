@@ -40,7 +40,7 @@ public class ProjectTest {
     }
 
     @Test
-    public void testProjectTypesByGameSlugAndProjectType () {
+    public void getProjectTypesByGameSlugAndProjectType () {
 
         get(URL + "/eco/mods").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
@@ -55,7 +55,7 @@ public class ProjectTest {
     }
 
     @Test
-    public void testProjectsByGameSlugAndProjectType () {
+    public void getProjectsByGameSlugAndProjectType () {
 
         get(URL + "/eco/mods/projects").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
@@ -70,7 +70,7 @@ public class ProjectTest {
     }
 
     @Test
-    public void testProjectByGameSlugAndProjectTypeAndProject () {
+    public void getProjectByGameSlugAndProjectTypeAndProjectSlug () {
 
         get(URL + "/eco/mods/test").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
@@ -89,7 +89,7 @@ public class ProjectTest {
     }
 
     @Test
-    public void testProjectFilesByGameSlugAndProjectTypeAndProject () {
+    public void getProjectFilesByGameSlugAndProjectTypeAndProjectSlug () {
 
         get(URL + "/eco/mods/test/files").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
@@ -111,7 +111,7 @@ public class ProjectTest {
     }
 
     @Test
-    public void testCreateProject () {
+    public void postProjectByGameSlugAndProjectType () {
 
         given()
             .header("Authorization", "Bearer " + darkhaxToken)
@@ -124,6 +124,7 @@ public class ProjectTest {
             .with().post(URL + "/minecraft/maps").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
             .body("message", equalTo(ErrorResponse.NOT_FOUND_PROJECT_TYPE.getMessage()));
+
         ClassLoader classLoader = getClass().getClassLoader();
         given()
             .header("Authorization", "Bearer " + darkhaxToken)
@@ -143,5 +144,18 @@ public class ProjectTest {
             .multiPart("logo", new File(classLoader.getResource("logo.png").getFile()))
             .with().post(URL + "/minecraft/mods").then().assertThat().statusCode(200)
             .body(matchesJsonSchemaInClasspath("schema/project-schema.json"));
+    }
+
+    @Test
+    public void postProjectFilesByGameSlugAndProjectTypeAndProjectSlug () {
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        given()
+            .header("Authorization", "Bearer " + darkhaxToken)
+            .formParam("changelog", "Changelog")
+            .multiPart("file", new File(classLoader.getResource("logo.png").getFile()))
+            .with().post(URL + "/minecraft/mods/bookshelf/files").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"))
+            .body("message", equalTo(ErrorResponse.PROJECT_TAKEN_SLUG.getMessage()));
     }
 }

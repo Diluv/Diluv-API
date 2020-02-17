@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorResponse;
 
-import static io.restassured.RestAssured.get;
+import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -28,27 +28,36 @@ public class GameTest {
     }
 
     @Test
-    public void testGame () {
+    public void getGames () {
 
-        get(URL).then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/game-list-schema.json"));
+        given()
+            .with().get(URL).then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/game-list-schema.json"));
     }
 
     @Test
-    public void testGameBySlug () {
+    public void getGameBySlug () {
 
-        get(URL + "/eco").then().assertThat().statusCode(400)
+        given()
+            .with().get(URL + "/eco").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
             .body("message", equalTo(ErrorResponse.NOT_FOUND_GAME.getMessage()));
-        get(URL + "/minecraft").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/game-schema.json"));
+
+        given()
+            .with().get(URL + "/minecraft").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/game-schema.json"));
     }
 
     @Test
-    public void testProjectTypesByGameSlug () {
+    public void getProjectTypesByGameSlug () {
 
-        get(URL + "/eco/types").then().assertThat().statusCode(400)
+        given()
+            .with().get(URL + "/eco/types").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
             .body("message", equalTo(ErrorResponse.NOT_FOUND_GAME.getMessage()));
 
-        get(URL + "/minecraft/types").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-types-list-schema.json"));
+        given()
+            .with().get(URL + "/minecraft/types").then().assertThat().statusCode(200)
+            .body(matchesJsonSchemaInClasspath("schema/project-types-list-schema.json"));
     }
 }

@@ -1,5 +1,6 @@
 {
     "slug": "mods",
     "name": "Mods",
-    "gameSlug": "stardew_valley"
+    "gameSlug": "stardew_valley",
+    "maxSize": 10000000
 }
