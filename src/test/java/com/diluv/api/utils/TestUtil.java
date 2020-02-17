@@ -4,11 +4,13 @@ import com.diluv.api.DiluvAPI;
 import com.diluv.api.database.EmailTestDatabase;
 import com.diluv.api.database.FileTestDatabase;
 import com.diluv.api.database.GameTestDatabase;
+import com.diluv.api.database.NewsTestDatabase;
 import com.diluv.api.database.ProjectTestDatabase;
 import com.diluv.api.database.UserTestDatabase;
 import com.diluv.confluencia.database.dao.EmailDAO;
 import com.diluv.confluencia.database.dao.FileDAO;
 import com.diluv.confluencia.database.dao.GameDAO;
+import com.diluv.confluencia.database.dao.NewsDAO;
 import com.diluv.confluencia.database.dao.ProjectDAO;
 import com.diluv.confluencia.database.dao.UserDAO;
 import io.restassured.RestAssured;
@@ -25,12 +27,13 @@ public class TestUtil {
     public static final FileDAO FILE_DAO = new FileTestDatabase();
     public static final UserDAO USER_DAO = new UserTestDatabase();
     public static final EmailDAO EMAIL_DAO = new EmailTestDatabase();
+    public static final NewsDAO NEWS_DAO = new NewsTestDatabase();
 
     public static void start () {
 
         TestUtil.server = Undertow.builder()
             .addHttpListener(PORT, IP)
-            .setHandler(DiluvAPI.getHandler(GAME_DAO, PROJECT_DAO, FILE_DAO, USER_DAO, EMAIL_DAO))
+            .setHandler(DiluvAPI.getHandler(GAME_DAO, PROJECT_DAO, FILE_DAO, USER_DAO, EMAIL_DAO, NEWS_DAO))
             .build();
         TestUtil.server.start();
 

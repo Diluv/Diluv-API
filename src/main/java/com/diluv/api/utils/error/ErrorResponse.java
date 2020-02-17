@@ -58,6 +58,7 @@ public enum ErrorResponse {
     NOT_FOUND_USER(ErrorType.BAD_REQUEST, "notfound.user"),
     NOT_FOUND_PROJECT(ErrorType.BAD_REQUEST, "notfound.project"),
     NOT_FOUND_USER_REFRESH_TOKEN(ErrorType.BAD_REQUEST, "notfound.user_refresh_token"),
+    NOT_FOUND_NEWS(ErrorType.BAD_REQUEST, "notfound.news"),
 
     FORM_INVALID(ErrorType.BAD_REQUEST, "form.invalid"),
     ERROR_TOKEN(ErrorType.BAD_REQUEST, "error.token"),
@@ -66,6 +67,7 @@ public enum ErrorResponse {
     ERROR_ALGORITHM(ErrorType.INTERNAL_SERVER_ERROR, "error.algorithm"),
     ERROR_SAVING_IMAGE(ErrorType.INTERNAL_SERVER_ERROR, "error.saving_image"),
 
+    NEWS_INVALID_SLUG(ErrorType.BAD_REQUEST, "news.invalid.slug"),
     COOLDOWN_EMAIL(ErrorType.BAD_REQUEST, "cooldown.email");
 
     private final ErrorType type;

@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.diluv.api.endpoints.v1.auth.AuthAPI;
 import com.diluv.api.endpoints.v1.game.GameAPI;
+import com.diluv.api.endpoints.v1.news.NewsAPI;
 import com.diluv.api.endpoints.v1.user.UserAPI;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.cors.CorsHandler;
@@ -20,11 +21,13 @@ import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.EmailDatabase;
 import com.diluv.confluencia.database.FileDatabase;
 import com.diluv.confluencia.database.GameDatabase;
+import com.diluv.confluencia.database.NewsDatabase;
 import com.diluv.confluencia.database.ProjectDatabase;
 import com.diluv.confluencia.database.UserDatabase;
 import com.diluv.confluencia.database.dao.EmailDAO;
 import com.diluv.confluencia.database.dao.FileDAO;
 import com.diluv.confluencia.database.dao.GameDAO;
+import com.diluv.confluencia.database.dao.NewsDAO;
 import com.diluv.confluencia.database.dao.ProjectDAO;
 import com.diluv.confluencia.database.dao.UserDAO;
 import com.google.gson.Gson;
@@ -54,10 +57,12 @@ public class DiluvAPI {
         FileDAO fileDAO = new FileDatabase();
         UserDAO userDAO = new UserDatabase();
         EmailDAO emailDAO = new EmailDatabase();
+        NewsDAO newsDAO = new NewsDatabase();
+
         migrate(emailDAO);
         Undertow server = Undertow.builder()
             .addHttpListener(port, host)
-            .setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, fileDAO, userDAO, emailDAO))
+            .setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, fileDAO, userDAO, emailDAO, newsDAO))
             .build();
         server.start();
         LOGGER.info("Server starting on {}:{}", host, port);
@@ -89,7 +94,7 @@ public class DiluvAPI {
      * @param projectDAO The Project DAO to fetch project data
      * @return HttpHandler for all the routes, with cors.
      */
-    public static HttpHandler getHandler (GameDAO gameDAO, ProjectDAO projectDAO, FileDAO fileDAO, UserDAO userDAO, EmailDAO emailDAO) {
+    public static HttpHandler getHandler (GameDAO gameDAO, ProjectDAO projectDAO, FileDAO fileDAO, UserDAO userDAO, EmailDAO emailDAO, NewsDAO newsDAO) {
 
         PathHandler routing = Handlers.path();
         Path rootPath = Paths.get("public");
@@ -99,6 +104,7 @@ public class DiluvAPI {
         routing.addPrefixPath("/auth", new AuthAPI(userDAO, emailDAO));
         routing.addPrefixPath("/users", new UserAPI(userDAO, projectDAO));
         routing.addPrefixPath("/games", new GameAPI(gameDAO, projectDAO, fileDAO));
+        routing.addPrefixPath("/news", new NewsAPI(newsDAO));
         path.addPrefixPath("/v1", routing);
         return new ErrorHandler(new BlockingHandler(new CorsHandler(path)));
     }
