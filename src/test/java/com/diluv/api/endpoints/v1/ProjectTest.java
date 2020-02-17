@@ -155,7 +155,6 @@ public class ProjectTest {
             .formParam("changelog", "Changelog")
             .multiPart("file", new File(classLoader.getResource("logo.png").getFile()))
             .with().post(URL + "/minecraft/mods/bookshelf/files").then().assertThat().statusCode(200)
-            .body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"))
-            .body("message", equalTo(ErrorResponse.PROJECT_TAKEN_SLUG.getMessage()));
+            .body(matchesJsonSchemaInClasspath("schema/project-files-queue-schema.json"));
     }
 }

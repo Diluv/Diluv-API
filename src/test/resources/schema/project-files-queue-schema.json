@@ -11,9 +11,6 @@
                 "name": {
                     "type": "string"
                 },
-                "sha512": {
-                    "type": "string"
-                },
                 "size": {
                     "type": "number"
                 },
@@ -22,19 +19,14 @@
                 },
                 "createdAt": {
                     "type": "number"
-                },
-                "updatedAt": {
-                    "type": "number"
                 }
             },
             "required": [
                 "id",
                 "name",
-                "sha512",
                 "size",
                 "changelog",
-                "createdAt",
-                "updatedAt"
+                "createdAt"
             ]
         }
     },
