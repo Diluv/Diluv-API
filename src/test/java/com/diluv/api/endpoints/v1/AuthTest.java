@@ -107,6 +107,13 @@ public class AuthTest {
             .body(matchesJsonSchemaInClasspath("schema/login-schema.json"));
 
         given()
+            .formParam("username", "jaredlll08")
+            .formParam("password", "wrongpassword")
+            .with().post(URL + "/login").then().assertThat().statusCode(400)
+            .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
+            .body("message", equalTo(ErrorResponse.USER_WRONG_PASSWORD.getMessage()));
+
+        given()
             .formParam("username", "darkhax")
             .formParam("password", "password")
             .with().post(URL + "/login").then().assertThat().statusCode(400)
@@ -120,6 +127,7 @@ public class AuthTest {
             .with().post(URL + "/login").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
             .body("message", equalTo(ErrorResponse.USER_NOT_VERIFIED.getMessage()));
+
 
         given()
             .formParam("username", "testing")
