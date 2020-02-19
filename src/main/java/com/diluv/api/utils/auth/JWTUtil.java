@@ -30,8 +30,23 @@ public class JWTUtil {
         return BEARER.regionMatches(true, 0, token, 0, BEARER.length());
     }
 
-    public static String getToken (HttpServerExchange exchange) {
+    public static String getTokenString (HttpServerExchange exchange) {
 
         return exchange.getRequestHeaders().getFirst(AUTHORIZATION);
+    }
+
+    public static AccessToken getToken (HttpServerExchange exchange) throws InvalidTokenException {
+
+        String token = getTokenString(exchange);
+        if (token != null) {
+            AccessToken accessToken = AccessToken.getToken(token);
+            if (accessToken == null) {
+                throw new InvalidTokenException();
+            }
+
+            return accessToken;
+        }
+
+        return null;
     }
 }

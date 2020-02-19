@@ -1,5 +1,6 @@
 package com.diluv.api.database;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.diluv.api.utils.FileReader;
@@ -82,6 +83,6 @@ public class EmailTestDatabase implements EmailDAO {
     @Override
     public List<EmailSendRecord> findEmailSentByEmail (String email) {
 
-        return null;
+        return new ArrayList<>();
     }
 }

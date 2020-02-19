@@ -25,6 +25,26 @@
                 },
                 "updatedAt": {
                     "type": "number"
+                },
+                "users": {
+                    "type": "array",
+                    "items": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "username": {
+                                    "type": "string"
+                                },
+                                "role": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "username",
+                                "role"
+                            ]
+                        }
+                    ]
                 }
             },
             "required": [
@@ -34,7 +54,8 @@
                 "description",
                 "cachedDownloads",
                 "createdAt",
-                "updatedAt"
+                "updatedAt",
+                "users"
             ]
         }
     },

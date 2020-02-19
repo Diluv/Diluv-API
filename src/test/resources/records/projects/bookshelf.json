@@ -8,6 +8,9 @@
     "createdAt": 1573482394,
     "updatedAt": 1573482394,
     "userId": 0,
+    "username": "darkhax",
     "gameSlug": "minecraft",
-    "projectTypeSlug": "mods"
+    "projectTypeSlug": "mods",
+    "released": true,
+    "review": false
 }

@@ -1,5 +1,7 @@
 package com.diluv.api.utils.error;
 
+import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.auth.InvalidTokenException;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 
@@ -17,25 +19,17 @@ public class ErrorHandler implements HttpHandler {
     @Override
     public void handleRequest (final HttpServerExchange ex) throws Exception {
 
-        ex.addDefaultResponseListener(exchange -> {
-            if (!exchange.isResponseChannelAvailable()) {
-                return false;
+        try {
+            next.handleRequest(ex);
+        }
+        catch (Throwable throwable) {
+            if (InvalidTokenException.class.isInstance(throwable)) {
+                ResponseUtil.errorResponse(ex, ErrorResponse.USER_INVALID_TOKEN);
             }
-            final int code = exchange.getStatusCode();
-            if (code == 401) {
-                exchange.getResponseSender().send("ERROR_401");
-                return true;
+            else {
+                throw throwable;
             }
-            else if (code == 403) {
-                exchange.getResponseSender().send("ERROR_403");
-                return true;
-            }
-            else if (code == 500) {
-                exchange.getResponseSender().send("ERROR_500");
-                return true;
-            }
-            return false;
-        });
-        next.handleRequest(ex);
+        }
+
     }
 }

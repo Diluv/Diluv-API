@@ -1,4 +1,7 @@
-package com.diluv.api.endpoints.v1.user.domain;
+package com.diluv.api.endpoints.v1.game.domain;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.diluv.confluencia.database.record.ProjectRecord;
 
@@ -10,8 +13,14 @@ public class ProjectDomain {
     private final long cachedDownloads;
     private final long createdAt;
     private final long updatedAt;
+    private List<ProjectAuthorDomain> users = new ArrayList<>();
 
     public ProjectDomain (ProjectRecord projectRecord) {
+
+        this(projectRecord, null);
+    }
+
+    public ProjectDomain (ProjectRecord projectRecord, List<ProjectAuthorDomain> projectAuthorRecords) {
 
         this.name = projectRecord.getName();
         this.slug = projectRecord.getSlug();
@@ -20,6 +29,9 @@ public class ProjectDomain {
         this.cachedDownloads = projectRecord.getCachedDownloads();
         this.createdAt = projectRecord.getCreatedAt();
         this.updatedAt = projectRecord.getUpdatedAt();
+        this.users.add(new ProjectAuthorDomain(projectRecord.getUsername(), "owner"));
+        if (projectAuthorRecords != null)
+            this.users.addAll(projectAuthorRecords);
     }
 
     public String getName () {

@@ -70,7 +70,6 @@ public class CorsHandler implements HttpHandler {
         }
         setCorsResponseHeaders(exchange);
         this.next.handleRequest(exchange);
-
     }
 
     private void handlePreflightRequest (HttpServerExchange exchange) throws Exception {

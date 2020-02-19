@@ -99,13 +99,12 @@ public class DiluvAPI {
         PathHandler routing = Handlers.path();
         Path rootPath = Paths.get("public");
         PathHandler path = Handlers.path();
-        path.addPrefixPath("/public", new ResourceHandler(new PathResourceManager(rootPath))
-            .setDirectoryListingEnabled(true));
+        path.addPrefixPath("/public", new ResourceHandler(new PathResourceManager(rootPath)).setDirectoryListingEnabled(true));
         routing.addPrefixPath("/auth", new AuthAPI(userDAO, emailDAO));
         routing.addPrefixPath("/users", new UserAPI(userDAO, projectDAO));
         routing.addPrefixPath("/games", new GameAPI(gameDAO, projectDAO, fileDAO));
         routing.addPrefixPath("/news", new NewsAPI(newsDAO));
         path.addPrefixPath("/v1", routing);
-        return new ErrorHandler(new BlockingHandler(new CorsHandler(path)));
+        return new BlockingHandler(new CorsHandler(new ErrorHandler(path)));
     }
 }

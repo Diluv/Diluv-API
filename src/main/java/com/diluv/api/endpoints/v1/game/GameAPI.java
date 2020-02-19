@@ -5,25 +5,29 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.diluv.api.DiluvAPI;
 
 import org.apache.commons.io.FileUtils;
 
+import com.diluv.api.DiluvAPI;
 import com.diluv.api.endpoints.v1.domain.Domain;
+import com.diluv.api.endpoints.v1.game.domain.AuthorizedProjectAuthorDomain;
+import com.diluv.api.endpoints.v1.game.domain.AuthorizedProjectDomain;
 import com.diluv.api.endpoints.v1.game.domain.BaseProjectFileDomain;
 import com.diluv.api.endpoints.v1.game.domain.GameDomain;
+import com.diluv.api.endpoints.v1.game.domain.ProjectAuthorDomain;
+import com.diluv.api.endpoints.v1.game.domain.ProjectDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectFileDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectFileQueueDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectTypeDomain;
-import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FormUtil;
 import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.auth.AccessToken;
+import com.diluv.api.utils.auth.InvalidTokenException;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.error.ErrorResponse;
@@ -31,6 +35,7 @@ import com.diluv.confluencia.database.dao.FileDAO;
 import com.diluv.confluencia.database.dao.GameDAO;
 import com.diluv.confluencia.database.dao.ProjectDAO;
 import com.diluv.confluencia.database.record.GameRecord;
+import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
@@ -151,7 +156,9 @@ public class GameAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, projects);
     }
 
-    private Domain getProjectByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) {
+    private Domain getProjectByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) throws InvalidTokenException {
+
+        final AccessToken token = JWTUtil.getToken(exchange);
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
@@ -178,14 +185,28 @@ public class GameAPI extends RoutingHandler {
         }
 
         ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-
-        if (projectRecord == null) {
+        if (projectRecord == null || (!projectRecord.isReleased() && token == null)) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
         }
-        return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
+
+        List<ProjectAuthorRecord> records = this.projectDAO.findAllByProjectId(projectRecord.getId());
+
+        if (!projectRecord.isReleased() && token != null) {
+            Optional<ProjectAuthorRecord> record = records.stream().filter(par -> par.getUserId() == token.getUserId()).findFirst();
+
+            if (record.isPresent()) {
+                List<ProjectAuthorDomain> projectAuthors = records.stream().map(AuthorizedProjectAuthorDomain::new).collect(Collectors.toList());
+                return ResponseUtil.successResponse(exchange, new AuthorizedProjectDomain(projectRecord, projectAuthors, record.get().getPermissions()));
+            }
+        }
+
+        List<ProjectAuthorDomain> projectAuthors = records.stream().map(ProjectAuthorDomain::new).collect(Collectors.toList());
+        return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord, projectAuthors));
     }
 
-    private Domain getProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) {
+    private Domain getProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) throws InvalidTokenException {
+
+        final AccessToken token = JWTUtil.getToken(exchange);
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
@@ -214,22 +235,12 @@ public class GameAPI extends RoutingHandler {
         ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (projectRecord == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
-        }
-
-        Long id = null;
-        String token = JWTUtil.getToken(exchange);
-        if (token != null) {
-            AccessToken accessToken = AccessToken.getToken(token);
-            if (accessToken == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
-            }
-            id = accessToken.getUserId();
         }
 
         List<ProjectFileRecord> projectRecords;
 
         //TODO Check permissions
-        if (id != null && projectRecord.getUserId() == id) {
+        if (token != null && projectRecord.getUserId() == token.getUserId()) {
             projectRecords = this.fileDAO.findAllProjectFilesByGameSlugAndProjectTypeAndProjectSlugAuthorized(gameSlug, projectTypeSlug, projectSlug);
         }
         else {
@@ -247,15 +258,11 @@ public class GameAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, projects);
     }
 
-    private Domain postProjectByGameSlugAndProjectType (HttpServerExchange exchange) {
+    private Domain postProjectByGameSlugAndProjectType (HttpServerExchange exchange) throws InvalidTokenException {
 
-        String token = JWTUtil.getToken(exchange);
+        final AccessToken token = JWTUtil.getToken(exchange);
         if (token == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
-        }
-        AccessToken accessToken = AccessToken.getToken(token);
-        if (accessToken == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
         }
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
@@ -335,15 +342,11 @@ public class GameAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
     }
 
-    private Domain postProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) {
+    private Domain postProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) throws InvalidTokenException {
 
-        String token = JWTUtil.getToken(exchange);
+        final AccessToken token = JWTUtil.getToken(exchange);
         if (token == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
-        }
-        AccessToken accessToken = AccessToken.getToken(token);
-        if (accessToken == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
         }
 
         String gameSlug = RequestUtil.getParam(exchange, "game_slug");
@@ -377,7 +380,7 @@ public class GameAPI extends RoutingHandler {
         }
 
         //TODO Needs to be moved to check the user permissions in the future
-        if (projectRecord.getUserId() != accessToken.getUserId()) {
+        if (projectRecord.getUserId() != token.getUserId()) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_NOT_AUTHORIZED);
         }
         FormData data = FormUtil.getForm(exchange);
@@ -402,7 +405,7 @@ public class GameAPI extends RoutingHandler {
         }
 
         String fileName = formFile.getFile().getFileName().toString();
-        Long id = this.fileDAO.insertProjectFile(fileName, fileSize, formChangelog, projectRecord.getId(), accessToken.getUserId());
+        Long id = this.fileDAO.insertProjectFile(fileName, fileSize, formChangelog, projectRecord.getId(), token.getUserId());
         if (id == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT_FILE);
         }

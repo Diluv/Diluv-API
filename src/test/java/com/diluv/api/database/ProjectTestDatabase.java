@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.diluv.api.utils.FileReader;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.confluencia.database.dao.ProjectDAO;
+import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.record.UserRecord;
@@ -71,9 +72,15 @@ public class ProjectTestDatabase implements ProjectDAO {
     }
 
     @Override
+    public List<ProjectAuthorRecord> findAllByProjectId (long projectId) {
+
+        return new ArrayList<>();
+    }
+
+    @Override
     public boolean insertProject (String slug, String name, String summary, String description, long userId, String gameSlug, String projectTypeSlug) {
 
-        this.projectRecords.add(new ProjectRecord(this.projectRecords.size(), name, slug, summary, description, 0L, System.currentTimeMillis(), System.currentTimeMillis(), gameSlug, projectTypeSlug, false, true, userId));
+        this.projectRecords.add(new ProjectRecord(this.projectRecords.size(), name, slug, summary, description, 0L, System.currentTimeMillis(), System.currentTimeMillis(), gameSlug, projectTypeSlug, false, true, userId, "lclc98"));
         return true;
     }
 }

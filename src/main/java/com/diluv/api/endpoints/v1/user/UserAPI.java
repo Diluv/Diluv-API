@@ -4,12 +4,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.diluv.api.endpoints.v1.domain.Domain;
+import com.diluv.api.endpoints.v1.game.domain.ProjectDomain;
 import com.diluv.api.endpoints.v1.user.domain.AuthorizedUserDomain;
-import com.diluv.api.endpoints.v1.user.domain.ProjectDomain;
 import com.diluv.api.endpoints.v1.user.domain.UserDomain;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.auth.AccessToken;
+import com.diluv.api.utils.auth.InvalidTokenException;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.error.ErrorResponse;
 import com.diluv.confluencia.database.dao.ProjectDAO;
@@ -32,30 +33,27 @@ public class UserAPI extends RoutingHandler {
         this.get("/{username}/projects", this::getProjectsByUsername);
     }
 
-    private Domain getUserByUsername (HttpServerExchange exchange) {
+    private Domain getUserByUsername (HttpServerExchange exchange) throws InvalidTokenException {
+
+        final AccessToken token = JWTUtil.getToken(exchange);
 
         String usernameParam = RequestUtil.getParam(exchange, "username");
         if (usernameParam == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
         }
 
-        String username = usernameParam;
         boolean authorized = false;
-        String token = JWTUtil.getToken(exchange);
-
+        String username = usernameParam;
         if (token != null) {
-            AccessToken accessToken = AccessToken.getToken(token);
-            if (accessToken == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
-            }
-            if ("me".equalsIgnoreCase(usernameParam) || accessToken.getUsername().equalsIgnoreCase(usernameParam)) {
-                username = accessToken.getUsername();
+            if ("me".equalsIgnoreCase(usernameParam) || token.getUsername().equalsIgnoreCase(usernameParam)) {
+                username = token.getUsername();
                 authorized = true;
             }
         }
         else if ("me".equalsIgnoreCase(usernameParam)) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
         }
+
 
         UserRecord userRecord = this.userDAO.findOneByUsername(username);
         if (userRecord == null) {
@@ -68,30 +66,28 @@ public class UserAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, new UserDomain(userRecord));
     }
 
-    private Domain getProjectsByUsername (HttpServerExchange exchange) {
+    private Domain getProjectsByUsername (HttpServerExchange exchange) throws InvalidTokenException {
+
+        final AccessToken token = JWTUtil.getToken(exchange);
 
         // TODO Implement a filter/pagination
         String usernameParam = RequestUtil.getParam(exchange, "username");
         if (usernameParam == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
         }
-        String username = usernameParam;
-        boolean authorized = false;
-        String token = JWTUtil.getToken(exchange);
-        if (token != null) {
-            AccessToken accessToken = AccessToken.getToken(token);
-            if (accessToken == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TOKEN);
-            }
 
-            if ("me".equalsIgnoreCase(usernameParam) || accessToken.getUsername().equalsIgnoreCase(usernameParam)) {
-                username = accessToken.getUsername();
+        boolean authorized = false;
+        String username = usernameParam;
+        if (token != null) {
+            if ("me".equalsIgnoreCase(usernameParam) || token.getUsername().equalsIgnoreCase(usernameParam)) {
+                username = token.getUsername();
                 authorized = true;
             }
         }
         else if ("me".equalsIgnoreCase(usernameParam)) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
         }
+
         List<ProjectRecord> projectRecords;
         if (authorized) {
             projectRecords = this.projectDAO.findAllByUsernameWhereAuthorized(username);

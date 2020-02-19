@@ -318,7 +318,7 @@ public class AuthAPI extends RoutingHandler {
     private Domain refresh (HttpServerExchange exchange) {
 
         try {
-            String token = JWTUtil.getToken(exchange);
+            String token = JWTUtil.getTokenString(exchange);
 
             if (token == null) {
                 return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
