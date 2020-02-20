@@ -19,7 +19,7 @@ import io.undertow.Undertow;
 public class TestUtil {
 
     public static final String IP = "0.0.0.0";
-    public static final int PORT = 4567;
+    public static final int PORT = 4545;
     private static Undertow server;
 
     public static final GameDAO GAME_DAO = new GameTestDatabase();
@@ -37,7 +37,7 @@ public class TestUtil {
             .build();
         TestUtil.server.start();
 
-        RestAssured.port = 4567;
+        RestAssured.port = PORT;
     }
 
     public static void stop () {
