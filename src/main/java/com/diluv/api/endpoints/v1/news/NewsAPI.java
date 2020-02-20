@@ -1,19 +1,17 @@
 package com.diluv.api.endpoints.v1.news;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.diluv.api.endpoints.v1.domain.Domain;
-import com.diluv.api.endpoints.v1.game.domain.GameDomain;
 import com.diluv.api.endpoints.v1.news.domain.NewsDomain;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.error.ErrorResponse;
 import com.diluv.confluencia.database.dao.NewsDAO;
-import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.NewsRecord;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class NewsAPI extends RoutingHandler {
 
@@ -27,6 +25,7 @@ public class NewsAPI extends RoutingHandler {
     }
 
     private Domain getNews (HttpServerExchange exchange) {
+
         List<NewsRecord> newsRecords = this.newsDAO.findAll();
         List<NewsDomain> games = newsRecords.stream().map(NewsDomain::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, games);

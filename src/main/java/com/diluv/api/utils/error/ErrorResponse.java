@@ -30,14 +30,14 @@ public enum ErrorResponse {
     PROJECT_INVALID_SLUG(ErrorType.BAD_REQUEST, "project.invalid.slug"),
     PROJECT_INVALID_NAME(ErrorType.BAD_REQUEST, "project.invalid.name"),
     PROJECT_INVALID_LOGO(ErrorType.BAD_REQUEST, "project.invalid.logo"),
-    PROJECT_INVALID_LOGO_SIZE(ErrorType.BAD_REQUEST, "project.invalid.logo_size"),
     PROJECT_INVALID_SUMMARY(ErrorType.BAD_REQUEST, "project.invalid.summary"),
     PROJECT_INVALID_DESCRIPTION(ErrorType.BAD_REQUEST, "project.invalid.description"),
     PROJECT_TAKEN_SLUG(ErrorType.BAD_REQUEST, "project.taken.slug"),
 
     PROJECT_FILE_INVALID_CHANGELOG(ErrorType.BAD_REQUEST, "project_file.invalid.changelog"),
     PROJECT_FILE_INVALID_FILE(ErrorType.BAD_REQUEST, "project_file.invalid.file"),
-    PROJECT_FILE_INVALID_SIZE(ErrorType.BAD_REQUEST, "project_file.invalid.size"),
+
+    FILE_INVALID_SIZE(ErrorType.BAD_REQUEST, "file.invalid.size"),
 
     // Project Type Errors
     PROJECT_TYPE_INVALID_SLUG(ErrorType.BAD_REQUEST, "project_type.invalid.slug"),

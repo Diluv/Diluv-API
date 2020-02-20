@@ -43,6 +43,7 @@ import com.github.slugify.Slugify;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.form.FormData;
+import io.undertow.server.handlers.form.MultiPartParserDefinition;
 
 public class GameAPI extends RoutingHandler {
 
@@ -258,7 +259,7 @@ public class GameAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, projects);
     }
 
-    private Domain postProjectByGameSlugAndProjectType (HttpServerExchange exchange) throws InvalidTokenException {
+    private Domain postProjectByGameSlugAndProjectType (HttpServerExchange exchange) throws InvalidTokenException, MultiPartParserDefinition.FileTooLargeException {
 
         final AccessToken token = JWTUtil.getToken(exchange);
         if (token == null) {
@@ -284,7 +285,9 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT_TYPE);
         }
 
-        FormData data = FormUtil.getForm(exchange);
+        FormData data = FormUtil.getMultiPartForm(exchange, 1000000L);
+        // Defaults to 1MB should be database stored. TODO
+
         if (data == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
@@ -309,11 +312,7 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO);
         }
 
-        Long imageSize = ImageUtil.getSize(formLogo);
-        // Defaults to 1MB should be database stored
-        if (imageSize == null || imageSize > 1000000L) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO_SIZE);
-        }
+        ImageUtil.getSize(formLogo);
 
         BufferedImage image = ImageUtil.isValidImage(formLogo);
         if (image == null) {
@@ -322,10 +321,9 @@ public class GameAPI extends RoutingHandler {
         String projectSlug = slugify.slugify(formName);
 
         if (this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) != null) {
-            //TODO Do we generate a new slug or just ask them to change project name?
             return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_TAKEN_SLUG);
         }
-        if (!this.projectDAO.insertProject(projectSlug, formName, formSummary, formDescription, 1, gameSlug, projectTypeSlug)) {
+        if (!this.projectDAO.insertProject(projectSlug, formName, formSummary, formDescription, token.getUserId(), gameSlug, projectTypeSlug)) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT);
         }
 
@@ -342,7 +340,7 @@ public class GameAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, new ProjectDomain(projectRecord));
     }
 
-    private Domain postProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) throws InvalidTokenException {
+    private Domain postProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) throws InvalidTokenException, MultiPartParserDefinition.FileTooLargeException {
 
         final AccessToken token = JWTUtil.getToken(exchange);
         if (token == null) {
@@ -383,7 +381,8 @@ public class GameAPI extends RoutingHandler {
         if (projectRecord.getUserId() != token.getUserId()) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_NOT_AUTHORIZED);
         }
-        FormData data = FormUtil.getForm(exchange);
+        FormData data = FormUtil.getMultiPartForm(exchange, projectTypeRecord.getMaxSize());
+
         if (data == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
         }
@@ -400,9 +399,6 @@ public class GameAPI extends RoutingHandler {
         }
 
         Long fileSize = ImageUtil.getSize(formFile);
-        if (fileSize == null || fileSize > projectTypeRecord.getMaxSize()) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_FILE_INVALID_SIZE);
-        }
 
         String fileName = formFile.getFile().getFileName().toString();
         Long id = this.fileDAO.insertProjectFile(fileName, fileSize, formChangelog, projectRecord.getId(), token.getUserId());

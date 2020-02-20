@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Calendar;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -126,12 +127,14 @@ public class ProjectTest {
             .body("message", equalTo(ErrorResponse.NOT_FOUND_PROJECT_TYPE.getMessage()));
 
         ClassLoader classLoader = getClass().getClassLoader();
+        File logo = new File(classLoader.getResource("logo.png").getFile());
+
         given()
             .header("Authorization", "Bearer " + darkhaxToken)
             .formParam("name", "Bookshelf")
             .formParam("summary", "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
             .formParam("description", "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-            .multiPart("logo", new File(classLoader.getResource("logo.png").getFile()))
+            .multiPart("logo", logo)
             .with().post(URL + "/minecraft/mods").then().assertThat().statusCode(400)
             .body(matchesJsonSchemaInClasspath("schema/error-schema.json"))
             .body("message", equalTo(ErrorResponse.PROJECT_TAKEN_SLUG.getMessage()));
@@ -141,7 +144,7 @@ public class ProjectTest {
             .formParam("name", "Bookshelf2")
             .formParam("summary", "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
             .formParam("description", "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-            .multiPart("logo", new File(classLoader.getResource("logo.png").getFile()))
+            .multiPart("logo", logo)
             .with().post(URL + "/minecraft/mods").then().assertThat().statusCode(200)
             .body(matchesJsonSchemaInClasspath("schema/project-schema.json"));
     }
