@@ -22,6 +22,7 @@ import com.diluv.api.endpoints.v1.game.domain.ProjectFileDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectFileQueueDomain;
 import com.diluv.api.endpoints.v1.game.domain.ProjectTypeDomain;
 import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.FormUtil;
 import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.RequestUtil;
@@ -312,7 +313,7 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_INVALID_LOGO);
         }
 
-        ImageUtil.getSize(formLogo);
+        FileUtil.getSize(formLogo);
 
         BufferedImage image = ImageUtil.isValidImage(formLogo);
         if (image == null) {
@@ -398,16 +399,23 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.PROJECT_FILE_INVALID_FILE);
         }
 
-        Long fileSize = ImageUtil.getSize(formFile);
+        Long fileSize = FileUtil.getSize(formFile);
 
+        String sha512 = FileUtil.getSHA512(formFile);
         String fileName = formFile.getFile().getFileName().toString();
-        Long id = this.fileDAO.insertProjectFile(fileName, fileSize, formChangelog, projectRecord.getId(), token.getUserId());
+
+        if (sha512 == null) {
+            return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_SHA512);
+        }
+
+        Long id = this.fileDAO.insertProjectFile(fileName, fileSize, formChangelog, sha512, projectRecord.getId(), token.getUserId());
         if (id == null) {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_PROJECT_FILE);
         }
 
         File file = new File(Constants.PROCESSING_FOLDER, String.format("%s/%s/%s/%s/%s", gameSlug, projectTypeSlug, projectSlug, id, fileName));
         try {
+
             FileUtils.copyInputStreamToFile(formFile.getInputStream(), file);
         }
         catch (IOException e) {

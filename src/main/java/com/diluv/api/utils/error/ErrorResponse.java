@@ -49,6 +49,7 @@ public enum ErrorResponse {
     FAILED_CREATE_PROJECT_FILE(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_file"),
     FAILED_DELETE_TEMP_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_temp_user"),
     FAILED_DELETE_REFRESH_TOKEN(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_refresh_token"),
+    FAILED_SHA512(ErrorType.INTERNAL_SERVER_ERROR, "failed.sha512"),
 
     FAILED_CREATE_EMAIL_SEND(ErrorType.INTERNAL_SERVER_ERROR, "database.create_email_sent"),
     FAILED_SEND_EMAIL(ErrorType.INTERNAL_SERVER_ERROR, "email.send"),

@@ -57,7 +57,13 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public Long insertProjectFile (String name, long size, String changelog, long projectId, long userId) {
+    public boolean insertProjectFileAntivirus (long projectId, String malware) {
+
+        return true;
+    }
+
+    @Override
+    public Long insertProjectFile (String name, long size, String changelog, String sha512, long projectId, long userId) {
 
         return (long) this.projectFileRecords.size();
     }

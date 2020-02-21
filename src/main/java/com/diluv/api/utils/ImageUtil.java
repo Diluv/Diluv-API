@@ -8,19 +8,8 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 import io.undertow.server.handlers.form.FormData;
-import io.undertow.server.handlers.form.MultiPartParserDefinition;
 
 public class ImageUtil {
-
-    public static Long getSize (FormData.FileItem fileItem) throws MultiPartParserDefinition.FileTooLargeException {
-
-        try {
-            return fileItem.getFileSize();
-        }
-        catch (IOException e) {
-            throw new MultiPartParserDefinition.FileTooLargeException();
-        }
-    }
 
     public static BufferedImage isValidImage (String url) {
 
