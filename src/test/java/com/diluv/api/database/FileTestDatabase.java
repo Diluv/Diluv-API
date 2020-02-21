@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.FileDAO;
+import com.diluv.confluencia.database.record.FileStatus;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 
 public class FileTestDatabase implements FileDAO {
@@ -18,27 +19,27 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public List<ProjectFileRecord> findAllWherePending (int amount) {
+    public List<ProjectFileRecord> findAllWhereStatusAndLimit (FileStatus status, int amount) {
 
         //TODO
         return new ArrayList<>();
     }
 
     @Override
-    public boolean updateFileQueueStatusById (long id) throws SQLException {
+    public boolean updateStatusById (long id, FileStatus status) throws SQLException {
 
         return true;
     }
 
     @Override
-    public List<ProjectFileRecord> getLatestFileQueueRecord (int amount) throws SQLException {
+    public List<ProjectFileRecord>getLatestFiles (int amount) throws SQLException {
 
         //TODO
         return new ArrayList<>();
     }
 
     @Override
-    public List<ProjectFileRecord> findAllProjectFilesByGameSlugAndProjectTypeAndProjectSlug (String gameSlug, String projectTypeSlug, String projectSlug) {
+    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlug (String gameSlug, String projectTypeSlug, String projectSlug) {
 
 //        ProjectRecord project = this.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
 //        if (project == null) {
@@ -50,7 +51,7 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public List<ProjectFileRecord> findAllProjectFilesByGameSlugAndProjectTypeAndProjectSlugAuthorized (String gameSlug, String projectTypeSlug, String projectSlug) {
+    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized (String gameSlug, String projectTypeSlug, String projectSlug) {
 
         // TODO
         return this.projectFileRecords;

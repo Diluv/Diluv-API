@@ -72,7 +72,7 @@ public class ProjectTestDatabase implements ProjectDAO {
     }
 
     @Override
-    public List<ProjectAuthorRecord> findAllByProjectId (long projectId) {
+    public List<ProjectAuthorRecord> findAllProjectAuthorsByProjectId (long projectId) {
 
         return new ArrayList<>();
     }
@@ -82,5 +82,11 @@ public class ProjectTestDatabase implements ProjectDAO {
 
         this.projectRecords.add(new ProjectRecord(this.projectRecords.size(), name, slug, summary, description, 0L, System.currentTimeMillis(), System.currentTimeMillis(), gameSlug, projectTypeSlug, false, true, userId, "lclc98"));
         return true;
+    }
+
+    @Override
+    public ProjectRecord findOneProjectByProjectId (long id) {
+
+        return this.projectRecords.stream().filter(projectRecord -> projectRecord.getId() == id).findAny().orElse(null);
     }
 }
