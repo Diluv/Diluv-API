@@ -191,7 +191,7 @@ public class GameAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_PROJECT);
         }
 
-        List<ProjectAuthorRecord> records = this.projectDAO.findAllByProjectId(projectRecord.getId());
+        List<ProjectAuthorRecord> records = this.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
 
         if (!projectRecord.isReleased() && token != null) {
             Optional<ProjectAuthorRecord> record = records.stream().filter(par -> par.getUserId() == token.getUserId()).findFirst();
@@ -243,10 +243,10 @@ public class GameAPI extends RoutingHandler {
 
         //TODO Check permissions
         if (token != null && projectRecord.getUserId() == token.getUserId()) {
-            projectRecords = this.fileDAO.findAllProjectFilesByGameSlugAndProjectTypeAndProjectSlugAuthorized(gameSlug, projectTypeSlug, projectSlug);
+            projectRecords = this.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized(gameSlug, projectTypeSlug, projectSlug);
         }
         else {
-            projectRecords = this.fileDAO.findAllProjectFilesByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+            projectRecords = this.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         }
         List<BaseProjectFileDomain> projects = new ArrayList<>();
         for (ProjectFileRecord record : projectRecords) {
