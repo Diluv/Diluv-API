@@ -12,11 +12,11 @@ import org.apache.commons.io.FileUtils;
 
 import com.diluv.api.DiluvAPI;
 import com.diluv.api.endpoints.v1.Response;
+import com.diluv.api.endpoints.v1.game.project.DataProject;
+import com.diluv.api.endpoints.v1.game.project.DataProjectAuthor;
 import com.diluv.api.endpoints.v1.game.project.DataProjectAuthorAuthorized;
 import com.diluv.api.endpoints.v1.game.project.DataProjectAuthorized;
 import com.diluv.api.endpoints.v1.game.project.DataProjectFile;
-import com.diluv.api.endpoints.v1.game.project.DataProjectAuthor;
-import com.diluv.api.endpoints.v1.game.project.DataProject;
 import com.diluv.api.endpoints.v1.game.project.DataProjectFileAvailable;
 import com.diluv.api.endpoints.v1.game.project.DataProjectFileInQueue;
 import com.diluv.api.endpoints.v1.game.project.DataProjectType;
