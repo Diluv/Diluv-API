@@ -1,9 +1,9 @@
 package com.diluv.api.endpoints.v1.news;
 
-import com.diluv.api.endpoints.v1.Domain;
+import com.diluv.api.endpoints.v1.Response;
 import com.diluv.confluencia.database.record.NewsRecord;
 
-public class NewsDomain implements Domain {
+public class DataNewsPost implements Response {
     
     private final String slug;
     private final String title;
@@ -12,7 +12,7 @@ public class NewsDomain implements Domain {
     private final String username;
     private final long createdAt;
     
-    public NewsDomain(NewsRecord news) {
+    public DataNewsPost(NewsRecord news) {
         
         this.slug = news.getSlug();
         this.title = news.getTitle();

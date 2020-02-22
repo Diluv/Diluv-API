@@ -3,14 +3,14 @@ package com.diluv.api.endpoints.v1.user;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.diluv.api.endpoints.v1.Domain;
-import com.diluv.api.endpoints.v1.game.ProjectDomain;
+import com.diluv.api.endpoints.v1.Response;
+import com.diluv.api.endpoints.v1.game.project.DataProject;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.auth.InvalidTokenException;
 import com.diluv.api.utils.auth.JWTUtil;
-import com.diluv.api.utils.error.ErrorResponse;
+import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.confluencia.database.dao.ProjectDAO;
 import com.diluv.confluencia.database.dao.UserDAO;
 import com.diluv.confluencia.database.record.ProjectRecord;
@@ -32,13 +32,13 @@ public class UserAPI extends RoutingHandler {
         this.get("/{username}/projects", this::getProjectsByUsername);
     }
     
-    private Domain getUserByUsername (HttpServerExchange exchange) throws InvalidTokenException {
+    private Response getUserByUsername (HttpServerExchange exchange) throws InvalidTokenException {
         
         final AccessToken token = JWTUtil.getToken(exchange);
         
         final String usernameParam = RequestUtil.getParam(exchange, "username");
         if (usernameParam == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_USERNAME);
         }
         
         boolean authorized = false;
@@ -50,28 +50,28 @@ public class UserAPI extends RoutingHandler {
             }
         }
         else if ("me".equalsIgnoreCase(usernameParam)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_REQUIRED_TOKEN);
         }
         
         final UserRecord userRecord = this.userDAO.findOneByUsername(username);
         if (userRecord == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_USER);
         }
         
         if (authorized) {
-            return ResponseUtil.successResponse(exchange, new AuthorizedUserDomain(userRecord));
+            return ResponseUtil.successResponse(exchange, new DataAuthorizedUser(userRecord));
         }
-        return ResponseUtil.successResponse(exchange, new UserDomain(userRecord));
+        return ResponseUtil.successResponse(exchange, new DataUser(userRecord));
     }
     
-    private Domain getProjectsByUsername (HttpServerExchange exchange) throws InvalidTokenException {
+    private Response getProjectsByUsername (HttpServerExchange exchange) throws InvalidTokenException {
         
         final AccessToken token = JWTUtil.getToken(exchange);
         
         // TODO Implement a filter/pagination
         final String usernameParam = RequestUtil.getParam(exchange, "username");
         if (usernameParam == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_USERNAME);
         }
         
         boolean authorized = false;
@@ -83,7 +83,7 @@ public class UserAPI extends RoutingHandler {
             }
         }
         else if ("me".equalsIgnoreCase(usernameParam)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_REQUIRED_TOKEN);
         }
         
         List<ProjectRecord> projectRecords;
@@ -93,7 +93,7 @@ public class UserAPI extends RoutingHandler {
         else {
             projectRecords = this.projectDAO.findAllByUsername(username);
         }
-        final List<ProjectDomain> projects = projectRecords.stream().map(ProjectDomain::new).collect(Collectors.toList());
+        final List<DataProject> projects = projectRecords.stream().map(DataProject::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, projects);
     }
 }

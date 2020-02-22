@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.auth.RefreshToken;
-import com.diluv.api.utils.error.ErrorResponse;
+import com.diluv.api.utils.error.ErrorMessage;
 import com.nimbusds.jose.JOSEException;
 
 public class AuthTest {
@@ -43,18 +43,18 @@ public class AuthTest {
         given().formParam("email", "testing@example.com").formParam("username", "testing").formParam("password", "password").formParam("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(200);
         
         // Banned domains
-        given().formParam("email", "testing@banned.com").formParam("username", "testing").formParam("password", "password").formParam("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_BLACKLISTED_EMAIL.getMessage()));
+        given().formParam("email", "testing@banned.com").formParam("username", "testing").formParam("password", "password").formParam("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_BLACKLISTED_EMAIL.getMessage()));
         
-        given().formParam("email", "test@banned2.com").formParam("username", "testing").formParam("password", "password").formParam("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_BLACKLISTED_EMAIL.getMessage()));
+        given().formParam("email", "test@banned2.com").formParam("username", "testing").formParam("password", "password").formParam("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_BLACKLISTED_EMAIL.getMessage()));
         
         // Email used
-        given().formParam("email", "lclc98@example.com").formParam("username", "testing2").formParam("password", "password").formParam("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_TAKEN_EMAIL.getMessage()));
+        given().formParam("email", "lclc98@example.com").formParam("username", "testing2").formParam("password", "password").formParam("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_EMAIL.getMessage()));
         
         // Username used
-        given().formParam("email", "testing@example.com").formParam("username", "lclc98").formParam("password", "password").formParam("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_TAKEN_USERNAME.getMessage()));
+        given().formParam("email", "testing@example.com").formParam("username", "lclc98").formParam("password", "password").formParam("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_USERNAME.getMessage()));
         
         // Terms false
-        given().formParam("email", "testing@example.com").formParam("username", "lclc98").formParam("password", "password").formParam("terms", "false").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_INVALID_TERMS.getMessage()));
+        given().formParam("email", "testing@example.com").formParam("username", "lclc98").formParam("password", "password").formParam("terms", "false").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_INVALID_TERMS.getMessage()));
     }
     
     @Test
@@ -62,13 +62,13 @@ public class AuthTest {
         
         given().formParam("username", "jaredlll08").formParam("password", "password").with().post(URL + "/login").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/login-schema.json"));
         
-        given().formParam("username", "jaredlll08").formParam("password", "wrongpassword").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_WRONG_PASSWORD.getMessage()));
+        given().formParam("username", "jaredlll08").formParam("password", "wrongpassword").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_WRONG_PASSWORD.getMessage()));
         
-        given().formParam("username", "darkhax").formParam("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_REQUIRED_MFA.getMessage()));
+        given().formParam("username", "darkhax").formParam("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_REQUIRED_MFA.getMessage()));
         
-        given().formParam("username", "lclc98").formParam("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_NOT_VERIFIED.getMessage()));
+        given().formParam("username", "lclc98").formParam("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_NOT_VERIFIED.getMessage()));
         
-        given().formParam("username", "testing").formParam("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+        given().formParam("username", "testing").formParam("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_USER.getMessage()));
     }
     
     @Test
@@ -76,17 +76,17 @@ public class AuthTest {
         
         given().formParam("email", "lclc98@example.com").formParam("code", "8f32d879-45b3-4b8b-ae44-999e59566125").with().post(URL + "/verify").then().assertThat().statusCode(200);
         
-        given().formParam("email", "darkhax@example.com").formParam("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_VERIFIED.getMessage()));
+        given().formParam("email", "darkhax@example.com").formParam("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_VERIFIED.getMessage()));
         
-        given().formParam("email", "jaredlll08@example.com").formParam("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_VERIFIED.getMessage()));
+        given().formParam("email", "jaredlll08@example.com").formParam("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_VERIFIED.getMessage()));
         
-        given().formParam("email", "testing@example.com").formParam("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+        given().formParam("email", "testing@example.com").formParam("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_USER.getMessage()));
     }
     
     @Test
     public void testRefresh () {
         
-        given().with().post(URL + "/refresh").then().assertThat().statusCode(401).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_REQUIRED_TOKEN.getMessage()));
+        given().with().post(URL + "/refresh").then().assertThat().statusCode(401).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_REQUIRED_TOKEN.getMessage()));
         
         given().header("Authorization", "Bearer " + darkhaxRefreshToken).with().post(URL + "/refresh").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/login-schema.json"));
     }
@@ -94,9 +94,9 @@ public class AuthTest {
     @Test
     public void testCheckUsername () {
         
-        given().with().get(URL + "/checkusername/lclc98").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_TAKEN_USERNAME.getMessage()));
+        given().with().get(URL + "/checkusername/lclc98").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_USERNAME.getMessage()));
         
-        given().with().get(URL + "/checkusername/darkhax").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.USER_TAKEN_USERNAME.getMessage()));
+        given().with().get(URL + "/checkusername/darkhax").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_USERNAME.getMessage()));
         
         given().with().get(URL + "/checkusername/nonexisting").then().assertThat().statusCode(200);
     }
@@ -104,7 +104,7 @@ public class AuthTest {
     @Test
     public void testResend () {
         
-        given().formParam("username", "jaredlll08").formParam("email", "jaredlll08@example.com").with().post(URL + "/resend").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_USER.getMessage()));
+        given().formParam("username", "jaredlll08").formParam("email", "jaredlll08@example.com").with().post(URL + "/resend").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_USER.getMessage()));
         
         given().formParam("username", "lclc98").formParam("email", "lclc98@example.com").with().post(URL + "/resend").then().assertThat().statusCode(200);
     }

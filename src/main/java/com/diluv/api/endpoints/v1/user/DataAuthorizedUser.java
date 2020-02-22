@@ -2,11 +2,11 @@ package com.diluv.api.endpoints.v1.user;
 
 import com.diluv.confluencia.database.record.UserRecord;
 
-public class AuthorizedUserDomain extends UserDomain {
+public class DataAuthorizedUser extends DataUser {
     private final String email;
     private final boolean mfa;
     
-    public AuthorizedUserDomain(UserRecord userRecord) {
+    public DataAuthorizedUser(UserRecord userRecord) {
         
         super(userRecord);
         

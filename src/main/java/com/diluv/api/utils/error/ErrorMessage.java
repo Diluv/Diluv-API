@@ -1,6 +1,6 @@
 package com.diluv.api.utils.error;
 
-public enum ErrorResponse {
+public enum ErrorMessage {
     
     // User Errors
     USER_INVALID_MFA(ErrorType.BAD_REQUEST, "user.invalid.mfa"),
@@ -74,7 +74,7 @@ public enum ErrorResponse {
     private final ErrorType type;
     private final String message;
     
-    ErrorResponse(ErrorType type, String message) {
+    ErrorMessage(ErrorType type, String message) {
         
         this.type = type;
         this.message = message;

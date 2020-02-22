@@ -3,10 +3,10 @@ package com.diluv.api.endpoints.v1.news;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.diluv.api.endpoints.v1.Domain;
+import com.diluv.api.endpoints.v1.Response;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
-import com.diluv.api.utils.error.ErrorResponse;
+import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.confluencia.database.dao.NewsDAO;
 import com.diluv.confluencia.database.record.NewsRecord;
 
@@ -24,24 +24,24 @@ public class NewsAPI extends RoutingHandler {
         this.get("/{news_slug}", this::getNewsBySlug);
     }
     
-    private Domain getNews (HttpServerExchange exchange) {
+    private Response getNews (HttpServerExchange exchange) {
         
         final List<NewsRecord> newsRecords = this.newsDAO.findAll();
-        final List<NewsDomain> games = newsRecords.stream().map(NewsDomain::new).collect(Collectors.toList());
+        final List<DataNewsPost> games = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, games);
     }
     
-    private Domain getNewsBySlug (HttpServerExchange exchange) {
+    private Response getNewsBySlug (HttpServerExchange exchange) {
         
         final String newsSlug = RequestUtil.getParam(exchange, "news_slug");
         if (newsSlug == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.NEWS_INVALID_SLUG);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.NEWS_INVALID_SLUG);
         }
         
         final NewsRecord newsRecord = this.newsDAO.findOneByNewsSlug(newsSlug);
         if (newsRecord == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_NEWS);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_NEWS);
         }
-        return ResponseUtil.successResponse(exchange, new NewsDomain(newsRecord));
+        return ResponseUtil.successResponse(exchange, new DataNewsPost(newsRecord));
     }
 }

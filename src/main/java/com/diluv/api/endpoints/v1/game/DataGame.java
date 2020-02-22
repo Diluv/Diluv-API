@@ -2,12 +2,12 @@ package com.diluv.api.endpoints.v1.game;
 
 import com.diluv.confluencia.database.record.GameRecord;
 
-public class GameDomain {
+public class DataGame {
     private final String slug;
     private final String name;
     private final String url;
     
-    public GameDomain(GameRecord rs) {
+    public DataGame(GameRecord rs) {
         
         this.slug = rs.getSlug();
         this.name = rs.getName();

@@ -1,6 +1,6 @@
 package com.diluv.api.endpoints.v1.auth;
 
-public class LoginDomain {
+public class DataLogin {
     
     /**
      * Sent to the client, used to make future requests.
@@ -16,7 +16,7 @@ public class LoginDomain {
     
     private final long refreshExpiredAt;
     
-    public LoginDomain(String accessToken, long expiredAt, String refreshToken, long refreshExpiredAt) {
+    public DataLogin(String accessToken, long expiredAt, String refreshToken, long refreshExpiredAt) {
         
         this.accessToken = accessToken;
         this.expiredAt = expiredAt;

@@ -25,10 +25,10 @@ public class ErrorHandler implements HttpHandler {
         }
         catch (final Throwable throwable) {
             if (InvalidTokenException.class.isInstance(throwable)) {
-                ResponseUtil.errorResponse(ex, ErrorResponse.USER_INVALID_TOKEN);
+                ResponseUtil.errorResponse(ex, ErrorMessage.USER_INVALID_TOKEN);
             }
             else if (MultiPartParserDefinition.FileTooLargeException.class.isInstance(throwable)) {
-                ResponseUtil.errorResponse(ex, ErrorResponse.FILE_INVALID_SIZE);
+                ResponseUtil.errorResponse(ex, ErrorMessage.FILE_INVALID_SIZE);
             }
             else {
                 throw throwable;

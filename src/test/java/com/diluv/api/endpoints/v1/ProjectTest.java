@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.auth.AccessToken;
-import com.diluv.api.utils.error.ErrorResponse;
+import com.diluv.api.utils.error.ErrorMessage;
 import com.nimbusds.jose.JOSEException;
 
 public class ProjectTest {
@@ -42,9 +42,9 @@ public class ProjectTest {
     @Test
     public void getProjectTypesByGameSlugAndProjectType () {
         
-        get(URL + "/eco/mods").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_GAME.getMessage()));
+        get(URL + "/eco/mods").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_GAME.getMessage()));
         
-        get(URL + "/minecraft/maps").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_PROJECT_TYPE.getMessage()));
+        get(URL + "/minecraft/maps").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_PROJECT_TYPE.getMessage()));
         
         get(URL + "/minecraft/mods").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-types-schema.json"));
     }
@@ -52,9 +52,9 @@ public class ProjectTest {
     @Test
     public void getProjectsByGameSlugAndProjectType () {
         
-        get(URL + "/eco/mods/projects").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_GAME.getMessage()));
+        get(URL + "/eco/mods/projects").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_GAME.getMessage()));
         
-        get(URL + "/minecraft/maps/projects").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_PROJECT_TYPE.getMessage()));
+        get(URL + "/minecraft/maps/projects").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_PROJECT_TYPE.getMessage()));
         
         get(URL + "/minecraft/mods/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
     }
@@ -62,11 +62,11 @@ public class ProjectTest {
     @Test
     public void getProjectByGameSlugAndProjectTypeAndProjectSlug () {
         
-        get(URL + "/eco/mods/test").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_GAME.getMessage()));
+        get(URL + "/eco/mods/test").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_GAME.getMessage()));
         
-        get(URL + "/minecraft/maps/test").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_PROJECT_TYPE.getMessage()));
+        get(URL + "/minecraft/maps/test").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_PROJECT_TYPE.getMessage()));
         
-        get(URL + "/minecraft/mods/test").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_PROJECT.getMessage()));
+        get(URL + "/minecraft/mods/test").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_PROJECT.getMessage()));
         
         get(URL + "/minecraft/mods/bookshelf").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-schema.json"));
     }
@@ -74,11 +74,11 @@ public class ProjectTest {
     @Test
     public void getProjectFilesByGameSlugAndProjectTypeAndProjectSlug () {
         
-        get(URL + "/eco/mods/test/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_GAME.getMessage()));
+        get(URL + "/eco/mods/test/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_GAME.getMessage()));
         
-        get(URL + "/minecraft/maps/mapproject/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_PROJECT_TYPE.getMessage()));
+        get(URL + "/minecraft/maps/mapproject/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_PROJECT_TYPE.getMessage()));
         
-        get(URL + "/minecraft/mods/invalidproject/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_PROJECT.getMessage()));
+        get(URL + "/minecraft/mods/invalidproject/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_PROJECT.getMessage()));
         
         get(URL + "/minecraft/mods/crafttweaker/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-list-schema.json"));
         
@@ -88,14 +88,14 @@ public class ProjectTest {
     @Test
     public void postProjectByGameSlugAndProjectType () {
         
-        given().header("Authorization", "Bearer " + darkhaxToken).with().post(URL + "/eco/mods").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_GAME.getMessage()));
+        given().header("Authorization", "Bearer " + darkhaxToken).with().post(URL + "/eco/mods").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_GAME.getMessage()));
         
-        given().header("Authorization", "Bearer " + darkhaxToken).with().post(URL + "/minecraft/maps").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.NOT_FOUND_PROJECT_TYPE.getMessage()));
+        given().header("Authorization", "Bearer " + darkhaxToken).with().post(URL + "/minecraft/maps").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_PROJECT_TYPE.getMessage()));
         
         final ClassLoader classLoader = this.getClass().getClassLoader();
         final File logo = new File(classLoader.getResource("logo.png").getFile());
         
-        given().header("Authorization", "Bearer " + darkhaxToken).formParam("name", "Bookshelf").formParam("summary", "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").formParam("description", "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").multiPart("logo", logo).with().post(URL + "/minecraft/mods").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorResponse.PROJECT_TAKEN_SLUG.getMessage()));
+        given().header("Authorization", "Bearer " + darkhaxToken).formParam("name", "Bookshelf").formParam("summary", "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").formParam("description", "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").multiPart("logo", logo).with().post(URL + "/minecraft/mods").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.PROJECT_TAKEN_SLUG.getMessage()));
         
         given().header("Authorization", "Bearer " + darkhaxToken).formParam("name", "Bookshelf2").formParam("summary", "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").formParam("description", "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").multiPart("logo", logo).with().post(URL + "/minecraft/mods").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-schema.json"));
     }

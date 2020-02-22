@@ -1,8 +1,8 @@
-package com.diluv.api.endpoints.v1.game;
+package com.diluv.api.endpoints.v1.game.project;
 
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 
-public class BaseProjectFileDomain {
+public class DataProjectFile {
     
     private final long id;
     private final String name;
@@ -14,7 +14,7 @@ public class BaseProjectFileDomain {
     private final String projectSlug;
     private final String username;
     
-    public BaseProjectFileDomain(ProjectFileRecord rs, String gameSlug, String projectTypeSlug, String projectSlug) {
+    public DataProjectFile(ProjectFileRecord rs, String gameSlug, String projectTypeSlug, String projectSlug) {
         
         this.id = rs.getId();
         this.name = rs.getName();

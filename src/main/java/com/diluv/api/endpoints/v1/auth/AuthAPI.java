@@ -13,7 +13,7 @@ import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import com.diluv.api.DiluvAPI;
-import com.diluv.api.endpoints.v1.Domain;
+import com.diluv.api.endpoints.v1.Response;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FormUtil;
 import com.diluv.api.utils.ImageUtil;
@@ -25,7 +25,7 @@ import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.RefreshToken;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.email.EmailUtil;
-import com.diluv.api.utils.error.ErrorResponse;
+import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.confluencia.database.dao.EmailDAO;
 import com.diluv.confluencia.database.dao.UserDAO;
 import com.diluv.confluencia.database.record.EmailSendRecord;
@@ -61,12 +61,12 @@ public class AuthAPI extends RoutingHandler {
         this.get("/checkusername/{username}", this::checkUsername);
     }
     
-    private Domain register (HttpServerExchange exchange) {
+    private Response register (HttpServerExchange exchange) {
         
         try {
             final FormData data = FormUtil.getForm(exchange);
             if (data == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.FORM_INVALID);
             }
             final String formUsername = RequestUtil.getFormParam(data, "username");
             final String formEmail = RequestUtil.getFormParam(data, "email");
@@ -74,19 +74,19 @@ public class AuthAPI extends RoutingHandler {
             final String formTerms = RequestUtil.getFormParam(data, "terms");
             
             if (!"true".equals(formTerms)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_TERMS);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_TERMS);
             }
             
             if (!Validator.validateUsername(formUsername)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_USERNAME);
             }
             
             if (!Validator.validateEmail(formEmail)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_EMAIL);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_EMAIL);
             }
             
             if (!Validator.validatePassword(formPassword)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_PASSWORD);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_PASSWORD);
             }
             
             final String email = formEmail.toLowerCase();
@@ -94,14 +94,14 @@ public class AuthAPI extends RoutingHandler {
             
             final String domain = email.split("@")[1];
             if (this.emailDAO.existsBlacklist(email, domain)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_BLACKLISTED_EMAIL);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_BLACKLISTED_EMAIL);
             }
             
             if (this.userDAO.existsUserByUsername(username) || this.userDAO.existsTempUserByUsername(username)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_TAKEN_USERNAME);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_TAKEN_USERNAME);
             }
             if (this.userDAO.existsUserByEmail(email) || this.userDAO.existsTempUserByEmail(email)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_TAKEN_EMAIL);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_TAKEN_EMAIL);
             }
             
             final byte[] salt = new byte[16];
@@ -110,43 +110,43 @@ public class AuthAPI extends RoutingHandler {
             
             final String verificationCode = UUID.randomUUID().toString();
             if (!this.userDAO.insertTempUser(email, username, bcryptPassword, "bcrypt", verificationCode)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_TEMP_USER);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_CREATE_TEMP_USER);
             }
             
             if (Constants.POSTMARK_API_TOKEN != null) {
                 final MessageResponse emailResponse = EmailUtil.sendVerificationEmail(email, verificationCode);
                 if (emailResponse == null) {
-                    return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_SEND_EMAIL);
+                    return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_SEND_EMAIL);
                 }
                 
                 if (!this.emailDAO.insertEmailSent(emailResponse.getMessageId(), email, "verification")) {
-                    return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_EMAIL_SEND);
+                    return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_CREATE_EMAIL_SEND);
                 }
             }
             return ResponseUtil.successResponse(exchange, null);
         }
         catch (final NoSuchAlgorithmException e) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_ALGORITHM);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.ERROR_ALGORITHM);
         }
     }
     
-    private Domain login (HttpServerExchange exchange) {
+    private Response login (HttpServerExchange exchange) {
         
         try {
             final FormData data = FormUtil.getForm(exchange);
             if (data == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.FORM_INVALID);
             }
             final String formUsername = RequestUtil.getFormParam(data, "username");
             final String formPassword = RequestUtil.getFormParam(data, "password");
             final String mfa = RequestUtil.getFormParam(data, "mfa");
             
             if (!Validator.validateUsername(formUsername)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_USERNAME);
             }
             
             if (!Validator.validatePassword(formPassword)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_PASSWORD);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_PASSWORD);
             }
             
             final String username = formUsername.toLowerCase();
@@ -154,26 +154,26 @@ public class AuthAPI extends RoutingHandler {
             final UserRecord userRecord = this.userDAO.findOneByUsername(username);
             if (userRecord == null) {
                 if (this.userDAO.existsTempUserByUsername(username)) {
-                    return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_NOT_VERIFIED);
+                    return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_NOT_VERIFIED);
                 }
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_USER);
             }
             
             if (!userRecord.getPasswordType().equalsIgnoreCase("bcrypt")) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_PASSWORD_TYPE);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_PASSWORD_TYPE);
             }
             
             if (!OpenBSDBCrypt.checkPassword(userRecord.getPassword(), formPassword.toCharArray())) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_WRONG_PASSWORD);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_WRONG_PASSWORD);
             }
             
             if (userRecord.isMfa()) {
                 if (mfa == null) {
-                    return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_MFA);
+                    return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_REQUIRED_MFA);
                 }
                 
                 if (!GenericValidator.isInt(mfa)) {
-                    return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_MFA);
+                    return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_MFA);
                 }
                 
                 if (!this.ga.authorize(userRecord.getMfaSecret(), Integer.parseInt(mfa))) {
@@ -187,85 +187,85 @@ public class AuthAPI extends RoutingHandler {
         catch (final JOSEException e) {
             
             DiluvAPI.LOGGER.error("Failed to login.");
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_TOKEN);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.ERROR_TOKEN);
         }
     }
     
-    private Domain verify (HttpServerExchange exchange) {
+    private Response verify (HttpServerExchange exchange) {
         
         final FormData data = FormUtil.getForm(exchange);
         if (data == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.FORM_INVALID);
         }
         final String formEmail = RequestUtil.getFormParam(data, "email");
         final String formCode = RequestUtil.getFormParam(data, "code");
         
         if (!Validator.validateEmail(formEmail)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_EMAIL);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_EMAIL);
         }
         
         if (GenericValidator.isBlankOrNull(formCode)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_VERIFICATION_CODE);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_VERIFICATION_CODE);
         }
         
         final String email = formEmail.toLowerCase();
         
         if (this.userDAO.existsUserByEmail(email)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_VERIFIED);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_VERIFIED);
         }
         
         final TempUserRecord record = this.userDAO.findTempUserByEmailAndCode(email, formCode);
         if (record == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_USER);
         }
         
         // Is the temp user older then 24 hours.
         if (System.currentTimeMillis() - record.getCreatedAt() >= TimeUnit.DAYS.toMillis(1)) {
             if (!this.userDAO.deleteTempUser(record.getEmail(), record.getUsername())) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_DELETE_TEMP_USER);
             }
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_USER);
         }
         final String emailHash = MD5Util.md5Hex(record.getEmail());
         
         if (emailHash == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_ALGORITHM);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.ERROR_ALGORITHM);
         }
         final BufferedImage image = ImageUtil.isValidImage("https://www.gravatar.com/avatar/" + emailHash + "?d=identicon");
         if (image == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.ERROR_SAVING_IMAGE);
         }
         final File file = new File(Constants.CDN_FOLDER, String.format("users/%s/avatar.png", record.getUsername()));
         if (!ImageUtil.saveImage(image, file)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_SAVING_IMAGE);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.ERROR_SAVING_IMAGE);
         }
         
         if (!this.userDAO.insertUser(record.getEmail(), record.getUsername(), record.getPassword(), record.getPasswordType(), new Timestamp(record.getCreatedAt()))) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_USER);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_CREATE_USER);
         }
         
         if (!this.userDAO.deleteTempUser(record.getEmail(), record.getUsername())) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_DELETE_TEMP_USER);
         }
         
         return ResponseUtil.successResponse(exchange, null);
     }
     
-    private Domain resend (HttpServerExchange exchange) {
+    private Response resend (HttpServerExchange exchange) {
         
         final FormData data = FormUtil.getForm(exchange);
         if (data == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.FORM_INVALID);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.FORM_INVALID);
         }
         final String formEmail = RequestUtil.getFormParam(data, "email");
         final String formUsername = RequestUtil.getFormParam(data, "username");
         
         if (!Validator.validateEmail(formEmail)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_EMAIL);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_EMAIL);
         }
         
         if (!Validator.validateUsername(formUsername)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_USERNAME);
         }
         
         final String tempEmail = formEmail.toLowerCase();
@@ -273,15 +273,15 @@ public class AuthAPI extends RoutingHandler {
         
         final TempUserRecord tUserRecord = this.userDAO.findTempUserByEmailAndUsername(tempEmail, username);
         if (tUserRecord == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_USER);
         }
         
         // Is the temp user older then 24 hours.
         if (System.currentTimeMillis() - tUserRecord.getCreatedAt() >= TimeUnit.DAYS.toMillis(1)) {
             if (!this.userDAO.deleteTempUser(tUserRecord.getEmail(), tUserRecord.getUsername())) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_TEMP_USER);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_DELETE_TEMP_USER);
             }
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_USER);
         }
         
         final String verificationCode = UUID.randomUUID().toString();
@@ -290,50 +290,50 @@ public class AuthAPI extends RoutingHandler {
         final String email = tUserRecord.getEmail();
         
         if (!this.userDAO.updateTempUser(email, username, verificationCode)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_TEMP_USER);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_CREATE_TEMP_USER);
         }
         
         final EmailSendRecord emailSendRecord = this.emailDAO.findEmailSentByEmailAndType(email, "verficiation");
         if (emailSendRecord != null) {
             if (System.currentTimeMillis() - tUserRecord.getCreatedAt() <= TimeUnit.HOURS.toMillis(1)) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.COOLDOWN_EMAIL);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.COOLDOWN_EMAIL);
             }
         }
         if (Constants.POSTMARK_API_TOKEN != null) {
             final MessageResponse emailResponse = EmailUtil.sendVerificationEmail(email, verificationCode);
             if (emailResponse == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_SEND_EMAIL);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_SEND_EMAIL);
             }
             
             if (!this.emailDAO.insertEmailSent(emailResponse.getMessageId(), email, "verification")) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_EMAIL_SEND);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_CREATE_EMAIL_SEND);
             }
         }
         return ResponseUtil.successResponse(exchange, null);
     }
     
-    private Domain refresh (HttpServerExchange exchange) {
+    private Response refresh (HttpServerExchange exchange) {
         
         try {
             final String token = JWTUtil.getTokenString(exchange);
             
             if (token == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_REQUIRED_TOKEN);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_REQUIRED_TOKEN);
             }
             
             final RefreshToken refreshToken = RefreshToken.getToken(token);
             
             if (refreshToken == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_REFRESH_TOKEN);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_REFRESH_TOKEN);
             }
             
             final RefreshTokenRecord record = this.userDAO.findRefreshTokenByUserIdAndCode(refreshToken.getUserId(), refreshToken.getCode());
             if (record == null) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.NOT_FOUND_USER_REFRESH_TOKEN);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_USER_REFRESH_TOKEN);
             }
             
             if (!this.userDAO.deleteRefreshTokenByUserIdAndCode(refreshToken.getUserId(), refreshToken.getCode())) {
-                return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_DELETE_REFRESH_TOKEN);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_DELETE_REFRESH_TOKEN);
             }
             
             return this.generateToken(exchange, refreshToken.getUserId(), refreshToken.getUsername());
@@ -341,25 +341,25 @@ public class AuthAPI extends RoutingHandler {
         catch (final JOSEException e) {
             
             DiluvAPI.LOGGER.error("Failed to refresh", e);
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.ERROR_TOKEN);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.ERROR_TOKEN);
         }
     }
     
-    private Domain checkUsername (HttpServerExchange exchange) {
+    private Response checkUsername (HttpServerExchange exchange) {
         
         final String username = RequestUtil.getParam(exchange, "username");
         if (username == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_INVALID_USERNAME);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_INVALID_USERNAME);
         }
         
         if (this.userDAO.existsUserByUsername(username) || this.userDAO.existsTempUserByUsername(username)) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.USER_TAKEN_USERNAME);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_TAKEN_USERNAME);
         }
         
         return ResponseUtil.successResponse(exchange, null);
     }
     
-    private Domain generateToken (HttpServerExchange exchange, long userId, String username) throws JOSEException {
+    private Response generateToken (HttpServerExchange exchange, long userId, String username) throws JOSEException {
         
         final String code = UUID.randomUUID().toString();
         
@@ -370,11 +370,11 @@ public class AuthAPI extends RoutingHandler {
         refreshTokenExpire.add(Calendar.MONTH, 1);
         
         if (!this.userDAO.insertRefreshToken(userId, code, new Timestamp(refreshTokenExpire.getTimeInMillis()))) {
-            return ResponseUtil.errorResponse(exchange, ErrorResponse.FAILED_CREATE_USER_REFRESH);
+            return ResponseUtil.errorResponse(exchange, ErrorMessage.FAILED_CREATE_USER_REFRESH);
         }
         final String accessToken = new AccessToken(userId, username).generate(accessTokenExpire.getTime());
         final String refreshToken = new RefreshToken(userId, username, code).generate(refreshTokenExpire.getTime());
         
-        return ResponseUtil.successResponse(exchange, new LoginDomain(accessToken, accessTokenExpire.getTimeInMillis(), refreshToken, refreshTokenExpire.getTimeInMillis()));
+        return ResponseUtil.successResponse(exchange, new DataLogin(accessToken, accessTokenExpire.getTimeInMillis(), refreshToken, refreshTokenExpire.getTimeInMillis()));
     }
 }

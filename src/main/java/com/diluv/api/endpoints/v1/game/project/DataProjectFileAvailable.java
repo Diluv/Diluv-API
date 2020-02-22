@@ -1,13 +1,13 @@
-package com.diluv.api.endpoints.v1.game;
+package com.diluv.api.endpoints.v1.game.project;
 
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 
-public class ProjectFileDomain extends BaseProjectFileDomain {
+public class DataProjectFileAvailable extends DataProjectFile {
     
     private final String sha512;
     private final long updatedAt;
     
-    public ProjectFileDomain(ProjectFileRecord rs, String projectSlug, String projectTypeSlug, String gameSlug) {
+    public DataProjectFileAvailable(ProjectFileRecord rs, String projectSlug, String projectTypeSlug, String gameSlug) {
         
         super(rs, projectSlug, projectTypeSlug, gameSlug);
         this.sha512 = rs.getSha512();

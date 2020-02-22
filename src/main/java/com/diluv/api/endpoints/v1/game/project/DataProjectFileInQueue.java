@@ -1,13 +1,13 @@
-package com.diluv.api.endpoints.v1.game;
+package com.diluv.api.endpoints.v1.game.project;
 
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 
-public class ProjectFileQueueDomain extends BaseProjectFileDomain {
+public class DataProjectFileInQueue extends DataProjectFile {
     
     private final String status;
     private final long statusChange;
     
-    public ProjectFileQueueDomain(ProjectFileRecord record, String gameSlug, String projectTypeSlug, String projectSlug) {
+    public DataProjectFileInQueue(ProjectFileRecord record, String gameSlug, String projectTypeSlug, String projectSlug) {
         
         super(record, gameSlug, projectTypeSlug, projectSlug);
         this.status = record.getStatus().toString();

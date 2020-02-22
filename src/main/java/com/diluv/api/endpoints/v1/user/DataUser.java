@@ -3,12 +3,12 @@ package com.diluv.api.endpoints.v1.user;
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.UserRecord;
 
-public class UserDomain {
+public class DataUser {
     private final String username;
     private final String avatarURL;
     private final long createdAt;
     
-    public UserDomain(UserRecord userRecord) {
+    public DataUser(UserRecord userRecord) {
         
         this.username = userRecord.getUsername();
         this.avatarURL = Constants.getUserAvatar(userRecord.getUsername());
