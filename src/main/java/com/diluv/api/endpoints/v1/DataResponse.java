@@ -2,7 +2,12 @@ package com.diluv.api.endpoints.v1;
 
 import com.google.gson.annotations.Expose;
 
-public class DataResponse<T> implements Response {
+/**
+ * This response type is used to respond with a data object.
+ * 
+ * @param <T> The type of data to respond with.
+ */
+public class DataResponse<T> implements IResponse {
     
     @Expose
     private final T data;

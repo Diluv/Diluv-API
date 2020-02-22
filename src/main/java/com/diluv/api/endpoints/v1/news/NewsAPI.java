@@ -3,7 +3,7 @@ package com.diluv.api.endpoints.v1.news;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.diluv.api.endpoints.v1.Response;
+import com.diluv.api.endpoints.v1.IResponse;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -24,14 +24,14 @@ public class NewsAPI extends RoutingHandler {
         this.get("/{news_slug}", this::getNewsBySlug);
     }
     
-    private Response getNews (HttpServerExchange exchange) {
+    private IResponse getNews (HttpServerExchange exchange) {
         
         final List<NewsRecord> newsRecords = this.newsDAO.findAll();
         final List<DataNewsPost> games = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, games);
     }
     
-    private Response getNewsBySlug (HttpServerExchange exchange) {
+    private IResponse getNewsBySlug (HttpServerExchange exchange) {
         
         final String newsSlug = RequestUtil.getParam(exchange, "news_slug");
         if (newsSlug == null) {

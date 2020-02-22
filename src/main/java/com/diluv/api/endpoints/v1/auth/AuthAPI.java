@@ -13,7 +13,7 @@ import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import com.diluv.api.DiluvAPI;
-import com.diluv.api.endpoints.v1.Response;
+import com.diluv.api.endpoints.v1.IResponse;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FormUtil;
 import com.diluv.api.utils.ImageUtil;
@@ -61,7 +61,7 @@ public class AuthAPI extends RoutingHandler {
         this.get("/checkusername/{username}", this::checkUsername);
     }
     
-    private Response register (HttpServerExchange exchange) {
+    private IResponse register (HttpServerExchange exchange) {
         
         try {
             final FormData data = FormUtil.getForm(exchange);
@@ -130,7 +130,7 @@ public class AuthAPI extends RoutingHandler {
         }
     }
     
-    private Response login (HttpServerExchange exchange) {
+    private IResponse login (HttpServerExchange exchange) {
         
         try {
             final FormData data = FormUtil.getForm(exchange);
@@ -191,7 +191,7 @@ public class AuthAPI extends RoutingHandler {
         }
     }
     
-    private Response verify (HttpServerExchange exchange) {
+    private IResponse verify (HttpServerExchange exchange) {
         
         final FormData data = FormUtil.getForm(exchange);
         if (data == null) {
@@ -251,7 +251,7 @@ public class AuthAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, null);
     }
     
-    private Response resend (HttpServerExchange exchange) {
+    private IResponse resend (HttpServerExchange exchange) {
         
         final FormData data = FormUtil.getForm(exchange);
         if (data == null) {
@@ -312,7 +312,7 @@ public class AuthAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, null);
     }
     
-    private Response refresh (HttpServerExchange exchange) {
+    private IResponse refresh (HttpServerExchange exchange) {
         
         try {
             final String token = JWTUtil.getTokenString(exchange);
@@ -345,7 +345,7 @@ public class AuthAPI extends RoutingHandler {
         }
     }
     
-    private Response checkUsername (HttpServerExchange exchange) {
+    private IResponse checkUsername (HttpServerExchange exchange) {
         
         final String username = RequestUtil.getParam(exchange, "username");
         if (username == null) {
@@ -359,7 +359,7 @@ public class AuthAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, null);
     }
     
-    private Response generateToken (HttpServerExchange exchange, long userId, String username) throws JOSEException {
+    private IResponse generateToken (HttpServerExchange exchange, long userId, String username) throws JOSEException {
         
         final String code = UUID.randomUUID().toString();
         

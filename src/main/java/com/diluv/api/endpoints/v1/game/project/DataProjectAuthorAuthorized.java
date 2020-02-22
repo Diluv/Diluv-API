@@ -4,7 +4,12 @@ import java.util.List;
 
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 
-public class DataProjectAuthorAuthorized extends DataProjectAuthor {
+/**
+ * Represents a project contributor from the perspective of an authorized user.
+ */
+public class DataProjectAuthorAuthorized extends DataProjectContributor {
+    
+    // TODO doc this
     private final List<String> permissions;
     
     public DataProjectAuthorAuthorized(ProjectAuthorRecord projectAuthor) {

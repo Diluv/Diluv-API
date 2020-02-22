@@ -3,7 +3,7 @@ package com.diluv.api.endpoints.v1.user;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.diluv.api.endpoints.v1.Response;
+import com.diluv.api.endpoints.v1.IResponse;
 import com.diluv.api.endpoints.v1.game.project.DataProject;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
@@ -32,7 +32,7 @@ public class UserAPI extends RoutingHandler {
         this.get("/{username}/projects", this::getProjectsByUsername);
     }
     
-    private Response getUserByUsername (HttpServerExchange exchange) throws InvalidTokenException {
+    private IResponse getUserByUsername (HttpServerExchange exchange) throws InvalidTokenException {
         
         final AccessToken token = JWTUtil.getToken(exchange);
         
@@ -64,7 +64,7 @@ public class UserAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, new DataUser(userRecord));
     }
     
-    private Response getProjectsByUsername (HttpServerExchange exchange) throws InvalidTokenException {
+    private IResponse getProjectsByUsername (HttpServerExchange exchange) throws InvalidTokenException {
         
         final AccessToken token = JWTUtil.getToken(exchange);
         

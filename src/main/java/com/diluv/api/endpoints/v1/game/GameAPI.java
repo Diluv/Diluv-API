@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 
 import com.diluv.api.DiluvAPI;
-import com.diluv.api.endpoints.v1.Response;
+import com.diluv.api.endpoints.v1.IResponse;
 import com.diluv.api.endpoints.v1.game.project.DataProject;
-import com.diluv.api.endpoints.v1.game.project.DataProjectAuthor;
 import com.diluv.api.endpoints.v1.game.project.DataProjectAuthorAuthorized;
 import com.diluv.api.endpoints.v1.game.project.DataProjectAuthorized;
+import com.diluv.api.endpoints.v1.game.project.DataProjectContributor;
 import com.diluv.api.endpoints.v1.game.project.DataProjectFile;
 import com.diluv.api.endpoints.v1.game.project.DataProjectFileAvailable;
 import com.diluv.api.endpoints.v1.game.project.DataProjectFileInQueue;
@@ -70,14 +70,14 @@ public class GameAPI extends RoutingHandler {
         this.post("/{game_slug}/{project_type_slug}/{project_slug}/files", this::postProjectFilesByGameSlugAndProjectTypeAndProjectSlug);
     }
     
-    private Response getGames (HttpServerExchange exchange) {
+    private IResponse getGames (HttpServerExchange exchange) {
         
         final List<GameRecord> gameRecords = this.gameDAO.findAll();
         final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, games);
     }
     
-    private Response getGameBySlug (HttpServerExchange exchange) {
+    private IResponse getGameBySlug (HttpServerExchange exchange) {
         
         final String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         if (gameSlug == null) {
@@ -91,7 +91,7 @@ public class GameAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, new DataGame(gameRecord));
     }
     
-    private Response getProjectTypesByGameSlug (HttpServerExchange exchange) {
+    private IResponse getProjectTypesByGameSlug (HttpServerExchange exchange) {
         
         final String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         if (gameSlug == null) {
@@ -108,7 +108,7 @@ public class GameAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, projectTypes);
     }
     
-    private Response getProjectTypesByGameSlugAndProjectType (HttpServerExchange exchange) {
+    private IResponse getProjectTypesByGameSlugAndProjectType (HttpServerExchange exchange) {
         
         final String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         final String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
@@ -133,7 +133,7 @@ public class GameAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, new DataProjectType(projectTypesRecords));
     }
     
-    private Response getProjectsByGameSlugAndProjectType (HttpServerExchange exchange) {
+    private IResponse getProjectsByGameSlugAndProjectType (HttpServerExchange exchange) {
         
         final String gameSlug = RequestUtil.getParam(exchange, "game_slug");
         final String projectTypeSlug = RequestUtil.getParam(exchange, "project_type_slug");
@@ -158,7 +158,7 @@ public class GameAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, projects);
     }
     
-    private Response getProjectByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) throws InvalidTokenException {
+    private IResponse getProjectByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) throws InvalidTokenException {
         
         final AccessToken token = JWTUtil.getToken(exchange);
         
@@ -197,16 +197,16 @@ public class GameAPI extends RoutingHandler {
             final Optional<ProjectAuthorRecord> record = records.stream().filter(par -> par.getUserId() == token.getUserId()).findFirst();
             
             if (record.isPresent()) {
-                final List<DataProjectAuthor> projectAuthors = records.stream().map(DataProjectAuthorAuthorized::new).collect(Collectors.toList());
+                final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectAuthorAuthorized::new).collect(Collectors.toList());
                 return ResponseUtil.successResponse(exchange, new DataProjectAuthorized(projectRecord, projectAuthors, record.get().getPermissions()));
             }
         }
         
-        final List<DataProjectAuthor> projectAuthors = records.stream().map(DataProjectAuthor::new).collect(Collectors.toList());
+        final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributor::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, new DataProject(projectRecord, projectAuthors));
     }
     
-    private Response getProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) throws InvalidTokenException {
+    private IResponse getProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) throws InvalidTokenException {
         
         final AccessToken token = JWTUtil.getToken(exchange);
         
@@ -260,7 +260,7 @@ public class GameAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, projects);
     }
     
-    private Response postProjectByGameSlugAndProjectType (HttpServerExchange exchange) throws InvalidTokenException, MultiPartParserDefinition.FileTooLargeException {
+    private IResponse postProjectByGameSlugAndProjectType (HttpServerExchange exchange) throws InvalidTokenException, MultiPartParserDefinition.FileTooLargeException {
         
         final AccessToken token = JWTUtil.getToken(exchange);
         if (token == null) {
@@ -341,7 +341,7 @@ public class GameAPI extends RoutingHandler {
         return ResponseUtil.successResponse(exchange, new DataProject(projectRecord));
     }
     
-    private Response postProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) throws InvalidTokenException, MultiPartParserDefinition.FileTooLargeException {
+    private IResponse postProjectFilesByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange) throws InvalidTokenException, MultiPartParserDefinition.FileTooLargeException {
         
         final AccessToken token = JWTUtil.getToken(exchange);
         if (token == null) {

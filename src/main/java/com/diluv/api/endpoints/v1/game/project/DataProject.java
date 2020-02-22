@@ -5,33 +5,68 @@ import java.util.List;
 
 import com.diluv.confluencia.database.record.ProjectRecord;
 
+/**
+ * Represents a project on the site.
+ */
 public class DataProject {
+    
+    /**
+     * The display name of the project.
+     */
     private final String name;
+    
+    /**
+     * A unique slug used to identify the project in URLs and API requests.
+     */
     private final String slug;
+    
+    /**
+     * A short summary of the project.
+     */
     private final String summary;
+    
+    /**
+     * The description of the project.
+     */
     private final String description;
-    private final long cachedDownloads;
+    
+    /**
+     * The amount of downloads the project has.
+     */
+    private final long downloads;
+    
+    /**
+     * The creation data of the project.
+     */
     private final long createdAt;
+    
+    /**
+     * The date when the project was last updated.
+     */
     private final long updatedAt;
-    private final List<DataProjectAuthor> users = new ArrayList<>();
+    
+    /**
+     * The users who contributed to the project.
+     */
+    private final List<DataProjectContributor> contributors = new ArrayList<>();
     
     public DataProject(ProjectRecord projectRecord) {
         
         this(projectRecord, null);
     }
     
-    public DataProject(ProjectRecord projectRecord, List<DataProjectAuthor> projectAuthorRecords) {
+    public DataProject(ProjectRecord projectRecord, List<DataProjectContributor> projectAuthorRecords) {
         
         this.name = projectRecord.getName();
         this.slug = projectRecord.getSlug();
         this.summary = projectRecord.getSummary();
         this.description = projectRecord.getDescription();
-        this.cachedDownloads = projectRecord.getCachedDownloads();
+        this.downloads = projectRecord.getCachedDownloads();
         this.createdAt = projectRecord.getCreatedAt();
         this.updatedAt = projectRecord.getUpdatedAt();
-        this.users.add(new DataProjectAuthor(projectRecord.getUsername(), "owner"));
+        this.contributors.add(new DataProjectContributor(projectRecord.getUsername(), "owner"));
         if (projectAuthorRecords != null) {
-            this.users.addAll(projectAuthorRecords);
+            this.contributors.addAll(projectAuthorRecords);
         }
     }
     
@@ -57,7 +92,7 @@ public class DataProject {
     
     public long getCachedDownloads () {
         
-        return this.cachedDownloads;
+        return this.downloads;
     }
     
     public long getCreatedAt () {

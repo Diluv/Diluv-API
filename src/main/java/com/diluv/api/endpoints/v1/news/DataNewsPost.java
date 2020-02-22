@@ -1,15 +1,41 @@
 package com.diluv.api.endpoints.v1.news;
 
-import com.diluv.api.endpoints.v1.Response;
+import com.diluv.api.endpoints.v1.IResponse;
 import com.diluv.confluencia.database.record.NewsRecord;
 
-public class DataNewsPost implements Response {
+/**
+ * Represents a news post on the site.
+ */
+public class DataNewsPost implements IResponse {
     
+    /**
+     * The slug for the news post.
+     */
     private final String slug;
+    
+    /**
+     * The title of the post.
+     */
     private final String title;
+    
+    /**
+     * A short summary of the post.
+     */
     private final String summary;
+    
+    /**
+     * The description body of the post.
+     */
     private final String description;
+    
+    /**
+     * The username of the account that created the post.
+     */
     private final String username;
+    
+    /**
+     * The date when the post was created.
+     */
     private final long createdAt;
     
     public DataNewsPost(NewsRecord news) {
