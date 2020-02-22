@@ -1,4 +1,4 @@
-package com.diluv.api.endpoints.v1.game.domain;
+package com.diluv.api.endpoints.v1.game;
 
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
 

@@ -1,4 +1,4 @@
-package com.diluv.api.endpoints.v1.auth.domain;
+package com.diluv.api.endpoints.v1.auth;
 
 public class LoginDomain {
     

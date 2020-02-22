@@ -1,4 +1,4 @@
-package com.diluv.api.endpoints.v1.domain;
+package com.diluv.api.endpoints.v1;
 
 public class ErrorDomain implements Domain {
     private final String error;

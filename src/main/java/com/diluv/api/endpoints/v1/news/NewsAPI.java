@@ -3,8 +3,7 @@ package com.diluv.api.endpoints.v1.news;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.diluv.api.endpoints.v1.domain.Domain;
-import com.diluv.api.endpoints.v1.news.domain.NewsDomain;
+import com.diluv.api.endpoints.v1.Domain;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.error.ErrorResponse;

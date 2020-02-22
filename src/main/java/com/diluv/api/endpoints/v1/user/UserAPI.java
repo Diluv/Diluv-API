@@ -3,10 +3,8 @@ package com.diluv.api.endpoints.v1.user;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.diluv.api.endpoints.v1.domain.Domain;
-import com.diluv.api.endpoints.v1.game.domain.ProjectDomain;
-import com.diluv.api.endpoints.v1.user.domain.AuthorizedUserDomain;
-import com.diluv.api.endpoints.v1.user.domain.UserDomain;
+import com.diluv.api.endpoints.v1.Domain;
+import com.diluv.api.endpoints.v1.game.ProjectDomain;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.auth.AccessToken;

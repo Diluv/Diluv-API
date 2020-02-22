@@ -1,9 +1,9 @@
 package com.diluv.api.utils;
 
 import com.diluv.api.DiluvAPI;
-import com.diluv.api.endpoints.v1.domain.DataDomain;
-import com.diluv.api.endpoints.v1.domain.Domain;
-import com.diluv.api.endpoints.v1.domain.ErrorDomain;
+import com.diluv.api.endpoints.v1.DataDomain;
+import com.diluv.api.endpoints.v1.Domain;
+import com.diluv.api.endpoints.v1.ErrorDomain;
 import com.diluv.api.utils.error.ErrorResponse;
 
 import io.undertow.server.HttpServerExchange;

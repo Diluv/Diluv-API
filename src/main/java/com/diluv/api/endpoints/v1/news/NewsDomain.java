@@ -1,6 +1,6 @@
-package com.diluv.api.endpoints.v1.news.domain;
+package com.diluv.api.endpoints.v1.news;
 
-import com.diluv.api.endpoints.v1.domain.Domain;
+import com.diluv.api.endpoints.v1.Domain;
 import com.diluv.confluencia.database.record.NewsRecord;
 
 public class NewsDomain implements Domain {

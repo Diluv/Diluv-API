@@ -11,16 +11,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 
 import com.diluv.api.DiluvAPI;
-import com.diluv.api.endpoints.v1.domain.Domain;
-import com.diluv.api.endpoints.v1.game.domain.AuthorizedProjectAuthorDomain;
-import com.diluv.api.endpoints.v1.game.domain.AuthorizedProjectDomain;
-import com.diluv.api.endpoints.v1.game.domain.BaseProjectFileDomain;
-import com.diluv.api.endpoints.v1.game.domain.GameDomain;
-import com.diluv.api.endpoints.v1.game.domain.ProjectAuthorDomain;
-import com.diluv.api.endpoints.v1.game.domain.ProjectDomain;
-import com.diluv.api.endpoints.v1.game.domain.ProjectFileDomain;
-import com.diluv.api.endpoints.v1.game.domain.ProjectFileQueueDomain;
-import com.diluv.api.endpoints.v1.game.domain.ProjectTypeDomain;
+import com.diluv.api.endpoints.v1.Domain;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.FormUtil;

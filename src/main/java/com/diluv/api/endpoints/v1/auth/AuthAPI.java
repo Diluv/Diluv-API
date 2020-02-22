@@ -13,8 +13,7 @@ import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import com.diluv.api.DiluvAPI;
-import com.diluv.api.endpoints.v1.auth.domain.LoginDomain;
-import com.diluv.api.endpoints.v1.domain.Domain;
+import com.diluv.api.endpoints.v1.Domain;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FormUtil;
 import com.diluv.api.utils.ImageUtil;

@@ -1,4 +1,4 @@
-package com.diluv.api.endpoints.v1.domain;
+package com.diluv.api.endpoints.v1;
 
 public class DataDomain<T> implements Domain {
     private T data;
