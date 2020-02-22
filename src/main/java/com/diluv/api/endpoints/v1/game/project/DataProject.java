@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.diluv.confluencia.database.record.ProjectRecord;
+import com.google.gson.annotations.Expose;
 
 /**
  * Represents a project on the site.
@@ -13,41 +14,49 @@ public class DataProject {
     /**
      * The display name of the project.
      */
+    @Expose
     private final String name;
     
     /**
      * A unique slug used to identify the project in URLs and API requests.
      */
+    @Expose
     private final String slug;
     
     /**
      * A short summary of the project.
      */
+    @Expose
     private final String summary;
     
     /**
      * The description of the project.
      */
+    @Expose
     private final String description;
     
     /**
      * The amount of downloads the project has.
      */
+    @Expose
     private final long downloads;
     
     /**
      * The creation data of the project.
      */
+    @Expose
     private final long createdAt;
     
     /**
      * The date when the project was last updated.
      */
+    @Expose
     private final long updatedAt;
     
     /**
      * The users who contributed to the project.
      */
+    @Expose
     private final List<DataProjectContributor> contributors = new ArrayList<>();
     
     public DataProject(ProjectRecord projectRecord) {
@@ -68,40 +77,5 @@ public class DataProject {
         if (projectAuthorRecords != null) {
             this.contributors.addAll(projectAuthorRecords);
         }
-    }
-    
-    public String getName () {
-        
-        return this.name;
-    }
-    
-    public String getSlug () {
-        
-        return this.slug;
-    }
-    
-    public String getSummary () {
-        
-        return this.summary;
-    }
-    
-    public String getDescription () {
-        
-        return this.description;
-    }
-    
-    public long getCachedDownloads () {
-        
-        return this.downloads;
-    }
-    
-    public long getCreatedAt () {
-        
-        return this.createdAt;
-    }
-    
-    public long getUpdatedAt () {
-        
-        return this.updatedAt;
     }
 }

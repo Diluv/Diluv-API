@@ -2,6 +2,7 @@ package com.diluv.api.endpoints.v1.user;
 
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.UserRecord;
+import com.google.gson.annotations.Expose;
 
 /**
  * Represents data about a user.
@@ -11,16 +12,19 @@ public class DataUser {
     /**
      * The username of the user.
      */
+    @Expose
     private final String username;
     
     /**
      * A URL that points to their avatar image.
      */
+    @Expose
     private final String avatarURL;
     
     /**
      * The date the user created their account.
      */
+    @Expose
     private final long createdAt;
     
     public DataUser(UserRecord userRecord) {
@@ -28,20 +32,5 @@ public class DataUser {
         this.username = userRecord.getUsername();
         this.avatarURL = Constants.getUserAvatar(userRecord.getUsername());
         this.createdAt = userRecord.getCreatedAt();
-    }
-    
-    public String getUsername () {
-        
-        return this.username;
-    }
-    
-    public String getAvatarURL () {
-        
-        return this.avatarURL;
-    }
-    
-    public long getCreatedAt () {
-        
-        return this.createdAt;
     }
 }
