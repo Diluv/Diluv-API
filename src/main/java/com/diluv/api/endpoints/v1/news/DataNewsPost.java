@@ -1,12 +1,11 @@
 package com.diluv.api.endpoints.v1.news;
 
-import com.diluv.api.endpoints.v1.IResponse;
 import com.diluv.confluencia.database.record.NewsRecord;
 
 /**
  * Represents a news post on the site.
  */
-public class DataNewsPost implements IResponse {
+public class DataNewsPost {
     
     /**
      * The slug for the news post.
