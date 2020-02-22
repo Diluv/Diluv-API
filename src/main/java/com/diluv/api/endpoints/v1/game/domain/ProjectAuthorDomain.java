@@ -5,15 +5,15 @@ import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 public class ProjectAuthorDomain {
     private final String username;
     private final String role;
-
-    public ProjectAuthorDomain (ProjectAuthorRecord projectAuthor) {
-
+    
+    public ProjectAuthorDomain(ProjectAuthorRecord projectAuthor) {
+        
         this.username = projectAuthor.getUsername();
         this.role = projectAuthor.getRole();
     }
-
-    public ProjectAuthorDomain (String username, String role) {
-
+    
+    public ProjectAuthorDomain(String username, String role) {
+        
         this.username = username;
         this.role = role;
     }

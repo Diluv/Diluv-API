@@ -3,7 +3,7 @@ package com.diluv.api.endpoints.v1.game.domain;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 
 public class BaseProjectFileDomain {
-
+    
     private final long id;
     private final String name;
     private final long size;
@@ -13,9 +13,9 @@ public class BaseProjectFileDomain {
     private final String projectTypeSlug;
     private final String projectSlug;
     private final String username;
-
-    public BaseProjectFileDomain (ProjectFileRecord rs, String gameSlug, String projectTypeSlug, String projectSlug) {
-
+    
+    public BaseProjectFileDomain(ProjectFileRecord rs, String gameSlug, String projectTypeSlug, String projectSlug) {
+        
         this.id = rs.getId();
         this.name = rs.getName();
         this.size = rs.getSize();
@@ -26,49 +26,49 @@ public class BaseProjectFileDomain {
         this.projectTypeSlug = projectTypeSlug;
         this.projectSlug = projectSlug;
     }
-
+    
     public long getId () {
-
+        
         return this.id;
     }
-
+    
     public String getName () {
-
+        
         return this.name;
     }
-
+    
     public long getSize () {
-
+        
         return this.size;
     }
-
+    
     public String getChangelog () {
-
+        
         return this.changelog;
     }
-
+    
     public long getCreatedAt () {
-
+        
         return this.createdAt;
     }
-
+    
     public String getProjectSlug () {
-
+        
         return this.projectSlug;
     }
-
+    
     public String getProjectTypeSlug () {
-
+        
         return this.projectTypeSlug;
     }
-
+    
     public String getGameSlug () {
-
+        
         return this.gameSlug;
     }
-
+    
     public String getUsername () {
-
+        
         return this.username;
     }
 }
