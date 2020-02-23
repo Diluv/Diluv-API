@@ -2,6 +2,7 @@ package com.diluv.api.endpoints.v1.auth;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
@@ -9,6 +10,7 @@ import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
@@ -17,7 +19,6 @@ import com.diluv.api.endpoints.v1.IResponse;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FormUtil;
 import com.diluv.api.utils.ImageUtil;
-import com.diluv.api.utils.MD5Util;
 import com.diluv.api.utils.RequestUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.auth.AccessToken;
@@ -32,6 +33,8 @@ import com.diluv.confluencia.database.record.EmailSendRecord;
 import com.diluv.confluencia.database.record.RefreshTokenRecord;
 import com.diluv.confluencia.database.record.TempUserRecord;
 import com.diluv.confluencia.database.record.UserRecord;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
 import com.nimbusds.jose.JOSEException;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
@@ -226,12 +229,15 @@ public class AuthAPI extends RoutingHandler {
             }
             return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_USER);
         }
-        final String emailHash = MD5Util.md5Hex(record.getEmail());
         
-        if (emailHash == null) {
+        final HashCode emailHashCode = Hashing.md5().hashBytes(record.getEmail().trim().toLowerCase().getBytes(StandardCharsets.US_ASCII));
+        final String emailHashHex = Hex.encodeHexString(emailHashCode.asBytes());
+        
+        if (emailHashHex == null) {
             return ResponseUtil.errorResponse(exchange, ErrorMessage.ERROR_ALGORITHM);
         }
-        final BufferedImage image = ImageUtil.isValidImage("https://www.gravatar.com/avatar/" + emailHash + "?d=identicon");
+        
+        final BufferedImage image = ImageUtil.isValidImage("https://www.gravatar.com/avatar/" + emailHashHex + "?d=identicon");
         if (image == null) {
             return ResponseUtil.errorResponse(exchange, ErrorMessage.ERROR_SAVING_IMAGE);
         }
