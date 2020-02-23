@@ -2,7 +2,6 @@ package com.diluv.api.endpoints.v1.auth;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
@@ -10,7 +9,7 @@ import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
@@ -33,8 +32,6 @@ import com.diluv.confluencia.database.record.EmailSendRecord;
 import com.diluv.confluencia.database.record.RefreshTokenRecord;
 import com.diluv.confluencia.database.record.TempUserRecord;
 import com.diluv.confluencia.database.record.UserRecord;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.Hashing;
 import com.nimbusds.jose.JOSEException;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
@@ -230,8 +227,7 @@ public class AuthAPI extends RoutingHandler {
             return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_USER);
         }
         
-        final HashCode emailHashCode = Hashing.md5().hashBytes(record.getEmail().trim().toLowerCase().getBytes(StandardCharsets.US_ASCII));
-        final String emailHashHex = Hex.encodeHexString(emailHashCode.asBytes());
+        final String emailHashHex = DigestUtils.md5Hex(record.getEmail().trim().toLowerCase());
         
         if (emailHashHex == null) {
             return ResponseUtil.errorResponse(exchange, ErrorMessage.ERROR_ALGORITHM);
