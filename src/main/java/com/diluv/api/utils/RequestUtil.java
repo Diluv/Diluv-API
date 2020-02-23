@@ -1,15 +1,12 @@
 package com.diluv.api.utils;
 
 import java.util.Deque;
-import java.util.logging.Logger;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormData;
 
 // TODO Temp class name
 public class RequestUtil {
-    
-    private static final Logger LOGGER = Logger.getLogger(RequestUtil.class.getName());
     
     private RequestUtil() {
         

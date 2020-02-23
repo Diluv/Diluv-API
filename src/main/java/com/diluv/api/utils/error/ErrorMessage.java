@@ -63,7 +63,6 @@ public enum ErrorMessage {
     
     FORM_INVALID(ErrorType.BAD_REQUEST, "form.invalid"),
     ERROR_TOKEN(ErrorType.BAD_REQUEST, "error.token"),
-    ERROR_FOLDER(ErrorType.INTERNAL_SERVER_ERROR, "error.folder"),
     ERROR_WRITING(ErrorType.INTERNAL_SERVER_ERROR, "error.writing"),
     ERROR_ALGORITHM(ErrorType.INTERNAL_SERVER_ERROR, "error.algorithm"),
     ERROR_SAVING_IMAGE(ErrorType.INTERNAL_SERVER_ERROR, "error.saving_image"),
