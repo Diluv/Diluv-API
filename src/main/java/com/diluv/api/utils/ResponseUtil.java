@@ -9,26 +9,29 @@ import com.diluv.api.utils.error.ErrorMessage;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 
-public class ResponseUtil {
+public final class ResponseUtil {
     
-    private static IResponse response (HttpServerExchange exchange, int status, IResponse domain) {
+    private static IResponse jsonResponse (HttpServerExchange exchange, int status, IResponse response) {
         
         exchange.setStatusCode(status);
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
-        if (domain != null) {
-            exchange.getResponseSender().send(DiluvAPI.GSON.toJson(domain));
+        
+        if (response != null) {
+            
+            exchange.getResponseSender().send(DiluvAPI.GSON.toJson(response));
             exchange.endExchange();
         }
-        return domain;
+        
+        return response;
     }
     
     public static IResponse successResponse (HttpServerExchange exchange, Object data) {
         
-        return response(exchange, 200, data == null ? null : new DataResponse<>(data));
+        return jsonResponse(exchange, 200, data == null ? null : new DataResponse<>(data));
     }
     
     public static IResponse errorResponse (HttpServerExchange exchange, ErrorMessage errorResponses) {
         
-        return response(exchange, errorResponses.getType().getCode(), new ErrorResponse(errorResponses.getType().getError(), errorResponses.getMessage()));
+        return jsonResponse(exchange, errorResponses.getType().getCode(), new ErrorResponse(errorResponses.getType().getError(), errorResponses.getMessage()));
     }
 }
