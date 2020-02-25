@@ -3,6 +3,8 @@ package com.diluv.api.utils.auth;
 import java.text.ParseException;
 import java.util.Date;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.validator.GenericValidator;
 
 import com.diluv.api.DiluvAPI;
@@ -25,29 +27,33 @@ public class AccessToken {
         this.username = username;
     }
     
-    public static AccessToken getToken (String token) {
+    public static AccessToken getToken (@Nullable String token) {
         
-        try {
-            final SignedJWT jwt = JWTUtil.getJWT(token);
-            if (jwt == null) {
-                return null;
-            }
-            final JWTClaimsSet claims = jwt.getJWTClaimsSet();
-            if (!claims.getSubject().equalsIgnoreCase("accessToken")) {
-                return null;
-            }
-            final String audienceId = claims.getAudience().get(0);
-            if (!GenericValidator.isLong(audienceId)) {
-                return null;
-            }
-            final long userId = Long.parseLong(audienceId);
-            final String username = claims.getStringClaim("username");
-            return new AccessToken(userId, username);
-        }
-        catch (final ParseException e) {
+        if (token != null) {
             
-            DiluvAPI.LOGGER.warn("Failed to parse access token.", e);
+            try {
+                final SignedJWT jwt = JWTUtil.getJWT(token);
+                if (jwt == null) {
+                    return null;
+                }
+                final JWTClaimsSet claims = jwt.getJWTClaimsSet();
+                if (!claims.getSubject().equalsIgnoreCase("accessToken")) {
+                    return null;
+                }
+                final String audienceId = claims.getAudience().get(0);
+                if (!GenericValidator.isLong(audienceId)) {
+                    return null;
+                }
+                final long userId = Long.parseLong(audienceId);
+                final String username = claims.getStringClaim("username");
+                return new AccessToken(userId, username);
+            }
+            catch (final ParseException e) {
+                
+                DiluvAPI.LOGGER.warn("Failed to parse access token.", e);
+            }
         }
+
         return null;
     }
     
