@@ -1,33 +1,37 @@
 package com.diluv.api.utils;
 
 import com.diluv.api.DiluvAPI;
-import com.diluv.api.endpoints.v1.domain.DataDomain;
-import com.diluv.api.endpoints.v1.domain.Domain;
-import com.diluv.api.endpoints.v1.domain.ErrorDomain;
-import com.diluv.api.utils.error.ErrorResponse;
+import com.diluv.api.endpoints.v1.DataResponse;
+import com.diluv.api.endpoints.v1.ErrorResponse;
+import com.diluv.api.endpoints.v1.IResponse;
+import com.diluv.api.utils.error.ErrorMessage;
+
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 
-public class ResponseUtil {
-
-    private static Domain response (HttpServerExchange exchange, int status, Domain domain) {
-
+public final class ResponseUtil {
+    
+    private static IResponse jsonResponse (HttpServerExchange exchange, int status, IResponse response) {
+        
         exchange.setStatusCode(status);
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
-        if (domain != null) {
-            exchange.getResponseSender().send(DiluvAPI.GSON.toJson(domain));
+        
+        if (response != null) {
+            
+            exchange.getResponseSender().send(DiluvAPI.GSON.toJson(response));
             exchange.endExchange();
         }
-        return domain;
+        
+        return response;
     }
-
-    public static Domain successResponse (HttpServerExchange exchange, Object data) {
-
-        return response(exchange, 200, data == null ? null : new DataDomain<>(data));
+    
+    public static IResponse successResponse (HttpServerExchange exchange, Object data) {
+        
+        return jsonResponse(exchange, 200, data == null ? null : new DataResponse<>(data));
     }
-
-    public static Domain errorResponse (HttpServerExchange exchange, ErrorResponse errorResponses) {
-
-        return response(exchange, errorResponses.getType().getCode(), new ErrorDomain(errorResponses.getType().getError(), errorResponses.getMessage()));
+    
+    public static IResponse errorResponse (HttpServerExchange exchange, ErrorMessage errorResponses) {
+        
+        return jsonResponse(exchange, errorResponses.getType().getCode(), new ErrorResponse(errorResponses.getType().getError(), errorResponses.getMessage()));
     }
 }

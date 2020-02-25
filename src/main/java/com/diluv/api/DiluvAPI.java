@@ -32,6 +32,7 @@ import com.diluv.confluencia.database.dao.ProjectDAO;
 import com.diluv.confluencia.database.dao.UserDAO;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
@@ -41,52 +42,49 @@ import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
 
 public class DiluvAPI {
-
+    
     public static final Logger LOGGER = LogManager.getLogger("API");
     public static final Gson GSON = new GsonBuilder().create();
-
+    
     public static void main (String[] args) {
-
+        
         new DiluvAPI().start("0.0.0.0", 4567);
     }
-
+    
     private void start (String host, int port) {
-
-        GameDAO gameDAO = new GameDatabase();
-        ProjectDAO projectDAO = new ProjectDatabase();
-        FileDAO fileDAO = new FileDatabase();
-        UserDAO userDAO = new UserDatabase();
-        EmailDAO emailDAO = new EmailDatabase();
-        NewsDAO newsDAO = new NewsDatabase();
-
-        migrate(emailDAO);
-        Undertow server = Undertow.builder()
-            .addHttpListener(port, host)
-            .setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, fileDAO, userDAO, emailDAO, newsDAO))
-            .build();
+        
+        final GameDAO gameDAO = new GameDatabase();
+        final ProjectDAO projectDAO = new ProjectDatabase();
+        final FileDAO fileDAO = new FileDatabase();
+        final UserDAO userDAO = new UserDatabase();
+        final EmailDAO emailDAO = new EmailDatabase();
+        final NewsDAO newsDAO = new NewsDatabase();
+        
+        this.migrate(emailDAO);
+        final Undertow server = Undertow.builder().addHttpListener(port, host).setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, fileDAO, userDAO, emailDAO, newsDAO)).build();
         server.start();
         LOGGER.info("Server starting on {}:{}", host, port);
     }
-
+    
     private void migrate (EmailDAO emailDAO) {
-
+        
         // TODO CHANGE TO FALSE ON RELEASE
         Confluencia.init(Constants.DB_HOSTNAME, Constants.DB_USERNAME, Constants.DB_PASSWORD, true);
         this.blacklistDomains(emailDAO);
     }
-
+    
     private void blacklistDomains (EmailDAO emailDAO) {
-
+        
         try {
-            URL uri = new URL("https://raw.githubusercontent.com/wesbos/burner-email-providers/master/emails.txt");
-            String[] data = IOUtils.toString(uri, (Charset) null).toLowerCase().split("\n");
+            final URL uri = new URL("https://raw.githubusercontent.com/wesbos/burner-email-providers/master/emails.txt");
+            final String[] data = IOUtils.toString(uri, (Charset) null).toLowerCase().split("\n");
             emailDAO.insertDomainBlacklist(data);
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             LOGGER.error("Failed to insert domain blacklist.", e);
         }
     }
-
+    
     /**
      * Gets the routes and paths for requests
      *
@@ -95,10 +93,10 @@ public class DiluvAPI {
      * @return HttpHandler for all the routes, with cors.
      */
     public static HttpHandler getHandler (GameDAO gameDAO, ProjectDAO projectDAO, FileDAO fileDAO, UserDAO userDAO, EmailDAO emailDAO, NewsDAO newsDAO) {
-
-        PathHandler routing = Handlers.path();
-        Path rootPath = Paths.get("public");
-        PathHandler path = Handlers.path();
+        
+        final PathHandler routing = Handlers.path();
+        final Path rootPath = Paths.get("public");
+        final PathHandler path = Handlers.path();
         path.addPrefixPath("/public", new ResourceHandler(new PathResourceManager(rootPath)).setDirectoryListingEnabled(true));
         routing.addPrefixPath("/auth", new AuthAPI(userDAO, emailDAO));
         routing.addPrefixPath("/users", new UserAPI(userDAO, projectDAO));
