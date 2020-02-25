@@ -32,7 +32,7 @@ dependencies {
     implementation group: 'com.github.slugify', name: 'slugify', version: '2.4'
     implementation group: 'com.wildbit.java', name: 'postmark', version: '1.2.5'
 
-    implementation group: 'com.github.spotbugs', name: 'spotbugs', version: '4.0.0-beta5'
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.0'
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.2.0'
@@ -86,4 +86,21 @@ static boolean isSnapshot() {
         return false
     }
     return true
+}
+
+task depsize  {
+    doLast {
+        final formatStr = "%,10.2f"
+        final conf = configurations.default
+        final size = conf.collect { it.length() / (1024 * 1024) }.sum()
+        final out = new StringBuffer()
+        out << 'Total dependencies size:'.padRight(45)
+        out << "${String.format(formatStr, size)} Mb\n\n"
+        conf.sort { -it.length() }
+            .each {
+                out << "${it.name}".padRight(45)
+                out << "${String.format(formatStr, (it.length() / 1024))} kb\n"
+            }
+        println(out)
+    }
 }
