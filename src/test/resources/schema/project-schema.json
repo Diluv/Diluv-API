@@ -17,7 +17,7 @@
                 "description": {
                     "type": "string"
                 },
-                "cachedDownloads": {
+                "downloads": {
                     "type": "number"
                 },
                 "createdAt": {
@@ -26,7 +26,7 @@
                 "updatedAt": {
                     "type": "number"
                 },
-                "users": {
+                "contributors": {
                     "type": "array",
                     "items": [
                         {
@@ -52,10 +52,10 @@
                 "slug",
                 "summary",
                 "description",
-                "cachedDownloads",
+                "downloads",
                 "createdAt",
                 "updatedAt",
-                "users"
+                "contributors"
             ]
         }
     },

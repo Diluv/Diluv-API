@@ -20,7 +20,7 @@
                         "description": {
                             "type": "string"
                         },
-                        "cachedDownloads": {
+                        "downloads": {
                             "type": "integer"
                         },
                         "createdAt": {
@@ -35,7 +35,7 @@
                         "slug",
                         "summary",
                         "description",
-                        "cachedDownloads",
+                        "downloads",
                         "createdAt",
                         "updatedAt"
                     ]
