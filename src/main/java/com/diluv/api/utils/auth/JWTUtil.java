@@ -2,6 +2,8 @@ package com.diluv.api.utils.auth;
 
 import java.text.ParseException;
 
+import javax.annotation.Nullable;
+
 import com.nimbusds.jwt.SignedJWT;
 
 import io.undertow.server.HttpServerExchange;
@@ -34,6 +36,20 @@ public class JWTUtil {
     public static String getTokenString (HttpServerExchange exchange) {
         
         return exchange.getRequestHeaders().getFirst(AUTHORIZATION);
+    }
+    
+    @Nullable
+    public static AccessToken getTokenSafely (HttpServerExchange exchange) {
+        
+        try {
+            
+            return getToken(exchange);
+        }
+        
+        catch (InvalidTokenException e) {
+            
+            return null;
+        }
     }
     
     public static AccessToken getToken (HttpServerExchange exchange) throws InvalidTokenException {
