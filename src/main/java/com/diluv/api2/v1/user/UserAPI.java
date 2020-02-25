@@ -20,14 +20,6 @@ import com.diluv.confluencia.database.record.UserRecord;
 public class UserAPI {
     
     @GET
-    @Path("/prod")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response prod() { 
-        
-        return Response.ok(new Test()).build();
-    }
-    
-    @GET
     @Path("/self")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSelf(@HeaderParam("Authorization") String auth) { 
@@ -83,11 +75,5 @@ public class UserAPI {
         }
         
         return Response.ok(new DataUser(userRecord)).build();
-    }
-    
-    private class Test {
-        
-        public String val1 = "hello";
-        public int val2 = 34;
     }
 }
