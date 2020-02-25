@@ -35,46 +35,50 @@ import com.google.gson.GsonBuilder;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
+import io.undertow.predicate.Predicates;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.BlockingHandler;
 import io.undertow.server.handlers.PathHandler;
+import io.undertow.server.handlers.encoding.ContentEncodingRepository;
+import io.undertow.server.handlers.encoding.EncodingHandler;
+import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
 
 public class DiluvAPI {
-    
+
     public static final Logger LOGGER = LogManager.getLogger("API");
     public static final Gson GSON = new GsonBuilder().create();
-    
+
     public static void main (String[] args) {
-        
+
         new DiluvAPI().start("0.0.0.0", 4567);
     }
-    
+
     private void start (String host, int port) {
-        
+
         final GameDAO gameDAO = new GameDatabase();
         final ProjectDAO projectDAO = new ProjectDatabase();
         final FileDAO fileDAO = new FileDatabase();
         final UserDAO userDAO = new UserDatabase();
         final EmailDAO emailDAO = new EmailDatabase();
         final NewsDAO newsDAO = new NewsDatabase();
-        
+
         this.migrate(emailDAO);
         final Undertow server = Undertow.builder().addHttpListener(port, host).setHandler(DiluvAPI.getHandler(gameDAO, projectDAO, fileDAO, userDAO, emailDAO, newsDAO)).build();
         server.start();
         LOGGER.info("Server starting on {}:{}", host, port);
     }
-    
+
     private void migrate (EmailDAO emailDAO) {
-        
+
         // TODO CHANGE TO FALSE ON RELEASE
         Confluencia.init(Constants.DB_HOSTNAME, Constants.DB_USERNAME, Constants.DB_PASSWORD, true);
         this.blacklistDomains(emailDAO);
     }
-    
+
     private void blacklistDomains (EmailDAO emailDAO) {
-        
+
         try {
             final URL uri = new URL("https://raw.githubusercontent.com/wesbos/burner-email-providers/master/emails.txt");
             final String[] data = IOUtils.toString(uri, (Charset) null).toLowerCase().split("\n");
@@ -84,7 +88,7 @@ public class DiluvAPI {
             LOGGER.error("Failed to insert domain blacklist.", e);
         }
     }
-    
+
     /**
      * Gets the routes and paths for requests
      *
@@ -93,7 +97,7 @@ public class DiluvAPI {
      * @return HttpHandler for all the routes, with cors.
      */
     public static HttpHandler getHandler (GameDAO gameDAO, ProjectDAO projectDAO, FileDAO fileDAO, UserDAO userDAO, EmailDAO emailDAO, NewsDAO newsDAO) {
-        
+
         final PathHandler routing = Handlers.path();
         final Path rootPath = Paths.get("public");
         final PathHandler path = Handlers.path();
@@ -103,6 +107,15 @@ public class DiluvAPI {
         routing.addPrefixPath("/games", new GameAPI(gameDAO, projectDAO, fileDAO));
         routing.addPrefixPath("/news", new NewsAPI(newsDAO));
         path.addPrefixPath("/v1", routing);
-        return new BlockingHandler(new CorsHandler(new ErrorHandler(path)));
+        return new BlockingHandler(new CorsHandler(new ErrorHandler(gzip(path))));
+    }
+
+    public static HttpHandler gzip (HttpHandler path) {
+
+        return new EncodingHandler(new ContentEncodingRepository()
+                .addEncodingHandler("gzip",
+                    new GzipEncodingProvider(), 50,
+                    Predicates.parse("max-content-size[5]")))
+                .setNext(path);
     }
 }
