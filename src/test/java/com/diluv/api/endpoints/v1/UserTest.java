@@ -68,29 +68,21 @@ public class UserTest {
         given().header("Authorization", "Bearer " + darkhaxToken).with().get(URL + "/jaredlll08").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/user-schema.json"));
     }
 
-//    @Test
-//    public void testProjectsByUsername () {
-//
-//        // /user/self/projects tests
-//        given().with().get(URL + "/self/projects").then().assertThat().statusCode(401).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_REQUIRED_TOKEN.getMessage()));
-//
-//        given().header("Authorization", "Bearer " + invalidToken).with().get(URL + "/self/projects").then().assertThat().statusCode(401).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_INVALID_TOKEN.getMessage()));
-//
-//        given().header("Authorization", "Bearer " + darkhaxToken).with().get(URL + "/self/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
-//        given().header("Authorization", "Bearer " + jaredlll08Token).with().get(URL + "/self/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
-//
-//        // Check for a non-existing user
-//        given().with().get(URL + "/abc/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
-//
-//        given().header("Authorization", "Bearer " + darkhaxToken).with().get(URL + "/abc/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
-//
-//        // Check for existing user with and without a token, and an invalid token
-//        given().with().get(URL + "/darkhax/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
-//        given().header("Authorization", "Bearer " + darkhaxToken).with().get(URL + "/darkhax/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
-//        given().header("Authorization", "Bearer " + jaredlll08Token).with().get(URL + "/darkhax/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
-//        given().header("Authorization", "Bearer " + invalidToken).with().get(URL + "/darkhax/projects").then().assertThat().statusCode(401).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_INVALID_TOKEN.getMessage()));
-//
-//        // Check for wrong authorization
-//        given().header("Authorization", "Bearer " + darkhaxToken).with().get(URL + "/jaredlll08/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
-//    }
+    @Test
+    public void testProjectsByUsername () {
+
+        // Check for a non-existing user
+        given().with().get(URL + "/abc/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
+
+        given().header("Authorization", "Bearer " + darkhaxToken).with().get(URL + "/abc/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
+
+        // Check for existing user with and without a token, and an invalid token
+        given().with().get(URL + "/darkhax/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
+        given().header("Authorization", "Bearer " + darkhaxToken).with().get(URL + "/darkhax/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
+        given().header("Authorization", "Bearer " + jaredlll08Token).with().get(URL + "/darkhax/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
+        // TODO given().header("Authorization", "Bearer " + invalidToken).with().get(URL + "/darkhax/projects").then().assertThat().statusCode(401).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_INVALID_TOKEN.getMessage()));
+
+        // Check for wrong authorization
+        given().header("Authorization", "Bearer " + darkhaxToken).with().get(URL + "/jaredlll08/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
+    }
 }
