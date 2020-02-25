@@ -18,37 +18,37 @@ public class RoutingHandlerPlus extends RoutingHandler {
     
     public void get(String path, String first, HandlerPar1<String> handler) {
         
-        this.get(path, new ResponseHandler(e -> handler.accept(e, pathString(e, first))));
+        this.get(path, new ResponseHandler(e -> handler.accept(e, queryString(e, first))));
     }
     
     public void get(String path, String first, String second, BiHandlerPar2<String, String> handler) {
         
-        this.get(path, new ResponseHandler(e -> handler.accept(e, pathString(e, first), pathString(e, second))));
+        this.get(path, new ResponseHandler(e -> handler.accept(e, queryString(e, first), queryString(e, second))));
     }
     
     public void get(String path, String first, String second, String third, TriHandlerPar3<String, String, String> handler) {
         
-        this.get(path, new ResponseHandler(e -> handler.accept(e, pathString(e, first), pathString(e, second), pathString(e, third))));
+        this.get(path, new ResponseHandler(e -> handler.accept(e, queryString(e, first), queryString(e, second), queryString(e, third))));
     }
     
     public void get(String path, AuthHandler handler) {
         
-        this.get(path, authenticate((e, a) -> handler.accept(e, a)));
+        this.get(path, authenticate(handler::accept));
     }
     
     public void get(String path, String first, AuthHandlerPar1<String> handler) {
         
-        this.get(path, authenticate((e, a) -> handler.accept(e, a, pathString(e, first))));
+        this.get(path, authenticate((e, a) -> handler.accept(e, a, queryString(e, first))));
     }
     
     public void get(String path, String first, String second, AuthHandlerPar2<String, String> handler) {
         
-        this.get(path, authenticate((e, a)-> handler.accept(e, a, pathString(e, first), pathString(e, second))));
+        this.get(path, authenticate((e, a)-> handler.accept(e, a, queryString(e, first), queryString(e, second))));
     }
     
     public void get(String path, String first, String second, String third, AuthHandlerPar3<String, String, String> handler) {
         
-        this.get(path, authenticate((e, a) -> handler.accept(e, a, pathString(e, first), pathString(e, second), pathString(e, third))));
+        this.get(path, authenticate((e, a) -> handler.accept(e, a, queryString(e, first), queryString(e, second), queryString(e, third))));
     }
     
     public void get(String path, IResponseHandler handler) {
@@ -110,8 +110,7 @@ public class RoutingHandlerPlus extends RoutingHandler {
 
         IResponse accept(HttpServerExchange exchange, AccessToken token, A par1, B par2, C par3);
     }
-    
-    
+
     private IResponseHandler authenticate (IAuthResponseHandler handler) {
         
         return exchange -> {
@@ -120,7 +119,7 @@ public class RoutingHandlerPlus extends RoutingHandler {
             
             if (token == null) {
                 
-                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_NOT_AUTHORIZED);
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.USER_REQUIRED_TOKEN);
             }
             
             return handler.handleRequest(exchange, token);

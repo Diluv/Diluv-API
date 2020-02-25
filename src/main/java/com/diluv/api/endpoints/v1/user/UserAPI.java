@@ -45,16 +45,16 @@ public class UserAPI extends RoutingHandlerPlus {
     }
     
     private IResponse getUserByUsername (HttpServerExchange exchange, String username) {
-        
+
         final UserRecord userRecord = this.userDAO.findOneByUsername(username);
-        
+
         if (userRecord == null) {
             
             return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_USER);
         }
         
         final AccessToken token = JWTUtil.getTokenSafely(exchange);
-        
+
         if (token != null && token.getUsername().equalsIgnoreCase(username)) {
             
             return ResponseUtil.successResponse(exchange, new DataAuthorizedUser(userRecord));
@@ -64,11 +64,9 @@ public class UserAPI extends RoutingHandlerPlus {
     }
     
     private IResponse getProjectsByUsername (HttpServerExchange exchange, String username) {
-        
 
         final AccessToken token = JWTUtil.getTokenSafely(exchange);
-        
-        
+
         List<ProjectRecord> projectRecords;
         
         if ( token != null && token.getUsername().equalsIgnoreCase(username)) {
