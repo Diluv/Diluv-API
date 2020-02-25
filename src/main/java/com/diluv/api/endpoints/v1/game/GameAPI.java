@@ -65,6 +65,7 @@ public class GameAPI extends RoutingHandlerPlus {
 
         final GameRecord gameRecord = this.gameDAO.findOneBySlug(gameSlug);
         if (gameRecord == null) {
+
             return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_GAME);
         }
         return ResponseUtil.successResponse(exchange, new DataGame(gameRecord));
@@ -73,6 +74,7 @@ public class GameAPI extends RoutingHandlerPlus {
     private IResponse getProjectTypesByGameSlug (HttpServerExchange exchange, String gameSlug) {
 
         if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+
             return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_GAME);
         }
 
@@ -84,13 +86,15 @@ public class GameAPI extends RoutingHandlerPlus {
 
     private IResponse getProjectTypesByGameSlugAndProjectType (HttpServerExchange exchange, String gameSlug, String projectTypeSlug) {
 
-        if (this.gameDAO.findOneBySlug(gameSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_GAME);
-        }
-
         final ProjectTypeRecord projectTypesRecords = this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
 
         if (projectTypesRecords == null) {
+
+            if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_GAME);
+            }
+
             return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
         }
 
@@ -99,44 +103,64 @@ public class GameAPI extends RoutingHandlerPlus {
 
     private IResponse getProjectsByGameSlugAndProjectType (HttpServerExchange exchange, String gameSlug, String projectTypeSlug) {
 
-        if (this.gameDAO.findOneBySlug(gameSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_GAME);
-        }
-
-        if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
-        }
-
         final List<ProjectRecord> projectRecords = this.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug);
+
+        if (projectRecords.isEmpty()) {
+
+            if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_GAME);
+            }
+
+            if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+            }
+        }
+
         final List<DataProject> projects = projectRecords.stream().map(DataProject::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(exchange, projects);
     }
 
     private IResponse getProjectByGameSlugAndProjectTypeAndProjectSlug (HttpServerExchange exchange, String gameSlug, String projectTypeSlug, String projectSlug) {
 
-        if (this.gameDAO.findOneBySlug(gameSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_GAME);
-        }
-
-        if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
-        }
-
         final AccessToken token = JWTUtil.getTokenSafely(exchange);
 
         final ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (projectRecord == null || !projectRecord.isReleased() && token == null) {
+            if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_GAME);
+            }
+
+            if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+            }
+
             return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_PROJECT);
         }
 
         final List<ProjectAuthorRecord> records = this.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
 
-        if (!projectRecord.isReleased() && token != null) {
-            final Optional<ProjectAuthorRecord> record = records.stream().filter(par -> par.getUserId() == token.getUserId()).findFirst();
+        if (token != null) {
 
-            if (record.isPresent()) {
+            List<String> permissions = null;
+            if (token.getUserId() == projectRecord.getUserId()) {
+                //TODO All permissions
+                permissions = new ArrayList<>();
+            }
+            else {
+                final Optional<ProjectAuthorRecord> record = records.stream().filter(par -> par.getUserId() == token.getUserId()).findFirst();
+
+                if (record.isPresent()) {
+                    permissions = record.get().getPermissions();
+                }
+            }
+
+            if (permissions != null) {
                 final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectAuthorAuthorized::new).collect(Collectors.toList());
-                return ResponseUtil.successResponse(exchange, new DataProjectAuthorized(projectRecord, projectAuthors, record.get().getPermissions()));
+                return ResponseUtil.successResponse(exchange, new DataProjectAuthorized(projectRecord, projectAuthors, permissions));
             }
         }
 
@@ -148,16 +172,17 @@ public class GameAPI extends RoutingHandlerPlus {
 
         final AccessToken token = JWTUtil.getTokenSafely(exchange);
 
-        if (this.gameDAO.findOneBySlug(gameSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_GAME);
-        }
-
-        if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
-            return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
-        }
-
         final ProjectRecord projectRecord = this.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (projectRecord == null) {
+
+            if (this.gameDAO.findOneBySlug(gameSlug) == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_GAME);
+            }
+
+            if (this.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+                return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+            }
+
             return ResponseUtil.errorResponse(exchange, ErrorMessage.NOT_FOUND_PROJECT);
         }
 
