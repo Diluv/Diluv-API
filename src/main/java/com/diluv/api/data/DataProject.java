@@ -1,4 +1,4 @@
-package com.diluv.api.endpoints.v1.game.project;
+package com.diluv.api.data;
 
 import java.util.ArrayList;
 import java.util.List;

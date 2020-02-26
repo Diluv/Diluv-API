@@ -1,4 +1,4 @@
-package com.diluv.api.endpoints.v1.user;
+package com.diluv.api.data;
 
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.UserRecord;

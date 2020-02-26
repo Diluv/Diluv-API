@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 /**
  * This response type is used to respond with an error message.
  */
-public class ErrorResponse implements IResponse {
+public class ErrorResponse {
     
     /**
      * The type of error that occurred, as a string.

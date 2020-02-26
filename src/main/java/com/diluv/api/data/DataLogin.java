@@ -1,4 +1,4 @@
-package com.diluv.api.endpoints.v1.auth;
+package com.diluv.api.data;
 
 import com.google.gson.annotations.Expose;
 

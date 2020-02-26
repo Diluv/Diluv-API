@@ -1,4 +1,4 @@
-package com.diluv.api.endpoints.v1.game;
+package com.diluv.api.data;
 
 import com.diluv.confluencia.database.record.GameRecord;
 import com.google.gson.annotations.Expose;

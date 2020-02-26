@@ -1,5 +1,7 @@
 package com.diluv.api.utils.error;
 
+import com.diluv.api.endpoints.v1.ErrorResponse;
+
 import javax.ws.rs.core.Response;
 
 public enum ErrorMessage {
@@ -92,7 +94,7 @@ public enum ErrorMessage {
     }
     
     public Response respond() {
-        
-        return Response.status(this.type.code).entity(this.getMessage()).build();
+
+        return Response.status(this.type.code).entity(new ErrorResponse(this.getType().getError(), this.getMessage())).build();
     }
 }
