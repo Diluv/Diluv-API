@@ -20,6 +20,9 @@ public class APIV1 extends Application {
 
         // Enables Json
         classes.add(GsonProvider.class);
+        
+        // Enables custom param types
+        classes.add(ParameterProviderV1.class);
 
         classes.add(AuthAPI.class);
         classes.add(GamesAPI.class);

@@ -134,10 +134,8 @@ public class GamesAPI {
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProject (@HeaderParam("Authorization") String auth, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
-        
-        final AccessToken token = AccessToken.getToken(auth);
-        
+    public Response getProject (@HeaderParam("Authorization") AccessToken token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
+
         final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (projectRecord == null || !projectRecord.isReleased() && token == null) {
             if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
@@ -183,9 +181,7 @@ public class GamesAPI {
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectFiles (@HeaderParam("Authorization") String auth, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
-        
-        final AccessToken token = AccessToken.getToken(auth);
+    public Response getProjectFiles (@HeaderParam("Authorization") AccessToken token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
         
         final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (projectRecord == null) {
@@ -226,10 +222,8 @@ public class GamesAPI {
     @Path("/{gameSlug}/{projectTypeSlug}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postProject (@HeaderParam("Authorization") String auth, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @MultipartForm ProjectCreateForm form) {
+    public Response postProject (@HeaderParam("Authorization") AccessToken token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @MultipartForm ProjectCreateForm form) {
         
-        //
-        final AccessToken token = AccessToken.getToken(auth);
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
@@ -292,9 +286,7 @@ public class GamesAPI {
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postProjectFile (@HeaderParam("Authorization") String auth, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectFileUploadForm form) {
-        
-        final AccessToken token = AccessToken.getToken(auth);
+    public Response postProjectFile (@HeaderParam("Authorization") AccessToken token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectFileUploadForm form) {
         
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
