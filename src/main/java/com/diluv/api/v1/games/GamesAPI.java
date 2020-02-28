@@ -334,9 +334,7 @@ public class GamesAPI {
         }
 
         File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, projectRecord.getId(), id, fileName);
-        if (!destination.getParentFile().mkdirs()) {
-            return ErrorMessage.ERROR_WRITING.respond();
-        }
+        destination.getParentFile().mkdirs();
 
         final boolean moved = tempFile.renameTo(destination);
 
@@ -345,7 +343,8 @@ public class GamesAPI {
             return ErrorMessage.ERROR_WRITING.respond();
         }
 
-        // TODO return more info
-        return Response.ok().build();
+        final ProjectFileRecord record = DATABASE.fileDAO.findOneProjectFileQueueByFileId(id);
+
+        return ResponseUtil.successResponse(new DataProjectFileInQueue(record, gameSlug, projectTypeSlug, projectSlug));
     }
 }
