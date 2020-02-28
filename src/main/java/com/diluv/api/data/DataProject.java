@@ -81,7 +81,7 @@ public class DataProject {
         this.downloads = projectRecord.getCachedDownloads();
         this.createdAt = projectRecord.getCreatedAt();
         this.updatedAt = projectRecord.getUpdatedAt();
-        this.contributors.add(new DataProjectContributor(projectRecord.getUsername(), "owner"));
+        this.contributors.add(new DataProjectContributor(projectRecord.getUserId(), projectRecord.getUsername(), "owner"));
         if (projectAuthorRecords != null) {
             this.contributors.addAll(projectAuthorRecords);
         }

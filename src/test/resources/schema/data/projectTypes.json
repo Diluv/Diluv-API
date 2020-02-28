@@ -2,16 +2,24 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "error": {
+        "name": {
             "type": "string"
         },
-        "message": {
+        "slug": {
             "type": "string"
+        },
+        "gameSlug": {
+            "type": "string"
+        },
+        "maxSize": {
+            "type": "number"
         }
     },
     "required": [
-        "error",
-        "message"
+        "name",
+        "slug",
+        "gameSlug",
+        "maxSize"
     ],
     "additionalProperties": false
 }

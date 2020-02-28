@@ -1,0 +1,62 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "number"
+        },
+        "name": {
+            "type": "string"
+        },
+        "changelog": {
+            "type": "string"
+        },
+        "sha512": {
+            "type": "string"
+        },
+        "size": {
+            "type": "number"
+        },
+        "createdAt": {
+            "type": "number"
+        },
+        "gameSlug": {
+            "type": "string"
+        },
+        "projectTypeSlug": {
+            "type": "string"
+        },
+        "projectSlug": {
+            "type": "string"
+        },
+        "uploaderUserId": {
+            "type": "number"
+        },
+        "uploaderUsername": {
+            "type": "string"
+        },
+        "updatedAt": {
+            "type": "number"
+        },
+        "status": {
+            "type": "string"
+        },
+        "lastStatusChanged": {
+            "type": "number"
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "changelog",
+        "sha512",
+        "size",
+        "createdAt",
+        "gameSlug",
+        "projectTypeSlug",
+        "projectSlug",
+        "uploaderUserId",
+        "uploaderUsername"
+    ],
+    "additionalProperties": false
+}

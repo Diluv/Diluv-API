@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "slug": {
+            "type": "string"
+        },
+        "title": {
+            "type": "string"
+        },
+        "summary": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "username": {
+            "type": "string"
+        },
+        "createdAt": {
+            "type": "number"
+        }
+    },
+    "required": [
+        "slug",
+        "title",
+        "summary",
+        "description",
+        "username",
+        "createdAt"
+    ],
+    "additionalProperties": false
+}

@@ -31,7 +31,13 @@ public class DataProjectFile {
      */
     @Expose
     private final String changelog;
-    
+
+    /**
+     * The SHA-512 hash of the file.
+     */
+    @Expose
+    private final String sha512;
+
     /**
      * The time when the file was created.
      */
@@ -55,10 +61,18 @@ public class DataProjectFile {
      */
     @Expose
     private final String projectSlug;
-    
-    // TODO doc this
+
+    /**
+     * The user id who uploaded the file
+     */
     @Expose
-    private final String username;
+    private final long uploaderUserId;
+
+    /**
+     * The username who uploaded the file
+     */
+    @Expose
+    private final String uploaderUsername;
     
     public DataProjectFile(ProjectFileRecord rs, String gameSlug, String projectTypeSlug, String projectSlug) {
         
@@ -66,8 +80,10 @@ public class DataProjectFile {
         this.name = rs.getName();
         this.size = rs.getSize();
         this.changelog = rs.getChangelog();
+        this.sha512 = rs.getSha512();
         this.createdAt = rs.getCreatedAt();
-        this.username = rs.getUsername();
+        this.uploaderUserId = rs.getUserId();
+        this.uploaderUsername = rs.getUsername();
         this.gameSlug = gameSlug;
         this.projectTypeSlug = projectTypeSlug;
         this.projectSlug = projectSlug;

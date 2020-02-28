@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
         "data": {
@@ -23,10 +23,12 @@
                 "expiredAt",
                 "refreshToken",
                 "refreshExpiredAt"
-            ]
+            ],
+            "additionalProperties": false
         }
     },
     "required": [
         "data"
-    ]
+    ],
+    "additionalProperties": false
 }

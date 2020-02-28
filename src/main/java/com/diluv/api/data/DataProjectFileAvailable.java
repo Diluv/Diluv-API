@@ -9,12 +9,6 @@ import com.google.gson.annotations.Expose;
 public class DataProjectFileAvailable extends DataProjectFile {
     
     /**
-     * The SHA-512 hash of the file.
-     */
-    @Expose
-    private final String sha512;
-    
-    /**
      * The last time the file was updated.
      */
     @Expose
@@ -23,7 +17,6 @@ public class DataProjectFileAvailable extends DataProjectFile {
     public DataProjectFileAvailable(ProjectFileRecord rs, String projectSlug, String projectTypeSlug, String gameSlug) {
         
         super(rs, projectSlug, projectTypeSlug, gameSlug);
-        this.sha512 = rs.getSha512();
         this.updatedAt = rs.getUpdatedAt();
     }
 }

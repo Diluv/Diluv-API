@@ -16,12 +16,12 @@ public class DataProjectFileInQueue extends DataProjectFile {
     
     // TODO doc this
     @Expose
-    private final long statusChange;
+    private final long lastStatusChanged;
     
     public DataProjectFileInQueue(ProjectFileRecord record, String gameSlug, String projectTypeSlug, String projectSlug) {
         
         super(record, gameSlug, projectTypeSlug, projectSlug);
         this.status = record.getStatus().toString();
-        this.statusChange = record.getStatusChange();
+        this.lastStatusChanged = record.getStatusChange();
     }
 }

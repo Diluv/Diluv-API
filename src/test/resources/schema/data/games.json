@@ -2,16 +2,20 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "error": {
+        "name": {
             "type": "string"
         },
-        "message": {
+        "slug": {
+            "type": "string"
+        },
+        "url": {
             "type": "string"
         }
     },
     "required": [
-        "error",
-        "message"
+        "name",
+        "slug",
+        "url"
     ],
     "additionalProperties": false
 }
