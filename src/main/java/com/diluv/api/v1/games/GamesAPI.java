@@ -257,7 +257,7 @@ public class GamesAPI {
             return ErrorMessage.PROJECT_INVALID_LOGO.respond();
         }
 
-        final BufferedImage image = ImageUtil.isValidImage(form.logo);
+        final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
 
         if (image == null) {
             return ErrorMessage.PROJECT_INVALID_LOGO.respond();
@@ -323,7 +323,6 @@ public class GamesAPI {
 
         if (sha512 == null) {
 
-            // TODO make this make sense
             return ErrorMessage.FAILED_SHA512.respond();
         }
 
@@ -334,7 +333,12 @@ public class GamesAPI {
             return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
         }
 
-        final boolean moved = tempFile.renameTo(FileUtil.getOutputLocation(gameSlug, projectTypeSlug, projectRecord.getId(), id, fileName));
+        File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, projectRecord.getId(), id, fileName);
+        if (!destination.getParentFile().mkdirs()) {
+            return ErrorMessage.ERROR_WRITING.respond();
+        }
+
+        final boolean moved = tempFile.renameTo(destination);
 
         if (!moved) {
 

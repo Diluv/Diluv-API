@@ -8,6 +8,8 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import org.apache.james.mime4j.io.LimitedInputStream;
+
 public class ImageUtil {
 
     public static BufferedImage isValidImage (String url) {
@@ -20,10 +22,10 @@ public class ImageUtil {
         }
     }
 
-    public static BufferedImage isValidImage (InputStream inputStream) {
+    public static BufferedImage isValidImage (InputStream inputStream, long limit) {
 
         try {
-            return ImageIO.read(inputStream);
+            return ImageIO.read(new LimitedInputStream(inputStream, limit));
         }
         catch (final IOException e) {
             return null;
