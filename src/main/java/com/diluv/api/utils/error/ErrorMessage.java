@@ -1,5 +1,9 @@
 package com.diluv.api.utils.error;
 
+import com.diluv.api.utils.response.ErrorResponse;
+
+import javax.ws.rs.core.Response;
+
 public enum ErrorMessage {
     
     // User Errors
@@ -35,8 +39,9 @@ public enum ErrorMessage {
     PROJECT_TAKEN_SLUG(ErrorType.BAD_REQUEST, "project.taken.slug"),
     
     PROJECT_FILE_INVALID_CHANGELOG(ErrorType.BAD_REQUEST, "project_file.invalid.changelog"),
+    PROJECT_FILE_INVALID_FILENAME(ErrorType.BAD_REQUEST, "prject_file.invalid.filename"),
     PROJECT_FILE_INVALID_FILE(ErrorType.BAD_REQUEST, "project_file.invalid.file"),
-    
+
     FILE_INVALID_SIZE(ErrorType.BAD_REQUEST, "file.invalid.size"),
     
     // Project Type Errors
@@ -87,5 +92,10 @@ public enum ErrorMessage {
     public String getMessage () {
         
         return this.message;
+    }
+    
+    public Response respond() {
+
+        return Response.status(this.type.code).entity(new ErrorResponse(this.getType().getError(), this.getMessage())).build();
     }
 }

@@ -36,7 +36,7 @@ public class GameTest {
     @Test
     public void getGameBySlug () {
         
-        given().with().get(URL + "/eco").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_GAME.getMessage()));
+        given().with().get(URL + "/invalid").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_GAME.getMessage()));
         
         given().with().get(URL + "/minecraft").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/game-schema.json"));
     }
@@ -44,7 +44,7 @@ public class GameTest {
     @Test
     public void getProjectTypesByGameSlug () {
         
-        given().with().get(URL + "/eco/types").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_GAME.getMessage()));
+        given().with().get(URL + "/invalid/types").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_GAME.getMessage()));
         
         given().with().get(URL + "/minecraft/types").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-types-list-schema.json"));
     }

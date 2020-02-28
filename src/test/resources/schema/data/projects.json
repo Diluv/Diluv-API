@@ -1,0 +1,44 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "slug": {
+            "type": "string"
+        },
+        "summary": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "logo": {
+            "type": "string"
+        },
+        "downloads": {
+            "type": "number"
+        },
+        "createdAt": {
+            "type": "number"
+        },
+        "updatedAt": {
+            "type": "number"
+        },
+        "contributors": {
+            "$ref": "contributors.json"
+        }
+    },
+    "required": [
+        "name",
+        "slug",
+        "summary",
+        "description",
+        "downloads",
+        "createdAt",
+        "updatedAt",
+        "contributors"
+    ],
+    "additionalProperties": false
+}

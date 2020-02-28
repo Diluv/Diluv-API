@@ -1,49 +1,18 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
         "data": {
             "type": "array",
             "items": [
                 {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "type": "number"
-                        },
-                        "name": {
-                            "type": "string"
-                        },
-                        "sha512": {
-                            "type": "string"
-                        },
-                        "size": {
-                            "type": "number"
-                        },
-                        "changelog": {
-                            "type": "string"
-                        },
-                        "createdAt": {
-                            "type": "number"
-                        },
-                        "updatedAt": {
-                            "type": "number"
-                        }
-                    },
-                    "required": [
-                        "id",
-                        "name",
-                        "sha512",
-                        "size",
-                        "changelog",
-                        "createdAt",
-                        "updatedAt"
-                    ]
+                    "$ref": "data/projectFiles.json"
                 }
             ]
         }
     },
     "required": [
         "data"
-    ]
+    ],
+    "additionalProperties": false
 }
