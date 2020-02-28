@@ -22,7 +22,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import com.diluv.api.data.DataGame;
 import com.diluv.api.data.DataProject;
-import com.diluv.api.data.DataProjectAuthorAuthorized;
+import com.diluv.api.data.DataProjectContributorAuthorized;
 import com.diluv.api.data.DataProjectAuthorized;
 import com.diluv.api.data.DataProjectContributor;
 import com.diluv.api.data.DataProjectFile;
@@ -161,7 +161,7 @@ public class GamesAPI {
             List<String> permissions = ProjectPermissions.getPermissions(projectRecord, token.getUserId(), records);
 
             if (permissions != null) {
-                final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectAuthorAuthorized::new).collect(Collectors.toList());
+                final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributorAuthorized::new).collect(Collectors.toList());
                 return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, projectAuthors, permissions));
             }
         }

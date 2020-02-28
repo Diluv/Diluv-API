@@ -3,30 +3,7 @@
     "type": "object",
     "properties": {
         "data": {
-            "type": "object",
-            "properties": {
-                "username": {
-                    "type": "string"
-                },
-                "avatarURL": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "number"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "mfa": {
-                    "type": "boolean"
-                }
-            },
-            "required": [
-                "username",
-                "createdAt",
-                "avatarURL"
-            ],
-            "additionalProperties": false
+            "$ref": "data/user.json"
         }
     },
     "required": [

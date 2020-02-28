@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "userId": {
+            "type": "number"
+        },
+        "username": {
+            "type": "string"
+        },
+        "avatarURL": {
+            "type": "string"
+        },
+        "createdAt": {
+            "type": "number"
+        },
+        "email": {
+            "type": "string"
+        },
+        "mfa": {
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "userId",
+        "username",
+        "avatarURL",
+        "createdAt"
+    ],
+    "additionalProperties": false
+}

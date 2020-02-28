@@ -8,7 +8,7 @@ import com.google.gson.annotations.Expose;
 /**
  * Represents a project contributor from the perspective of an authorized user.
  */
-public class DataProjectAuthorAuthorized extends DataProjectContributor {
+public class DataProjectContributorAuthorized extends DataProjectContributor {
 
     /**
      * The permissions the auth has.
@@ -16,7 +16,7 @@ public class DataProjectAuthorAuthorized extends DataProjectContributor {
     @Expose
     private final List<String> permissions;
     
-    public DataProjectAuthorAuthorized(ProjectAuthorRecord projectAuthor) {
+    public DataProjectContributorAuthorized (ProjectAuthorRecord projectAuthor) {
         
         super(projectAuthor);
         this.permissions = projectAuthor.getPermissions();

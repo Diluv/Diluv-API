@@ -11,6 +11,12 @@
                 "username": {
                     "type": "string"
                 },
+                "avatarURL": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "number"
+                },
                 "role": {
                     "type": "string"
                 }
@@ -18,6 +24,8 @@
             "required": [
                 "userId",
                 "username",
+                "avatarURL",
+                "createdAt",
                 "role"
             ],
             "additionalProperties": false

@@ -6,19 +6,7 @@ import com.google.gson.annotations.Expose;
 /**
  * Represents a user who contributed to a project.
  */
-public class DataProjectContributor {
-
-    /**
-     * The user name of the contributor.
-     */
-    @Expose
-    private final long userId;
-
-    /**
-     * The user name of the contributor.
-     */
-    @Expose
-    private final String username;
+public class DataProjectContributor extends DataUser {
 
     /**
      * The role the contributor played in the creation of the project.
@@ -27,16 +15,12 @@ public class DataProjectContributor {
     private final String role;
 
     public DataProjectContributor(ProjectAuthorRecord projectAuthor) {
-
-        this.userId = projectAuthor.getUserId();
-        this.username = projectAuthor.getUsername();
+        super(projectAuthor.getUserId(), projectAuthor.getUsername(), projectAuthor.getCreatedAt());
         this.role = projectAuthor.getRole();
     }
 
-    public DataProjectContributor(long userId, String username, String role) {
-
-        this.userId = userId;
-        this.username = username;
+    public DataProjectContributor(long userId, String username, long createdAt, String role) {
+        super(userId, username, createdAt);
         this.role = role;
     }
 }

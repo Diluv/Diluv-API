@@ -11,25 +11,25 @@ import com.google.gson.annotations.Expose;
  * Represents a project on the site.
  */
 public class DataProject {
-    
+
     /**
      * The display name of the project.
      */
     @Expose
     private final String name;
-    
+
     /**
      * A unique slug used to identify the project in URLs and API requests.
      */
     @Expose
     private final String slug;
-    
+
     /**
      * A short summary of the project.
      */
     @Expose
     private final String summary;
-    
+
     /**
      * The description of the project.
      */
@@ -47,32 +47,32 @@ public class DataProject {
      */
     @Expose
     private final long downloads;
-    
+
     /**
      * The creation data of the project.
      */
     @Expose
     private final long createdAt;
-    
+
     /**
      * The date when the project was last updated.
      */
     @Expose
     private final long updatedAt;
-    
+
     /**
      * The users who contributed to the project.
      */
     @Expose
     private final List<DataProjectContributor> contributors = new ArrayList<>();
-    
-    public DataProject(ProjectRecord projectRecord) {
-        
+
+    public DataProject (ProjectRecord projectRecord) {
+
         this(projectRecord, null);
     }
-    
-    public DataProject(ProjectRecord projectRecord, List<DataProjectContributor> projectAuthorRecords) {
-        
+
+    public DataProject (ProjectRecord projectRecord, List<DataProjectContributor> projectAuthorRecords) {
+
         this.name = projectRecord.getName();
         this.slug = projectRecord.getSlug();
         this.summary = projectRecord.getSummary();
@@ -81,7 +81,7 @@ public class DataProject {
         this.downloads = projectRecord.getCachedDownloads();
         this.createdAt = projectRecord.getCreatedAt();
         this.updatedAt = projectRecord.getUpdatedAt();
-        this.contributors.add(new DataProjectContributor(projectRecord.getUserId(), projectRecord.getUsername(), "owner"));
+        this.contributors.add(new DataProjectContributor(projectRecord.getUserId(), projectRecord.getUsername(), projectRecord.getUserCreatedAt(), "owner"));
         if (projectAuthorRecords != null) {
             this.contributors.addAll(projectAuthorRecords);
         }
