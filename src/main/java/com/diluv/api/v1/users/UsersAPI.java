@@ -20,8 +20,11 @@ import com.diluv.api.data.DataUser;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.UserRecord;
 
+import org.jboss.resteasy.annotations.GZIP;
+
 import static com.diluv.api.Main.DATABASE;
 
+@GZIP
 @Path("/users")
 public class UsersAPI {
 

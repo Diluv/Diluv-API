@@ -15,8 +15,11 @@ import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.confluencia.database.record.NewsRecord;
 
+import org.jboss.resteasy.annotations.GZIP;
+
 import static com.diluv.api.Main.DATABASE;
 
+@GZIP
 @Path("/news")
 public class NewsAPI {
 

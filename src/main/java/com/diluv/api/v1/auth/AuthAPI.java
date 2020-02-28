@@ -42,8 +42,11 @@ import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.wildbit.java.postmark.client.data.model.message.MessageResponse;
 
+import org.jboss.resteasy.annotations.GZIP;
+
 import static com.diluv.api.Main.DATABASE;
 
+@GZIP
 @Path("/auth")
 public class AuthAPI {
 

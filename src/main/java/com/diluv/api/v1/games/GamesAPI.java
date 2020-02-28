@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.FilenameUtils;
+import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import com.diluv.api.data.DataGame;
@@ -45,6 +46,7 @@ import com.github.slugify.Slugify;
 
 import static com.diluv.api.Main.DATABASE;
 
+@GZIP
 @Path("/games")
 public class GamesAPI {
 
