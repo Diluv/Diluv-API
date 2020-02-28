@@ -310,7 +310,6 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-
         if (projectRecord.getUserId() != token.getUserId()) { // TODO make sure they have perms
 
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();

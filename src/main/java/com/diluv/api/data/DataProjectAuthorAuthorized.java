@@ -9,8 +9,10 @@ import com.google.gson.annotations.Expose;
  * Represents a project contributor from the perspective of an authorized user.
  */
 public class DataProjectAuthorAuthorized extends DataProjectContributor {
-    
-    // TODO doc this
+
+    /**
+     * The permissions the auth has.
+     */
     @Expose
     private final List<String> permissions;
     

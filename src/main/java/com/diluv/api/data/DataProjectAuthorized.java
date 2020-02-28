@@ -9,24 +9,30 @@ import com.google.gson.annotations.Expose;
  * Represents the authorized view of the project data.
  */
 public class DataProjectAuthorized extends DataProject {
-    
-    // TODO doc this
-    @Expose
-    private final List<String> permissions;
-    
-    // TODO doc this
+
+    /**
+     * Is the project released to the public.
+     */
     @Expose
     private final boolean released;
-    
-    // TODO doc this
+
+    /**
+     * If the project needs a review from the dev team.
+     */
     @Expose
     private final boolean review;
-    
-    public DataProjectAuthorized(ProjectRecord projectRecord, List<DataProjectContributor> projectAuthor, List<String> permissions) {
-        
+
+    /**
+     * The permissions the authorize user has.
+     */
+    @Expose
+    private final List<String> permissions;
+
+    public DataProjectAuthorized (ProjectRecord projectRecord, List<DataProjectContributor> projectAuthor, List<String> permissions) {
+
         super(projectRecord, projectAuthor);
-        this.permissions = permissions;
         this.released = projectRecord.isReleased();
         this.review = projectRecord.isReview();
+        this.permissions = permissions;
     }
 }
