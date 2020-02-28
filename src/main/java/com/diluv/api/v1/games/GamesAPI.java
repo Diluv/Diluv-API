@@ -297,7 +297,7 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-        if (projectRecord.getUserId() != token.getUserId()) { // TODO make sure they have perms
+        if (!ProjectPermissions.hasPermission(projectRecord, token.getUserId(), ProjectPermissions.FILE_UPLOAD)) {
 
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
         }
