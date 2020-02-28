@@ -9,7 +9,6 @@ import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -43,6 +42,7 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.wildbit.java.postmark.client.data.model.message.MessageResponse;
 
 import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -57,27 +57,27 @@ public class AuthAPI {
     @POST
     @Path("/register")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getSelf (@FormParam("email") String formEmail, @FormParam("username") String formUsername, @FormParam("password") String formPassword, @FormParam("terms") boolean formTerms) {
+    public Response register (@MultipartForm RegisterForm form) {
 
         try {
-            if (!formTerms) {
-                return ErrorMessage.USER_INVALID_TERMS.respond();
-            }
-
-            if (!Validator.validateUsername(formUsername)) {
+            if (!Validator.validateUsername(form.username)) {
                 return ErrorMessage.USER_INVALID_USERNAME.respond();
             }
 
-            if (!Validator.validateEmail(formEmail)) {
+            if (!Validator.validateEmail(form.email)) {
                 return ErrorMessage.USER_INVALID_EMAIL.respond();
             }
 
-            if (!Validator.validatePassword(formPassword)) {
+            if (!Validator.validatePassword(form.password)) {
                 return ErrorMessage.USER_INVALID_PASSWORD.respond();
             }
 
-            final String email = formEmail.toLowerCase();
-            final String username = formUsername.toLowerCase();
+            if (!form.terms) {
+                return ErrorMessage.USER_INVALID_TERMS.respond();
+            }
+
+            final String email = form.email.toLowerCase();
+            final String username = form.username.toLowerCase();
 
             final String domain = email.split("@")[1];
             if (DATABASE.emailDAO.existsBlacklist(email, domain)) {
@@ -93,7 +93,7 @@ public class AuthAPI {
 
             final byte[] salt = new byte[16];
             SecureRandom.getInstanceStrong().nextBytes(salt);
-            final String bcryptPassword = OpenBSDBCrypt.generate(formPassword.toCharArray(), salt, Constants.BCRYPT_COST);
+            final String bcryptPassword = OpenBSDBCrypt.generate(form.password.toCharArray(), salt, Constants.BCRYPT_COST);
 
             final String verificationCode = UUID.randomUUID().toString();
             if (!DATABASE.userDAO.insertTempUser(email, username, bcryptPassword, "bcrypt", verificationCode)) {
@@ -120,19 +120,19 @@ public class AuthAPI {
     @POST
     @Path("/login")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response login (@FormParam("username") String formUsername, @FormParam("password") String formPassword, @FormParam("mfa") String formMFA) {
+    public Response login (@MultipartForm LoginForm form) {
 
         try {
 
-            if (!Validator.validateUsername(formUsername)) {
+            if (!Validator.validateUsername(form.username)) {
                 return ErrorMessage.USER_INVALID_USERNAME.respond();
             }
 
-            if (!Validator.validatePassword(formPassword)) {
+            if (!Validator.validatePassword(form.password)) {
                 return ErrorMessage.USER_INVALID_PASSWORD.respond();
             }
 
-            final String username = formUsername.toLowerCase();
+            final String username = form.username.toLowerCase();
 
             final UserRecord userRecord = DATABASE.userDAO.findOneByUsername(username);
             if (userRecord == null) {
@@ -146,20 +146,20 @@ public class AuthAPI {
                 return ErrorMessage.USER_INVALID_PASSWORD_TYPE.respond();
             }
 
-            if (!OpenBSDBCrypt.checkPassword(userRecord.getPassword(), formPassword.toCharArray())) {
+            if (!OpenBSDBCrypt.checkPassword(userRecord.getPassword(), form.password.toCharArray())) {
                 return ErrorMessage.USER_WRONG_PASSWORD.respond();
             }
 
             if (userRecord.isMfa()) {
-                if (formMFA == null) {
+                if (form.mfa == null) {
                     return ErrorMessage.USER_REQUIRED_MFA.respond();
                 }
 
-                if (!GenericValidator.isInt(formMFA)) {
+                if (!GenericValidator.isInt(form.mfa)) {
                     return ErrorMessage.USER_INVALID_MFA.respond();
                 }
 
-                if (!this.ga.authorize(userRecord.getMfaSecret(), Integer.parseInt(formMFA))) {
+                if (!this.ga.authorize(userRecord.getMfaSecret(), Integer.parseInt(form.mfa))) {
                     // TODO Code not valid and check scratch codes
                     return null;
                 }
@@ -177,23 +177,23 @@ public class AuthAPI {
     @POST
     @Path("/verify")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response verify (@FormParam("email") String formEmail, @FormParam("code") String formCode) {
+    public Response verify (@MultipartForm VerifyForm form) {
 
-        if (!Validator.validateEmail(formEmail)) {
+        if (!Validator.validateEmail(form.email)) {
             return ErrorMessage.USER_INVALID_EMAIL.respond();
         }
 
-        if (GenericValidator.isBlankOrNull(formCode)) {
+        if (GenericValidator.isBlankOrNull(form.code)) {
             return ErrorMessage.USER_INVALID_VERIFICATION_CODE.respond();
         }
 
-        final String email = formEmail.toLowerCase();
+        final String email = form.email.toLowerCase();
 
         if (DATABASE.userDAO.existsUserByEmail(email)) {
             return ErrorMessage.USER_VERIFIED.respond();
         }
 
-        final TempUserRecord record = DATABASE.userDAO.findTempUserByEmailAndCode(email, formCode);
+        final TempUserRecord record = DATABASE.userDAO.findTempUserByEmailAndCode(email, form.code);
         if (record == null) {
             return ErrorMessage.NOT_FOUND_USER.respond();
         }
@@ -235,18 +235,18 @@ public class AuthAPI {
     @POST
     @Path("/resend")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response resend (@FormParam("email") String formEmail, @FormParam("username") String formUsername) {
+    public Response resend (@MultipartForm ResendForm form) {
 
-        if (!Validator.validateEmail(formEmail)) {
+        if (!Validator.validateEmail(form.email)) {
             return ErrorMessage.USER_INVALID_EMAIL.respond();
         }
 
-        if (!Validator.validateUsername(formUsername)) {
+        if (!Validator.validateUsername(form.username)) {
             return ErrorMessage.USER_INVALID_USERNAME.respond();
         }
 
-        final String tempEmail = formEmail.toLowerCase();
-        final String username = formUsername.toLowerCase();
+        final String tempEmail = form.email.toLowerCase();
+        final String username = form.username.toLowerCase();
 
         final TempUserRecord tUserRecord = DATABASE.userDAO.findTempUserByEmailAndUsername(tempEmail, username);
         if (tUserRecord == null) {

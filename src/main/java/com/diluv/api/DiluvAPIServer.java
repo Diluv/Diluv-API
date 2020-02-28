@@ -2,6 +2,9 @@ package com.diluv.api;
 
 import javax.ws.rs.core.Application;
 
+import io.undertow.server.handlers.resource.PathResourceManager;
+import io.undertow.server.handlers.resource.ResourceHandler;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jboss.resteasy.core.ResteasyDeploymentImpl;
@@ -19,6 +22,9 @@ import io.undertow.Undertow;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 public class DiluvAPIServer {
 
     public static final Logger LOGGER = LogManager.getLogger("API");
@@ -34,6 +40,11 @@ public class DiluvAPIServer {
 
         this.deploy("API V1", "/v1", APIV1.class);
 
+        ResourceHandler resourceHandler = new ResourceHandler(new PathResourceManager(
+            Paths.get(new File("public/").getAbsolutePath()), 100))
+            .setDirectoryListingEnabled(true)
+            .addWelcomeFiles("index.html");
+        this.server.addResourcePrefixPath("/public", resourceHandler);
         this.server.start(Undertow.builder().addHttpListener(port, host));
         LOGGER.info("Server started on {}:{}", host, port);
     }

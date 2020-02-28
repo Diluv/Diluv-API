@@ -41,7 +41,7 @@ public final class Constants {
     public static final String PROCESSING_FOLDER = getValueOrDefault("PROCESSING_FOLDER", "processing");
 
     // Emails
-    public static final String POSTMARK_API_TOKEN = getValueOrDefault("POSTMARK_API_TOKEN", "POSTMARK_API_TEST");
+    public static final String POSTMARK_API_TOKEN = getValueOrDefault("POSTMARK_API_TOKEN", null);
     public static final String NOREPLY_EMAIL = getValueOrDefault("NOREPLY_EMAIL", "noreply@diluv.co");
     public static final String EMAIL_VERIFICATION = Constants.readResourceFileToString("/templates/email_verification.html", false);
 
