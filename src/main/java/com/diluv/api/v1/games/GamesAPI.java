@@ -4,6 +4,8 @@ import static com.diluv.api.Main.DATABASE;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +21,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
+import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.data.DataGame;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataProjectAuthorAuthorized;
@@ -31,6 +35,7 @@ import com.diluv.api.data.DataProjectFileAvailable;
 import com.diluv.api.data.DataProjectFileInQueue;
 import com.diluv.api.data.DataProjectType;
 import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.ResponseUtil;
 import com.diluv.api.utils.auth.AccessToken;
@@ -135,7 +140,7 @@ public class GamesAPI {
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProject (@HeaderParam("Authorization") AccessToken token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
-
+        
         final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (projectRecord == null || !projectRecord.isReleased() && token == null) {
             if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
@@ -297,67 +302,51 @@ public class GamesAPI {
         }
         
         final ProjectTypeRecord projectTypeRecord = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        
         if (projectTypeRecord == null) {
             return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
         }
         
         final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        
         if (projectRecord == null) {
             return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
         }
         
-        // TODO Needs to be moved to check the user permissions in the future
-        if (projectRecord.getUserId() != token.getUserId()) {
+        if (projectRecord.getUserId() != token.getUserId()) { // TODO make sure they have perms
+            
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
         }
-        // final FormData data = FormUtil.getMultiPartForm(exchange,
-        // projectTypeRecord.getMaxSize());
-        
-        // if (data == null) {
-        // return ErrorMessage.FORM_INVALID.respond();
-        // }
-        
-        // final FormData.FileItem formFile = RequestUtil.getFormFile(data, "file");
         
         if (!Validator.validateProjectFileChangelog(form.changelog)) {
             return ErrorMessage.PROJECT_FILE_INVALID_CHANGELOG.respond();
         }
         
-        // if (formFile == null) {
-        // return ErrorMessage.PROJECT_FILE_INVALID_FILE.respond();
-        // }
-        //
-        // final Long fileSize = FileUtil.getSize(formFile);
-        //
-        // final String sha512 = FileUtil.getSHA512(formFile);
-        // final String fileName = formFile.getFile().getFileName().toString();
+        final String fileName = FilenameUtils.getName(form.fileName);
+        final File tempFile = FileUtil.getTempFile(projectRecord.getId(), fileName);
+        final String sha512 = FileUtil.writeFile(form.file, 25 * 1024 * 1024, tempFile);
         
-        // if (sha512 == null) {
-        // return ErrorMessage.FAILED_SHA512.respond();
-        // }
+        if (sha512 == null) {
+            
+            // TODO make this make sense
+            return ErrorMessage.FILE_INVALID_SIZE.respond();
+        }
         
-        // final Long id = DATABASE.fileDAO.insertProjectFile(fileName, fileSize,
-        // form.changelog, sha512, projectRecord.getId(), token.getUserId());
-        // if (id == null) {
-        // return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
-        // }
-        //
-        // final File file = new File(Constants.PROCESSING_FOLDER,
-        // String.format("%s/%s/%s/%s/%s", gameSlug, projectTypeSlug, projectSlug, id,
-        // fileName));
-        // try {
-        //
-        // FileUtils.copyInputStreamToFile(form.file, file);
-        // }
-        // catch (final IOException e) {
-        // DiluvAPIServer.LOGGER.error("Failed to
-        // postProjectFilesByGameSlugAndProjectTypeAndProjectSlug.", e);
-        // return ErrorMessage.ERROR_WRITING.respond();
-        // }
+        final Long id = DATABASE.fileDAO.insertProjectFile(fileName, tempFile.length(), form.changelog, sha512, projectRecord.getId(), token.getUserId());
         
-        // TODO
-        // final ProjectFileRecord record =
-        // DATABASE.fileDAO.findOneProjectFileQueueByFileId(id);
-        return ResponseUtil.successResponse(new DataProjectFileInQueue(/* record */null, gameSlug, projectTypeSlug, projectSlug));
+        if (id == null) {
+            
+            return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
+        }
+        
+        final boolean moved = tempFile.renameTo(FileUtil.getOutputLocation(gameSlug, projectTypeSlug, projectRecord.getId(), id, fileName));
+        
+        if (!moved) {
+            
+            return ErrorMessage.ERROR_WRITING.respond();
+        }
+        
+        // TODO return more info
+        return Response.ok().build();
     }
 }

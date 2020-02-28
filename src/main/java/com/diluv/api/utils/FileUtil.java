@@ -1,33 +1,56 @@
 package com.diluv.api.utils;
 
-import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import javax.annotation.Nullable;
 
-import io.undertow.server.handlers.form.FormData;
-import io.undertow.server.handlers.form.MultiPartParserDefinition;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.james.mime4j.io.LimitedInputStream;
+import org.bouncycastle.util.encoders.Hex;
+
+import com.diluv.api.DiluvAPIServer;
 
 public class FileUtil {
     
-    public static String getSHA512 (FormData.FileItem fileItem) {
+    public static String writeFile (InputStream input, long limit, File destination) {
         
-        try (BufferedInputStream bis = new BufferedInputStream(fileItem.getInputStream())) {
+        try (DigestInputStream hashStream = new DigestInputStream(input, MessageDigest.getInstance("SHA512")); LimitedInputStream in = new LimitedInputStream(hashStream, limit)) {
             
-            return DigestUtils.sha512Hex(bis);
+            FileUtils.copyInputStreamToFile(in, destination);
+            return Hex.toHexString(hashStream.getMessageDigest().digest());
         }
-        catch (final IOException e) {
+        
+        catch (IOException | NoSuchAlgorithmException e) {
+            
             return null;
         }
     }
     
-    public static Long getSize (FormData.FileItem fileItem) throws MultiPartParserDefinition.FileTooLargeException {
+    @Nullable
+    public static File getTempFile (long project, String fileName) {
         
         try {
-            return fileItem.getFileSize();
+            
+            final File tempFolder = Files.createTempDirectory(Long.toString(project)).toFile();
+            return new File(tempFolder, fileName);
         }
-        catch (final IOException e) {
-            throw new MultiPartParserDefinition.FileTooLargeException();
+        
+        catch (IOException e) {
+            
+            DiluvAPIServer.LOGGER.catching(e);
+            return null;
         }
+    }
+    
+    public static File getOutputLocation (String game, String type, long project, long id, String inputFileName) {
+        
+        return new File(Constants.PROCESSING_FOLDER, game + "/" + type + "/" + project + "/" + id + "/" + inputFileName);
     }
 }
