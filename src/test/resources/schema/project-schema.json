@@ -17,6 +17,9 @@
                 "description": {
                     "type": "string"
                 },
+                "logo": {
+                    "type": "string"
+                },
                 "downloads": {
                     "type": "number"
                 },

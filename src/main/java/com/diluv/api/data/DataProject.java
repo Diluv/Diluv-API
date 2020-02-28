@@ -3,6 +3,7 @@ package com.diluv.api.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.google.gson.annotations.Expose;
 
@@ -34,7 +35,13 @@ public class DataProject {
      */
     @Expose
     private final String description;
-    
+
+    /**
+     * The logo url of the project.
+     */
+    @Expose
+    private final String logo;
+
     /**
      * The amount of downloads the project has.
      */
@@ -70,6 +77,7 @@ public class DataProject {
         this.slug = projectRecord.getSlug();
         this.summary = projectRecord.getSummary();
         this.description = projectRecord.getDescription();
+        this.logo = Constants.getLogo(projectRecord.getGameSlug(), projectRecord.getProjectTypeSlug(), projectRecord.getId());
         this.downloads = projectRecord.getCachedDownloads();
         this.createdAt = projectRecord.getCreatedAt();
         this.updatedAt = projectRecord.getUpdatedAt();

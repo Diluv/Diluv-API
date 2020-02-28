@@ -39,8 +39,9 @@ public enum ErrorMessage {
     PROJECT_TAKEN_SLUG(ErrorType.BAD_REQUEST, "project.taken.slug"),
     
     PROJECT_FILE_INVALID_CHANGELOG(ErrorType.BAD_REQUEST, "project_file.invalid.changelog"),
+    PROJECT_FILE_INVALID_FILENAME(ErrorType.BAD_REQUEST, "prject_file.invalid.filename"),
     PROJECT_FILE_INVALID_FILE(ErrorType.BAD_REQUEST, "project_file.invalid.file"),
-    
+
     FILE_INVALID_SIZE(ErrorType.BAD_REQUEST, "file.invalid.size"),
     
     // Project Type Errors

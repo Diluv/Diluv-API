@@ -236,4 +236,9 @@ public final class Constants {
 
         return String.format("%s/users/%s/avatar.png", CDN_URL, username);
     }
+
+    public static String getLogo (String gameSlug, String projectTypeSlug, long projectId) {
+
+        return String.format("%s/games/%s/%s/%d/logo.png", CDN_URL, gameSlug, projectTypeSlug, projectId);
+    }
 }

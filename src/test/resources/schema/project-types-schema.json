@@ -13,12 +13,16 @@
                 },
                 "gameSlug": {
                     "type": "string"
+                },
+                "maxSize": {
+                    "type": "number"
                 }
             },
             "required": [
                 "name",
                 "slug",
-                "gameSlug"
+                "gameSlug",
+                "maxSize"
             ]
         }
     },

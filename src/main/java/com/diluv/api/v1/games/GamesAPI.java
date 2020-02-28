@@ -239,9 +239,6 @@ public class GamesAPI {
         if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
             return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
         }
-        // 1000000L
-        // Defaults to 1MB should be database stored. TODO
-        // final FormData.FileItem formLogo = RequestUtil.getFormFile(data, "logo");
 
         if (!Validator.validateProjectName(form.name)) {
             return ErrorMessage.PROJECT_INVALID_NAME.respond();
@@ -279,7 +276,7 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-        final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%s/logo.png", gameSlug, projectTypeSlug, projectSlug));
+        final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, projectRecord.getId()));
         if (!ImageUtil.saveImage(image, file)) {
             return ErrorMessage.ERROR_SAVING_IMAGE.respond();
         }
@@ -297,17 +294,22 @@ public class GamesAPI {
         }
 
         final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        final ProjectTypeRecord projectTypeRecord = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
 
         if (projectRecord == null) {
             if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+
                 return ErrorMessage.NOT_FOUND_GAME.respond();
             }
 
-            if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+            if (projectTypeRecord == null) {
+
                 return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
             }
+
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
+
 
         if (projectRecord.getUserId() != token.getUserId()) { // TODO make sure they have perms
 
@@ -315,13 +317,14 @@ public class GamesAPI {
         }
 
         if (!Validator.validateProjectFileChangelog(form.changelog)) {
+
             return ErrorMessage.PROJECT_FILE_INVALID_CHANGELOG.respond();
         }
 
         //TODO Check for form.fileName being null
         final String fileName = FilenameUtils.getName(form.fileName);
         final File tempFile = FileUtil.getTempFile(projectRecord.getId(), fileName);
-        final String sha512 = FileUtil.writeFile(form.file, 25 * 1024 * 1024, tempFile);
+        final String sha512 = FileUtil.writeFile(form.file, projectTypeRecord.getMaxSize(), tempFile);
 
         if (sha512 == null) {
 
