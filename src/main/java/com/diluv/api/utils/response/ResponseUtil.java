@@ -1,8 +1,6 @@
-package com.diluv.api.utils;
+package com.diluv.api.utils.response;
 
 import javax.ws.rs.core.Response;
-
-import com.diluv.api.endpoints.v1.DataResponse;
 
 public final class ResponseUtil {
 

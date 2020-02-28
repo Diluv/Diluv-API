@@ -33,7 +33,7 @@ import com.diluv.api.data.DataProjectType;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.ImageUtil;
-import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.error.ErrorMessage;

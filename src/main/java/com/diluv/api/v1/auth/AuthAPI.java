@@ -25,7 +25,7 @@ import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.data.DataLogin;
-import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.auth.AccessToken;

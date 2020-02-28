@@ -12,7 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.diluv.api.data.DataProject;
-import com.diluv.api.utils.ResponseUtil;
+import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.data.DataAuthorizedUser;

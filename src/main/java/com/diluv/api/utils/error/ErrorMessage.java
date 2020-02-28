@@ -1,6 +1,6 @@
 package com.diluv.api.utils.error;
 
-import com.diluv.api.endpoints.v1.ErrorResponse;
+import com.diluv.api.utils.response.ErrorResponse;
 
 import javax.ws.rs.core.Response;
 
