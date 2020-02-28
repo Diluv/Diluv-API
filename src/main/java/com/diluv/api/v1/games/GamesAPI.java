@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
@@ -33,10 +32,11 @@ import com.diluv.api.data.DataProjectType;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.ImageUtil;
-import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.utils.permissions.ProjectPermissions;
+import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
@@ -158,19 +158,7 @@ public class GamesAPI {
         final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
 
         if (token != null) {
-
-            List<String> permissions = null;
-            if (token.getUserId() == projectRecord.getUserId()) {
-                // TODO All permissions
-                permissions = new ArrayList<>();
-            }
-            else {
-                final Optional<ProjectAuthorRecord> record = records.stream().filter(par -> par.getUserId() == token.getUserId()).findFirst();
-
-                if (record.isPresent()) {
-                    permissions = record.get().getPermissions();
-                }
-            }
+            List<String> permissions = ProjectPermissions.getPermissions(projectRecord, token.getUserId(), records);
 
             if (permissions != null) {
                 final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectAuthorAuthorized::new).collect(Collectors.toList());
@@ -203,8 +191,7 @@ public class GamesAPI {
 
         List<ProjectFileRecord> projectRecords;
 
-        // TODO Check permissions
-        if (token != null && projectRecord.getUserId() == token.getUserId()) {
+        if (token != null && ProjectPermissions.hasPermission(projectRecord, token.getUserId(), ProjectPermissions.FILE_UPLOAD)) {
             projectRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized(gameSlug, projectTypeSlug, projectSlug);
         }
         else {
