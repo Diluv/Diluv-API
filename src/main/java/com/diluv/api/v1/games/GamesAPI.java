@@ -321,7 +321,16 @@ public class GamesAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_CHANGELOG.respond();
         }
 
-        //TODO Check for form.fileName being null
+        if (form.file == null) {
+
+            return ErrorMessage.PROJECT_FILE_INVALID_FILE.respond();
+        }
+
+        if (form.fileName == null) {
+
+            return ErrorMessage.PROJECT_FILE_INVALID_FILENAME.respond();
+        }
+
         final String fileName = FilenameUtils.getName(form.fileName);
         final File tempFile = FileUtil.getTempFile(projectRecord.getId(), fileName);
         final String sha512 = FileUtil.writeFile(form.file, projectTypeRecord.getMaxSize(), tempFile);
