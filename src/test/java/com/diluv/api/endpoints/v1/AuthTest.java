@@ -1,41 +1,32 @@
 package com.diluv.api.endpoints.v1;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
-import static org.hamcrest.Matchers.equalTo;
-
-import java.util.Calendar;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.diluv.api.utils.TestUtil;
-import com.diluv.api.utils.auth.RefreshToken;
 import com.diluv.api.utils.error.ErrorMessage;
-import com.nimbusds.jose.JOSEException;
+
+import static io.restassured.RestAssured.given;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.hamcrest.Matchers.equalTo;
 
 public class AuthTest {
-    
+
     private static final String URL = "/v1/auth";
-    private static String darkhaxRefreshToken;
-    
+
     @BeforeAll
-    public static void setup () throws JOSEException {
-        
-        final Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, 30);
-        darkhaxRefreshToken = new RefreshToken(0, "darkhax", "cd65cb00-b9a6-4da1-9b23-d7edfe2f9fa5").generate(calendar.getTime());
-        
+    public static void setup () {
+
         TestUtil.start();
     }
-    
+
     @AfterAll
     public static void stop () {
-        
+
         TestUtil.stop();
     }
-    
+
     @Test
     public void testRegister () {
 
@@ -56,7 +47,7 @@ public class AuthTest {
         // Terms false
         given().multiPart("email", "testing@example.com").multiPart("username", "lclc98").multiPart("password", "password").multiPart("terms", "false").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_INVALID_TERMS.getMessage()));
     }
-    
+
     @Test
     public void testLogin () {
 
@@ -88,19 +79,19 @@ public class AuthTest {
 
         given().with().post(URL + "/refresh").then().assertThat().statusCode(401).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_REQUIRED_TOKEN.getMessage()));
 
-        given().header("Authorization", "Bearer " + darkhaxRefreshToken).with().post(URL + "/refresh").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/login-schema.json"));
+        given().header("Authorization", "Bearer " + TestUtil.VALID_REFRESH_TOKEN).with().post(URL + "/refresh").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/login-schema.json"));
     }
-    
+
     @Test
     public void testCheckUsername () {
-        
+
         given().with().get(URL + "/checkusername/lclc98").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_USERNAME.getMessage()));
-        
+
         given().with().get(URL + "/checkusername/darkhax").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_USERNAME.getMessage()));
-        
+
         given().with().get(URL + "/checkusername/nonexisting").then().assertThat().statusCode(200);
     }
-    
+
     @Test
     public void testResend () {
 

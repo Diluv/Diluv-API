@@ -1,5 +1,8 @@
 package com.diluv.api.utils;
 
+import java.util.Calendar;
+import java.util.Collections;
+
 import com.diluv.api.Database;
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.Main;
@@ -9,12 +12,17 @@ import com.diluv.api.database.GameTestDatabase;
 import com.diluv.api.database.NewsTestDatabase;
 import com.diluv.api.database.ProjectTestDatabase;
 import com.diluv.api.database.UserTestDatabase;
+import com.diluv.api.utils.auth.tokens.AccessToken;
+import com.diluv.api.utils.auth.tokens.LongLivedAccessToken;
+import com.diluv.api.utils.auth.tokens.RefreshToken;
+import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.confluencia.database.dao.EmailDAO;
 import com.diluv.confluencia.database.dao.FileDAO;
 import com.diluv.confluencia.database.dao.GameDAO;
 import com.diluv.confluencia.database.dao.NewsDAO;
 import com.diluv.confluencia.database.dao.ProjectDAO;
 import com.diluv.confluencia.database.dao.UserDAO;
+import com.nimbusds.jose.JOSEException;
 import io.restassured.RestAssured;
 
 public class TestUtil {
@@ -28,6 +36,46 @@ public class TestUtil {
     public static final UserDAO USER_DAO = new UserTestDatabase();
     public static final EmailDAO EMAIL_DAO = new EmailTestDatabase();
     public static final NewsDAO NEWS_DAO = new NewsTestDatabase();
+
+    public static String VALID_TOKEN;
+    public static String VALID_TOKEN_TWO;
+    public static String VALID_LONG_LASTING_TOKEN;
+    public static String VALID_REFRESH_TOKEN;
+    public static String INVALID_TOKEN = "invalid";
+
+    static {
+        final Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, 30);
+        try {
+            VALID_TOKEN = new AccessToken(0, "darkhax").generate(calendar.getTime());
+        }
+        catch (JOSEException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            VALID_TOKEN_TWO = new AccessToken(1, "jaredlll08").generate(calendar.getTime());
+        }
+        catch (JOSEException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            VALID_REFRESH_TOKEN = new RefreshToken(0, "darkhax", "cd65cb00-b9a6-4da1-9b23-d7edfe2f9fa5").generate(calendar.getTime());
+        }
+        catch (JOSEException e) {
+            e.printStackTrace();
+        }
+
+        calendar.add(Calendar.MONTH, 6);
+
+        try {
+            VALID_LONG_LASTING_TOKEN = new LongLivedAccessToken(0, "darkhax", Collections.singletonList(ProjectPermissions.FILE_UPLOAD.getName())).generate(calendar.getTime());
+        }
+        catch (JOSEException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void start () {
 

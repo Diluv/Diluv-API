@@ -1,11 +1,12 @@
 package com.diluv.api.utils.permissions;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.diluv.api.utils.auth.tokens.LongLivedAccessToken;
+import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 
@@ -30,42 +31,47 @@ public enum ProjectPermissions {
         return this.name;
     }
 
-    public static boolean hasPermission (ProjectRecord projectRecord, long userId, ProjectPermissions permissions) {
+    public static boolean hasPermission (ProjectRecord projectRecord, Token token, ProjectPermissions permissions) {
 
-        List<String> userPermissions = getPermissions(projectRecord, userId);
+        List<String> userPermissions;
+        if (token instanceof LongLivedAccessToken) {
+            userPermissions = ((LongLivedAccessToken) token).getPermissions();
+        }
+        else {
+            userPermissions = getAuthorizedUserPermissions(projectRecord, token);
+        }
         return userPermissions != null && userPermissions.contains(permissions.getName());
     }
 
-    public static List<String> getPermissions (ProjectRecord projectRecord, long userId, List<ProjectAuthorRecord> records) {
+    protected static List<String> getAuthorizedUserPermissions (ProjectRecord projectRecord, Token token) {
 
-        if (userId == projectRecord.getUserId()) {
+        if (token instanceof LongLivedAccessToken) {
+            return ((LongLivedAccessToken) token).getPermissions();
+        }
+
+        if (token.getUserId() == projectRecord.getUserId()) {
             return ProjectPermissions.getAllPermissions();
         }
-        else {
-            final Optional<ProjectAuthorRecord> record = records.stream().filter(par -> par.getUserId() == userId).findFirst();
+        final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
 
-            if (record.isPresent()) {
-                return record.get().getPermissions();
-            }
-        }
-        return null;
+        final Optional<ProjectAuthorRecord> record = records.stream().filter(par -> par.getUserId() == token.getUserId()).findFirst();
+
+        return record.map(ProjectAuthorRecord::getPermissions).orElse(null);
     }
 
-    public static List<String> getPermissions (ProjectRecord projectRecord, long userId) {
+    public static List<String> getAuthorizedUserPermissions (ProjectRecord projectRecord, Token token, List<ProjectAuthorRecord> records) {
 
-        if (userId == projectRecord.getUserId()) {
+        if (token instanceof LongLivedAccessToken) {
+            return ((LongLivedAccessToken) token).getPermissions();
+        }
+
+        if (token.getUserId() == projectRecord.getUserId()) {
             return ProjectPermissions.getAllPermissions();
         }
-        else {
-            final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
 
-            final Optional<ProjectAuthorRecord> record = records.stream().filter(par -> par.getUserId() == userId).findFirst();
+        final Optional<ProjectAuthorRecord> record = records.stream().filter(par -> par.getUserId() == token.getUserId()).findFirst();
 
-            if (record.isPresent()) {
-                return record.get().getPermissions();
-            }
-        }
-        return Collections.emptyList();
+        return record.map(ProjectAuthorRecord::getPermissions).orElse(null);
     }
 
     public static List<String> getAllPermissions () {

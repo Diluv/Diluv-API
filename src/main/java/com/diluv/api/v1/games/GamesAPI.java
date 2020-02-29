@@ -32,8 +32,8 @@ import com.diluv.api.data.DataProjectType;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.ImageUtil;
-import com.diluv.api.utils.auth.AccessToken;
 import com.diluv.api.utils.auth.Validator;
+import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
@@ -138,7 +138,7 @@ public class GamesAPI {
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProject (@HeaderParam("Authorization") AccessToken token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
+    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
 
         final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (projectRecord == null || !projectRecord.isReleased() && token == null) {
@@ -158,7 +158,7 @@ public class GamesAPI {
         final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
 
         if (token != null) {
-            List<String> permissions = ProjectPermissions.getPermissions(projectRecord, token.getUserId(), records);
+            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(projectRecord, token, records);
 
             if (permissions != null) {
                 final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributorAuthorized::new).collect(Collectors.toList());
@@ -173,7 +173,7 @@ public class GamesAPI {
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectFiles (@HeaderParam("Authorization") AccessToken token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
+    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
 
         final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (projectRecord == null) {
@@ -191,7 +191,7 @@ public class GamesAPI {
 
         List<ProjectFileRecord> projectRecords;
 
-        if (token != null && ProjectPermissions.hasPermission(projectRecord, token.getUserId(), ProjectPermissions.FILE_UPLOAD)) {
+        if (token != null && ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD)) {
             projectRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized(gameSlug, projectTypeSlug, projectSlug);
         }
         else {
@@ -199,11 +199,11 @@ public class GamesAPI {
         }
         final List<DataProjectFile> projects = new ArrayList<>();
         for (final ProjectFileRecord record : projectRecords) {
-            if (record.getSha512() == null) {
-                projects.add(new DataProjectFileInQueue(record, gameSlug, projectTypeSlug, projectSlug));
+            if (record.isReleased()) {
+                projects.add(new DataProjectFileAvailable(record, gameSlug, projectTypeSlug, projectSlug));
             }
             else {
-                projects.add(new DataProjectFileAvailable(record, gameSlug, projectTypeSlug, projectSlug));
+                projects.add(new DataProjectFileInQueue(record, gameSlug, projectTypeSlug, projectSlug));
             }
         }
         return ResponseUtil.successResponse(projects);
@@ -213,7 +213,7 @@ public class GamesAPI {
     @Path("/{gameSlug}/{projectTypeSlug}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postProject (@HeaderParam("Authorization") AccessToken token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @MultipartForm ProjectCreateForm form) {
+    public Response postProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @MultipartForm ProjectCreateForm form) {
 
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
@@ -274,7 +274,7 @@ public class GamesAPI {
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postProjectFile (@HeaderParam("Authorization") AccessToken token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectFileUploadForm form) {
+    public Response postProjectFile (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectFileUploadForm form) {
 
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
@@ -297,11 +297,10 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-        if (!ProjectPermissions.hasPermission(projectRecord, token.getUserId(), ProjectPermissions.FILE_UPLOAD)) {
+        if (!ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD)) {
 
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
         }
-
 
         if (!Validator.validateProjectFileChangelog(form.changelog)) {
 
@@ -351,11 +350,12 @@ public class GamesAPI {
 
         File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, projectRecord.getId(), id, fileName);
         destination.getParentFile().mkdirs();
-
         final boolean moved = tempFile.renameTo(destination);
 
-        if (!moved) {
+        tempFile.delete();
+        tempFile.getParentFile().delete();
 
+        if (!moved) {
             return ErrorMessage.ERROR_WRITING.respond();
         }
 

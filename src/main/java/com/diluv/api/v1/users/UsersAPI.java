@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 
 import com.diluv.api.data.DataProject;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.api.utils.auth.AccessToken;
+import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.data.DataAuthorizedUser;
 import com.diluv.api.data.DataUser;
