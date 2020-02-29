@@ -22,9 +22,9 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import com.diluv.api.data.DataGame;
 import com.diluv.api.data.DataProject;
-import com.diluv.api.data.DataProjectContributorAuthorized;
 import com.diluv.api.data.DataProjectAuthorized;
 import com.diluv.api.data.DataProjectContributor;
+import com.diluv.api.data.DataProjectContributorAuthorized;
 import com.diluv.api.data.DataProjectFile;
 import com.diluv.api.data.DataProjectFileAvailable;
 import com.diluv.api.data.DataProjectFileInQueue;
@@ -302,6 +302,7 @@ public class GamesAPI {
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
         }
 
+
         if (!Validator.validateProjectFileChangelog(form.changelog)) {
 
             return ErrorMessage.PROJECT_FILE_INVALID_CHANGELOG.respond();
@@ -321,12 +322,27 @@ public class GamesAPI {
         final File tempFile = FileUtil.getTempFile(projectRecord.getId(), fileName);
         final String sha512 = FileUtil.writeFile(form.file, projectTypeRecord.getMaxSize(), tempFile);
 
+        if (tempFile == null) {
+
+            return ErrorMessage.FAILED_TEMP_FILE.respond();
+        }
+
         if (sha512 == null) {
 
             return ErrorMessage.FAILED_SHA512.respond();
         }
 
-        final Long id = DATABASE.fileDAO.insertProjectFile(fileName, tempFile.length(), form.changelog, sha512, projectRecord.getId(), token.getUserId());
+        if (!Validator.validateReleaseType(form.releaseType)) {
+
+            return ErrorMessage.PROJECT_FILE_INVALID_RELEASE_TYPE.respond();
+        }
+
+        if (!Validator.validateClassifier(form.classifier)) {
+
+            return ErrorMessage.PROJECT_FILE_INVALID_CLASSIFIER.respond();
+        }
+
+        final Long id = DATABASE.fileDAO.insertProjectFile(fileName, tempFile.length(), form.changelog, sha512, form.releaseType.toLowerCase(), form.classifier.toLowerCase(), projectRecord.getId(), token.getUserId());
 
         if (id == null) {
 

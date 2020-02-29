@@ -21,7 +21,7 @@ public class DataProjectFileInQueue extends DataProjectFile {
     public DataProjectFileInQueue(ProjectFileRecord record, String gameSlug, String projectTypeSlug, String projectSlug) {
         
         super(record, gameSlug, projectTypeSlug, projectSlug);
-        this.status = record.getStatus().toString();
-        this.lastStatusChanged = record.getStatusChange();
+        this.status = record.getProcessingStatus().toString();
+        this.lastStatusChanged = record.getProcessingStatusChanged();
     }
 }

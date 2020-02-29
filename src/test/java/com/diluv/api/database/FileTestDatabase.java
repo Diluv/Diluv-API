@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.FileDAO;
-import com.diluv.confluencia.database.record.FileStatus;
+import com.diluv.confluencia.database.record.FileProcessingStatus;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 
 public class FileTestDatabase implements FileDAO {
@@ -19,14 +19,14 @@ public class FileTestDatabase implements FileDAO {
     }
     
     @Override
-    public List<ProjectFileRecord> findAllWhereStatusAndLimit (FileStatus status, int amount) {
+    public List<ProjectFileRecord> findAllWhereStatusAndLimit (FileProcessingStatus status, int amount) {
         
         // TODO
         return new ArrayList<>();
     }
     
     @Override
-    public boolean updateStatusById (long id, FileStatus status) throws SQLException {
+    public boolean updateStatusById (long id, FileProcessingStatus status) throws SQLException {
         
         return true;
     }
@@ -67,7 +67,7 @@ public class FileTestDatabase implements FileDAO {
     }
     
     @Override
-    public Long insertProjectFile (String name, long size, String changelog, String sha512, long projectId, long userId) {
+    public Long insertProjectFile (String name, long size, String changelog, String sha512, String releaseType, String classifier, long projectId, long userId) {
         
         return (long) this.projectFileRecords.size();
     }
