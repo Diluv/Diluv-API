@@ -12,8 +12,8 @@ import com.diluv.api.database.GameTestDatabase;
 import com.diluv.api.database.NewsTestDatabase;
 import com.diluv.api.database.ProjectTestDatabase;
 import com.diluv.api.database.UserTestDatabase;
+import com.diluv.api.utils.auth.tokens.APIAccessToken;
 import com.diluv.api.utils.auth.tokens.AccessToken;
-import com.diluv.api.utils.auth.tokens.LongLivedAccessToken;
 import com.diluv.api.utils.auth.tokens.RefreshToken;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.confluencia.database.dao.EmailDAO;
@@ -70,7 +70,7 @@ public class TestUtil {
         calendar.add(Calendar.MONTH, 6);
 
         try {
-            VALID_LONG_LASTING_TOKEN = new LongLivedAccessToken(0, "darkhax", Collections.singletonList(ProjectPermissions.FILE_UPLOAD.getName())).generate(calendar.getTime());
+            VALID_LONG_LASTING_TOKEN = new APIAccessToken(0, "darkhax", "4b3b85e3-f7ac-4c7b-b71a-df972909b213", Collections.singletonList(ProjectPermissions.FILE_UPLOAD.getName())).generate();
         }
         catch (JOSEException e) {
             e.printStackTrace();

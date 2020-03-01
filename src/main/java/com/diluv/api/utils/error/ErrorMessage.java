@@ -49,7 +49,7 @@ public enum ErrorMessage {
     // Project Type Errors
     PROJECT_TYPE_INVALID_SLUG(ErrorType.BAD_REQUEST, "project_type.invalid.slug"),
 
-    FAILED_CREATE_USER_REFRESH(ErrorType.INTERNAL_SERVER_ERROR, "database.create_user_refresh"),
+    FAILED_CREATE_REFRESH_TOKEN(ErrorType.INTERNAL_SERVER_ERROR, "database.create_refresh_token"),
     FAILED_CREATE_TEMP_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.create_temp_user"),
     FAILED_CREATE_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.create_user"),
     FAILED_CREATE_PROJECT(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project"),

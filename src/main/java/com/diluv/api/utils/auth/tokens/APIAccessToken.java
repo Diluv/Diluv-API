@@ -1,29 +1,34 @@
 package com.diluv.api.utils.auth.tokens;
 
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import com.diluv.api.DiluvAPIServer;
+import com.diluv.confluencia.database.dao.APITokenRecord;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
 
-public class LongLivedAccessToken extends Token {
+import static com.diluv.api.Main.DATABASE;
 
-    private static final String SUBJECT = "long_lived";
+public class APIAccessToken extends Token {
+
+    private static final String SUBJECT = "apiToken";
+
+    private final String code;
     private final List<String> permissions;
 
-    public LongLivedAccessToken (long userId, String username, List<String> permissions) {
+    public APIAccessToken (long userId, String username, String code, List<String> permissions) {
 
         super(userId, username);
+        this.code = code;
         this.permissions = permissions;
     }
 
-    public static LongLivedAccessToken getToken (@Nullable String token) {
+    public static APIAccessToken getToken (@Nullable String token) {
 
         JWTClaimsSet claims = Token.getToken(token, SUBJECT);
 
@@ -33,8 +38,14 @@ public class LongLivedAccessToken extends Token {
                 final String audienceId = claims.getAudience().get(0);
                 final long userId = Long.parseLong(audienceId);
                 final String username = claims.getStringClaim("username");
+                final String code = claims.getStringClaim("code");
                 final List<String> permissions = claims.getStringListClaim("permissions");
-                return new LongLivedAccessToken(userId, username, permissions);
+
+                APITokenRecord apiToken = DATABASE.userDAO.findAPITokenByUserIdAndCode(userId, code);
+                if (apiToken == null) {
+                    return null;
+                }
+                return new APIAccessToken(userId, username, code, permissions);
             }
             catch (final ParseException e) {
 
@@ -45,11 +56,17 @@ public class LongLivedAccessToken extends Token {
         return null;
     }
 
-    public String generate (Date time) throws JOSEException {
+    public String generate () throws JOSEException {
 
-        Map<String, Object> data = Collections.singletonMap("permissions", this.permissions);
+        Map<String, Object> data = new HashMap<>();
+        data.put("code", this.code);
+        data.put("permissions", this.permissions);
+        return this.generate(null, SUBJECT, data);
+    }
 
-        return this.generate(time, SUBJECT, data);
+    public String getCode () {
+
+        return this.code;
     }
 
     public List<String> getPermissions () {

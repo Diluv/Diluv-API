@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import com.diluv.api.utils.FileReader;
+import com.diluv.confluencia.database.dao.APITokenRecord;
 import com.diluv.confluencia.database.dao.UserDAO;
 import com.diluv.confluencia.database.record.RefreshTokenRecord;
 import com.diluv.confluencia.database.record.TempUserRecord;
@@ -14,12 +15,14 @@ public class UserTestDatabase implements UserDAO {
     private final List<UserRecord> userList;
     private final List<TempUserRecord> tempUsersList;
     private final List<RefreshTokenRecord> refreshTokens;
-    
+    private final List<APITokenRecord> apiTokens;
+
     public UserTestDatabase() {
         
         this.userList = FileReader.readJsonFolder("users", UserRecord.class);
         this.tempUsersList = FileReader.readJsonFolder("temp_users", TempUserRecord.class);
         this.refreshTokens = FileReader.readJsonFolder("refresh_token", RefreshTokenRecord.class);
+        this.apiTokens = FileReader.readJsonFolder("api_token", APITokenRecord.class);
     }
     
     @Override
@@ -148,6 +151,35 @@ public class UserTestDatabase implements UserDAO {
     @Override
     public boolean deleteRefreshTokenByUserIdAndCode (long userId, String code) {
         
+        return true;
+    }
+
+    @Override
+    public boolean insertAPITokens (long userId, String code, String name) {
+
+        return true;
+    }
+
+    @Override
+    public boolean insertAPITokenPermissions (long userId, String code, List<String> permissions) {
+
+        return true;
+    }
+
+    @Override
+    public APITokenRecord findAPITokenByUserIdAndCode (long userId, String code) {
+
+        for (final APITokenRecord record : this.apiTokens) {
+            if (record.getCode().equalsIgnoreCase(code) && record.getUserId() == userId) {
+                return record;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean deleteAPITokenByUserIdAndCode (long userId, String code) {
+
         return true;
     }
 }

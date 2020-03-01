@@ -3,7 +3,7 @@ package com.diluv.api.utils.auth;
 import javax.ws.rs.ext.ParamConverter;
 
 import com.diluv.api.utils.auth.tokens.AccessToken;
-import com.diluv.api.utils.auth.tokens.LongLivedAccessToken;
+import com.diluv.api.utils.auth.tokens.APIAccessToken;
 import com.diluv.api.utils.auth.tokens.Token;
 
 public class ParamConverterAccessToken implements ParamConverter<Token> {
@@ -19,8 +19,7 @@ public class ParamConverterAccessToken implements ParamConverter<Token> {
 
         AccessToken token = AccessToken.getToken(param);
         if (token != null) return token;
-        LongLivedAccessToken test = LongLivedAccessToken.getToken(param);
-        return test;
+        return APIAccessToken.getToken(param);
     }
 
     @Override

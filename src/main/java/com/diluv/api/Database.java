@@ -18,10 +18,10 @@ public class Database {
 
     public final GameDAO gameDAO;
     public final ProjectDAO projectDAO;
-    public final FileDAO fileDAO ;
-    public final UserDAO userDAO ;
-    public final EmailDAO emailDAO ;
-    public final NewsDAO newsDAO ;
+    public final FileDAO fileDAO;
+    public final UserDAO userDAO;
+    public final EmailDAO emailDAO;
+    public final NewsDAO newsDAO;
 
     public Database () {
 

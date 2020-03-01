@@ -346,7 +346,7 @@ public class AuthAPI {
         refreshTokenExpire.add(Calendar.MONTH, 1);
 
         if (!DATABASE.userDAO.insertRefreshToken(userId, code, new Timestamp(refreshTokenExpire.getTimeInMillis()))) {
-            return ErrorMessage.FAILED_CREATE_USER_REFRESH.respond();
+            return ErrorMessage.FAILED_CREATE_REFRESH_TOKEN.respond();
         }
         final String accessToken = new AccessToken(userId, username).generate(accessTokenExpire.getTime());
         final String refreshToken = new RefreshToken(userId, username, code).generate(refreshTokenExpire.getTime());
