@@ -1,16 +1,13 @@
 package com.diluv.api.endpoints.v1;
 
 import java.io.File;
-import java.util.Calendar;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.diluv.api.utils.TestUtil;
-import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.error.ErrorMessage;
-import com.nimbusds.jose.JOSEException;
 
 import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;

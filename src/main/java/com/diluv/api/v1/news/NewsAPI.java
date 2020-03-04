@@ -7,15 +7,17 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.data.DataNewsPost;
-import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.api.utils.error.ErrorMessage;
-import com.diluv.confluencia.database.record.NewsRecord;
-
 import org.jboss.resteasy.annotations.GZIP;
+
+import com.diluv.api.data.DataNewsPost;
+import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.confluencia.database.record.NewsRecord;
+import com.diluv.confluencia.utils.Pagination;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -26,12 +28,15 @@ public class NewsAPI {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getSelf () {
+    public Response getSelf (@QueryParam("cursor") String queryCursor, @QueryParam("limit") int queryLimit) {
 
-        final List<NewsRecord> newsRecords = DATABASE.newsDAO.findAll();
-        final List<DataNewsPost> newsPosts = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
+        Pagination pagination = Pagination.getPagination(queryCursor);
+        int limit = Pagination.getLimit(queryLimit);
 
-        return ResponseUtil.successResponse(newsPosts);
+        final List<NewsRecord> newsRecords = DATABASE.newsDAO.findAll(pagination, limit + 1);
+        final List<DataNewsPost> newsPosts = newsRecords.stream().limit(limit).map(DataNewsPost::new).collect(Collectors.toList());
+
+        return ResponseUtil.successResponsePagination(newsPosts, newsRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
     }
 
     @GET

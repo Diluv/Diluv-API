@@ -8,21 +8,21 @@ import com.diluv.confluencia.database.dao.EmailDAO;
 import com.diluv.confluencia.database.record.EmailSendRecord;
 
 public class EmailTestDatabase implements EmailDAO {
-    
+
     private final String[] emailRecords;
     private final String[] domainRecords;
     private final List<EmailSendRecord> emailSentRecords;
-    
-    public EmailTestDatabase() {
-        
+
+    public EmailTestDatabase () {
+
         this.emailRecords = FileReader.readJsonFile("email/blacklistEmail", String[].class);
         this.domainRecords = FileReader.readJsonFile("email/blacklistDomain", String[].class);
         this.emailSentRecords = FileReader.readJsonFolder("email_sent", EmailSendRecord.class);
     }
-    
+
     @Override
     public boolean insertDomainBlacklist (String[] domains) {
-        
+
         for (final String domain : domains) {
             for (final String record : this.domainRecords) {
                 if (domain.equalsIgnoreCase(record)) {
@@ -32,16 +32,16 @@ public class EmailTestDatabase implements EmailDAO {
         }
         return true;
     }
-    
+
     @Override
     public boolean existsBlacklist (String email, String domain) {
-        
+
         for (final String record : this.emailRecords) {
             if (email.equalsIgnoreCase(record)) {
                 return true;
             }
         }
-        
+
         for (final String record : this.domainRecords) {
             if (domain.equalsIgnoreCase(record)) {
                 return true;
@@ -49,40 +49,40 @@ public class EmailTestDatabase implements EmailDAO {
         }
         return false;
     }
-    
+
     @Override
     public boolean insertEmailSent (String messageId, String email, String type) {
-        
+
         return true;
     }
-    
+
     @Override
     public boolean existsEmailSent (String messageId) {
-        
+
         for (final EmailSendRecord record : this.emailSentRecords) {
             if (messageId.equalsIgnoreCase(record.getMessageId())) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     @Override
     public EmailSendRecord findEmailSentByEmailAndType (String email, String type) {
-        
+
         for (final EmailSendRecord record : this.emailSentRecords) {
             if (email.equalsIgnoreCase(record.getEmail()) && type.equalsIgnoreCase(record.getType())) {
                 return record;
             }
         }
-        
+
         return null;
     }
-    
+
     @Override
     public List<EmailSendRecord> findEmailSentByEmail (String email) {
-        
+
         return new ArrayList<>();
     }
 }

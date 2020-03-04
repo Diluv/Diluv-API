@@ -9,6 +9,9 @@
                     "$ref": "data/projectTypes.json"
                 }
             ]
+        },
+        "cursor": {
+            "type": "string"
         }
     },
     "required": [

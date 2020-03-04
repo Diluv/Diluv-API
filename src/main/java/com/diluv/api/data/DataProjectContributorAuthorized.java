@@ -15,9 +15,9 @@ public class DataProjectContributorAuthorized extends DataProjectContributor {
      */
     @Expose
     private final List<String> permissions;
-    
+
     public DataProjectContributorAuthorized (ProjectAuthorRecord projectAuthor) {
-        
+
         super(projectAuthor);
         this.permissions = projectAuthor.getPermissions();
     }

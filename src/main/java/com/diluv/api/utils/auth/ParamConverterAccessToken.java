@@ -2,8 +2,8 @@ package com.diluv.api.utils.auth;
 
 import javax.ws.rs.ext.ParamConverter;
 
-import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.auth.tokens.APIAccessToken;
+import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.auth.tokens.Token;
 
 public class ParamConverterAccessToken implements ParamConverter<Token> {

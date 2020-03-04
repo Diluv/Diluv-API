@@ -8,6 +8,7 @@ import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.FileDAO;
 import com.diluv.confluencia.database.record.FileProcessingStatus;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
+import com.diluv.confluencia.utils.Pagination;
 
 public class FileTestDatabase implements FileDAO {
 
@@ -40,7 +41,7 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlug (String gameSlug, String projectTypeSlug, String projectSlug) {
+    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlug (String gameSlug, String projectTypeSlug, String projectSlug, Pagination cursor, int limit) {
 
         // ProjectRecord project =
         // this.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug,
@@ -55,7 +56,7 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized (String gameSlug, String projectTypeSlug, String projectSlug) {
+    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized (String gameSlug, String projectTypeSlug, String projectSlug, Pagination cursor, int limit) {
 
         // TODO
         return this.projectFileRecords;

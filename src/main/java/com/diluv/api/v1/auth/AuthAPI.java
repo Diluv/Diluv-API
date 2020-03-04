@@ -21,17 +21,19 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.data.DataLogin;
-import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
+import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.auth.tokens.RefreshToken;
-import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.email.EmailUtil;
 import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.database.record.EmailSendRecord;
 import com.diluv.confluencia.database.record.RefreshTokenRecord;
 import com.diluv.confluencia.database.record.TempUserRecord;
@@ -40,9 +42,6 @@ import com.nimbusds.jose.JOSEException;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.wildbit.java.postmark.client.data.model.message.MessageResponse;
-
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import static com.diluv.api.Main.DATABASE;
 

@@ -1,9 +1,9 @@
 package com.diluv.api;
 
-import javax.ws.rs.core.Application;
+import java.io.File;
+import java.nio.file.Paths;
 
-import io.undertow.server.handlers.resource.PathResourceManager;
-import io.undertow.server.handlers.resource.ResourceHandler;
+import javax.ws.rs.core.Application;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,18 +12,11 @@ import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 
 import com.diluv.api.v1.APIV1;
-import com.diluv.confluencia.database.dao.EmailDAO;
-import com.diluv.confluencia.database.dao.FileDAO;
-import com.diluv.confluencia.database.dao.GameDAO;
-import com.diluv.confluencia.database.dao.NewsDAO;
-import com.diluv.confluencia.database.dao.ProjectDAO;
-import com.diluv.confluencia.database.dao.UserDAO;
 import io.undertow.Undertow;
+import io.undertow.server.handlers.resource.PathResourceManager;
+import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
-
-import java.io.File;
-import java.nio.file.Paths;
 
 public class DiluvAPIServer {
 

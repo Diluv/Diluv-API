@@ -14,12 +14,14 @@ public class DataProjectContributor extends DataUser {
     @Expose
     private final String role;
 
-    public DataProjectContributor(ProjectAuthorRecord projectAuthor) {
+    public DataProjectContributor (ProjectAuthorRecord projectAuthor) {
+
         super(projectAuthor.getUserId(), projectAuthor.getUsername(), projectAuthor.getCreatedAt());
         this.role = projectAuthor.getRole();
     }
 
-    public DataProjectContributor(long userId, String username, long createdAt, String role) {
+    public DataProjectContributor (long userId, String username, long createdAt, String role) {
+
         super(userId, username, createdAt);
         this.role = role;
     }
