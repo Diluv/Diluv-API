@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.diluv.api.DiluvAPIServer;
-import com.diluv.confluencia.database.dao.APITokenRecord;
+import com.diluv.confluencia.database.record.APITokenRecord;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
 

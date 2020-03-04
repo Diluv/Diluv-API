@@ -27,10 +27,18 @@ public class DataGame {
     @Expose
     private final String url;
 
+
+    /**
+     * A URL that links to the banner of the game.
+     */
+    @Expose
+    private final String bannerURL;
+
     public DataGame (GameRecord rs) {
 
         this.slug = rs.getSlug();
         this.name = rs.getName();
         this.url = rs.getUrl();
+        this.bannerURL = rs.getBannerURL();
     }
 }

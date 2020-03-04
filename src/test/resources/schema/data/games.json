@@ -10,12 +10,16 @@
         },
         "url": {
             "type": "string"
+        },
+        "bannerURL": {
+            "type": "string"
         }
     },
     "required": [
         "name",
         "slug",
-        "url"
+        "url",
+        "bannerURL"
     ],
     "additionalProperties": false
 }

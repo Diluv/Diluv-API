@@ -1,5 +1,6 @@
 {
     "slug": "minecraft",
     "name": "Minecraft",
-    "url": "https://www.minecraft.net"
+    "url": "https://www.minecraft.net",
+    "bannerURL": "https://images.placeholders.dev/?width=1200&height=150"
 }

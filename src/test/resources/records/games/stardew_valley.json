@@ -1,5 +1,6 @@
 {
     "slug": "stardew_valley",
     "name": "Stardew Valley",
-    "url": "https://www.stardewvalley.net/"
+    "url": "https://www.stardewvalley.net/",
+    "bannerURL": "https://images.placeholders.dev/?width=1200&height=150"
 }
