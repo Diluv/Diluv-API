@@ -21,16 +21,22 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
+    public boolean updateStatusById (FileProcessingStatus status, long id) throws SQLException {
+
+        return true;
+    }
+
+    @Override
+    public boolean updateStatusByStatus (FileProcessingStatus set, FileProcessingStatus where) throws SQLException {
+
+        return true;
+    }
+
+    @Override
     public List<ProjectFileRecord> findAllWhereStatusAndLimit (FileProcessingStatus status, int amount) {
 
         // TODO
         return new ArrayList<>();
-    }
-
-    @Override
-    public boolean updateStatusById (long id, FileProcessingStatus status) throws SQLException {
-
-        return true;
     }
 
     @Override
