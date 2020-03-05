@@ -13,6 +13,9 @@
         },
         "bannerURL": {
             "type": "string"
+        },
+        "versions": {
+            "$ref": "game_versions.json"
         }
     },
     "required": [

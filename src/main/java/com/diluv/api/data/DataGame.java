@@ -1,5 +1,8 @@
 package com.diluv.api.data;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.diluv.confluencia.database.record.GameRecord;
 import com.google.gson.annotations.Expose;
 
@@ -34,11 +37,20 @@ public class DataGame {
     @Expose
     private final String bannerURL;
 
+    @Expose
+    private final List<DataGameVersion> versions;
+
     public DataGame (GameRecord rs) {
+
+        this(rs, null);
+    }
+
+    public DataGame (GameRecord rs, List<DataGameVersion> versions) {
 
         this.slug = rs.getSlug();
         this.name = rs.getName();
         this.url = rs.getUrl();
         this.bannerURL = rs.getBannerURL();
+        this.versions = versions;
     }
 }

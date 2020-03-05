@@ -1,5 +1,7 @@
 package com.diluv.api.data;
 
+import java.util.List;
+
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.google.gson.annotations.Expose;
 
@@ -32,11 +34,25 @@ public class DataProjectType {
     @Expose
     private final long maxSize;
 
+    @Expose
+    private final List<DataCategory> categories;
+
+    @Expose
+    private final List<DataModLoader> modloaders;
+
     public DataProjectType (ProjectTypeRecord rs) {
+
+        this(rs, null, null);
+    }
+
+    public DataProjectType (ProjectTypeRecord rs, List<DataCategory> categories, List<DataModLoader> modloaders) {
 
         this.name = rs.getName();
         this.slug = rs.getSlug();
         this.gameSlug = rs.getGameSlug();
         this.maxSize = rs.getMaxSize();
+
+        this.categories = categories;
+        this.modloaders = modloaders;
     }
 }

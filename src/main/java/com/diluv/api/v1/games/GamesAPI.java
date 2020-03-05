@@ -20,15 +20,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
-import com.diluv.api.data.DataGame;
-import com.diluv.api.data.DataProject;
-import com.diluv.api.data.DataProjectAuthorized;
-import com.diluv.api.data.DataProjectContributor;
-import com.diluv.api.data.DataProjectContributorAuthorized;
-import com.diluv.api.data.DataProjectFile;
-import com.diluv.api.data.DataProjectFileAvailable;
-import com.diluv.api.data.DataProjectFileInQueue;
-import com.diluv.api.data.DataProjectType;
+import com.diluv.api.data.*;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.ImageUtil;
@@ -37,7 +29,10 @@ import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.GameRecord;
+import com.diluv.confluencia.database.record.GameVersionRecord;
+import com.diluv.confluencia.database.record.ModLoaderRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
@@ -76,7 +71,10 @@ public class GamesAPI {
 
             return ErrorMessage.NOT_FOUND_GAME.respond();
         }
-        return ResponseUtil.successResponse(new DataGame(gameRecord));
+
+        final List<GameVersionRecord> gameVersionRecords = DATABASE.gameDAO.findAllGameVersionsByGameSlug(gameSlug);
+        List<DataGameVersion> versions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
+        return ResponseUtil.successResponse(new DataGame(gameRecord, versions));
     }
 
     @GET
@@ -114,7 +112,13 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
         }
 
-        return ResponseUtil.successResponse(new DataProjectType(projectTypesRecords));
+        final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
+
+        final List<ModLoaderRecord> modloadersRecords = DATABASE.projectDAO.findAllModLoadersByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        List<DataModLoader> modloaders = modloadersRecords.stream().map(DataModLoader::new).collect(Collectors.toList());
+
+        return ResponseUtil.successResponse(new DataProjectType(projectTypesRecords, categories, modloaders));
     }
 
     @GET
@@ -209,11 +213,11 @@ public class GamesAPI {
         else {
             projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug, pagination, limit + 1);
         }
-        final List<DataProjectFile> projects = projectFileRecords.stream().limit(limit).map(record -> record.isReleased() ?
+        final List<DataProjectFile> projectFiles = projectFileRecords.stream().limit(limit).map(record -> record.isReleased() ?
             new DataProjectFileAvailable(record, gameSlug, projectTypeSlug, projectSlug) :
             new DataProjectFileInQueue(record, gameSlug, projectTypeSlug, projectSlug))
             .collect(Collectors.toList());
-        return ResponseUtil.successResponsePagination(projects, projectFileRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
+        return ResponseUtil.successResponsePagination(projectFiles, projectFileRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
     }
 
     @POST

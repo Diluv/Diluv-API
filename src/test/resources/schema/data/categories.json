@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "array",
+    "items": [
+        {
+            "type": "object",
+            "properties": {
+                "slug": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "iconURL": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "slug",
+                "name",
+                "iconURL"
+            ],
+            "additionalProperties": false
+        }
+    ]
+}

@@ -1,0 +1,8 @@
+{
+    "id": 1,
+    "slug": "tech",
+    "name": "Tech",
+    "iconURL": "https://images.placeholders.dev/?width=150&height=150",
+    "projectTypeSlug": "mods",
+    "gameSlug": "minecraft"
+}
