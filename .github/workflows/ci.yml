@@ -39,7 +39,7 @@ jobs:
           openssl rsa -inform PEM -in rsa.private -pubout > public.pem
 
       - name: Testing Building
-        run: ./gradlew :test
+        run: ./gradlew test
 
       - name: Build and deploy with Jib
         run: ./gradlew jib
