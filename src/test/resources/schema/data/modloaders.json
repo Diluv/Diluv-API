@@ -14,5 +14,6 @@
             ],
             "additionalProperties": false
         }
-    ]
+    ],
+    "additionalProperties": false
 }
