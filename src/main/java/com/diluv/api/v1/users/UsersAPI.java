@@ -24,6 +24,8 @@ import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.UserRecord;
 import com.diluv.confluencia.utils.Pagination;
 
+import org.jboss.resteasy.annotations.cache.Cache;
+
 import static com.diluv.api.Main.DATABASE;
 
 @GZIP
@@ -58,6 +60,7 @@ public class UsersAPI {
         return ResponseUtil.successResponse(new DataAuthorizedUser(userRecord));
     }
 
+    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{username}")
     @Produces(MediaType.APPLICATION_JSON)

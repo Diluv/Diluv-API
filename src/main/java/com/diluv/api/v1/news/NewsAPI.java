@@ -19,12 +19,15 @@ import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.database.record.NewsRecord;
 import com.diluv.confluencia.utils.Pagination;
 
+import org.jboss.resteasy.annotations.cache.Cache;
+
 import static com.diluv.api.Main.DATABASE;
 
 @GZIP
 @Path("/news")
 public class NewsAPI {
 
+    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
@@ -39,6 +42,7 @@ public class NewsAPI {
         return ResponseUtil.successResponsePagination(newsPosts, newsRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
     }
 
+    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{slug}")
     @Produces(MediaType.APPLICATION_JSON)

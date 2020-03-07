@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.cache.Cache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import com.diluv.api.data.*;
@@ -48,6 +49,7 @@ public class GamesAPI {
 
     private final Slugify slugify = new Slugify();
 
+    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
@@ -61,6 +63,7 @@ public class GamesAPI {
         return ResponseUtil.successResponsePagination(games, gameRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
     }
 
+    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -77,6 +80,7 @@ public class GamesAPI {
         return ResponseUtil.successResponse(new DataGame(gameRecord, versions));
     }
 
+    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/types")
     @Produces(MediaType.APPLICATION_JSON)
@@ -95,6 +99,7 @@ public class GamesAPI {
         return ResponseUtil.successResponsePagination(projectTypes, projectTypesRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
     }
 
+    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -148,6 +153,7 @@ public class GamesAPI {
         return ResponseUtil.successResponsePagination(projects, projectRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
     }
 
+    @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -183,6 +189,7 @@ public class GamesAPI {
         return ResponseUtil.successResponse(new DataProject(projectRecord, projectAuthors));
     }
 
+    @Cache(maxAge = 60, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
     @Produces(MediaType.APPLICATION_JSON)
