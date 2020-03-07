@@ -5,15 +5,22 @@ import com.google.gson.annotations.Expose;
 
 public class DataGameVersion {
 
+    //TODO
     @Expose
     private final String version;
 
+    //TODO
     @Expose
-    private final String changelogURL;
+    private final String type;
+
+    //TODO
+    @Expose
+    private final long released;
 
     public DataGameVersion (GameVersionRecord rs) {
 
         this.version = rs.getVersion();
-        this.changelogURL = rs.getChangelogURL();
+        this.type = rs.getType();
+        this.released = rs.getReleased();
     }
 }

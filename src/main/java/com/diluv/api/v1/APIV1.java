@@ -31,7 +31,6 @@ public class APIV1 extends Application {
         // Enables gzip
         classes.add(GZIPEncodingInterceptor.class);
 
-
         classes.add(AuthAPI.class);
         classes.add(GamesAPI.class);
         classes.add(UsersAPI.class);
