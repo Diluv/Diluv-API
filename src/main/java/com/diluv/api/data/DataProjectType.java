@@ -37,15 +37,12 @@ public class DataProjectType {
     @Expose
     private final List<DataCategory> categories;
 
-    @Expose
-    private final List<DataModLoader> modloaders;
-
     public DataProjectType (ProjectTypeRecord rs) {
 
-        this(rs, null, null);
+        this(rs, null);
     }
 
-    public DataProjectType (ProjectTypeRecord rs, List<DataCategory> categories, List<DataModLoader> modloaders) {
+    public DataProjectType (ProjectTypeRecord rs, List<DataCategory> categories) {
 
         this.name = rs.getName();
         this.slug = rs.getSlug();
@@ -53,6 +50,5 @@ public class DataProjectType {
         this.maxSize = rs.getMaxSize();
 
         this.categories = categories;
-        this.modloaders = modloaders;
     }
 }

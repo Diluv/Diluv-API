@@ -16,9 +16,6 @@
         },
         "categories": {
             "$ref": "categories.json"
-        },
-        "modloaders": {
-            "$ref": "modloaders.json"
         }
     },
     "required": [

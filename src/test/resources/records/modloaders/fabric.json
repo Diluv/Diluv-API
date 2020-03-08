@@ -1,6 +1,6 @@
 {
     "id": 1,
     "name": "Fabric",
-    "projectTypeSlug": "mods",
+    "projectTypeSlug": "forge-mods",
     "gameSlug": "minecraft"
 }

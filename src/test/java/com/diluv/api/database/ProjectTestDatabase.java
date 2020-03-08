@@ -9,7 +9,6 @@ import com.diluv.api.utils.FileReader;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.confluencia.database.dao.ProjectDAO;
 import com.diluv.confluencia.database.record.CategoryRecord;
-import com.diluv.confluencia.database.record.ModLoaderRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
@@ -21,14 +20,12 @@ public class ProjectTestDatabase implements ProjectDAO {
     private final List<ProjectRecord> projectRecords;
     private final List<ProjectTypeRecord> projectTypeRecords;
     private final List<CategoryRecord> categories;
-    private final List<ModLoaderRecord> modloaders;
 
     public ProjectTestDatabase () {
 
         this.projectRecords = FileReader.readJsonFolder("projects", ProjectRecord.class);
         this.projectTypeRecords = FileReader.readJsonFolder("project_types", ProjectTypeRecord.class);
         this.categories = FileReader.readJsonFolder("categories", CategoryRecord.class);
-        this.modloaders = FileReader.readJsonFolder("modloaders", ModLoaderRecord.class);
     }
 
     @Override
@@ -98,11 +95,5 @@ public class ProjectTestDatabase implements ProjectDAO {
     public List<CategoryRecord> findAllCategoriesByGameSlugAndProjectTypeSlug (String gameSlug, String projectTypeSlug) {
 
         return this.categories.stream().filter(record -> record.getGameSlug().equalsIgnoreCase(gameSlug) && record.getProjectTypeSlug().equalsIgnoreCase(projectTypeSlug)).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ModLoaderRecord> findAllModLoadersByGameSlugAndProjectTypeSlug (String gameSlug, String projectTypeSlug) {
-
-        return this.modloaders.stream().filter(record -> record.getGameSlug().equalsIgnoreCase(gameSlug) && record.getProjectTypeSlug().equalsIgnoreCase(projectTypeSlug)).collect(Collectors.toList());
     }
 }

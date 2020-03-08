@@ -1,6 +1,6 @@
 {
-    "slug": "mods",
-    "name": "Mods",
+    "slug": "forge-mods",
+    "name": "Forge Mods",
     "gameSlug": "minecraft",
     "maxSize": 10000000
 }

@@ -33,7 +33,6 @@ import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
-import com.diluv.confluencia.database.record.ModLoaderRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
@@ -120,10 +119,7 @@ public class GamesAPI {
         final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
         List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
 
-        final List<ModLoaderRecord> modloadersRecords = DATABASE.projectDAO.findAllModLoadersByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
-        List<DataModLoader> modloaders = modloadersRecords.stream().map(DataModLoader::new).collect(Collectors.toList());
-
-        return ResponseUtil.successResponse(new DataProjectType(projectTypesRecords, categories, modloaders));
+        return ResponseUtil.successResponse(new DataProjectType(projectTypesRecords, categories));
     }
 
     @GET
