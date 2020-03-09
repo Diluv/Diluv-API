@@ -28,7 +28,7 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public boolean updateStatusByStatus (FileProcessingStatus set, FileProcessingStatus where) throws SQLException {
+    public boolean updateStatusByStatus (FileProcessingStatus set, FileProcessingStatus where) {
 
         return true;
     }
