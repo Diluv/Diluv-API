@@ -1,5 +1,7 @@
 package com.diluv.api.data;
 
+import java.util.List;
+
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.google.gson.annotations.Expose;
 
@@ -18,9 +20,9 @@ public class DataProjectFileInQueue extends DataProjectFile {
     @Expose
     private final long lastStatusChanged;
 
-    public DataProjectFileInQueue (ProjectFileRecord record, String gameSlug, String projectTypeSlug, String projectSlug) {
+    public DataProjectFileInQueue (ProjectFileRecord record, List<DataGameVersion> gameVersions, String gameSlug, String projectTypeSlug, String projectSlug) {
 
-        super(record, gameSlug, projectTypeSlug, projectSlug);
+        super(record, gameVersions, gameSlug, projectTypeSlug, projectSlug);
         this.status = record.getProcessingStatus().toString();
         this.lastStatusChanged = record.getProcessingStatusChanged();
     }

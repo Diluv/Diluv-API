@@ -7,6 +7,7 @@ import java.util.List;
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.FileDAO;
 import com.diluv.confluencia.database.record.FileProcessingStatus;
+import com.diluv.confluencia.database.record.GameVersionRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.diluv.confluencia.utils.Pagination;
 
@@ -72,6 +73,12 @@ public class FileTestDatabase implements FileDAO {
     public boolean insertProjectFileAntivirus (long projectId, String malware) {
 
         return true;
+    }
+
+    @Override
+    public List<GameVersionRecord> findAllGameVersionsByProjectFile (long projectFileId) {
+
+        return new ArrayList<>();
     }
 
     @Override

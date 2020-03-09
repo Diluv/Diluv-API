@@ -13,18 +13,19 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataAuthorizedUser;
+import com.diluv.api.data.DataCategory;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.UserRecord;
 import com.diluv.confluencia.utils.Pagination;
-
-import org.jboss.resteasy.annotations.cache.Cache;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -107,7 +108,12 @@ public class UsersAPI {
             projectRecords = DATABASE.projectDAO.findAllByUsername(username, pagination, limit + 1);
         }
 
-        final List<DataProject> projects = projectRecords.stream().limit(limit).map(DataProject::new).collect(Collectors.toList());
+        final List<DataProject> projects = projectRecords.stream().limit(limit).map(projectRecord -> {
+            final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
+            List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
+            return new DataProject(projectRecord, categories);
+        }).collect(Collectors.toList());
+
         return ResponseUtil.successResponsePagination(projects, projectRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
     }
 }

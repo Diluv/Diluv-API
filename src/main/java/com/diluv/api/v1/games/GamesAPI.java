@@ -145,7 +145,12 @@ public class GamesAPI {
             }
         }
 
-        final List<DataProject> projects = projectRecords.stream().limit(limit).map(DataProject::new).collect(Collectors.toList());
+
+        final List<DataProject> projects = projectRecords.stream().limit(limit).map(projectRecord -> {
+            final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
+            List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
+            return new DataProject(projectRecord, categories);
+        }).collect(Collectors.toList());
         return ResponseUtil.successResponsePagination(projects, projectRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
     }
 
@@ -172,17 +177,20 @@ public class GamesAPI {
 
         final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
 
+        final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
+        List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
+
         if (token != null) {
             List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(projectRecord, token, records);
 
             if (permissions != null) {
                 final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributorAuthorized::new).collect(Collectors.toList());
-                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, projectAuthors, permissions));
+                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, categories, projectAuthors, permissions));
             }
         }
 
         final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributor::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataProject(projectRecord, projectAuthors));
+        return ResponseUtil.successResponse(new DataProject(projectRecord, categories, projectAuthors));
     }
 
     @Cache(maxAge = 60, mustRevalidate = true)
@@ -216,10 +224,15 @@ public class GamesAPI {
         else {
             projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug, pagination, limit + 1);
         }
-        final List<DataProjectFile> projectFiles = projectFileRecords.stream().limit(limit).map(record -> record.isReleased() ?
-            new DataProjectFileAvailable(record, gameSlug, projectTypeSlug, projectSlug) :
-            new DataProjectFileInQueue(record, gameSlug, projectTypeSlug, projectSlug))
-            .collect(Collectors.toList());
+
+        final List<DataProjectFile> projectFiles = projectFileRecords.stream().limit(limit).map(record -> {
+            final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsByProjectFile(projectRecord.getId());
+            List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
+
+            return record.isReleased() ?
+                new DataProjectFileAvailable(record, gameVersions, gameSlug, projectTypeSlug, projectSlug) :
+                new DataProjectFileInQueue(record, gameVersions, gameSlug, projectTypeSlug, projectSlug);
+        }).collect(Collectors.toList());
         return ResponseUtil.successResponsePagination(projectFiles, projectFileRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
     }
 
@@ -281,7 +294,10 @@ public class GamesAPI {
         if (!ImageUtil.saveImage(image, file)) {
             return ErrorMessage.ERROR_SAVING_IMAGE.respond();
         }
-        return ResponseUtil.successResponse(new DataProject(projectRecord));
+
+        final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
+        List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
+        return ResponseUtil.successResponse(new DataProject(projectRecord, categories));
     }
 
     @POST
@@ -375,6 +391,9 @@ public class GamesAPI {
 
         final ProjectFileRecord record = DATABASE.fileDAO.findOneProjectFileQueueByFileId(id);
 
-        return ResponseUtil.successResponse(new DataProjectFileInQueue(record, gameSlug, projectTypeSlug, projectSlug));
+        final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsByProjectFile(record.getId());
+        List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
+
+        return ResponseUtil.successResponse(new DataProjectFileInQueue(record, gameVersions, gameSlug, projectTypeSlug, projectSlug));
     }
 }

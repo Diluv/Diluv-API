@@ -20,6 +20,9 @@
         "createdAt": {
             "type": "number"
         },
+        "gameVersions": {
+            "$ref": "game_versions.json"
+        },
         "gameSlug": {
             "type": "string"
         },

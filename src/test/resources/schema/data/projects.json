@@ -28,6 +28,9 @@
         },
         "contributors": {
             "$ref": "contributors.json"
+        },
+        "categories": {
+            "$ref": "categories.json"
         }
     },
     "required": [
