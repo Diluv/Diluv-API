@@ -3,6 +3,6 @@
     "slug": "tech",
     "name": "Tech",
     "iconURL": "https://images.placeholders.dev/?width=150&height=150",
-    "projectTypeSlug": "forge-mods",
+    "projectTypeSlug": "mods",
     "gameSlug": "minecraft"
 }
