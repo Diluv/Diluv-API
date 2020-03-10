@@ -32,10 +32,13 @@ public class DataProjectType {
      * The default max byte size for files of this type.
      */
     @Expose
-    private final long maxSize;
+    private final long maxFileSize;
 
     @Expose
     private final List<DataCategory> categories;
+
+    @Expose
+    private final long projectCount;
 
     public DataProjectType (ProjectTypeRecord rs) {
 
@@ -47,7 +50,8 @@ public class DataProjectType {
         this.name = rs.getName();
         this.slug = rs.getSlug();
         this.gameSlug = rs.getGameSlug();
-        this.maxSize = rs.getMaxSize();
+        this.maxFileSize = rs.getMaxFileSize();
+        this.projectCount = rs.getProjectCount();
 
         this.categories = categories;
     }

@@ -349,7 +349,7 @@ public class GamesAPI {
 
         final String fileName = FilenameUtils.getName(form.fileName);
         final File tempFile = FileUtil.getTempFile(projectRecord.getId(), fileName);
-        final String sha512 = FileUtil.writeFile(form.file, projectTypeRecord.getMaxSize(), tempFile);
+        final String sha512 = FileUtil.writeFile(form.file, projectTypeRecord.getMaxFileSize(), tempFile);
 
         if (tempFile == null) {
 
