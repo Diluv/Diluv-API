@@ -2,5 +2,5 @@
     "slug": "mods",
     "name": "Mods",
     "gameSlug": "minecraft",
-    "maxSize": 10000000
+    "maxFileSize": 10000000
 }

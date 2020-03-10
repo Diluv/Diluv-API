@@ -11,7 +11,10 @@
         "gameSlug": {
             "type": "string"
         },
-        "maxSize": {
+        "maxFileSize": {
+            "type": "number"
+        },
+        "projectCount": {
             "type": "number"
         },
         "categories": {
@@ -22,7 +25,8 @@
         "name",
         "slug",
         "gameSlug",
-        "maxSize"
+        "maxFileSize",
+        "projectCount"
     ],
     "additionalProperties": false
 }
