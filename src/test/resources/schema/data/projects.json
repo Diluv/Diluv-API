@@ -37,7 +37,6 @@
         "name",
         "slug",
         "summary",
-        "description",
         "downloads",
         "createdAt",
         "updatedAt",

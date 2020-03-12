@@ -1,6 +1,7 @@
 {
     "id": 0,
     "username": "darkhax",
+    "displayName": "Darkhax",
     "email": "darkhax@example.com",
     "password": "$2y$12$EOekQxPF3shOaXb2a2S3rusom7V6KTkMX8/gDHbXovHwKaOC4EBPu",
     "passwordType": "bcrypt",

@@ -16,13 +16,13 @@ public class DataProjectContributor extends DataUser {
 
     public DataProjectContributor (ProjectAuthorRecord projectAuthor) {
 
-        super(projectAuthor.getUserId(), projectAuthor.getUsername(), projectAuthor.getCreatedAt());
+        super(projectAuthor.getUserId(), projectAuthor.getUsername(), projectAuthor.getDisplayName(), projectAuthor.getCreatedAt());
         this.role = projectAuthor.getRole();
     }
 
-    public DataProjectContributor (long userId, String username, long createdAt, String role) {
+    public DataProjectContributor (long userId, String username, String displayName, long createdAt, String role) {
 
-        super(userId, username, createdAt);
+        super(userId, username, displayName, createdAt);
         this.role = role;
     }
 }

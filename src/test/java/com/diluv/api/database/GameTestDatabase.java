@@ -19,7 +19,7 @@ public class GameTestDatabase implements GameDAO {
     }
 
     @Override
-    public List<GameRecord> findAll (Pagination cursor, int limit) {
+    public List<GameRecord> findAll () {
 
         return this.gameRecords;
     }

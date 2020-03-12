@@ -11,6 +11,9 @@
                 "username": {
                     "type": "string"
                 },
+                "displayName": {
+                    "type": "string"
+                },
                 "avatarURL": {
                     "type": "string"
                 },
@@ -24,6 +27,7 @@
             "required": [
                 "userId",
                 "username",
+                "displayName",
                 "avatarURL",
                 "createdAt",
                 "role"

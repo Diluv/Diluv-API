@@ -81,7 +81,7 @@ public class DataBaseProject {
         this.createdAt = projectRecord.getCreatedAt();
         this.updatedAt = projectRecord.getUpdatedAt();
         this.categories = categories;
-        this.contributors.add(new DataProjectContributor(projectRecord.getUserId(), projectRecord.getUsername(), projectRecord.getUserCreatedAt(), "owner"));
+        this.contributors.add(new DataProjectContributor(projectRecord.getUserId(), projectRecord.getUsername(), projectRecord.getUserDisplayName(), projectRecord.getUserCreatedAt(), "owner"));
         if (projectAuthorRecords != null) {
             this.contributors.addAll(projectAuthorRecords);
         }

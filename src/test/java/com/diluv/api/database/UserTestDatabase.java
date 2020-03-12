@@ -62,7 +62,7 @@ public class UserTestDatabase implements UserDAO {
     }
 
     @Override
-    public boolean insertUser (String email, String username, String password, String passwordType, Timestamp timestamp) {
+    public boolean insertUser (String email, String username, String displayName, String password, String passwordType, Timestamp timestamp) {
 
         return true;
     }

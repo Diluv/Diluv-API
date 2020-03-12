@@ -220,7 +220,7 @@ public class AuthAPI {
             return ErrorMessage.ERROR_SAVING_IMAGE.respond();
         }
 
-        if (!DATABASE.userDAO.insertUser(record.getEmail(), record.getUsername(), record.getPassword(), record.getPasswordType(), new Timestamp(record.getCreatedAt()))) {
+        if (!DATABASE.userDAO.insertUser(record.getEmail(), record.getUsername(), record.getUsername(), record.getPassword(), record.getPasswordType(), new Timestamp(record.getCreatedAt()))) {
             return ErrorMessage.FAILED_CREATE_USER.respond();
         }
 

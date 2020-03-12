@@ -5,6 +5,9 @@
         "userId": {
             "type": "number"
         },
+        "displayName": {
+            "type": "string"
+        },
         "username": {
             "type": "string"
         },
@@ -24,6 +27,7 @@
     "required": [
         "userId",
         "username",
+        "displayName",
         "avatarURL",
         "createdAt"
     ],
