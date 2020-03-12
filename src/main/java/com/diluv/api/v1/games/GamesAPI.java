@@ -52,14 +52,11 @@ public class GamesAPI {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getGames (@QueryParam("cursor") String queryCursor, @QueryParam("limit") int queryLimit) {
+    public Response getGames () {
 
-        Pagination pagination = Pagination.getPagination(queryCursor);
-        int limit = Pagination.getLimit(queryLimit);
-
-        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(pagination, limit + 1);
-        final List<DataGame> games = gameRecords.stream().limit(limit).map(DataGame::new).collect(Collectors.toList());
-        return ResponseUtil.successResponsePagination(games, gameRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
+        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll();
+        final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
+        return ResponseUtil.successResponse(games);
     }
 
     @Cache(maxAge = 300, mustRevalidate = true)
