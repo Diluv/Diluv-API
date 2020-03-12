@@ -11,6 +11,7 @@ import org.jboss.resteasy.plugins.interceptors.GZIPEncodingInterceptor;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.GsonProvider;
 import com.diluv.api.v1.auth.AuthAPI;
+import com.diluv.api.v1.featured.FeaturedAPI;
 import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.api.v1.news.NewsAPI;
 import com.diluv.api.v1.users.UsersAPI;
@@ -32,9 +33,10 @@ public class APIV1 extends Application {
         classes.add(GZIPEncodingInterceptor.class);
 
         classes.add(AuthAPI.class);
+        classes.add(FeaturedAPI.class);
         classes.add(GamesAPI.class);
-        classes.add(UsersAPI.class);
         classes.add(NewsAPI.class);
+        classes.add(UsersAPI.class);
 
         return classes;
     }

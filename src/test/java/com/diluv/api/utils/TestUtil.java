@@ -83,15 +83,9 @@ public class TestUtil {
             Main.DATABASE = new Database(GAME_DAO, PROJECT_DAO, FILE_DAO, USER_DAO, EMAIL_DAO, NEWS_DAO);
             DiluvAPIServer server = new DiluvAPIServer();
             server.start(IP, PORT);
-//        TestUtil.server.start();
 
             RestAssured.port = PORT;
             running = true;
         }
-    }
-
-    public static void stop () {
-
-//        TestUtil.server.stop();
     }
 }

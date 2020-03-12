@@ -1,8 +1,8 @@
-INSERT INTO users(id, username, email, password, password_type, mfa, mfa_secret, created_at)
-VALUES (1, 'Darkhax', 'darkhax@diluv.com', '$2y$12$vK.BgcSPXMR8Xj6VJt0Z1Op8ijdicHj6sOpp.iAenna6p7RBDr01m', 'bcrypt',
-        FALSE, NULL, NOW()),
-       (2, 'Jaredlll08', 'jaredlll08@diluv.com', '$2y$12$vK.BgcSPXMR8Xj6VJt0Z1Op8ijdicHj6sOpp.iAenna6p7RBDr01m', 'bcrypt',
-        FALSE, NULL, NOW());
+INSERT INTO users(id, username, display_name, email, password, password_type, mfa, mfa_secret, created_at)
+VALUES (1, 'darkhax', 'Darkhax', 'darkhax@diluv.com', '$2y$12$vK.BgcSPXMR8Xj6VJt0Z1Op8ijdicHj6sOpp.iAenna6p7RBDr01m',
+        'bcrypt', FALSE, NULL, NOW()),
+       (2, 'jaredlll08', 'Jaredlll08', 'jaredlll08@diluv.com',
+        '$2y$12$vK.BgcSPXMR8Xj6VJt0Z1Op8ijdicHj6sOpp.iAenna6p7RBDr01m', 'bcrypt', FALSE, NULL, NOW());
 
 INSERT INTO projects(name, slug, summary, description, cached_downloads, review, released, created_at, updated_at,
                      user_id, game_slug, project_type_slug)
@@ -439,3 +439,12 @@ VALUES (94, 1, 'Coauthor'),
        (48, 2, 'Coauthor'),
        (60, 2, 'Coauthor'),
        (6, 2, 'Coauthor');
+
+
+INSERT INTO featured_games(slug)
+VALUES ('minecraft');
+
+INSERT INTO featured_projects(project_id)
+VALUES (1),
+       (2),
+       (99);

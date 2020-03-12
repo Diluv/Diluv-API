@@ -2,7 +2,6 @@ package com.diluv.api.endpoints.v1;
 
 import java.io.File;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -22,12 +21,6 @@ public class ProjectTest {
     public static void setup () {
 
         TestUtil.start();
-    }
-
-    @AfterAll
-    public static void stop () {
-
-        TestUtil.stop();
     }
 
     @Test

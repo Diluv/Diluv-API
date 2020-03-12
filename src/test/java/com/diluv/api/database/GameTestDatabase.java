@@ -1,5 +1,6 @@
 package com.diluv.api.database;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -7,7 +8,6 @@ import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.GameDAO;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
-import com.diluv.confluencia.utils.Pagination;
 
 public class GameTestDatabase implements GameDAO {
 
@@ -39,5 +39,11 @@ public class GameTestDatabase implements GameDAO {
             }
         }
         return null;
+    }
+
+    @Override
+    public List<GameRecord> findFeaturedGames () {
+
+        return Collections.singletonList(this.gameRecords.get((int) (Math.random() * this.gameRecords.size())));
     }
 }

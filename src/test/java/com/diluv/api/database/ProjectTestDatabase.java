@@ -1,6 +1,7 @@
 package com.diluv.api.database;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,12 @@ public class ProjectTestDatabase implements ProjectDAO {
     public List<ProjectRecord> findAllProjectsByGameSlugAndProjectType (String gameSlug, String projectTypeSlug, Pagination cursor, int limit) {
 
         return this.projectRecords.stream().filter(projectRecord -> projectRecord.getGameSlug().equals(gameSlug) && projectRecord.getProjectTypeSlug().equals(projectTypeSlug)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProjectRecord> findFeaturedProjects () {
+
+        return Collections.singletonList(this.projectRecords.get((int) (Math.random() * this.projectRecords.size())));
     }
 
     @Override
