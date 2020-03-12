@@ -142,12 +142,12 @@ public class GamesAPI {
             }
         }
 
-
-        final List<DataProject> projects = projectRecords.stream().limit(limit).map(projectRecord -> {
+        final List<DataBaseProject> projects = projectRecords.stream().limit(limit).map(projectRecord -> {
             final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
             List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
-            return new DataProject(projectRecord, categories);
+            return new DataBaseProject(projectRecord, categories);
         }).collect(Collectors.toList());
+
         return ResponseUtil.successResponsePagination(projects, projectRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
     }
 
