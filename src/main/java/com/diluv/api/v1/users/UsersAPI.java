@@ -12,6 +12,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.utils.Pagination;
+
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 
@@ -25,7 +27,6 @@ import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.UserRecord;
-import com.diluv.confluencia.utils.Pagination;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -90,30 +91,30 @@ public class UsersAPI {
     @GET
     @Path("/{username}/projects")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @QueryParam("cursor") String queryCursor, @QueryParam("limit") Integer queryLimit) {
+    public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit) {
 
         final AccessToken token = AccessToken.getToken(auth);
-        Pagination pagination = Pagination.getPagination(queryCursor);
+        long page = Pagination.getPage(queryPage);
         int limit = Pagination.getLimit(queryLimit);
 
         List<ProjectRecord> projectRecords;
 
         if (token != null && token.getUsername().equalsIgnoreCase(username)) {
 
-            projectRecords = DATABASE.projectDAO.findAllByUsernameWhereAuthorized(username, pagination, limit + 1);
+            projectRecords = DATABASE.projectDAO.findAllByUsernameWhereAuthorized(username, page, limit);
         }
 
         else {
 
-            projectRecords = DATABASE.projectDAO.findAllByUsername(username, pagination, limit + 1);
+            projectRecords = DATABASE.projectDAO.findAllByUsername(username, page, limit );
         }
 
-        final List<DataProject> projects = projectRecords.stream().limit(limit).map(projectRecord -> {
+        final List<DataProject> projects = projectRecords.stream().map(projectRecord -> {
             final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
             List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
             return new DataProject(projectRecord, categories);
         }).collect(Collectors.toList());
 
-        return ResponseUtil.successResponsePagination(projects, projectRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
+        return ResponseUtil.successResponse(projects);
     }
 }

@@ -11,13 +11,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.utils.Pagination;
+
 import org.jboss.resteasy.annotations.GZIP;
 
 import com.diluv.api.data.DataNewsPost;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.database.record.NewsRecord;
-import com.diluv.confluencia.utils.Pagination;
 
 import org.jboss.resteasy.annotations.cache.Cache;
 
@@ -31,22 +32,22 @@ public class NewsAPI {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getSelf (@QueryParam("cursor") String queryCursor, @QueryParam("limit") int queryLimit) {
+    public Response getNews (@QueryParam("page") Long queryPage, @QueryParam("limit") int queryLimit) {
 
-        Pagination pagination = Pagination.getPagination(queryCursor);
+        long page = Pagination.getPage(queryPage);
         int limit = Pagination.getLimit(queryLimit);
 
-        final List<NewsRecord> newsRecords = DATABASE.newsDAO.findAll(pagination, limit + 1);
-        final List<DataNewsPost> newsPosts = newsRecords.stream().limit(limit).map(DataNewsPost::new).collect(Collectors.toList());
+        final List<NewsRecord> newsRecords = DATABASE.newsDAO.findAll(page, limit);
+        final List<DataNewsPost> newsPosts = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
 
-        return ResponseUtil.successResponsePagination(newsPosts, newsRecords.size() > limit ? new Pagination(limit + pagination.offset).getCursor() : null);
+        return ResponseUtil.successResponse(newsPosts);
     }
 
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{slug}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUser (@PathParam("slug") String slug) {
+    public Response getNewsBySlug (@PathParam("slug") String slug) {
 
         final NewsRecord newsRecord = DATABASE.newsDAO.findOneByNewsSlug(slug);
 

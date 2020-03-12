@@ -13,7 +13,6 @@ import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.record.UserRecord;
-import com.diluv.confluencia.utils.Pagination;
 
 public class ProjectTestDatabase implements ProjectDAO {
 
@@ -29,7 +28,7 @@ public class ProjectTestDatabase implements ProjectDAO {
     }
 
     @Override
-    public List<ProjectRecord> findAllByUsername (String username, Pagination cursor, int limit) {
+    public List<ProjectRecord> findAllByUsername (String username, long page, int limit) {
 
         final UserRecord user = TestUtil.USER_DAO.findOneByUsername(username);
         if (user == null) {
@@ -39,7 +38,7 @@ public class ProjectTestDatabase implements ProjectDAO {
     }
 
     @Override
-    public List<ProjectRecord> findAllByUsernameWhereAuthorized (String username, Pagination cursor, int limit) {
+    public List<ProjectRecord> findAllByUsernameWhereAuthorized (String username, long page, int limit) {
 
         final UserRecord user = TestUtil.USER_DAO.findOneByUsername(username);
         if (user == null) {
@@ -49,13 +48,13 @@ public class ProjectTestDatabase implements ProjectDAO {
     }
 
     @Override
-    public List<ProjectTypeRecord> findAllProjectTypesByGameSlug (String gameSlug, Pagination cursor, int limit) {
+    public List<ProjectTypeRecord> findAllProjectTypesByGameSlug (String gameSlug) {
 
         return this.projectTypeRecords.stream().filter(projectRecord -> projectRecord.getGameSlug().equals(gameSlug)).collect(Collectors.toList());
     }
 
     @Override
-    public List<ProjectRecord> findAllProjectsByGameSlugAndProjectType (String gameSlug, String projectTypeSlug, Pagination cursor, int limit) {
+    public List<ProjectRecord> findAllProjectsByGameSlugAndProjectType (String gameSlug, String projectTypeSlug, long page, int limit) {
 
         return this.projectRecords.stream().filter(projectRecord -> projectRecord.getGameSlug().equals(gameSlug) && projectRecord.getProjectTypeSlug().equals(projectTypeSlug)).collect(Collectors.toList());
     }
