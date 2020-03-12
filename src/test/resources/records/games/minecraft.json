@@ -2,5 +2,6 @@
     "slug": "minecraft",
     "name": "Minecraft",
     "url": "https://www.minecraft.net",
+    "imageURL": "https://images.placeholders.dev/?width=1200&height=150",
     "bannerURL": "https://images.placeholders.dev/?width=1200&height=150"
 }

@@ -1,6 +1,5 @@
 package com.diluv.api.data;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.diluv.confluencia.database.record.GameRecord;
@@ -30,6 +29,11 @@ public class DataGame {
     @Expose
     private final String url;
 
+    /**
+     * A URL that links to the image of the game.
+     */
+    @Expose
+    private final String imageURL;
 
     /**
      * A URL that links to the banner of the game.
@@ -50,6 +54,7 @@ public class DataGame {
         this.slug = rs.getSlug();
         this.name = rs.getName();
         this.url = rs.getUrl();
+        this.imageURL = rs.getImageURL();
         this.bannerURL = rs.getBannerURL();
         this.versions = versions;
     }
