@@ -31,9 +31,6 @@ import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.sort.GameSort;
-import com.diluv.confluencia.database.sort.ProjectFileSort;
-import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
@@ -41,6 +38,9 @@ import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
+import com.diluv.confluencia.database.sort.GameSort;
+import com.diluv.confluencia.database.sort.ProjectFileSort;
+import com.diluv.confluencia.database.sort.ProjectSort;
 import com.github.slugify.Slugify;
 
 import static com.diluv.api.Main.DATABASE;
@@ -212,14 +212,8 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-        List<ProjectFileRecord> projectFileRecords;
-
-        if (token != null && ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD)) {
-            projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized(gameSlug, projectTypeSlug, projectSlug, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW));
-        }
-        else {
-            projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW));
-        }
+        boolean authorized = token != null && ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD);
+        List<ProjectFileRecord> projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug, authorized, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW));
 
         final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> {
             final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsByProjectFile(projectRecord.getId());

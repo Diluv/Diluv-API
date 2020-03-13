@@ -23,10 +23,10 @@ import com.diluv.api.utils.Pagination;
 import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.UserRecord;
+import com.diluv.confluencia.database.sort.ProjectSort;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -97,17 +97,9 @@ public class UsersAPI {
         long page = Pagination.getPage(queryPage);
         int limit = Pagination.getLimit(queryLimit);
 
-        List<ProjectRecord> projectRecords;
+        boolean authorized = token != null && token.getUsername().equalsIgnoreCase(username);
 
-        if (token != null && token.getUsername().equalsIgnoreCase(username)) {
-
-            projectRecords = DATABASE.projectDAO.findAllByUsernameWhereAuthorized(username, page, limit, ProjectSort.fromString(sort, ProjectSort.NEW));
-        }
-
-        else {
-
-            projectRecords = DATABASE.projectDAO.findAllByUsername(username, page, limit, ProjectSort.fromString(sort, ProjectSort.NEW));
-        }
+        List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, ProjectSort.fromString(sort, ProjectSort.NEW));
 
         final List<DataProject> projects = projectRecords.stream().map(projectRecord -> {
             final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
