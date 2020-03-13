@@ -23,7 +23,7 @@ import com.diluv.api.utils.Pagination;
 import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.filter.ProjectFilter;
+import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.UserRecord;
@@ -91,7 +91,7 @@ public class UsersAPI {
     @GET
     @Path("/{username}/projects")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("filter") String filter) {
+    public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort) {
 
         final AccessToken token = AccessToken.getToken(auth);
         long page = Pagination.getPage(queryPage);
@@ -101,12 +101,12 @@ public class UsersAPI {
 
         if (token != null && token.getUsername().equalsIgnoreCase(username)) {
 
-            projectRecords = DATABASE.projectDAO.findAllByUsernameWhereAuthorized(username, page, limit, ProjectFilter.fromString(filter, ProjectFilter.NEW));
+            projectRecords = DATABASE.projectDAO.findAllByUsernameWhereAuthorized(username, page, limit, ProjectSort.fromString(sort, ProjectSort.NEW));
         }
 
         else {
 
-            projectRecords = DATABASE.projectDAO.findAllByUsername(username, page, limit, ProjectFilter.fromString(filter, ProjectFilter.NEW));
+            projectRecords = DATABASE.projectDAO.findAllByUsername(username, page, limit, ProjectSort.fromString(sort, ProjectSort.NEW));
         }
 
         final List<DataProject> projects = projectRecords.stream().map(projectRecord -> {

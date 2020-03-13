@@ -11,7 +11,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.confluencia.database.filter.NewsFilter;
+import com.diluv.confluencia.database.sort.NewsSort;
 
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
@@ -32,12 +32,12 @@ public class NewsAPI {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getNews (@QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("filter") String filter) {
+    public Response getNews (@QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort) {
 
         long page = Pagination.getPage(queryPage);
         int limit = Pagination.getLimit(queryLimit);
 
-        final List<NewsRecord> newsRecords = DATABASE.newsDAO.findAll(page, limit, NewsFilter.fromString(filter, NewsFilter.NEW));
+        final List<NewsRecord> newsRecords = DATABASE.newsDAO.findAll(page, limit, NewsSort.fromString(sort, NewsSort.NEW));
         final List<DataNewsPost> newsPosts = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
 
         return ResponseUtil.successResponse(newsPosts);

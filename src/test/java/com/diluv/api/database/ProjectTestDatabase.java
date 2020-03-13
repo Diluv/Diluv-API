@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import com.diluv.api.utils.FileReader;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.confluencia.database.dao.ProjectDAO;
-import com.diluv.confluencia.database.filter.ProjectFilter;
+import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
@@ -29,7 +29,7 @@ public class ProjectTestDatabase implements ProjectDAO {
     }
 
     @Override
-    public List<ProjectRecord> findAllByUsername (String username, long page, int limit, ProjectFilter filter) {
+    public List<ProjectRecord> findAllByUsername (String username, long page, int limit, ProjectSort sort) {
 
         final UserRecord user = TestUtil.USER_DAO.findOneByUsername(username);
         if (user == null) {
@@ -39,7 +39,7 @@ public class ProjectTestDatabase implements ProjectDAO {
     }
 
     @Override
-    public List<ProjectRecord> findAllByUsernameWhereAuthorized (String username, long page, int limit, ProjectFilter filter) {
+    public List<ProjectRecord> findAllByUsernameWhereAuthorized (String username, long page, int limit, ProjectSort sort) {
 
         final UserRecord user = TestUtil.USER_DAO.findOneByUsername(username);
         if (user == null) {
@@ -55,7 +55,7 @@ public class ProjectTestDatabase implements ProjectDAO {
     }
 
     @Override
-    public List<ProjectRecord> findAllProjectsByGameSlugAndProjectType (String gameSlug, String projectTypeSlug, long page, int limit, ProjectFilter filter) {
+    public List<ProjectRecord> findAllProjectsByGameSlugAndProjectType (String gameSlug, String projectTypeSlug, long page, int limit, ProjectSort sort) {
 
         return this.projectRecords.stream().filter(projectRecord -> projectRecord.getGameSlug().equals(gameSlug) && projectRecord.getProjectTypeSlug().equals(projectTypeSlug)).collect(Collectors.toList());
     }

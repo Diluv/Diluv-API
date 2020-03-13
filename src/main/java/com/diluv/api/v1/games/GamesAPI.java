@@ -31,9 +31,9 @@ import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.filter.GameFilter;
-import com.diluv.confluencia.database.filter.ProjectFileFilter;
-import com.diluv.confluencia.database.filter.ProjectFilter;
+import com.diluv.confluencia.database.sort.GameSort;
+import com.diluv.confluencia.database.sort.ProjectFileSort;
+import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
@@ -55,9 +55,9 @@ public class GamesAPI {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getGames (@QueryParam("filter") String filter) {
+    public Response getGames (@QueryParam("sort") String sort) {
 
-        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(GameFilter.fromString(filter, GameFilter.NAME));
+        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(GameSort.fromString(sort, GameSort.NAME));
         final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(games);
     }
@@ -122,11 +122,11 @@ public class GamesAPI {
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/projects")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("filter") String filter) {
+    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort) {
 
         long page = Pagination.getPage(queryPage);
         int limit = Pagination.getLimit(queryLimit);
-        final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, page, limit, ProjectFilter.fromString(filter, ProjectFilter.POPULARITY));
+        final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, page, limit, ProjectSort.fromString(sort, ProjectSort.POPULARITY));
 
         if (projectRecords.isEmpty()) {
 
@@ -193,7 +193,7 @@ public class GamesAPI {
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("filter") String filter) {
+    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort) {
 
         long page = Pagination.getPage(queryPage);
         int limit = Pagination.getLimit(queryLimit);
@@ -215,10 +215,10 @@ public class GamesAPI {
         List<ProjectFileRecord> projectFileRecords;
 
         if (token != null && ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD)) {
-            projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized(gameSlug, projectTypeSlug, projectSlug, page, limit, ProjectFileFilter.fromString(filter, ProjectFileFilter.NEW));
+            projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized(gameSlug, projectTypeSlug, projectSlug, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW));
         }
         else {
-            projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug, page, limit, ProjectFileFilter.fromString(filter, ProjectFileFilter.NEW));
+            projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW));
         }
 
         final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> {

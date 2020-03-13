@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.NewsDAO;
-import com.diluv.confluencia.database.filter.NewsFilter;
+import com.diluv.confluencia.database.sort.NewsSort;
 import com.diluv.confluencia.database.record.NewsRecord;
 
 public class NewsTestDatabase implements NewsDAO {
@@ -17,7 +17,7 @@ public class NewsTestDatabase implements NewsDAO {
     }
 
     @Override
-    public List<NewsRecord> findAll (long page, int limit, NewsFilter filter) {
+    public List<NewsRecord> findAll (long page, int limit, NewsSort sort) {
 
         return this.newsRecord;
     }

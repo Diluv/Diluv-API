@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.GameDAO;
-import com.diluv.confluencia.database.filter.GameFilter;
+import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
 
@@ -19,7 +19,7 @@ public class GameTestDatabase implements GameDAO {
     }
 
     @Override
-    public List<GameRecord> findAll (GameFilter filter) {
+    public List<GameRecord> findAll (GameSort sort) {
 
         return this.gameRecords;
     }
