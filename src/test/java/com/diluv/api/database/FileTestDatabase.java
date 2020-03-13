@@ -6,10 +6,10 @@ import java.util.List;
 
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.FileDAO;
-import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.record.FileProcessingStatus;
 import com.diluv.confluencia.database.record.GameVersionRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
+import com.diluv.confluencia.database.sort.ProjectFileSort;
 
 public class FileTestDatabase implements FileDAO {
 
@@ -47,25 +47,17 @@ public class FileTestDatabase implements FileDAO {
         return new ArrayList<>();
     }
 
-    @Override
-    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlug (String gameSlug, String projectTypeSlug, String projectSlug, long page, int limit, ProjectFileSort sort) {
 
-        // ProjectRecord project =
-        // this.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug,
-        // projectTypeSlug, projectSlug);
-        // if (project == null) {
-        // return null;
-        // }
-        // return this.projectFileRecords.stream().filter(projectRecord ->
-        // projectRecord.getProjectId() == projectSlug).collect(Collectors.toList());
+    @Override
+    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlug (String gameSlug, String projectTypeSlug, String projectSlug, boolean authorized, long page, int limit, ProjectFileSort sort) {
+
         // TODO
-        return new ArrayList<>();
+        return this.projectFileRecords;
     }
 
     @Override
-    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized (String gameSlug, String projectTypeSlug, String projectSlug, long page, int limit, ProjectFileSort sort) {
+    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlugWhereVersion (String gameSlug, String projectTypeSlug, String projectSlug, boolean authorized, long page, int limit, ProjectFileSort sort, String version) {
 
-        // TODO
         return this.projectFileRecords;
     }
 

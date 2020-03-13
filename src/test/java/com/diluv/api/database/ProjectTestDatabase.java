@@ -8,12 +8,12 @@ import java.util.stream.Collectors;
 import com.diluv.api.utils.FileReader;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.confluencia.database.dao.ProjectDAO;
-import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.record.UserRecord;
+import com.diluv.confluencia.database.sort.ProjectSort;
 
 public class ProjectTestDatabase implements ProjectDAO {
 
@@ -29,23 +29,13 @@ public class ProjectTestDatabase implements ProjectDAO {
     }
 
     @Override
-    public List<ProjectRecord> findAllByUsername (String username, long page, int limit, ProjectSort sort) {
+    public List<ProjectRecord> findAllByUsername (String username, boolean authorized, long page, int limit, ProjectSort sort) {
 
         final UserRecord user = TestUtil.USER_DAO.findOneByUsername(username);
         if (user == null) {
             return new ArrayList<>();
         }
-        return this.projectRecords.stream().filter(projectRecord -> projectRecord.getUserId() == user.getId() && projectRecord.isReleased()).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ProjectRecord> findAllByUsernameWhereAuthorized (String username, long page, int limit, ProjectSort sort) {
-
-        final UserRecord user = TestUtil.USER_DAO.findOneByUsername(username);
-        if (user == null) {
-            return new ArrayList<>();
-        }
-        return this.projectRecords.stream().filter(projectRecord -> projectRecord.getUserId() == user.getId()).collect(Collectors.toList());
+        return this.projectRecords.stream().filter(projectRecord -> projectRecord.getUserId() == user.getId() && (projectRecord.isReleased() || authorized)).collect(Collectors.toList());
     }
 
     @Override
@@ -56,6 +46,12 @@ public class ProjectTestDatabase implements ProjectDAO {
 
     @Override
     public List<ProjectRecord> findAllProjectsByGameSlugAndProjectType (String gameSlug, String projectTypeSlug, long page, int limit, ProjectSort sort) {
+
+        return this.projectRecords.stream().filter(projectRecord -> projectRecord.getGameSlug().equals(gameSlug) && projectRecord.getProjectTypeSlug().equals(projectTypeSlug)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProjectRecord> findAllProjectsByGameSlugAndProjectTypeAndVersion (String gameSlug, String projectTypeSlug, long page, int limit, ProjectSort sort, String version) {
 
         return this.projectRecords.stream().filter(projectRecord -> projectRecord.getGameSlug().equals(gameSlug) && projectRecord.getProjectTypeSlug().equals(projectTypeSlug)).collect(Collectors.toList());
     }

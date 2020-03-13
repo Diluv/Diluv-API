@@ -122,11 +122,18 @@ public class GamesAPI {
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/projects")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort) {
+    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort, @QueryParam("version") String version) {
 
         long page = Pagination.getPage(queryPage);
         int limit = Pagination.getLimit(queryLimit);
-        final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, page, limit, ProjectSort.fromString(sort, ProjectSort.POPULARITY));
+        final List<ProjectRecord> projectRecords;
+
+        if (version == null) {
+            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, page, limit, ProjectSort.fromString(sort, ProjectSort.POPULARITY));
+        }
+        else {
+            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectTypeAndVersion(gameSlug, projectTypeSlug, page, limit, ProjectSort.fromString(sort, ProjectSort.POPULARITY), version);
+        }
 
         if (projectRecords.isEmpty()) {
 
@@ -193,7 +200,7 @@ public class GamesAPI {
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort) {
+    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort, @QueryParam("version") String version) {
 
         long page = Pagination.getPage(queryPage);
         int limit = Pagination.getLimit(queryLimit);
@@ -213,7 +220,14 @@ public class GamesAPI {
         }
 
         boolean authorized = token != null && ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD);
-        List<ProjectFileRecord> projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug, authorized, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW));
+        final List<ProjectFileRecord> projectFileRecords;
+
+        if (version == null) {
+            projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug, authorized, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW));
+        }
+        else {
+            projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlugWhereVersion(gameSlug, projectTypeSlug, projectSlug, authorized, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW), version);
+        }
 
         final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> {
             final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsByProjectFile(projectRecord.getId());
