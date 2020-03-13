@@ -12,8 +12,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.utils.Pagination;
-
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 
@@ -21,9 +19,11 @@ import com.diluv.api.data.DataAuthorizedUser;
 import com.diluv.api.data.DataCategory;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataUser;
+import com.diluv.api.utils.Pagination;
 import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.confluencia.database.filter.ProjectFilter;
 import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.UserRecord;
@@ -91,7 +91,7 @@ public class UsersAPI {
     @GET
     @Path("/{username}/projects")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit) {
+    public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("filter") String filter) {
 
         final AccessToken token = AccessToken.getToken(auth);
         long page = Pagination.getPage(queryPage);
@@ -101,12 +101,12 @@ public class UsersAPI {
 
         if (token != null && token.getUsername().equalsIgnoreCase(username)) {
 
-            projectRecords = DATABASE.projectDAO.findAllByUsernameWhereAuthorized(username, page, limit);
+            projectRecords = DATABASE.projectDAO.findAllByUsernameWhereAuthorized(username, page, limit, ProjectFilter.fromString(filter, ProjectFilter.NEW));
         }
 
         else {
 
-            projectRecords = DATABASE.projectDAO.findAllByUsername(username, page, limit );
+            projectRecords = DATABASE.projectDAO.findAllByUsername(username, page, limit, ProjectFilter.fromString(filter, ProjectFilter.NEW));
         }
 
         final List<DataProject> projects = projectRecords.stream().map(projectRecord -> {

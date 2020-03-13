@@ -1,11 +1,11 @@
 package com.diluv.api.database;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.GameDAO;
+import com.diluv.confluencia.database.filter.GameFilter;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
 
@@ -19,7 +19,7 @@ public class GameTestDatabase implements GameDAO {
     }
 
     @Override
-    public List<GameRecord> findAll () {
+    public List<GameRecord> findAll (GameFilter filter) {
 
         return this.gameRecords;
     }

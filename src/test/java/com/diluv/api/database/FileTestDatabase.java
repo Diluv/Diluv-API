@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.FileDAO;
+import com.diluv.confluencia.database.filter.ProjectFileFilter;
 import com.diluv.confluencia.database.record.FileProcessingStatus;
 import com.diluv.confluencia.database.record.GameVersionRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
@@ -47,7 +48,7 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlug (String gameSlug, String projectTypeSlug, String projectSlug, long page, int limit) {
+    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlug (String gameSlug, String projectTypeSlug, String projectSlug, long page, int limit, ProjectFileFilter filter) {
 
         // ProjectRecord project =
         // this.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug,
@@ -62,7 +63,7 @@ public class FileTestDatabase implements FileDAO {
     }
 
     @Override
-    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized (String gameSlug, String projectTypeSlug, String projectSlug, long page, int limit) {
+    public List<ProjectFileRecord> findAllByGameSlugAndProjectTypeAndProjectSlugAuthorized (String gameSlug, String projectTypeSlug, String projectSlug, long page, int limit, ProjectFileFilter filter) {
 
         // TODO
         return this.projectFileRecords;

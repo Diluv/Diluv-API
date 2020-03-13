@@ -1,10 +1,14 @@
 package com.diluv.api.endpoints.v1;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
 
@@ -91,5 +95,16 @@ public class ProjectTest {
         final File logo = new File(classLoader.getResource("logo.png").getFile());
         given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).with().post(URL + "/minecraft/mods/bookshelf/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
         given().header("Authorization", "Bearer " + TestUtil.VALID_LONG_LASTING_TOKEN).multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).with().post(URL + "/minecraft/mods/bookshelf/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
+    }
+
+    @AfterAll
+    public static void cleanup () {
+
+        try {
+            FileUtils.deleteDirectory(new File(Constants.PROCESSING_FOLDER));
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
