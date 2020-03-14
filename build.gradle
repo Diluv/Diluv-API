@@ -41,7 +41,7 @@ dependencies {
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.0'
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
-    testImplementation group: 'io.rest-assured', name: 'json-schema-validator', version: '4.2.0'
+    testImplementation group: 'io.rest-assured', name: 'json-schema-validator', version: '4.3.0'
 }
 
 test {
