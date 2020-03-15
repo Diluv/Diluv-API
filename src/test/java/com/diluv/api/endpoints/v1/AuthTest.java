@@ -24,21 +24,24 @@ public class AuthTest {
     public void testRegister () {
 
         // Valid user
-        given().multiPart("email", "testing@example.com").multiPart("username", "testing").multiPart("password", "password").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(200);
+        given().multiPart("email", "testing@example.com").multiPart("username", "testing").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(200);
+
+        // Password compromised
+        given().multiPart("email", "testing@example.com").multiPart("username", "testing").multiPart("password", "password").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_COMPROMISED_PASSWORD.getMessage()));
 
         // Banned domains
-        given().multiPart("email", "testing@banned.com").multiPart("username", "testing").multiPart("password", "password").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_BLACKLISTED_EMAIL.getMessage()));
+        given().multiPart("email", "testing@banned.com").multiPart("username", "testing").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_BLACKLISTED_EMAIL.getMessage()));
 
-        given().multiPart("email", "test@banned2.com").multiPart("username", "testing").multiPart("password", "password").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_BLACKLISTED_EMAIL.getMessage()));
+        given().multiPart("email", "test@banned2.com").multiPart("username", "testing").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_BLACKLISTED_EMAIL.getMessage()));
 
         // Email used
-        given().multiPart("email", "lclc98@example.com").multiPart("username", "testing2").multiPart("password", "password").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_EMAIL.getMessage()));
+        given().multiPart("email", "lclc98@example.com").multiPart("username", "testing2").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_EMAIL.getMessage()));
 
         // Username used
-        given().multiPart("email", "testing@example.com").multiPart("username", "lclc98").multiPart("password", "password").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_USERNAME.getMessage()));
+        given().multiPart("email", "testing@example.com").multiPart("username", "lclc98").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_USERNAME.getMessage()));
 
         // Terms false
-        given().multiPart("email", "testing@example.com").multiPart("username", "lclc98").multiPart("password", "password").multiPart("terms", "false").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_INVALID_TERMS.getMessage()));
+        given().multiPart("email", "testing@example.com").multiPart("username", "lclc98").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "false").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_INVALID_TERMS.getMessage()));
     }
 
     @Test
