@@ -1,6 +1,7 @@
 package com.diluv.api.database;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
 
 import com.diluv.api.utils.FileReader;
@@ -187,6 +188,6 @@ public class UserTestDatabase implements UserDAO {
     @Override
     public List<UserRoleRecord> findAllUserRolesByUserId (long userId) {
 
-        return null;
+        return Collections.emptyList();
     }
 }

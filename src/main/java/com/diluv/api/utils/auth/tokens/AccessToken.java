@@ -1,7 +1,10 @@
 package com.diluv.api.utils.auth.tokens;
 
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import com.diluv.api.DiluvAPIServer;
 import com.nimbusds.jose.JOSEException;
@@ -10,10 +13,12 @@ import com.nimbusds.jwt.JWTClaimsSet;
 public class AccessToken extends Token {
 
     private static final String SUBJECT = "accessToken";
+    private final List<String> roles;
 
-    public AccessToken (long userId, String username) {
+    public AccessToken (long userId, String username, List<String> roles) {
 
         super(userId, username);
+        this.roles = roles;
     }
 
     public static AccessToken getToken (String token) {
@@ -26,7 +31,8 @@ public class AccessToken extends Token {
                 final String audienceId = claims.getAudience().get(0);
                 final long userId = Long.parseLong(audienceId);
                 final String username = claims.getStringClaim("username");
-                return new AccessToken(userId, username);
+                final List<String> roles = claims.getStringListClaim("roles");
+                return new AccessToken(userId, username, roles);
             }
             catch (final ParseException e) {
 
@@ -39,6 +45,12 @@ public class AccessToken extends Token {
 
     public String generate (Date time) throws JOSEException {
 
-        return this.generate(time, SUBJECT);
+        Map<String, Object> data = Collections.singletonMap("roles", this.roles);
+        return this.generate(time, SUBJECT, data);
+    }
+
+    public List<String> getRoles () {
+
+        return this.roles;
     }
 }

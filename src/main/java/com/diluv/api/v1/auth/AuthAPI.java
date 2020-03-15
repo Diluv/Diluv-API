@@ -6,8 +6,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -39,6 +41,7 @@ import com.diluv.confluencia.database.record.EmailSendRecord;
 import com.diluv.confluencia.database.record.RefreshTokenRecord;
 import com.diluv.confluencia.database.record.TempUserRecord;
 import com.diluv.confluencia.database.record.UserRecord;
+import com.diluv.confluencia.database.record.UserRoleRecord;
 import com.nimbusds.jose.JOSEException;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
@@ -352,7 +355,10 @@ public class AuthAPI {
         if (!DATABASE.userDAO.insertRefreshToken(userId, code, new Timestamp(refreshTokenExpire.getTimeInMillis()))) {
             return ErrorMessage.FAILED_CREATE_REFRESH_TOKEN.respond();
         }
-        final String accessToken = new AccessToken(userId, username).generate(accessTokenExpire.getTime());
+
+        List<String> roles = DATABASE.userDAO.findAllUserRolesByUserId(userId).stream().map(UserRoleRecord::getName).collect(Collectors.toList());
+
+        final String accessToken = new AccessToken(userId, username, roles).generate(accessTokenExpire.getTime());
         final String refreshToken = new RefreshToken(userId, username, code).generate(refreshTokenExpire.getTime());
 
         return ResponseUtil.successResponse(new DataLogin(accessToken, accessTokenExpire.getTimeInMillis(), refreshToken, refreshTokenExpire.getTimeInMillis()));

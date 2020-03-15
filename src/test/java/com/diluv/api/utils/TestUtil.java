@@ -47,14 +47,14 @@ public class TestUtil {
         final Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, 30);
         try {
-            VALID_TOKEN = new AccessToken(0, "darkhax").generate(calendar.getTime());
+            VALID_TOKEN = new AccessToken(0, "darkhax", Collections.emptyList()).generate(calendar.getTime());
         }
         catch (JOSEException e) {
             e.printStackTrace();
         }
 
         try {
-            VALID_TOKEN_TWO = new AccessToken(1, "jaredlll08").generate(calendar.getTime());
+            VALID_TOKEN_TWO = new AccessToken(1, "jaredlll08", Collections.emptyList()).generate(calendar.getTime());
         }
         catch (JOSEException e) {
             e.printStackTrace();
