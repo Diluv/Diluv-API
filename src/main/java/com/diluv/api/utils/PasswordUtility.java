@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -20,9 +21,10 @@ import static com.diluv.api.Main.DATABASE;
 public class PasswordUtility {
     public static boolean isCompromised (String password) {
 
-        CompromisedPasswordRecord record = DATABASE.securityDAO.findOnePasswordByHash(password);
-        if (record == null) {
-            String hash = DigestUtils.sha1Hex(password).toUpperCase();
+        String hash = DigestUtils.sha1Hex(password).toUpperCase();
+
+        CompromisedPasswordRecord record = DATABASE.securityDAO.findOnePasswordByHash(hash);
+        if (record == null || System.currentTimeMillis() - record.getLastUpdated() >= TimeUnit.DAYS.toMillis(30)) {
             String hash5 = hash.substring(0, 5);
             List<String> passwords = getPasswordCheck(hash5);
             if (passwords.isEmpty()) {
