@@ -10,6 +10,7 @@ import com.diluv.api.utils.TestUtil;
 import com.diluv.confluencia.database.dao.ProjectDAO;
 import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
+import com.diluv.confluencia.database.record.ProjectLinkRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.record.UserRecord;
@@ -20,12 +21,14 @@ public class ProjectTestDatabase implements ProjectDAO {
     private final List<ProjectRecord> projectRecords;
     private final List<ProjectTypeRecord> projectTypeRecords;
     private final List<CategoryRecord> categories;
+    private final List<ProjectLinkRecord> projectLinkRecords;
 
     public ProjectTestDatabase () {
 
         this.projectRecords = FileReader.readJsonFolder("projects", ProjectRecord.class);
         this.projectTypeRecords = FileReader.readJsonFolder("project_types", ProjectTypeRecord.class);
         this.categories = FileReader.readJsonFolder("categories", CategoryRecord.class);
+        this.projectLinkRecords = FileReader.readJsonFolder("project_links", ProjectLinkRecord.class);
     }
 
     @Override
@@ -103,5 +106,11 @@ public class ProjectTestDatabase implements ProjectDAO {
     public List<CategoryRecord> findAllCategoriesByProjectId (long projectId) {
 
         return new ArrayList<>();
+    }
+
+    @Override
+    public List<ProjectLinkRecord> findAllLinksByProjectId (long id) {
+
+        return this.projectLinkRecords.stream().filter(projectLinkRecord -> projectLinkRecord.getProjectId() == id).collect(Collectors.toList());
     }
 }

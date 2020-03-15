@@ -36,6 +36,7 @@ import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
+import com.diluv.confluencia.database.record.ProjectLinkRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.sort.GameSort;
@@ -178,6 +179,9 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
+        final List<ProjectLinkRecord> projectLinkRecords = DATABASE.projectDAO.findAllLinksByProjectId(projectRecord.getId());
+        final List<DataProjectLink> projectLinks = projectLinkRecords.stream().map(DataProjectLink::new).collect(Collectors.toList());
+
         final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
 
         final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
@@ -188,12 +192,12 @@ public class GamesAPI {
 
             if (permissions != null) {
                 final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributorAuthorized::new).collect(Collectors.toList());
-                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, categories, projectAuthors, permissions));
+                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, categories, projectAuthors, projectLinks, permissions));
             }
         }
 
         final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributor::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataProject(projectRecord, categories, projectAuthors));
+        return ResponseUtil.successResponse(new DataProject(projectRecord, categories, projectAuthors, projectLinks));
     }
 
     @Cache(maxAge = 60, mustRevalidate = true)
