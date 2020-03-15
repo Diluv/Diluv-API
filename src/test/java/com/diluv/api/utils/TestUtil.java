@@ -6,7 +6,7 @@ import java.util.Collections;
 import com.diluv.api.Database;
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.Main;
-import com.diluv.api.database.EmailTestDatabase;
+import com.diluv.api.database.SecurityTestDatabase;
 import com.diluv.api.database.FileTestDatabase;
 import com.diluv.api.database.GameTestDatabase;
 import com.diluv.api.database.NewsTestDatabase;
@@ -16,7 +16,7 @@ import com.diluv.api.utils.auth.tokens.APIAccessToken;
 import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.auth.tokens.RefreshToken;
 import com.diluv.api.utils.permissions.ProjectPermissions;
-import com.diluv.confluencia.database.dao.EmailDAO;
+import com.diluv.confluencia.database.dao.SecurityDAO;
 import com.diluv.confluencia.database.dao.FileDAO;
 import com.diluv.confluencia.database.dao.GameDAO;
 import com.diluv.confluencia.database.dao.NewsDAO;
@@ -34,7 +34,7 @@ public class TestUtil {
     public static final ProjectDAO PROJECT_DAO = new ProjectTestDatabase();
     public static final FileDAO FILE_DAO = new FileTestDatabase();
     public static final UserDAO USER_DAO = new UserTestDatabase();
-    public static final EmailDAO EMAIL_DAO = new EmailTestDatabase();
+    public static final SecurityDAO SECURITY_DAO = new SecurityTestDatabase();
     public static final NewsDAO NEWS_DAO = new NewsTestDatabase();
 
     public static String VALID_TOKEN;
@@ -80,7 +80,7 @@ public class TestUtil {
     public static void start () {
 
         if (!running) {
-            Main.DATABASE = new Database(GAME_DAO, PROJECT_DAO, FILE_DAO, USER_DAO, EMAIL_DAO, NEWS_DAO);
+            Main.DATABASE = new Database(GAME_DAO, PROJECT_DAO, FILE_DAO, USER_DAO, SECURITY_DAO, NEWS_DAO);
             DiluvAPIServer server = new DiluvAPIServer();
             server.start(IP, PORT);
 

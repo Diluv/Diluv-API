@@ -19,6 +19,7 @@ public enum ErrorMessage {
     USER_REQUIRED_TOKEN(ErrorType.UNAUTHORIZED, "user.required.token"),
     USER_REQUIRED_MFA(ErrorType.BAD_REQUEST, "user.required.mfa"),
     USER_NOT_AUTHORIZED(ErrorType.UNAUTHORIZED, "user.unauthorized"),
+    USER_COMPROMISED_PASSWORD(ErrorType.BAD_REQUEST, "user.compromised.password"),
 
     USER_TAKEN_EMAIL(ErrorType.BAD_REQUEST, "user.taken.email"),
     USER_TAKEN_USERNAME(ErrorType.BAD_REQUEST, "user.taken.username"),

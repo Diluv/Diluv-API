@@ -28,6 +28,7 @@ import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.data.DataLogin;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
+import com.diluv.api.utils.PasswordUtility;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.auth.tokens.RefreshToken;
@@ -79,7 +80,7 @@ public class AuthAPI {
             final String username = form.username.toLowerCase();
 
             final String domain = email.split("@")[1];
-            if (DATABASE.emailDAO.existsBlacklist(email, domain)) {
+            if (DATABASE.securityDAO.existsBlacklist(email, domain)) {
                 return ErrorMessage.USER_BLACKLISTED_EMAIL.respond();
             }
 
@@ -88,6 +89,10 @@ public class AuthAPI {
             }
             if (DATABASE.userDAO.existsUserByEmail(email) || DATABASE.userDAO.existsTempUserByEmail(email)) {
                 return ErrorMessage.USER_TAKEN_EMAIL.respond();
+            }
+
+            if (PasswordUtility.isCompromised(form.password)) {
+                return ErrorMessage.USER_COMPROMISED_PASSWORD.respond();
             }
 
             final byte[] salt = new byte[16];
@@ -105,7 +110,7 @@ public class AuthAPI {
                     return ErrorMessage.FAILED_SEND_EMAIL.respond();
                 }
 
-                if (!DATABASE.emailDAO.insertEmailSent(emailResponse.getMessageId(), email, "verification")) {
+                if (!DATABASE.securityDAO.insertEmailSent(emailResponse.getMessageId(), email, "verification")) {
                     return ErrorMessage.FAILED_CREATE_EMAIL_SEND.respond();
                 }
             }
@@ -269,7 +274,7 @@ public class AuthAPI {
             return ErrorMessage.FAILED_CREATE_TEMP_USER.respond();
         }
 
-        final EmailSendRecord emailSendRecord = DATABASE.emailDAO.findEmailSentByEmailAndType(email, "verficiation");
+        final EmailSendRecord emailSendRecord = DATABASE.securityDAO.findEmailSentByEmailAndType(email, "verficiation");
         if (emailSendRecord != null) {
             if (System.currentTimeMillis() - tUserRecord.getCreatedAt() <= TimeUnit.HOURS.toMillis(1)) {
                 return ErrorMessage.COOLDOWN_EMAIL.respond();
@@ -281,7 +286,7 @@ public class AuthAPI {
                 return ErrorMessage.FAILED_SEND_EMAIL.respond();
             }
 
-            if (!DATABASE.emailDAO.insertEmailSent(emailResponse.getMessageId(), email, "verification")) {
+            if (!DATABASE.securityDAO.insertEmailSent(emailResponse.getMessageId(), email, "verification")) {
                 return ErrorMessage.FAILED_CREATE_EMAIL_SEND.respond();
             }
         }

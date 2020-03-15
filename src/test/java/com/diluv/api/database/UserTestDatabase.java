@@ -9,6 +9,7 @@ import com.diluv.confluencia.database.record.APITokenRecord;
 import com.diluv.confluencia.database.record.RefreshTokenRecord;
 import com.diluv.confluencia.database.record.TempUserRecord;
 import com.diluv.confluencia.database.record.UserRecord;
+import com.diluv.confluencia.database.record.UserRoleRecord;
 
 public class UserTestDatabase implements UserDAO {
 
@@ -181,5 +182,11 @@ public class UserTestDatabase implements UserDAO {
     public boolean deleteAPITokenByUserIdAndCode (long userId, String code) {
 
         return true;
+    }
+
+    @Override
+    public List<UserRoleRecord> findAllUserRolesByUserId (long userId) {
+
+        return null;
     }
 }

@@ -2,18 +2,20 @@ package com.diluv.api.database;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.diluv.api.utils.FileReader;
-import com.diluv.confluencia.database.dao.EmailDAO;
+import com.diluv.confluencia.database.dao.SecurityDAO;
+import com.diluv.confluencia.database.record.CompromisedPasswordRecord;
 import com.diluv.confluencia.database.record.EmailSendRecord;
 
-public class EmailTestDatabase implements EmailDAO {
+public class SecurityTestDatabase implements SecurityDAO {
 
     private final String[] emailRecords;
     private final String[] domainRecords;
     private final List<EmailSendRecord> emailSentRecords;
 
-    public EmailTestDatabase () {
+    public SecurityTestDatabase () {
 
         this.emailRecords = FileReader.readJsonFile("email/blacklistEmail", String[].class);
         this.domainRecords = FileReader.readJsonFile("email/blacklistDomain", String[].class);
@@ -84,5 +86,17 @@ public class EmailTestDatabase implements EmailDAO {
     public List<EmailSendRecord> findEmailSentByEmail (String email) {
 
         return new ArrayList<>();
+    }
+
+    @Override
+    public boolean insertPassword (Map<String, Long> hashOccurrences) {
+
+        return false;
+    }
+
+    @Override
+    public CompromisedPasswordRecord findOnePasswordByHash (String hash) {
+
+        return null;
     }
 }
