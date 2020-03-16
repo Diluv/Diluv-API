@@ -1,17 +1,17 @@
 package com.diluv.api;
 
 import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.SecurityDatabase;
 import com.diluv.confluencia.database.FileDatabase;
 import com.diluv.confluencia.database.GameDatabase;
 import com.diluv.confluencia.database.NewsDatabase;
 import com.diluv.confluencia.database.ProjectDatabase;
+import com.diluv.confluencia.database.SecurityDatabase;
 import com.diluv.confluencia.database.UserDatabase;
-import com.diluv.confluencia.database.dao.SecurityDAO;
 import com.diluv.confluencia.database.dao.FileDAO;
 import com.diluv.confluencia.database.dao.GameDAO;
 import com.diluv.confluencia.database.dao.NewsDAO;
 import com.diluv.confluencia.database.dao.ProjectDAO;
+import com.diluv.confluencia.database.dao.SecurityDAO;
 import com.diluv.confluencia.database.dao.UserDAO;
 
 public class Database {

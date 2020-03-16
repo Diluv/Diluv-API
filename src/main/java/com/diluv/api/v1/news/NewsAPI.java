@@ -11,8 +11,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.confluencia.database.sort.NewsSort;
-
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 
@@ -21,6 +19,7 @@ import com.diluv.api.utils.Pagination;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.database.record.NewsRecord;
+import com.diluv.confluencia.database.sort.NewsSort;
 
 import static com.diluv.api.Main.DATABASE;
 

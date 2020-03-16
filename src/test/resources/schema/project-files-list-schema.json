@@ -9,9 +9,6 @@
                     "$ref": "data/projectFiles.json"
                 }
             ]
-        },
-        "cursor": {
-            "type": "string"
         }
     },
     "required": [

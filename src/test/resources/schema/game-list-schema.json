@@ -9,9 +9,6 @@
                     "$ref": "data/games.json"
                 }
             ]
-        },
-        "cursor": {
-            "type": "string"
         }
     },
     "required": [

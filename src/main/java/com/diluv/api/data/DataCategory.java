@@ -15,6 +15,7 @@ public class DataCategory {
     private final String iconURL;
 
     public DataCategory (CategoryRecord rs) {
+
         this.slug = rs.getSlug();
         this.name = rs.getName();
         this.iconURL = rs.getIconURL();

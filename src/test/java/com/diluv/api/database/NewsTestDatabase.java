@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.NewsDAO;
-import com.diluv.confluencia.database.sort.NewsSort;
 import com.diluv.confluencia.database.record.NewsRecord;
+import com.diluv.confluencia.database.sort.NewsSort;
 
 public class NewsTestDatabase implements NewsDAO {
 

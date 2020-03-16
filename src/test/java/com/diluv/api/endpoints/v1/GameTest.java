@@ -27,6 +27,13 @@ public class GameTest {
     }
 
     @Test
+    public void getSort () {
+
+        given().with().get(URL + "/sort").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/sort-schema.json"));
+    }
+
+
+    @Test
     public void getGameBySlug () {
 
         given().with().get(URL + "/invalid").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_GAME.getMessage()));

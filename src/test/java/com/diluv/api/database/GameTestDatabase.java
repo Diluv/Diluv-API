@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.diluv.api.utils.FileReader;
 import com.diluv.confluencia.database.dao.GameDAO;
-import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
+import com.diluv.confluencia.database.sort.GameSort;
 
 public class GameTestDatabase implements GameDAO {
 

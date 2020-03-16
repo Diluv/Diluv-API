@@ -2,6 +2,7 @@ package com.diluv.api.v1.games;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import com.diluv.confluencia.database.sort.NewsSort;
 
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
@@ -61,6 +64,20 @@ public class GamesAPI {
         final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(GameSort.fromString(sort, GameSort.NAME));
         final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(games);
+    }
+
+    @Cache(maxAge = 7200, mustRevalidate = true)
+    @GET
+    @Path("/sort")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getGames () {
+
+        List<String> games = Arrays.stream(GameSort.values()).map(Enum::name).collect(Collectors.toList());
+        List<String> news = Arrays.stream(NewsSort.values()).map(Enum::name).collect(Collectors.toList());
+        List<String> projects = Arrays.stream(ProjectSort.values()).map(Enum::name).collect(Collectors.toList());
+        List<String> projectFiles = Arrays.stream(ProjectFileSort.values()).map(Enum::name).collect(Collectors.toList());
+
+        return ResponseUtil.successResponse(new DataSort(games, news, projects, projectFiles));
     }
 
     @Cache(maxAge = 300, mustRevalidate = true)
