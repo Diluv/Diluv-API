@@ -17,8 +17,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.confluencia.database.sort.NewsSort;
-
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
@@ -43,6 +41,7 @@ import com.diluv.confluencia.database.record.ProjectLinkRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.sort.GameSort;
+import com.diluv.confluencia.database.sort.NewsSort;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.github.slugify.Slugify;
@@ -299,12 +298,17 @@ public class GamesAPI {
         if (image == null) {
             return ErrorMessage.PROJECT_INVALID_LOGO.respond();
         }
-        final String projectSlug = this.slugify.slugify(form.name);
+
+        String name = form.name.trim();
+        String summary = form.summary.trim();
+        String description = form.description.trim();
+
+        final String projectSlug = this.slugify.slugify(name);
 
         if (DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) != null) {
             return ErrorMessage.PROJECT_TAKEN_SLUG.respond();
         }
-        if (!DATABASE.projectDAO.insertProject(projectSlug, form.name, form.summary, form.summary, token.getUserId(), gameSlug, projectTypeSlug)) {
+        if (!DATABASE.projectDAO.insertProject(projectSlug, name, summary, description, token.getUserId(), gameSlug, projectTypeSlug)) {
             return ErrorMessage.FAILED_CREATE_PROJECT.respond();
         }
 
