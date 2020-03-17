@@ -1,9 +1,0 @@
-{
-    "id": 2,
-    "username": "lclc98",
-    "email": "lclc98@example.com",
-    "password": "$2y$12$q5V.5jjgFtUsezneRMeOI.pzcEUDdp0xZQSczPKKLId3YrfXfCR6m",
-    "passwordType": "bcrypt",
-    "createdAt": 1923964145000,
-    "verificationCode": "8f32d879-45b3-4b8b-ae44-999e59566125"
-}

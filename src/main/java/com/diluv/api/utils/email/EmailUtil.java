@@ -29,4 +29,22 @@ public class EmailUtil {
         }
         return null;
     }
+
+    public static MessageResponse sendPasswordReset (String email, String code) {
+        try {
+            final ApiClient client = Postmark.getApiClient(Constants.POSTMARK_API_TOKEN);
+            final String url = String.format("%s/password-reset?code=%s&email=%s", Constants.WEBSITE_URL, code, email);
+            if (Constants.PASSWORD_RESET == null) {
+                DiluvAPIServer.LOGGER.error("Failed to load password_reset.html.");
+                return null;
+            }
+            final Message message = new Message(Constants.NOREPLY_EMAIL, email, "Diluv Email Password Reset", Constants.PASSWORD_RESET.replace("{{action_url}}", url));
+            return client.deliverMessage(message);
+        }
+        catch (IOException | PostmarkException e) {
+
+            DiluvAPIServer.LOGGER.error("Failed to send email.", e);
+        }
+        return null;
+    }
 }

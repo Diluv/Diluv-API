@@ -31,6 +31,6 @@ public class NewsTest {
 
         given().with().get(URL + "/invalid").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_NEWS.getMessage()));
 
-        given().with().get(URL + "/example?test=test").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/news-schema.json"));
+        given().with().get(URL + "/example").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/news-schema.json"));
     }
 }

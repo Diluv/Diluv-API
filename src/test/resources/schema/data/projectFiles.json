@@ -46,6 +46,12 @@
         },
         "lastStatusChanged": {
             "type": "number"
+        },
+        "classifier": {
+            "type": "string"
+        },
+        "releaseType": {
+            "type": "string"
         }
     },
     "required": [

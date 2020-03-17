@@ -1,8 +1,17 @@
 INSERT INTO users(id, username, display_name, email, password, password_type, mfa, mfa_secret, created_at)
-VALUES (1, 'darkhax', 'Darkhax', 'darkhax@diluv.com', '$2y$12$vK.BgcSPXMR8Xj6VJt0Z1Op8ijdicHj6sOpp.iAenna6p7RBDr01m',
-        'bcrypt', FALSE, NULL, NOW()),
+VALUES (1, 'darkhax', 'Darkhax', 'darkhax@diluv.com', '$2y$12$Y09/RQkc7icbiOonlBqTeegjtk9VYPKamMTJqkFVtfKDawRwifc8i',
+        'bcrypt', TRUE, NULL, NOW()),
        (2, 'jaredlll08', 'Jaredlll08', 'jaredlll08@diluv.com',
-        '$2y$12$vK.BgcSPXMR8Xj6VJt0Z1Op8ijdicHj6sOpp.iAenna6p7RBDr01m', 'bcrypt', FALSE, NULL, NOW());
+        '$2y$12$Y09/RQkc7icbiOonlBqTeegjtk9VYPKamMTJqkFVtfKDawRwifc8i', 'bcrypt', FALSE, NULL, NOW());
+
+INSERT INTO temp_users(id, username, email, password, password_type, created_at, verificationCode)
+VALUES (1, 'lclc98', 'lclc98@diluv.com', '$2y$12$Y09/RQkc7icbiOonlBqTeegjtk9VYPKamMTJqkFVtfKDawRwifc8i',
+        'bcrypt', NOW(), '8f32d879-45b3-4b8b-ae44-999e59566125'),
+       (2, 'test2', 'test2@diluv.com', '$2y$12$Y09/RQkc7icbiOonlBqTeegjtk9VYPKamMTJqkFVtfKDawRwifc8i',
+        'bcrypt', NOW(), '8f32d879-45b3-4b8b-ae44-999e59566125');
+
+INSERT INTO api_tokens(user_id, code, name)
+VALUES (1, '4b3b85e3-f7ac-4c7b-b71a-df972909b213', 'testing token');
 
 INSERT INTO projects(name, slug, summary, description, cached_downloads, review, released, created_at, updated_at,
                      user_id, game_slug, project_type_slug)
@@ -448,3 +457,17 @@ INSERT INTO featured_projects(project_id)
 VALUES (1),
        (2),
        (99);
+
+
+INSERT INTO refresh_tokens(user_id, code, expired_at)
+VALUES (1, 'cd65cb00-b9a6-4da1-9b23-d7edfe2f9fa5', NOW() + INTERVAL 1 MONTH);
+
+INSERT INTO news(slug, title, summary, description, user_id)
+VALUES ('example', 'Example Post', 'Summary', 'Example', 1);
+
+INSERT INTO password_reset(user_id, code, created_at)
+VALUES (2, 'daf1f148-effd-400e-9b65-a4bf96e5215d', NOW());
+
+INSERT INTO email_domain_blacklist(domain)
+VALUES ('banned.com'),
+       ('banned2.com')

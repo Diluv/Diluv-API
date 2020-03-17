@@ -43,6 +43,7 @@ public final class Constants {
     // Emails
     public static final String POSTMARK_API_TOKEN = getValueOrDefault("POSTMARK_API_TOKEN", null);
     public static final String NOREPLY_EMAIL = getValueOrDefault("NOREPLY_EMAIL", "noreply@diluv.com");
+    public static final String PASSWORD_RESET = Constants.readResourceFileToString("/templates/password_reset.html", false);
     public static final String EMAIL_VERIFICATION = Constants.readResourceFileToString("/templates/email_verification.html", false);
 
     /**

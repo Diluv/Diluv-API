@@ -1,8 +1,0 @@
-{
-    "id": 1,
-    "username": "jaredlll08",
-    "displayName": "Jaredlll08",
-    "email": "jaredlll08@example.com",
-    "password": "$2y$12$EOekQxPF3shOaXb2a2S3rusom7V6KTkMX8/gDHbXovHwKaOC4EBPu",
-    "passwordType": "bcrypt"
-}

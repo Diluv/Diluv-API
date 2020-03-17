@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -13,12 +15,27 @@ import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import com.diluv.confluencia.database.record.CompromisedPasswordRecord;
 
 import static com.diluv.api.Main.DATABASE;
 
 public class PasswordUtility {
+
+    public static String generateBCrypt (String password) {
+
+        try {
+            final byte[] salt = new byte[16];
+            SecureRandom.getInstanceStrong().nextBytes(salt);
+            return OpenBSDBCrypt.generate(password.toCharArray(), salt, Constants.BCRYPT_COST);
+        }
+        catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static boolean isCompromised (String password) {
 
         String hash = DigestUtils.sha1Hex(password).toUpperCase();
@@ -49,7 +66,7 @@ public class PasswordUtility {
 
             return compromised;
         }
-        return false;
+        return true;
     }
 
     public static List<String> getPasswordCheck (String hash) {

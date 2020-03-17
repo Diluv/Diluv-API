@@ -42,21 +42,27 @@ public enum ErrorMessage {
     PROJECT_FILE_INVALID_CHANGELOG(ErrorType.BAD_REQUEST, "project_file.invalid.changelog"),
     PROJECT_FILE_INVALID_FILENAME(ErrorType.BAD_REQUEST, "prject_file.invalid.filename"),
     PROJECT_FILE_INVALID_FILE(ErrorType.BAD_REQUEST, "project_file.invalid.file"),
-    PROJECT_FILE_INVALID_RELEASE_TYPE(ErrorType.BAD_REQUEST, " project_file.invalid_release_type"),
-    PROJECT_FILE_INVALID_CLASSIFIER(ErrorType.BAD_REQUEST, " project_file.invalid_classifier"),
+    PROJECT_FILE_INVALID_RELEASE_TYPE(ErrorType.BAD_REQUEST, "project_file.invalid_release_type"),
+    PROJECT_FILE_INVALID_CLASSIFIER(ErrorType.BAD_REQUEST, "project_file.invalid_classifier"),
 
     FILE_INVALID_SIZE(ErrorType.BAD_REQUEST, "file.invalid.size"),
 
     // Project Type Errors
     PROJECT_TYPE_INVALID_SLUG(ErrorType.BAD_REQUEST, "project_type.invalid.slug"),
 
+    PASSWORD_RESET_EXPIRED(ErrorType.BAD_REQUEST, "password_reset.expired"),
+
     FAILED_CREATE_REFRESH_TOKEN(ErrorType.INTERNAL_SERVER_ERROR, "database.create_refresh_token"),
     FAILED_CREATE_TEMP_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.create_temp_user"),
     FAILED_CREATE_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.create_user"),
     FAILED_CREATE_PROJECT(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project"),
     FAILED_CREATE_PROJECT_FILE(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_file"),
+    FAILED_CREATE_PASSWORD_RESET(ErrorType.INTERNAL_SERVER_ERROR, "database.create_password_reset"),
+
+    FAILED_UPDATE_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.update_user"),
     FAILED_DELETE_TEMP_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_temp_user"),
     FAILED_DELETE_REFRESH_TOKEN(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_refresh_token"),
+    FAILED_DELETE_PASSWORD_RESET(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_password_reset"),
     FAILED_SHA512(ErrorType.INTERNAL_SERVER_ERROR, "failed.sha512"),
 
     FAILED_CREATE_EMAIL_SEND(ErrorType.INTERNAL_SERVER_ERROR, "database.create_email_sent"),
@@ -69,14 +75,13 @@ public enum ErrorMessage {
     NOT_FOUND_PROJECT(ErrorType.BAD_REQUEST, "notfound.project"),
     NOT_FOUND_USER_REFRESH_TOKEN(ErrorType.BAD_REQUEST, "notfound.user_refresh_token"),
     NOT_FOUND_NEWS(ErrorType.BAD_REQUEST, "notfound.news"),
+    NOT_FOUND_PASSWORD_RESET(ErrorType.BAD_REQUEST, "notfound.password_reset"),
 
-    FORM_INVALID(ErrorType.BAD_REQUEST, "form.invalid"),
     ERROR_TOKEN(ErrorType.BAD_REQUEST, "error.token"),
     ERROR_WRITING(ErrorType.INTERNAL_SERVER_ERROR, "error.writing"),
     ERROR_ALGORITHM(ErrorType.INTERNAL_SERVER_ERROR, "error.algorithm"),
     ERROR_SAVING_IMAGE(ErrorType.INTERNAL_SERVER_ERROR, "error.saving_image"),
 
-    NEWS_INVALID_SLUG(ErrorType.BAD_REQUEST, "news.invalid.slug"),
     COOLDOWN_EMAIL(ErrorType.BAD_REQUEST, "cooldown.email");
 
     private final ErrorType type;
