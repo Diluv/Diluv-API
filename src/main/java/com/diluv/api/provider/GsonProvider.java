@@ -1,4 +1,4 @@
-package com.diluv.api.utils;
+package com.diluv.api.provider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +58,7 @@ public class GsonProvider implements MessageBodyWriter<Object>, MessageBodyReade
 
         try (OutputStreamWriter out = new OutputStreamWriter(entityStream, StandardCharsets.UTF_8)) {
 
-            this.getGsonInstance().toJson(object, genericType, out);
+            this.getGsonInstance().toJson(object, out);
         }
     }
 

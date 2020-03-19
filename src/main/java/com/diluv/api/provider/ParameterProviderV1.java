@@ -1,4 +1,4 @@
-package com.diluv.api.v1;
+package com.diluv.api.provider;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;

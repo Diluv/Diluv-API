@@ -82,7 +82,10 @@ public enum ErrorMessage {
     ERROR_ALGORITHM(ErrorType.INTERNAL_SERVER_ERROR, "error.algorithm"),
     ERROR_SAVING_IMAGE(ErrorType.INTERNAL_SERVER_ERROR, "error.saving_image"),
 
-    COOLDOWN_EMAIL(ErrorType.BAD_REQUEST, "cooldown.email");
+    COOLDOWN_EMAIL(ErrorType.BAD_REQUEST, "cooldown.email"),
+
+    NOT_FOUND(ErrorType.BAD_REQUEST, "generic.404"),
+    THROWABLE(ErrorType.INTERNAL_SERVER_ERROR, "generic.throwable");
 
     private final ErrorType type;
     private final String message;
