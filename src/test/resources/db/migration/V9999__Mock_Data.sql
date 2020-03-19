@@ -458,7 +458,6 @@ VALUES (1),
        (2),
        (99);
 
-
 INSERT INTO refresh_tokens(user_id, code, expired_at)
 VALUES (1, 'cd65cb00-b9a6-4da1-9b23-d7edfe2f9fa5', NOW() + INTERVAL 1 MONTH);
 

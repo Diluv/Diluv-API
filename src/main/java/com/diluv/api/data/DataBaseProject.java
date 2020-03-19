@@ -12,6 +12,9 @@ import com.google.gson.annotations.Expose;
  */
 public class DataBaseProject {
 
+    @Expose
+    private final long id;
+
     /**
      * The display name of the project.
      */
@@ -73,6 +76,7 @@ public class DataBaseProject {
 
     public DataBaseProject (ProjectRecord projectRecord, List<DataCategory> categories, List<DataProjectContributor> projectAuthorRecords) {
 
+        this.id = projectRecord.getId();
         this.name = projectRecord.getName();
         this.slug = projectRecord.getSlug();
         this.summary = projectRecord.getSummary();
