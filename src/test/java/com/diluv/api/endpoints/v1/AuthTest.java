@@ -53,7 +53,7 @@ public class AuthTest {
 
         given().multiPart("username", "darkhax").multiPart("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_REQUIRED_MFA.getMessage()));
 
-        given().multiPart("username", "lclc98").multiPart("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_NOT_VERIFIED.getMessage()));
+        given().multiPart("username", "tempuser").multiPart("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_NOT_VERIFIED.getMessage()));
 
         given().multiPart("username", "testing").multiPart("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_USER.getMessage()));
     }
@@ -61,7 +61,7 @@ public class AuthTest {
     @Test
     public void testVerify () {
 
-        given().multiPart("email", "lclc98@diluv.com").multiPart("code", "8f32d879-45b3-4b8b-ae44-999e59566125").with().post(URL + "/verify").then().assertThat().statusCode(200);
+        given().multiPart("email", "tempuser@diluv.com").multiPart("code", "c1632ff7-367e-485f-91dd-92ab75903fa4").with().post(URL + "/verify").then().assertThat().statusCode(200);
 
         given().multiPart("email", "darkhax@diluv.com").multiPart("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_VERIFIED.getMessage()));
 
@@ -93,7 +93,7 @@ public class AuthTest {
 
         given().multiPart("username", "jaredlll08").multiPart("email", "jaredlll08@diluv.com").with().post(URL + "/resend").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_USER.getMessage()));
 
-        given().multiPart("username", "test2").multiPart("email", "test2@diluv.com").with().post(URL + "/resend").then().assertThat().statusCode(200);
+        given().multiPart("username", "tempuser2").multiPart("email", "tempuser2@diluv.com").with().post(URL + "/resend").then().assertThat().statusCode(200);
     }
 
     @Test

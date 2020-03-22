@@ -1,33 +1,17 @@
 package com.diluv.api.utils;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Collections;
 
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.diluv.api.Database;
 import com.diluv.api.DiluvAPIServer;
-import com.diluv.api.Main;
 import com.diluv.api.utils.auth.tokens.APIAccessToken;
 import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.auth.tokens.RefreshToken;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.FileDatabase;
-import com.diluv.confluencia.database.GameDatabase;
-import com.diluv.confluencia.database.NewsDatabase;
-import com.diluv.confluencia.database.ProjectDatabase;
-import com.diluv.confluencia.database.SecurityDatabase;
-import com.diluv.confluencia.database.UserDatabase;
-import com.diluv.confluencia.database.dao.FileDAO;
-import com.diluv.confluencia.database.dao.GameDAO;
-import com.diluv.confluencia.database.dao.NewsDAO;
-import com.diluv.confluencia.database.dao.ProjectDAO;
-import com.diluv.confluencia.database.dao.SecurityDAO;
-import com.diluv.confluencia.database.dao.UserDAO;
 import com.nimbusds.jose.JOSEException;
 import io.restassured.RestAssured;
 
@@ -44,12 +28,6 @@ public class TestUtil {
     public static final String IP = "0.0.0.0";
     public static final int PORT = 4545;
     public static boolean running = false;
-    public static final SecurityDAO SECURITY = new SecurityDatabase();
-    public static final FileDAO FILE = new FileDatabase();
-    public static final GameDAO GAME = new GameDatabase();
-    public static final ProjectDAO PROJECT = new ProjectDatabase();
-    public static final UserDAO USER = new UserDatabase();
-    public static final NewsDAO NEWS = new NewsDatabase();
 
     public static String VALID_TOKEN;
     public static String VALID_TOKEN_TWO;
@@ -75,7 +53,7 @@ public class TestUtil {
         }
 
         try {
-            VALID_REFRESH_TOKEN = new RefreshToken(1, "darkhax", "cd65cb00-b9a6-4da1-9b23-d7edfe2f9fa5").generate(calendar.getTime());
+            VALID_REFRESH_TOKEN = new RefreshToken(1, "darkhax", "9bd63558-3835-4e01-963f-66a0f467291c").generate(calendar.getTime());
         }
         catch (JOSEException e) {
             e.printStackTrace();
@@ -94,7 +72,6 @@ public class TestUtil {
     public static void start () {
 
         if (!running) {
-            Main.DATABASE = new Database(GAME, PROJECT, FILE, USER, SECURITY, NEWS);
             Confluencia.init(TestUtil.CONTAINER.getJdbcUrl(), TestUtil.CONTAINER.getUsername(), TestUtil.CONTAINER.getPassword(), true);
             DiluvAPIServer server = new DiluvAPIServer();
             server.start(IP, PORT);

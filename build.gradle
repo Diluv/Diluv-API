@@ -39,6 +39,7 @@ dependencies {
     implementation group: 'org.jboss.weld.servlet', name: 'weld-servlet', version: '2.4.8.Final'
     implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
 
+    testImplementation project(path: ':Confluencia', configuration: 'testOutput')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.0'
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
     testImplementation group: 'io.rest-assured', name: 'json-schema-validator', version: '4.3.0'
