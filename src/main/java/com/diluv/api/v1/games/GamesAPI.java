@@ -2,6 +2,7 @@ package com.diluv.api.v1.games;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -329,31 +330,29 @@ public class GamesAPI {
     }
 
     @POST
-    @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
+    @Path("/files")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response postProjectFile (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectFileUploadForm form) {
+    public Response postProjectFile (@HeaderParam("Authorization") Token token, @MultipartForm ProjectFileUploadForm form) {
 
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-        final ProjectTypeRecord projectTypeRecord = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        if (form.projectId == null) {
+            return ErrorMessage.PROJECT_FILE_INVALID_PROJECT_ID.respond();
+        }
+
+        final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByProjectId(form.projectId);
 
         if (projectRecord == null) {
-            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
-
-                return ErrorMessage.NOT_FOUND_GAME.respond();
-            }
-
-            if (projectTypeRecord == null) {
-
-                return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
-            }
-
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
+
+        final String gameSlug = projectRecord.getGameSlug();
+        final String projectTypeSlug = projectRecord.getProjectTypeSlug();
+
+        final ProjectTypeRecord projectTypeRecord = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectRecord.getProjectTypeSlug());
 
         if (!ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD)) {
 
@@ -399,14 +398,48 @@ public class GamesAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_CLASSIFIER.respond();
         }
 
-        final Long id = DATABASE.fileDAO.insertProjectFile(fileName, tempFile.length(), form.changelog, sha512, form.releaseType.toLowerCase(), form.classifier.toLowerCase(), projectRecord.getId(), token.getUserId());
+        if (form.version == null || form.version.length() > 20) {
 
-        if (id == null) {
+            // TODO check unique
+            return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
+        }
+
+        List<GameVersionRecord> gameVersionRecords = new ArrayList<>();
+        if (form.gameVersions != null) {
+            String[] gameVersions = form.gameVersions.split(",");
+            if (gameVersions.length > 0) {
+                gameVersionRecords = DATABASE.gameDAO.findGameVersionsByGameSlugAndVersions(gameSlug, gameVersions);
+                if (gameVersionRecords.size() != gameVersions.length) {
+                    List<String> versionNotFound = new ArrayList<>();
+                    for (GameVersionRecord record : gameVersionRecords) {
+                        for (String gameVersion : gameVersions) {
+                            if (!record.getVersion().equalsIgnoreCase(gameVersion)) {
+                                versionNotFound.add(gameVersion);
+                            }
+                        }
+                    }
+                    //TODO Include version
+                    return ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION.respond();
+                }
+            }
+        }
+
+        final Long projectFileId = DATABASE.fileDAO.insertProjectFile(fileName, form.version, tempFile.length(), form.changelog, sha512, form.releaseType.toLowerCase(), form.classifier.toLowerCase(), projectRecord.getId(), token.getUserId());
+
+        if (projectFileId == null) {
 
             return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
         }
 
-        File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, projectRecord.getId(), id, fileName);
+        if (!gameVersionRecords.isEmpty()) {
+            List<Long> versionIds = gameVersionRecords.stream().map(GameVersionRecord::getId).collect(Collectors.toList());
+
+            if (!DATABASE.fileDAO.insertProjectFileGameVersions(projectFileId, versionIds)) {
+                return ErrorMessage.FAILED_CREATE_PROJECT_FILE_GAME_VERSION.respond();
+            }
+        }
+
+        File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, projectRecord.getId(), projectFileId, fileName);
         destination.getParentFile().mkdirs();
         final boolean moved = tempFile.renameTo(destination);
 
@@ -417,11 +450,10 @@ public class GamesAPI {
             return ErrorMessage.ERROR_WRITING.respond();
         }
 
-        final ProjectFileRecord record = DATABASE.fileDAO.findOneProjectFileQueueByFileId(id);
+        final ProjectFileRecord record = DATABASE.fileDAO.findOneProjectFileQueueByFileId(projectFileId);
 
-        final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsByProjectFile(record.getId());
         List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
 
-        return ResponseUtil.successResponse(new DataProjectFileInQueue(record, gameVersions, gameSlug, projectTypeSlug, projectSlug));
+        return ResponseUtil.successResponse(new DataProjectFileInQueue(record, gameVersions, gameSlug, projectTypeSlug, projectRecord.getSlug()));
     }
 }
