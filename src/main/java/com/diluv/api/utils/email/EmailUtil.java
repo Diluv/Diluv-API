@@ -31,6 +31,7 @@ public class EmailUtil {
     }
 
     public static MessageResponse sendPasswordReset (String email, String code) {
+
         try {
             final ApiClient client = Postmark.getApiClient(Constants.POSTMARK_API_TOKEN);
             final String url = String.format("%s/password-reset?code=%s&email=%s", Constants.WEBSITE_URL, code, email);

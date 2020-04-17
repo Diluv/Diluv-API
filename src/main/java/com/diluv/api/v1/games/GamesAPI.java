@@ -352,8 +352,6 @@ public class GamesAPI {
         final String gameSlug = projectRecord.getGameSlug();
         final String projectTypeSlug = projectRecord.getProjectTypeSlug();
 
-        final ProjectTypeRecord projectTypeRecord = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectRecord.getProjectTypeSlug());
-
         if (!ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD)) {
 
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
@@ -374,20 +372,6 @@ public class GamesAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_FILENAME.respond();
         }
 
-        final String fileName = FilenameUtils.getName(form.fileName);
-        final File tempFile = FileUtil.getTempFile(projectRecord.getId(), fileName);
-        final String sha512 = FileUtil.writeFile(form.file, projectTypeRecord.getMaxFileSize(), tempFile);
-
-        if (tempFile == null) {
-
-            return ErrorMessage.FAILED_TEMP_FILE.respond();
-        }
-
-        if (sha512 == null) {
-
-            return ErrorMessage.FAILED_SHA512.respond();
-        }
-
         if (!Validator.validateReleaseType(form.releaseType)) {
 
             return ErrorMessage.PROJECT_FILE_INVALID_RELEASE_TYPE.respond();
@@ -400,8 +384,27 @@ public class GamesAPI {
 
         if (form.version == null || form.version.length() > 20) {
 
-            // TODO check unique
             return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
+        }
+
+        if (DATABASE.fileDAO.existsByProjectIdAndVersion(form.projectId, form.version)) {
+            return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
+        }
+
+        final ProjectTypeRecord projectTypeRecord = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+
+        final String fileName = FilenameUtils.getName(form.fileName);
+        final File tempFile = FileUtil.getTempFile(projectRecord.getId(), fileName);
+        final String sha512 = FileUtil.writeFile(form.file, projectTypeRecord.getMaxFileSize(), tempFile);
+
+        if (tempFile == null) {
+
+            return ErrorMessage.FAILED_TEMP_FILE.respond();
+        }
+
+        if (sha512 == null) {
+
+            return ErrorMessage.FAILED_SHA512.respond();
         }
 
         List<GameVersionRecord> gameVersionRecords = new ArrayList<>();

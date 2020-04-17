@@ -47,6 +47,7 @@ public enum ErrorMessage {
     PROJECT_FILE_INVALID_CLASSIFIER(ErrorType.BAD_REQUEST, "project_file.invalid.classifier"),
     PROJECT_FILE_INVALID_VERSION(ErrorType.BAD_REQUEST, "project_file.invalid.version"),
     PROJECT_FILE_INVALID_GAME_VERSION(ErrorType.BAD_REQUEST, "project_file.invalid.game_version"),
+    PROJECT_FILE_TAKEN_VERSION(ErrorType.BAD_REQUEST, "project_file.taken.version"),
 
     FILE_INVALID_SIZE(ErrorType.BAD_REQUEST, "file.invalid.size"),
 
