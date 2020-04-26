@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.diluv.api.utils.auth.tokens.APIAccessToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
@@ -49,9 +48,9 @@ public enum ProjectPermissions {
 
         if (token.getUserId() == projectRecord.getUserId()) {
             List<String> permissions = ProjectPermissions.getAllPermissions();
-            if (token instanceof APIAccessToken) {
-                permissions.retainAll(((APIAccessToken) token).getPermissions());
-            }
+//            if (token instanceof APIAccessToken) {
+//                permissions.retainAll(((APIAccessToken) token).getPermissions());
+//            }
             return permissions;
         }
 
@@ -61,9 +60,9 @@ public enum ProjectPermissions {
             ProjectAuthorRecord r = record.get();
 
             List<String> permissions = r.getPermissions();
-            if (token instanceof APIAccessToken) {
-                permissions.retainAll(((APIAccessToken) token).getPermissions());
-            }
+//            if (token instanceof APIAccessToken) {
+//                permissions.retainAll(((APIAccessToken) token).getPermissions());
+//            }
 
             return permissions;
         }

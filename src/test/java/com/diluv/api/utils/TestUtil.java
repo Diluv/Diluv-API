@@ -1,19 +1,11 @@
 package com.diluv.api.utils;
 
-import java.util.Calendar;
-import java.util.Collections;
+import com.diluv.api.DiluvAPIServer;
+import com.diluv.confluencia.Confluencia;
+import io.restassured.RestAssured;
 
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import com.diluv.api.DiluvAPIServer;
-import com.diluv.api.utils.auth.tokens.APIAccessToken;
-import com.diluv.api.utils.auth.tokens.AccessToken;
-import com.diluv.api.utils.auth.tokens.RefreshToken;
-import com.diluv.api.utils.permissions.ProjectPermissions;
-import com.diluv.confluencia.Confluencia;
-import com.nimbusds.jose.JOSEException;
-import io.restassured.RestAssured;
 
 @Testcontainers
 public class TestUtil {
@@ -35,39 +27,39 @@ public class TestUtil {
     public static String VALID_REFRESH_TOKEN;
     public static String INVALID_TOKEN = "invalid";
 
-    static {
-        final Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, 30);
-        try {
-            VALID_TOKEN = new AccessToken(1, "darkhax", Collections.emptyList()).generate(calendar.getTime());
-        }
-        catch (JOSEException e) {
-            e.printStackTrace();
-        }
+//    static {
+//        final Calendar calendar = Calendar.getInstance();
+//        calendar.add(Calendar.MINUTE, 30);
+//        try {
+//            VALID_TOKEN = new AccessToken(1, "darkhax", Collections.emptyList()).generate(calendar.getTime());
+//        }
+//        catch (JOSEException e) {
+//            e.printStackTrace();
+//        }
 
-        try {
-            VALID_TOKEN_TWO = new AccessToken(2, "jaredlll08", Collections.emptyList()).generate(calendar.getTime());
-        }
-        catch (JOSEException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            VALID_TOKEN_TWO = new AccessToken(2, "jaredlll08", Collections.emptyList()).generate(calendar.getTime());
+//        }
+//        catch (JOSEException e) {
+//            e.printStackTrace();
+//        }
 
-        try {
-            VALID_REFRESH_TOKEN = new RefreshToken(1, "darkhax", "9bd63558-3835-4e01-963f-66a0f467291c").generate(calendar.getTime());
-        }
-        catch (JOSEException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            VALID_REFRESH_TOKEN = new RefreshToken(1, "darkhax", "9bd63558-3835-4e01-963f-66a0f467291c").generate(calendar.getTime());
+//}
+//        catch (JOSEException e) {
+//            e.printStackTrace();
+//        }
+//
+//        calendar.add(Calendar.MONTH, 6);
 
-        calendar.add(Calendar.MONTH, 6);
-
-        try {
-            VALID_LONG_LASTING_TOKEN = new APIAccessToken(1, "darkhax", "4b3b85e3-f7ac-4c7b-b71a-df972909b213", Collections.singletonList(ProjectPermissions.FILE_UPLOAD.getName())).generate();
-        }
-        catch (JOSEException e) {
-            e.printStackTrace();
-        }
-    }
+//        try {
+//            VALID_LONG_LASTING_TOKEN = new APIAccessToken(1, "darkhax", "4b3b85e3-f7ac-4c7b-b71a-df972909b213", Collections.singletonList(ProjectPermissions.FILE_UPLOAD.getName())).generate();
+//        }
+//        catch (JOSEException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public static void start () {
 

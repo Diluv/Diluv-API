@@ -2,16 +2,11 @@ package com.diluv.api.utils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,10 +16,23 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.validator.GenericValidator;
 
 import com.diluv.api.DiluvAPIServer;
+import com.nimbusds.jose.JOSEObjectType;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.jwk.source.RemoteJWKSet;
+import com.nimbusds.jose.proc.DefaultJOSEObjectTypeVerifier;
+import com.nimbusds.jose.proc.JWSKeySelector;
+import com.nimbusds.jose.proc.JWSVerificationKeySelector;
+import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
+import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier;
+import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 
 public final class Constants {
 
-    public static final PrivateKey PRIVATE_KEY = getPrivateKey("private.pem", "RSA", true);
+    public static final ConfigurableJWTProcessor<SecurityContext> JWT_PROCESSOR =
+        getJWTProcessor(getValueOrDefault("AUTH_URL", "https://auth.diluv.com/.well-known/openid-configuration/jwks"));
 
     public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
     public static final String WEBSITE_URL = getValueOrDefault("WEBSITE_URL", "https://diluv.com");
@@ -128,45 +136,29 @@ public final class Constants {
         return value == null || !GenericValidator.isInt(value) ? defaultValue : Integer.parseInt(value);
     }
 
-    /**
-     * Reads a private key from a file. If the key can not be read an error will be logged and
-     * a null value will be returned.
-     *
-     * @param fileLocation The location of the file to read.
-     * @param required Whether or not this is a required key. If true the program will
-     *     terminate on a null value.
-     * @return The private key read from the provided file. If no key can be loaded this will
-     *     return null.
-     */
     @Nullable
-    public static PrivateKey getPrivateKey (String fileLocation, String algorithm, boolean required) {
+    public static ConfigurableJWTProcessor<SecurityContext> getJWTProcessor (String url) {
 
         try {
+            ConfigurableJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
 
-            String privateKey = readFileToString(fileLocation, true);
+            jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(new JOSEObjectType("at+jwt")));
+            jwtProcessor.setJWTClaimsSetVerifier(new DefaultJWTClaimsVerifier(
+                new JWTClaimsSet.Builder().issuer("https://auth.dilub.com").build(),
+                new HashSet<>(Arrays.asList("sub", /*"iat",*/ "exp"/*, "jti"*/))));
 
-            if (privateKey != null) {
+            JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(url));
 
-                privateKey = privateKey.replace("-----BEGIN PRIVATE KEY-----", "");
-                privateKey = privateKey.replace("-----END PRIVATE KEY-----", "");
+            JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, keySource);
 
-                final KeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKey));
-                final KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+            jwtProcessor.setJWSKeySelector(keySelector);
 
-                return keyFactory.generatePrivate(spec);
-            }
+
+            return jwtProcessor;
         }
-
-        catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
-
-            DiluvAPIServer.LOGGER.error("Failed to read valid private key {} with algorithm {}.", fileLocation, algorithm, e);
+        catch (IOException e) {
+            e.printStackTrace();
         }
-
-        if (required) {
-
-            System.exit(1);
-        }
-
         return null;
     }
 

@@ -3,14 +3,10 @@ package com.diluv.api.v1.auth;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -20,28 +16,20 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.validator.GenericValidator;
-import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
-import com.diluv.api.DiluvAPIServer;
-import com.diluv.api.data.DataLogin;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.PasswordUtility;
 import com.diluv.api.utils.auth.Validator;
-import com.diluv.api.utils.auth.tokens.AccessToken;
-import com.diluv.api.utils.auth.tokens.RefreshToken;
 import com.diluv.api.utils.email.EmailUtil;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.database.record.EmailSendRecord;
 import com.diluv.confluencia.database.record.PasswordResetRecord;
-import com.diluv.confluencia.database.record.RefreshTokenRecord;
 import com.diluv.confluencia.database.record.TempUserRecord;
 import com.diluv.confluencia.database.record.UserRecord;
-import com.diluv.confluencia.database.record.UserRoleRecord;
-import com.nimbusds.jose.JOSEException;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.wildbit.java.postmark.client.data.model.message.MessageResponse;
@@ -119,62 +107,6 @@ public class AuthAPI {
         return ResponseUtil.successResponse(null);
     }
 
-    @POST
-    @Path("/login")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response login (@MultipartForm LoginForm form) {
-
-        try {
-
-            if (!Validator.validateUsername(form.username)) {
-                return ErrorMessage.USER_INVALID_USERNAME.respond();
-            }
-
-            if (!Validator.validatePassword(form.password)) {
-                return ErrorMessage.USER_INVALID_PASSWORD.respond();
-            }
-
-            final String username = form.username.toLowerCase();
-
-            final UserRecord userRecord = DATABASE.userDAO.findOneByUsername(username);
-            if (userRecord == null) {
-                if (DATABASE.userDAO.existsTempUserByUsername(username)) {
-                    return ErrorMessage.USER_NOT_VERIFIED.respond();
-                }
-                return ErrorMessage.NOT_FOUND_USER.respond();
-            }
-
-            if (!userRecord.getPasswordType().equalsIgnoreCase("bcrypt")) {
-                return ErrorMessage.USER_INVALID_PASSWORD_TYPE.respond();
-            }
-
-            if (!OpenBSDBCrypt.checkPassword(userRecord.getPassword(), form.password.toCharArray())) {
-                return ErrorMessage.USER_WRONG_PASSWORD.respond();
-            }
-
-            if (userRecord.isMfa()) {
-                if (form.mfa == null) {
-                    return ErrorMessage.USER_REQUIRED_MFA.respond();
-                }
-
-                if (!GenericValidator.isInt(form.mfa)) {
-                    return ErrorMessage.USER_INVALID_MFA.respond();
-                }
-
-                if (!this.ga.authorize(userRecord.getMfaSecret(), Integer.parseInt(form.mfa))) {
-                    // TODO Code not valid and check scratch codes
-                    return null;
-                }
-            }
-
-            return this.generateToken(userRecord.getId(), userRecord.getUsername());
-        }
-        catch (final JOSEException e) {
-
-            DiluvAPIServer.LOGGER.error("Failed to login.");
-            return ErrorMessage.ERROR_TOKEN.respond();
-        }
-    }
 
     @POST
     @Path("/verify")
@@ -374,40 +306,6 @@ public class AuthAPI {
         return ResponseUtil.successResponse(null);
     }
 
-    @POST
-    @Path("/refresh")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response refresh (@HeaderParam("Authorization") String auth) {
-
-        try {
-            if (auth == null) {
-                return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-            }
-
-            final RefreshToken refreshToken = RefreshToken.getToken(auth);
-
-            if (refreshToken == null) {
-                return ErrorMessage.USER_INVALID_REFRESH_TOKEN.respond();
-            }
-
-            final RefreshTokenRecord record = DATABASE.userDAO.findRefreshTokenByUserIdAndCode(refreshToken.getUserId(), refreshToken.getCode());
-            if (record == null) {
-                return ErrorMessage.NOT_FOUND_USER_REFRESH_TOKEN.respond();
-            }
-
-            if (!DATABASE.userDAO.deleteRefreshTokenByUserIdAndCode(refreshToken.getUserId(), refreshToken.getCode())) {
-                return ErrorMessage.FAILED_DELETE_REFRESH_TOKEN.respond();
-            }
-
-            return this.generateToken(refreshToken.getUserId(), refreshToken.getUsername());
-        }
-        catch (final JOSEException e) {
-
-            DiluvAPIServer.LOGGER.error("Failed to refresh", e);
-            return ErrorMessage.ERROR_TOKEN.respond();
-        }
-    }
-
     @GET
     @Path("/checkusername/{username}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -418,27 +316,5 @@ public class AuthAPI {
         }
 
         return ResponseUtil.successResponse(null);
-    }
-
-    private Response generateToken (long userId, String username) throws JOSEException {
-
-        final String code = UUID.randomUUID().toString();
-
-        final Calendar accessTokenExpire = Calendar.getInstance();
-        accessTokenExpire.add(Calendar.MINUTE, 30);
-
-        final Calendar refreshTokenExpire = Calendar.getInstance();
-        refreshTokenExpire.add(Calendar.MONTH, 1);
-
-        if (!DATABASE.userDAO.insertRefreshToken(userId, code, new Timestamp(refreshTokenExpire.getTimeInMillis()))) {
-            return ErrorMessage.FAILED_CREATE_REFRESH_TOKEN.respond();
-        }
-
-        List<String> roles = DATABASE.userDAO.findAllUserRolesByUserId(userId).stream().map(UserRoleRecord::getName).collect(Collectors.toList());
-
-        final String accessToken = new AccessToken(userId, username, roles).generate(accessTokenExpire.getTime());
-        final String refreshToken = new RefreshToken(userId, username, code).generate(refreshTokenExpire.getTime());
-
-        return ResponseUtil.successResponse(new DataLogin(accessToken, accessTokenExpire.getTimeInMillis(), refreshToken, refreshTokenExpire.getTimeInMillis()));
     }
 }

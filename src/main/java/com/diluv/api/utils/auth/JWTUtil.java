@@ -2,23 +2,26 @@ package com.diluv.api.utils.auth;
 
 import java.text.ParseException;
 
-import com.nimbusds.jwt.SignedJWT;
+import com.diluv.api.utils.Constants;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.proc.BadJOSEException;
+import com.nimbusds.jwt.JWTClaimsSet;
 
 public class JWTUtil {
 
     public static final String BEARER = "Bearer ";
 
-    public static SignedJWT getJWT (String token) {
+    public static JWTClaimsSet getJWT (String token) {
 
         try {
+
             if (JWTUtil.isBearerToken(token)) {
 
-                return SignedJWT.parse(token.substring(JWTUtil.BEARER.length()));
+                return Constants.JWT_PROCESSOR.process(token.substring(JWTUtil.BEARER.length()), null);
             }
         }
-        catch (final ParseException e) {
-
-            // Skip over invalid JWT without logging an error.
+        catch (ParseException | JOSEException | BadJOSEException e) {
+            e.printStackTrace();
         }
         return null;
     }
