@@ -1,13 +1,13 @@
 package com.diluv.api.utils.permissions;
 
+import com.diluv.api.utils.auth.tokens.Token;
+import com.diluv.confluencia.database.record.ProjectAuthorRecord;
+import com.diluv.confluencia.database.record.ProjectRecord;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.diluv.api.utils.auth.tokens.Token;
-import com.diluv.confluencia.database.record.ProjectAuthorRecord;
-import com.diluv.confluencia.database.record.ProjectRecord;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -47,10 +47,10 @@ public enum ProjectPermissions {
     public static List<String> getAuthorizedUserPermissions (ProjectRecord projectRecord, Token token, List<ProjectAuthorRecord> records) {
 
         if (token.getUserId() == projectRecord.getUserId()) {
-            List<String> permissions = ProjectPermissions.getAllPermissions();
-//            if (token instanceof APIAccessToken) {
-//                permissions.retainAll(((APIAccessToken) token).getPermissions());
-//            }
+
+            List<String> permissions = getAllPermissions();
+            permissions.retainAll(token.getProjectPermissions());
+
             return permissions;
         }
 
@@ -60,9 +60,7 @@ public enum ProjectPermissions {
             ProjectAuthorRecord r = record.get();
 
             List<String> permissions = r.getPermissions();
-//            if (token instanceof APIAccessToken) {
-//                permissions.retainAll(((APIAccessToken) token).getPermissions());
-//            }
+            permissions.retainAll(token.getProjectPermissions());
 
             return permissions;
         }
@@ -74,4 +72,5 @@ public enum ProjectPermissions {
 
         return Arrays.stream(ProjectPermissions.values()).map(ProjectPermissions::getName).collect(Collectors.toList());
     }
+
 }

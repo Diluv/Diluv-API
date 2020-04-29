@@ -1,9 +1,8 @@
 package com.diluv.api.utils.auth;
 
-import javax.ws.rs.ext.ParamConverter;
-
-import com.diluv.api.utils.auth.tokens.AccessToken;
 import com.diluv.api.utils.auth.tokens.Token;
+
+import javax.ws.rs.ext.ParamConverter;
 
 public class ParamConverterAccessToken implements ParamConverter<Token> {
 
@@ -16,10 +15,7 @@ public class ParamConverterAccessToken implements ParamConverter<Token> {
     @Override
     public Token fromString (String param) {
 
-        AccessToken token = AccessToken.getToken(param);
-        /*if (token != null) */
-        return token;
-//        return APIAccessToken.getToken(param);
+        return JWTUtil.getToken(param);
     }
 
     @Override

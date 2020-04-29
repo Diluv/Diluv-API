@@ -29,15 +29,6 @@ jobs:
         with:
           token: ${{secrets.github_token}}
 
-      - name: Install packages
-        run: sudo apt install openssh-client
-
-      - name: Generate private/public keys
-        run: |
-          openssl genrsa 2048 > rsa.private
-          openssl pkcs8 -topk8 -inform PEM -outform PEM -in rsa.private -nocrypt > private.pem
-          openssl rsa -inform PEM -in rsa.private -pubout > public.pem
-
       - name: Testing Building
         run: ./gradlew test
 

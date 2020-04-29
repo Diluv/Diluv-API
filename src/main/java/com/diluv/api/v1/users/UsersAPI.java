@@ -1,32 +1,28 @@
 package com.diluv.api.v1.users;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.cache.Cache;
-
 import com.diluv.api.data.DataAuthorizedUser;
 import com.diluv.api.data.DataCategory;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.Pagination;
-import com.diluv.api.utils.auth.tokens.AccessToken;
+import com.diluv.api.utils.auth.JWTUtil;
+import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.UserRecord;
 import com.diluv.confluencia.database.sort.ProjectSort;
+
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.cache.Cache;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -44,15 +40,14 @@ public class UsersAPI {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        final AccessToken token = AccessToken.getToken(auth);
+        final Token token = JWTUtil.getToken(auth);
 
         if (token == null) {
 
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
-
-        final UserRecord userRecord = DATABASE.userDAO.findOneByUsername(token.getUsername());
+        final UserRecord userRecord = DATABASE.userDAO.findOneByUserId(token.getUserId());
 
         if (userRecord == null) {
 
@@ -77,11 +72,14 @@ public class UsersAPI {
 
         if (auth != null) {
 
-            final AccessToken token = AccessToken.getToken(auth);
+            final Token token = JWTUtil.getToken(auth);
 
-            if (token != null && token.getUsername().equalsIgnoreCase(username)) {
+            if (token != null) {
+                final UserRecord tokenUser = DATABASE.userDAO.findOneByUserId(token.getUserId());
 
-                return ResponseUtil.successResponse(new DataAuthorizedUser(userRecord));
+                if (tokenUser.getUsername().equalsIgnoreCase(username)) {
+                    return ResponseUtil.successResponse(new DataAuthorizedUser(userRecord));
+                }
             }
         }
 
@@ -93,11 +91,16 @@ public class UsersAPI {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort) {
 
-        final AccessToken token = AccessToken.getToken(auth);
+        final Token token = JWTUtil.getToken(auth);
         long page = Pagination.getPage(queryPage);
         int limit = Pagination.getLimit(queryLimit);
 
-        boolean authorized = token != null && token.getUsername().equalsIgnoreCase(username);
+        boolean authorized = false;
+
+        if (token != null) {
+            final UserRecord userRecord = DATABASE.userDAO.findOneByUserId(token.getUserId());
+            authorized = userRecord.getUsername().equalsIgnoreCase(username);
+        }
 
         List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, ProjectSort.fromString(sort, ProjectSort.NEW));
 

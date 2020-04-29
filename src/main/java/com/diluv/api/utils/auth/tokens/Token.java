@@ -1,35 +1,15 @@
 package com.diluv.api.utils.auth.tokens;
 
-import javax.annotation.Nullable;
-
-import com.diluv.api.utils.auth.JWTUtil;
-import com.nimbusds.jwt.JWTClaimsSet;
+import java.util.List;
 
 public class Token {
     private final long userId;
-    private final String username;
+    private final List<String> projectPermissions;
 
-    protected Token (long userId, String username) {
+    public Token (long userId, List<String> projectPermissions) {
 
         this.userId = userId;
-        this.username = username;
-    }
-
-    protected static JWTClaimsSet getToken (@Nullable String token, String subject) {
-
-        if (token != null) {
-
-            final JWTClaimsSet claims = JWTUtil.getJWT(token);
-            if (claims == null) {
-                return null;
-            }
-            if (!claims.getSubject().equalsIgnoreCase(subject)) {
-                return null;
-            }
-            return claims;
-        }
-
-        return null;
+        this.projectPermissions = projectPermissions;
     }
 
     public long getUserId () {
@@ -37,8 +17,8 @@ public class Token {
         return this.userId;
     }
 
-    public String getUsername () {
+    public List<String> getProjectPermissions () {
 
-        return this.username;
+        return this.projectPermissions;
     }
 }

@@ -1,20 +1,5 @@
 package com.diluv.api.utils;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.validator.GenericValidator;
-
 import com.diluv.api.DiluvAPIServer;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -29,10 +14,25 @@ import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.validator.GenericValidator;
+
+import javax.annotation.Nullable;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public final class Constants {
 
-    public static final ConfigurableJWTProcessor<SecurityContext> JWT_PROCESSOR =
-        getJWTProcessor(getValueOrDefault("AUTH_URL", "https://auth.diluv.com/.well-known/openid-configuration/jwks"));
+    public static final String AUTH_BASE_URL = getValueOrDefault("AUTH_BASE_URL", "https://auth.diluv.com");
+    public static final ConfigurableJWTProcessor<SecurityContext> JWT_PROCESSOR = getJWTProcessor();
 
     public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
     public static final String WEBSITE_URL = getValueOrDefault("WEBSITE_URL", "https://diluv.com");
@@ -137,22 +137,21 @@ public final class Constants {
     }
 
     @Nullable
-    public static ConfigurableJWTProcessor<SecurityContext> getJWTProcessor (String url) {
+    public static ConfigurableJWTProcessor<SecurityContext> getJWTProcessor () {
 
         try {
             ConfigurableJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
 
             jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(new JOSEObjectType("at+jwt")));
-            jwtProcessor.setJWTClaimsSetVerifier(new DefaultJWTClaimsVerifier(
-                new JWTClaimsSet.Builder().issuer("https://auth.dilub.com").build(),
+            jwtProcessor.setJWTClaimsSetVerifier(new DefaultJWTClaimsVerifier<>(
+                new JWTClaimsSet.Builder().issuer(AUTH_BASE_URL).build(),
                 new HashSet<>(Arrays.asList("sub", /*"iat",*/ "exp"/*, "jti"*/))));
 
-            JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(url));
+            JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(AUTH_BASE_URL + "/.well-known/openid-configuration/jwks"));
 
             JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, keySource);
 
             jwtProcessor.setJWSKeySelector(keySelector);
-
 
             return jwtProcessor;
         }

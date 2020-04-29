@@ -45,20 +45,6 @@ public class AuthTest {
     }
 
     @Test
-    public void testLogin () {
-
-        given().multiPart("username", "jaredlll08").multiPart("password", "password").with().post(URL + "/login").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/login-schema.json"));
-
-        given().multiPart("username", "jaredlll08").multiPart("password", "wrongpassword").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_WRONG_PASSWORD.getMessage()));
-
-        given().multiPart("username", "darkhax").multiPart("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_REQUIRED_MFA.getMessage()));
-
-        given().multiPart("username", "tempuser").multiPart("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_NOT_VERIFIED.getMessage()));
-
-        given().multiPart("username", "testing").multiPart("password", "password").with().post(URL + "/login").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_USER.getMessage()));
-    }
-
-    @Test
     public void testVerify () {
 
         given().multiPart("email", "tempuser@diluv.com").multiPart("code", "c1632ff7-367e-485f-91dd-92ab75903fa4").with().post(URL + "/verify").then().assertThat().statusCode(200);
@@ -68,14 +54,6 @@ public class AuthTest {
         given().multiPart("email", "jaredlll08@diluv.com").multiPart("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_VERIFIED.getMessage()));
 
         given().multiPart("email", "testing@diluv.com").multiPart("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_USER.getMessage()));
-    }
-
-    @Test
-    public void testRefresh () {
-
-        given().with().post(URL + "/refresh").then().assertThat().statusCode(401).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_REQUIRED_TOKEN.getMessage()));
-
-        given().header("Authorization", "Bearer " + TestUtil.VALID_REFRESH_TOKEN).with().post(URL + "/refresh").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/login-schema.json"));
     }
 
     @Test
@@ -108,7 +86,5 @@ public class AuthTest {
         given().multiPart("code", "invalid").multiPart("email", "jaredlll08@diluv.com").multiPart("password", "password").with().post(URL + "/reset-password").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_PASSWORD_RESET.getMessage()));
         given().multiPart("code", "daf1f148-effd-400e-9b65-a4bf96e5215d").multiPart("email", "jaredlll08@diluv.com").multiPart("password", "password").with().post(URL + "/reset-password").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_COMPROMISED_PASSWORD.getMessage()));
         given().multiPart("code", "daf1f148-effd-400e-9b65-a4bf96e5215d").multiPart("email", "jaredlll08@diluv.com").multiPart("password", "qjeghExvF4SA6HuJLWjM").with().post(URL + "/reset-password").then().assertThat().statusCode(200);
-
-        given().multiPart("username", "jaredlll08").multiPart("password", "qjeghExvF4SA6HuJLWjM").with().post(URL + "/login").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/login-schema.json"));
     }
 }

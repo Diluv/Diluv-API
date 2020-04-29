@@ -2,8 +2,7 @@ package com.diluv.api.utils.permissions;
 
 public enum UserPermissions {
 
-    VIEW_ADMIN("admin.view"),
-    ;
+    VIEW_ADMIN("admin.view");
 
     private final String name;
 
@@ -16,5 +15,5 @@ public enum UserPermissions {
 
         return this.name;
     }
-
 }
+

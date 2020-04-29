@@ -1,10 +1,10 @@
 package com.diluv.api.provider;
 
+import com.diluv.api.utils.error.ErrorMessage;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-
-import com.diluv.api.utils.error.ErrorMessage;
 
 @Provider
 public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
@@ -12,6 +12,7 @@ public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
     @Override
     public Response toResponse (Throwable exception) {
 
+        exception.printStackTrace();
         return ErrorMessage.THROWABLE.respond();
     }
 }
