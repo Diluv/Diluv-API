@@ -58,13 +58,20 @@ public class JWTUtil {
                         return null;
                     }
                 }
-                byte[] sha256 = DigestUtils.sha256(token + ":reference_token");
+
+                String type = "reference_token";
+                byte[] sha256 = DigestUtils.sha256(token + ":" + type);
                 String key = Base64.getEncoder().encodeToString(sha256);
-                ReferenceTokenRecord record = DATABASE.securityDAO.findPersistedGrantByKeyAndType(key, "reference_token");
+                ReferenceTokenRecord record = DATABASE.securityDAO.findPersistedGrantByKeyAndType(key, type);
                 if (record == null)
                     return null;
 
-                if (System.currentTimeMillis() - record.getExpiration() > 0) {
+                long currentTime = System.currentTimeMillis();
+
+                if (currentTime < record.getCreationTime()) {
+                    return null;
+                }
+                if (currentTime > record.getExpiration()) {
                     return null;
                 }
 
