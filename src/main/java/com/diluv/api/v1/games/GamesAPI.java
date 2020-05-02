@@ -244,10 +244,10 @@ public class GamesAPI {
         final List<ProjectFileRecord> projectFileRecords;
 
         if (version == null) {
-            projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlug(gameSlug, projectTypeSlug, projectSlug, authorized, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW));
+            projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord.getId(), authorized, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW));
         }
         else {
-            projectFileRecords = DATABASE.fileDAO.findAllByGameSlugAndProjectTypeAndProjectSlugWhereVersion(gameSlug, projectTypeSlug, projectSlug, authorized, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW), version);
+            projectFileRecords = DATABASE.fileDAO.findAllByProjectIdWhereVersion(projectRecord.getId(), authorized, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW), version);
         }
 
         final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> {
@@ -327,136 +327,5 @@ public class GamesAPI {
         final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
         List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(new DataProject(projectRecord, categories));
-    }
-
-    @POST
-    @Path("/files")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response postProjectFile (@HeaderParam("Authorization") Token token, @MultipartForm ProjectFileUploadForm form) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (form.projectId == null) {
-            return ErrorMessage.PROJECT_FILE_INVALID_PROJECT_ID.respond();
-        }
-
-        final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByProjectId(form.projectId);
-
-        if (projectRecord == null) {
-            return ErrorMessage.NOT_FOUND_PROJECT.respond();
-        }
-
-        final String gameSlug = projectRecord.getGameSlug();
-        final String projectTypeSlug = projectRecord.getProjectTypeSlug();
-
-        if (!ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD)) {
-
-            return ErrorMessage.USER_NOT_AUTHORIZED.respond();
-        }
-
-        if (!Validator.validateProjectFileChangelog(form.changelog)) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_CHANGELOG.respond();
-        }
-
-        if (form.file == null) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_FILE.respond();
-        }
-
-        if (form.fileName == null) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_FILENAME.respond();
-        }
-
-        if (!Validator.validateReleaseType(form.releaseType)) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_RELEASE_TYPE.respond();
-        }
-
-        if (!Validator.validateClassifier(form.classifier)) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_CLASSIFIER.respond();
-        }
-
-        if (form.version == null || form.version.length() > 20) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
-        }
-
-        if (DATABASE.fileDAO.existsByProjectIdAndVersion(form.projectId, form.version)) {
-            return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
-        }
-
-        final ProjectTypeRecord projectTypeRecord = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
-
-        final String fileName = FilenameUtils.getName(form.fileName);
-        final File tempFile = FileUtil.getTempFile(projectRecord.getId(), fileName);
-        final String sha512 = FileUtil.writeFile(form.file, projectTypeRecord.getMaxFileSize(), tempFile);
-
-        if (tempFile == null) {
-
-            return ErrorMessage.FAILED_TEMP_FILE.respond();
-        }
-
-        if (sha512 == null) {
-
-            return ErrorMessage.FAILED_SHA512.respond();
-        }
-
-        List<GameVersionRecord> gameVersionRecords = new ArrayList<>();
-        if (form.gameVersions != null) {
-            String[] gameVersions = form.gameVersions.split(",");
-            if (gameVersions.length > 0) {
-                gameVersionRecords = DATABASE.gameDAO.findGameVersionsByGameSlugAndVersions(gameSlug, gameVersions);
-                if (gameVersionRecords.size() != gameVersions.length) {
-                    List<String> versionNotFound = new ArrayList<>();
-                    for (GameVersionRecord record : gameVersionRecords) {
-                        for (String gameVersion : gameVersions) {
-                            if (!record.getVersion().equalsIgnoreCase(gameVersion)) {
-                                versionNotFound.add(gameVersion);
-                            }
-                        }
-                    }
-                    //TODO Include version
-                    return ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION.respond();
-                }
-            }
-        }
-
-        final Long projectFileId = DATABASE.fileDAO.insertProjectFile(fileName, form.version, tempFile.length(), form.changelog, sha512, form.releaseType.toLowerCase(), form.classifier.toLowerCase(), projectRecord.getId(), token.getUserId());
-
-        if (projectFileId == null) {
-
-            return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
-        }
-
-        if (!gameVersionRecords.isEmpty()) {
-            List<Long> versionIds = gameVersionRecords.stream().map(GameVersionRecord::getId).collect(Collectors.toList());
-
-            if (!DATABASE.fileDAO.insertProjectFileGameVersions(projectFileId, versionIds)) {
-                return ErrorMessage.FAILED_CREATE_PROJECT_FILE_GAME_VERSION.respond();
-            }
-        }
-
-        File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, projectRecord.getId(), projectFileId, fileName);
-        destination.getParentFile().mkdirs();
-        final boolean moved = tempFile.renameTo(destination);
-
-        tempFile.delete();
-        tempFile.getParentFile().delete();
-
-        if (!moved) {
-            return ErrorMessage.ERROR_WRITING.respond();
-        }
-
-        final ProjectFileRecord record = DATABASE.fileDAO.findOneProjectFileQueueByFileId(projectFileId);
-
-        List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
-
-        return ResponseUtil.successResponse(new DataProjectFileInQueue(record, gameVersions, gameSlug, projectTypeSlug, projectRecord.getSlug()));
     }
 }

@@ -5,6 +5,8 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
+import com.diluv.api.v1.projects.ProjectsAPI;
+
 import org.jboss.resteasy.plugins.interceptors.CorsFilter;
 import org.jboss.resteasy.plugins.interceptors.GZIPEncodingInterceptor;
 
@@ -44,6 +46,7 @@ public class APIV1 extends Application {
         classes.add(AuthAPI.class);
         classes.add(FeaturedAPI.class);
         classes.add(GamesAPI.class);
+        classes.add(ProjectsAPI.class);
         classes.add(NewsAPI.class);
         classes.add(UsersAPI.class);
 
