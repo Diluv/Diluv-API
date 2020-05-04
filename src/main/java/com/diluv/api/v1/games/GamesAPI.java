@@ -1,31 +1,7 @@
 package com.diluv.api.v1.games;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.apache.commons.io.FilenameUtils;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.cache.Cache;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-
 import com.diluv.api.data.*;
 import com.diluv.api.utils.Constants;
-import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.Pagination;
 import com.diluv.api.utils.auth.Validator;
@@ -33,19 +9,26 @@ import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.record.CategoryRecord;
-import com.diluv.confluencia.database.record.GameRecord;
-import com.diluv.confluencia.database.record.GameVersionRecord;
-import com.diluv.confluencia.database.record.ProjectAuthorRecord;
-import com.diluv.confluencia.database.record.ProjectFileRecord;
-import com.diluv.confluencia.database.record.ProjectLinkRecord;
-import com.diluv.confluencia.database.record.ProjectRecord;
-import com.diluv.confluencia.database.record.ProjectTypeRecord;
+import com.diluv.confluencia.database.record.*;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.NewsSort;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.github.slugify.Slugify;
+
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.cache.Cache;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -251,11 +234,12 @@ public class GamesAPI {
         }
 
         final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> {
-            final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsByProjectFile(projectRecord.getId());
+            final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsById(projectRecord.getId());
             List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
+            final List<Long> dependencies = DATABASE.fileDAO.findAllProjectDependenciesById(record.getId());
             return record.isReleased() ?
-                new DataProjectFileAvailable(record, gameVersions, gameSlug, projectTypeSlug, projectSlug) :
-                new DataProjectFileInQueue(record, gameVersions, gameSlug, projectTypeSlug, projectSlug);
+                new DataProjectFileAvailable(record, dependencies, gameVersions, gameSlug, projectTypeSlug, projectSlug) :
+                new DataProjectFileInQueue(record, dependencies, gameVersions, gameSlug, projectTypeSlug, projectSlug);
         }).collect(Collectors.toList());
         return ResponseUtil.successResponse(projectFiles);
     }

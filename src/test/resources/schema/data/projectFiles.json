@@ -20,6 +20,9 @@
         "createdAt": {
             "type": "number"
         },
+        "dependencies": {
+            "type": "array"
+        },
         "gameVersions": {
             "$ref": "game_versions.json"
         },

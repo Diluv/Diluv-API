@@ -1,9 +1,9 @@
 package com.diluv.api.data;
 
-import java.util.List;
-
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.google.gson.annotations.Expose;
+
+import java.util.List;
 
 /**
  * Represents a file uploaded to a project.
@@ -59,6 +59,12 @@ public class DataProjectFile {
     private final long createdAt;
 
     /**
+     * The list of the project ids the file depends on.
+     */
+    @Expose
+    private final List<Long> dependencies;
+
+    /**
      * The list of game versions the file works with
      */
     @Expose
@@ -94,7 +100,7 @@ public class DataProjectFile {
     @Expose
     private final String uploaderUsername;
 
-    public DataProjectFile (ProjectFileRecord rs, List<DataGameVersion> gameVersions, String gameSlug, String projectTypeSlug, String projectSlug) {
+    public DataProjectFile (ProjectFileRecord rs, List<Long> dependencies, List<DataGameVersion> gameVersions, String gameSlug, String projectTypeSlug, String projectSlug) {
 
         this.id = rs.getId();
         this.name = rs.getName();
@@ -106,6 +112,7 @@ public class DataProjectFile {
         this.createdAt = rs.getCreatedAt();
         this.uploaderUserId = rs.getUserId();
         this.uploaderUsername = rs.getUsername();
+        this.dependencies = dependencies;
         this.gameVersions = gameVersions;
         this.gameSlug = gameSlug;
         this.projectTypeSlug = projectTypeSlug;

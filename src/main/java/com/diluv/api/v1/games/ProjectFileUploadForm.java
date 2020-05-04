@@ -29,4 +29,7 @@ public class ProjectFileUploadForm {
 
     @FormParam("game_versions")
     public String gameVersions;
+
+    @FormParam("dependencies")
+    public String dependencies;
 }

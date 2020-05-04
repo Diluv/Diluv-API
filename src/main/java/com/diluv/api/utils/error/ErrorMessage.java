@@ -1,8 +1,8 @@
 package com.diluv.api.utils.error;
 
-import javax.ws.rs.core.Response;
-
 import com.diluv.api.utils.response.ErrorResponse;
+
+import javax.ws.rs.core.Response;
 
 public enum ErrorMessage {
 
@@ -39,6 +39,8 @@ public enum ErrorMessage {
     PROJECT_INVALID_DESCRIPTION(ErrorType.BAD_REQUEST, "project.invalid.description"),
     PROJECT_TAKEN_SLUG(ErrorType.BAD_REQUEST, "project.taken.slug"),
 
+    PROJECT_FILE_INVALID_SAME_ID(ErrorType.BAD_REQUEST, "project_file.invalid.same_id"),
+    PROJECT_FILE_INVALID_DEPENDENCY_ID(ErrorType.BAD_REQUEST, "project_file.invalid.dependency_id"),
     PROJECT_FILE_INVALID_PROJECT_ID(ErrorType.BAD_REQUEST, "project_file.invalid.project_id"),
     PROJECT_FILE_INVALID_CHANGELOG(ErrorType.BAD_REQUEST, "project_file.invalid.changelog"),
     PROJECT_FILE_INVALID_FILENAME(ErrorType.BAD_REQUEST, "prject_file.invalid.filename"),

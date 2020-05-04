@@ -2,7 +2,6 @@ package com.diluv.api.endpoints.v1;
 
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.TestUtil;
-
 import com.diluv.api.utils.error.ErrorMessage;
 
 import org.apache.commons.io.FileUtils;
@@ -41,8 +40,19 @@ public class ProjectTest {
         final ClassLoader classLoader = this.getClass().getClassLoader();
         final File logo = new File(classLoader.getResource("logo.png").getFile());
         given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.0").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).with().post(URL + "/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
-//        given().header("Authorization", "Bearer " + TestUtil.VALID_LONG_LASTING_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.1").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).with().post(URL + "/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
-//        given().header("Authorization", "Bearer " + TestUtil.VALID_LONG_LASTING_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.2").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("game_versions", "1.12.2,1.12.1").with().post(URL + "/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
+
+        // Game Version
+        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.1").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("game_versions", "1.15,1.15.2").with().post(URL + "/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
+        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.2").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("game_versions", "1.15,1.15.2,invalid").with().post(URL + "/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION.getMessage()));
+
+        // Dependencies
+        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.3").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("dependencies", "2,3").with().post(URL + "/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
+        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.4").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("dependencies", "1,2,3").with().post(URL + "/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.PROJECT_FILE_INVALID_SAME_ID.getMessage()));
+        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.5").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("dependencies", "invalid").with().post(URL + "/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID.getMessage()));
+        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.6").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("dependencies", "1000000").with().post(URL + "/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID.getMessage()));
+
+        // Game Version + Dependencies
+        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.7").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("game_versions", "1.15,1.15.2").multiPart("dependencies", "2,3").with().post(URL + "/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
     }
 
     @AfterAll

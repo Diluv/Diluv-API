@@ -1,7 +1,6 @@
 package com.diluv.api.v1.projects;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +28,7 @@ import com.diluv.api.data.DataProjectContributorAuthorized;
 import com.diluv.api.data.DataProjectFileInQueue;
 import com.diluv.api.data.DataProjectLink;
 import com.diluv.api.utils.FileUtil;
+import com.diluv.api.utils.MismatchException;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -143,6 +143,25 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
         }
 
+        List<GameVersionRecord> gameVersionRecords;
+        try {
+            gameVersionRecords = Validator.validateGameVersions(gameSlug, form.gameVersions);
+        }
+        catch (MismatchException e) {
+            return e.getErrorMessage().respond();
+        }
+
+        List<ProjectRecord> dependencyRecords;
+        try {
+            dependencyRecords = Validator.validateDependencies(form.projectId, form.dependencies);
+        }
+        catch (MismatchException e) {
+            return e.getErrorMessage().respond();
+        }
+        catch (NumberFormatException e) {
+            return ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID.respond();
+        }
+
         final ProjectTypeRecord projectTypeRecord = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
 
         final String fileName = FilenameUtils.getName(form.fileName);
@@ -159,26 +178,6 @@ public class ProjectsAPI {
             return ErrorMessage.FAILED_SHA512.respond();
         }
 
-        List<GameVersionRecord> gameVersionRecords = new ArrayList<>();
-        if (form.gameVersions != null) {
-            String[] gameVersions = form.gameVersions.split(",");
-            if (gameVersions.length > 0) {
-                gameVersionRecords = DATABASE.gameDAO.findGameVersionsByGameSlugAndVersions(gameSlug, gameVersions);
-                if (gameVersionRecords.size() != gameVersions.length) {
-                    List<String> versionNotFound = new ArrayList<>();
-                    for (GameVersionRecord record : gameVersionRecords) {
-                        for (String gameVersion : gameVersions) {
-                            if (!record.getVersion().equalsIgnoreCase(gameVersion)) {
-                                versionNotFound.add(gameVersion);
-                            }
-                        }
-                    }
-                    //TODO Include version
-                    return ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION.respond();
-                }
-            }
-        }
-
         final Long projectFileId = DATABASE.fileDAO.insertProjectFile(fileName, form.version, tempFile.length(), form.changelog, sha512, form.releaseType.toLowerCase(), form.classifier.toLowerCase(), projectRecord.getId(), token.getUserId());
 
         if (projectFileId == null) {
@@ -190,6 +189,14 @@ public class ProjectsAPI {
             List<Long> versionIds = gameVersionRecords.stream().map(GameVersionRecord::getId).collect(Collectors.toList());
 
             if (!DATABASE.fileDAO.insertProjectFileGameVersions(projectFileId, versionIds)) {
+                return ErrorMessage.FAILED_CREATE_PROJECT_FILE_GAME_VERSION.respond();
+            }
+        }
+
+        List<Long> dependencies = dependencyRecords.stream().map(ProjectRecord::getId).collect(Collectors.toList());
+
+        if (!dependencyRecords.isEmpty()) {
+            if (!DATABASE.fileDAO.insertProjectFileDependency(projectFileId, dependencies)) {
                 return ErrorMessage.FAILED_CREATE_PROJECT_FILE_GAME_VERSION.respond();
             }
         }
@@ -209,7 +216,7 @@ public class ProjectsAPI {
 
         List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
 
-        return ResponseUtil.successResponse(new DataProjectFileInQueue(record, gameVersions, gameSlug, projectTypeSlug, projectRecord.getSlug()));
+        return ResponseUtil.successResponse(new DataProjectFileInQueue(record, dependencies, gameVersions, gameSlug, projectTypeSlug, projectRecord.getSlug()));
     }
 
 }
