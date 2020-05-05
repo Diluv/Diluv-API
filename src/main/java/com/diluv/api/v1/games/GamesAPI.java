@@ -1,5 +1,28 @@
 package com.diluv.api.v1.games;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.cache.Cache;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.atom.Entry;
+import org.jboss.resteasy.plugins.providers.atom.Feed;
+
 import com.diluv.api.data.*;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
@@ -9,26 +32,20 @@ import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.record.*;
+import com.diluv.api.v1.games.feed.FeedProject;
+import com.diluv.confluencia.database.record.CategoryRecord;
+import com.diluv.confluencia.database.record.GameRecord;
+import com.diluv.confluencia.database.record.GameVersionRecord;
+import com.diluv.confluencia.database.record.ProjectAuthorRecord;
+import com.diluv.confluencia.database.record.ProjectFileRecord;
+import com.diluv.confluencia.database.record.ProjectLinkRecord;
+import com.diluv.confluencia.database.record.ProjectRecord;
+import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.NewsSort;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.github.slugify.Slugify;
-
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.cache.Cache;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -156,6 +173,41 @@ public class GamesAPI {
         }).collect(Collectors.toList());
 
         return ResponseUtil.successResponse(projects);
+    }
+
+    @Cache(maxAge = 30, mustRevalidate = true)
+    @GET
+    @Path("/{gameSlug}/{projectTypeSlug}/feed.xml")
+    @Produces(MediaType.APPLICATION_ATOM_XML)
+    public Feed getProjectFeed (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
+
+        final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, 1, 25, ProjectSort.NEW);
+
+//        if (projectRecords.isEmpty()) {
+//
+////            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+////
+////                return ErrorMessage.NOT_FOUND_GAME.respond();
+////            }
+////
+////            if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+////
+////                return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
+////            }
+//        }
+
+        Feed feed = new Feed();
+        for (ProjectRecord record : projectRecords) {
+            Entry entity = new Entry();
+
+            final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(record.getId());
+            List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
+            entity.setAnyOtherJAXBObject(new FeedProject(record, categories));
+            feed.getEntries().add(entity);
+        }
+
+
+        return feed;
     }
 
     @Cache(maxAge = 30, mustRevalidate = true)

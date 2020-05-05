@@ -21,6 +21,9 @@ import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.api.v1.news.NewsAPI;
 import com.diluv.api.v1.users.UsersAPI;
 
+import org.jboss.resteasy.plugins.providers.atom.AtomEntryProvider;
+import org.jboss.resteasy.plugins.providers.atom.AtomFeedProvider;
+
 public class APIV1 extends Application {
 
     @Override
@@ -30,6 +33,10 @@ public class APIV1 extends Application {
 
         // Enables Json
         classes.add(GsonProvider.class);
+
+        // Enables XML
+        classes.add(AtomFeedProvider.class);
+        classes.add(AtomEntryProvider.class);
 
         // Enables custom param types
         classes.add(ParameterProviderV1.class);
