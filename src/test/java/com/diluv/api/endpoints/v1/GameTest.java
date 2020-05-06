@@ -72,6 +72,14 @@ public class GameTest {
     }
 
     @Test
+    public void getProjectFeed () {
+
+        get(URL + "/invalid/invalid/feed.atom").then().assertThat().statusCode(400);
+        get(URL + "/minecraft/invalid/feed.atom").then().assertThat().statusCode(400);
+        get(URL + "/minecraft/mods/feed.atom").then().assertThat().statusCode(200);
+    }
+
+    @Test
     public void getProjectByGameSlugAndProjectTypeAndProjectSlug () {
 
         get(URL + "/invalid/invalid/test").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_GAME.getMessage()));
@@ -81,6 +89,15 @@ public class GameTest {
         get(URL + "/minecraft/mods/test").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_PROJECT.getMessage()));
 
         get(URL + "/minecraft/mods/bookshelf").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-schema.json"));
+    }
+
+    @Test
+    public void getProjectFilesFeed () {
+
+        get(URL + "/invalid/invalid/test/feed.atom").then().assertThat().statusCode(400);
+        get(URL + "/minecraft/invalid/test/feed.atom").then().assertThat().statusCode(400);
+        get(URL + "/minecraft/mods/test/feed.atom").then().assertThat().statusCode(400);
+        get(URL + "/minecraft/mods/bookshelf/feed.atom").then().assertThat().statusCode(200);
     }
 
     @Test

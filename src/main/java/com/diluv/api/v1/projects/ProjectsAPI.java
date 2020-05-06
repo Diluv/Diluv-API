@@ -218,5 +218,4 @@ public class ProjectsAPI {
 
         return ResponseUtil.successResponse(new DataProjectFileInQueue(record, dependencies, gameVersions, gameSlug, projectTypeSlug, projectRecord.getSlug()));
     }
-
 }
