@@ -1,28 +1,21 @@
 package com.diluv.api.v1;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.ws.rs.core.Application;
-
-import com.diluv.api.v1.projects.ProjectsAPI;
-
-import org.jboss.resteasy.plugins.interceptors.CorsFilter;
-import org.jboss.resteasy.plugins.interceptors.GZIPEncodingInterceptor;
-
-import com.diluv.api.provider.GenericExceptionMapper;
-import com.diluv.api.provider.GsonProvider;
-import com.diluv.api.provider.NotFoundExceptionMapper;
-import com.diluv.api.provider.ParameterProviderV1;
+import com.diluv.api.provider.*;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.v1.auth.AuthAPI;
 import com.diluv.api.v1.featured.FeaturedAPI;
 import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.api.v1.news.NewsAPI;
+import com.diluv.api.v1.projects.ProjectsAPI;
 import com.diluv.api.v1.users.UsersAPI;
 
-import org.jboss.resteasy.plugins.providers.atom.AtomEntryProvider;
-import org.jboss.resteasy.plugins.providers.atom.AtomFeedProvider;
+import org.jboss.resteasy.plugins.interceptors.CorsFilter;
+import org.jboss.resteasy.plugins.interceptors.GZIPEncodingInterceptor;
+
+import javax.ws.rs.core.Application;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class APIV1 extends Application {
 
@@ -35,8 +28,7 @@ public class APIV1 extends Application {
         classes.add(GsonProvider.class);
 
         // Enables XML
-        classes.add(AtomFeedProvider.class);
-        classes.add(AtomEntryProvider.class);
+        classes.add(CustomAtomFeedProvider.class);
 
         // Enables custom param types
         classes.add(ParameterProviderV1.class);
