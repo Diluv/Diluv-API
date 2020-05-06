@@ -24,6 +24,17 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 
+/**
+ * This class was created by <Bill Burke>. It's distributed as
+ * part of Resteasy. Get the Source Code in github:
+ * https://github.com/resteasy/Resteasy/
+ *
+ * Resteasy is Apache License 2.0 and distributed under the
+ * Resteasy License: https://github.com/resteasy/Resteasy/blob/master/License.html
+ *
+ * Changes
+ * - Removed if check from getPreferredPrefix to not include a prefix
+ */
 public class CustomAtomFeedProvider extends AtomFeedProvider {
 
     @Override
@@ -31,31 +42,25 @@ public class CustomAtomFeedProvider extends AtomFeedProvider {
 
         LogMessages.LOGGER.debugf("Provider : %s,  Method : writeTo", getClass().getName());
         JAXBContextFinder finder = getFinder(mediaType);
-        if (finder == null)
-        {
+        if (finder == null) {
             throw new JAXBUnmarshalException(Messages.MESSAGES.unableToFindJAXBContext(mediaType));
         }
         HashSet<Class> set = new HashSet<Class>();
         set.add(Feed.class);
-        for (Entry entry : feed.getEntries())
-        {
-            if (entry.getAnyOtherJAXBObject() != null)
-            {
+        for (Entry entry : feed.getEntries()) {
+            if (entry.getAnyOtherJAXBObject() != null) {
                 set.add(entry.getAnyOtherJAXBObject().getClass());
             }
-            if (entry.getContent() != null && entry.getContent().getJAXBObject() != null)
-            {
+            if (entry.getContent() != null && entry.getContent().getJAXBObject() != null) {
                 set.add(entry.getContent().getJAXBObject().getClass());
             }
         }
-        try
-        {
+        try {
             JAXBContext ctx = finder.findCacheContext(mediaType, annotations, set.toArray(new Class[set.size()]));
             Marshaller marshaller = ctx.createMarshaller();
-            NamespacePrefixMapper mapper = new NamespacePrefixMapper()
-            {
-                public String getPreferredPrefix(String namespace, String s1, boolean b)
-                {
+            NamespacePrefixMapper mapper = new NamespacePrefixMapper() {
+                public String getPreferredPrefix (String namespace, String s1, boolean b) {
+
                     return s1;
                 }
             };
@@ -64,8 +69,7 @@ public class CustomAtomFeedProvider extends AtomFeedProvider {
 
             marshaller.marshal(feed, entityStream);
         }
-        catch (JAXBException e)
-        {
+        catch (JAXBException e) {
             throw new JAXBMarshalException(Messages.MESSAGES.unableToMarshal(mediaType), e);
         }
     }
