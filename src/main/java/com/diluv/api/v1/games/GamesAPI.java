@@ -7,9 +7,9 @@ import com.diluv.api.utils.Pagination;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.utils.error.ErrorType;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.api.v1.games.feed.FeedProject;
 import com.diluv.confluencia.database.record.*;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.NewsSort;
@@ -20,16 +20,11 @@ import com.github.slugify.Slugify;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.atom.Content;
-import org.jboss.resteasy.plugins.providers.atom.Entry;
-import org.jboss.resteasy.plugins.providers.atom.Feed;
-import org.jboss.resteasy.plugins.providers.atom.Link;
-import org.jboss.resteasy.plugins.providers.atom.Person;
+import org.jboss.resteasy.plugins.providers.atom.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -171,22 +166,13 @@ public class GamesAPI {
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/feed.atom")
     @Produces(MediaType.APPLICATION_ATOM_XML)
-    public Feed getProjectFeed (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
+    public Response getProjectFeed (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
 
         final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, 1, 25, ProjectSort.NEW);
 
-//        if (projectRecords.isEmpty()) {
-//
-////            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
-////
-////                return ErrorMessage.NOT_FOUND_GAME.respond();
-////            }
-////
-////            if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
-////
-////                return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
-////            }
-//        }
+        if (projectRecords.isEmpty()) {
+            return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
+        }
 
         final String baseUrl = String.format("%s/games/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug);
         Feed feed = new Feed();
@@ -206,8 +192,7 @@ public class GamesAPI {
             feed.getEntries().add(entry);
         }
 
-
-        return feed;
+        return Response.ok(feed).build();
     }
 
     @Cache(maxAge = 30, mustRevalidate = true)
@@ -250,6 +235,40 @@ public class GamesAPI {
 
         final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributor::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(new DataProject(projectRecord, categories, projectAuthors, projectLinks));
+    }
+
+    @Cache(maxAge = 30, mustRevalidate = true)
+    @GET
+    @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/feed.atom")
+    @Produces(MediaType.APPLICATION_ATOM_XML)
+    public Response getProjectFileFeed (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
+
+        final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (projectRecord == null) {
+            return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
+        }
+
+        final List<ProjectFileRecord> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord.getId(), false, 1, 25, ProjectFileSort.NEW);
+
+        final String baseUrl = String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
+        Feed feed = new Feed();
+        feed.setId(URI.create(baseUrl + "/feed.atom"));
+        feed.getLinks().add(new Link("self", baseUrl+"/"));
+        feed.setUpdated(new Date());
+        feed.setTitle(projectRecord.getName() + " File Feed");
+        for (ProjectFileRecord record : projectFileRecords) {
+            Content content = new Content();
+            content.setText(record.getChangelog());
+            Entry entry = new Entry();
+            entry.setId(URI.create(baseUrl + "/files/" + record.getId()));
+            entry.setTitle(record.getName());
+            entry.setUpdated(new Date(record.getUpdatedAt()));
+            entry.setContent(content);
+            entry.getAuthors().add(new Person(record.getUserDisplayName()));
+            feed.getEntries().add(entry);
+        }
+
+        return Response.ok(feed).build();
     }
 
     @Cache(maxAge = 60, mustRevalidate = true)
