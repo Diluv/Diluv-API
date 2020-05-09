@@ -61,12 +61,12 @@ public class Validator {
 
     public static boolean validateReleaseType (String releaseType) {
 
-        return releaseType != null && Arrays.asList(new String[]{"release", "beta", "alpha"}).contains(releaseType.toLowerCase());
+        return releaseType != null && Arrays.asList("release", "beta", "alpha").contains(releaseType.toLowerCase());
     }
 
     public static boolean validateClassifier (String classifier) {
 
-        return classifier != null && Arrays.asList(new String[]{"binary"}).contains(classifier.toLowerCase());
+        return classifier != null && Arrays.asList("binary").contains(classifier.toLowerCase());
     }
 
     public static List<GameVersionRecord> validateGameVersions (String gameSlug, String formGameVersions) throws MismatchException {
