@@ -86,7 +86,7 @@ public class Validator {
                             }
                         }
                     }
-                    if (versionNotFound.size() > 0) {
+                    if (!versionNotFound.isEmpty()) {
                         //String.join(", ", versionNotFound)
                         throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION);
                     }
@@ -123,7 +123,7 @@ public class Validator {
                             }
                         }
                     }
-                    if (projectNotFound.size() > 0) {
+                    if (!projectNotFound.isEmpty()) {
                         //projectNotFound.stream().map(Object::toString).collect(Collectors.joining(", "))
                         throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
                     }
