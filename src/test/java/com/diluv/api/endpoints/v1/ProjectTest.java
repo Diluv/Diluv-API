@@ -1,5 +1,6 @@
 package com.diluv.api.endpoints.v1;
 
+import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -62,7 +63,7 @@ public class ProjectTest {
             FileUtils.deleteDirectory(new File(Constants.PROCESSING_FOLDER));
         }
         catch (IOException e) {
-            e.printStackTrace();
+            DiluvAPIServer.LOGGER.catching(e);
         }
     }
 }

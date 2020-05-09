@@ -17,6 +17,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
+import com.diluv.api.DiluvAPIServer;
 import com.diluv.confluencia.database.record.CompromisedPasswordRecord;
 
 import static com.diluv.api.Main.DATABASE;
@@ -31,7 +32,7 @@ public class PasswordUtility {
             return OpenBSDBCrypt.generate(password.toCharArray(), salt, Constants.BCRYPT_COST);
         }
         catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            DiluvAPIServer.LOGGER.catching(e);
         }
         return null;
     }
@@ -92,7 +93,7 @@ public class PasswordUtility {
             return IOUtils.readLines(inputStream, Charset.defaultCharset());
         }
         catch (Exception e) {
-            e.printStackTrace();
+            DiluvAPIServer.LOGGER.catching(e);
             return Collections.emptyList();
         } finally {
             if (connection != null) {

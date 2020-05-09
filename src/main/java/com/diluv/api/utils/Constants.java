@@ -156,7 +156,7 @@ public final class Constants {
             return jwtProcessor;
         }
         catch (IOException e) {
-            e.printStackTrace();
+        	DiluvAPIServer.LOGGER.catching(e);
         }
         return null;
     }

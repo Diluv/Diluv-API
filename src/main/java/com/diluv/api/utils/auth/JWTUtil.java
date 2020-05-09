@@ -5,6 +5,7 @@ import java.util.Base64;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.permissions.ProjectPermissions;
@@ -54,7 +55,7 @@ public class JWTUtil {
                         }
                     }
                     catch (JOSEException | BadJOSEException | NumberFormatException e) {
-                        e.printStackTrace();
+                    	DiluvAPIServer.LOGGER.catching(e);
                         return null;
                     }
                 }
