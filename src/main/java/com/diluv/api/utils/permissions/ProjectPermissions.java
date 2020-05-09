@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 import static com.diluv.api.Main.DATABASE;
 
 public enum ProjectPermissions {
@@ -44,6 +46,7 @@ public enum ProjectPermissions {
         return getAuthorizedUserPermissions(projectRecord, token, records);
     }
 
+    @Nullable
     public static List<String> getAuthorizedUserPermissions (ProjectRecord projectRecord, Token token, List<ProjectAuthorRecord> records) {
 
         if (token.getUserId() == projectRecord.getUserId()) {
