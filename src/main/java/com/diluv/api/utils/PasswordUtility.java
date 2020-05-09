@@ -1,5 +1,6 @@
 package com.diluv.api.utils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -75,6 +76,7 @@ public class PasswordUtility {
         HttpURLConnection connection = null;
 
         try {
+        	
             URL url = new URL("https://api.pwnedpasswords.com/range/" + hash);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -82,23 +84,32 @@ public class PasswordUtility {
             connection.setRequestProperty("Accept-Encoding", "gzip");
             connection.setDoOutput(true);
 
-            InputStream inputStream;
-            if ("gzip".equals(connection.getContentEncoding())) {
-                inputStream = new GZIPInputStream(connection.getInputStream());
+            try (InputStream inputStream = getStreamWithGzip(connection)) {
+            	
+                return IOUtils.readLines(inputStream, Charset.defaultCharset());
             }
-            else {
-                inputStream = connection.getInputStream();
-            }
-
-            return IOUtils.readLines(inputStream, Charset.defaultCharset());
         }
+        
         catch (Exception e) {
+        	
             DiluvAPIServer.LOGGER.catching(e);
             return Collections.emptyList();
-        } finally {
+        } 
+        
+        finally {
             if (connection != null) {
                 connection.disconnect();
             }
         }
+    }
+    
+    public static InputStream getStreamWithGzip(HttpURLConnection connection) throws IOException {
+    	
+        if ("gzip".equals(connection.getContentEncoding())) {
+        	
+            return new GZIPInputStream(connection.getInputStream());
+        }
+        
+        return connection.getInputStream();
     }
 }
