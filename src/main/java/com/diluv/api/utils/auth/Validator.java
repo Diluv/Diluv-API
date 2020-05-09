@@ -7,10 +7,13 @@ import com.diluv.confluencia.database.record.ProjectRecord;
 
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.testcontainers.shaded.com.google.common.collect.Sets;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.diluv.api.Main.DATABASE;
@@ -59,14 +62,17 @@ public class Validator {
         return true;
     }
 
+    private static final Set<String> VALID_RELEASE_TYPES = Collections.unmodifiableSet(Sets.newHashSet("release", "beta", "alpha"));
+    private static final Set<String> VALID_CLASSIFIERS = Collections.unmodifiableSet(Sets.newHashSet("binary"));
+    
     public static boolean validateReleaseType (String releaseType) {
 
-        return releaseType != null && Arrays.asList("release", "beta", "alpha").contains(releaseType.toLowerCase());
+        return releaseType != null && VALID_RELEASE_TYPES.contains(releaseType.toLowerCase());
     }
 
     public static boolean validateClassifier (String classifier) {
 
-        return classifier != null && Arrays.asList("binary").contains(classifier.toLowerCase());
+        return classifier != null && VALID_CLASSIFIERS.contains(classifier.toLowerCase());
     }
 
     public static List<GameVersionRecord> validateGameVersions (String gameSlug, String formGameVersions) throws MismatchException {
