@@ -23,12 +23,6 @@ jobs:
         with:
           java-version: 1.8
 
-      - name: Generate build number
-        id: buildnumber
-        uses: einaregilsson/build-number@v1
-        with:
-          token: ${{secrets.github_token}}
-
       - name: Testing Building
         run: ./gradlew test
 
