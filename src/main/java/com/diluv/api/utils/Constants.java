@@ -238,7 +238,7 @@ public final class Constants {
 
     public static String getLogo (String gameSlug, String projectTypeSlug, long projectId) {
         if(!isProduction()){
-            return "https://images.placeholders.dev/?width=300&height=300";
+            return "https://images.placeholders.dev/?width=400&height=400";
         }
         return String.format("%s/games/%s/%s/%d/logo.png", CDN_URL, gameSlug, projectTypeSlug, projectId);
     }
