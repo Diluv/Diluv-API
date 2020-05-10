@@ -33,11 +33,6 @@ public class DiluvAPIServer {
 
         this.deploy("API V1", "/v1", APIV1.class);
 
-        ResourceHandler resourceHandler = new ResourceHandler(new PathResourceManager(
-            Paths.get(new File("public/").getAbsolutePath()), 100))
-            .setDirectoryListingEnabled(true)
-            .addWelcomeFiles("index.html");
-        this.server.addResourcePrefixPath("/public", resourceHandler);
         this.server.start(Undertow.builder().addHttpListener(port, host));
         LOGGER.info("Server started on {}:{}", host, port);
     }

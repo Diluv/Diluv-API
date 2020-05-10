@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 
 public final class Constants {
 
+    public static final String ENV = getValueOrDefault("ENVIRONMENT", "PRODUCTION");
+
     public static final String AUTH_BASE_URL = getValueOrDefault("AUTH_BASE_URL", "https://auth.diluv.com");
     public static final ConfigurableJWTProcessor<SecurityContext> JWT_PROCESSOR = getJWTProcessor();
 
@@ -156,7 +158,7 @@ public final class Constants {
             return jwtProcessor;
         }
         catch (IOException e) {
-        	DiluvAPIServer.LOGGER.catching(e);
+            DiluvAPIServer.LOGGER.catching(e);
         }
         return null;
     }
@@ -224,13 +226,20 @@ public final class Constants {
         return null;
     }
 
+    public static boolean isProduction () {
+
+        return "PRODUCTION".equals(ENV);
+    }
+
     public static String getUserAvatar (String username) {
 
         return String.format("%s/users/%s/avatar.png", CDN_URL, username);
     }
 
     public static String getLogo (String gameSlug, String projectTypeSlug, long projectId) {
-
+        if(!isProduction()){
+            return "https://images.placeholders.dev/?width=300&height=300";
+        }
         return String.format("%s/games/%s/%s/%d/logo.png", CDN_URL, gameSlug, projectTypeSlug, projectId);
     }
 }
