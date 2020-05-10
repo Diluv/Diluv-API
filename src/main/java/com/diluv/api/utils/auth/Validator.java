@@ -7,13 +7,8 @@ import com.diluv.confluencia.database.record.ProjectRecord;
 
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.testcontainers.shaded.com.google.common.collect.Sets;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.diluv.api.Main.DATABASE;
@@ -62,9 +57,9 @@ public class Validator {
         return true;
     }
 
-    private static final Set<String> VALID_RELEASE_TYPES = Collections.unmodifiableSet(Sets.newHashSet("release", "beta", "alpha"));
-    private static final Set<String> VALID_CLASSIFIERS = Collections.unmodifiableSet(Sets.newHashSet("binary"));
-    
+    private static final Set<String> VALID_RELEASE_TYPES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("release", "beta", "alpha")));
+    private static final Set<String> VALID_CLASSIFIERS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("binary")));
+
     public static boolean validateReleaseType (String releaseType) {
 
         return releaseType != null && VALID_RELEASE_TYPES.contains(releaseType.toLowerCase());
