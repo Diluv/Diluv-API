@@ -14,6 +14,7 @@ import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataCategory;
+import com.diluv.api.data.DataFeatured;
 import com.diluv.api.data.DataGame;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.database.record.CategoryRecord;
@@ -28,20 +29,12 @@ public class FeaturedAPI {
 
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
-    @Path("/games")
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getGames () {
 
         final List<GameRecord> gameRecords = DATABASE.gameDAO.findFeaturedGames();
         final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(games);
-    }
-
-    @Cache(maxAge = 300, mustRevalidate = true)
-    @GET
-    @Path("/projects")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getProjects () {
 
         final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findFeaturedProjects();
 
@@ -50,6 +43,10 @@ public class FeaturedAPI {
             List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
             return new DataBaseProject(projectRecord, categories);
         }).collect(Collectors.toList());
-        return ResponseUtil.successResponse(projects);
+
+        final long projectCount = DATABASE.projectDAO.countAll();
+        final long userCount = DATABASE.userDAO.countAll();
+
+        return ResponseUtil.successResponse(new DataFeatured(games, projects, projectCount, userCount));
     }
 }

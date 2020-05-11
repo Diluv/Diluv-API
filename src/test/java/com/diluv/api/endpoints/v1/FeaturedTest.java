@@ -19,14 +19,8 @@ public class FeaturedTest {
     }
 
     @Test
-    public void getGames () {
+    public void getFeatured () {
 
-        given().with().get(URL + "/games").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/game-list-schema.json"));
-    }
-
-    @Test
-    public void getProjects () {
-
-        given().with().get(URL + "/projects").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-list-schema.json"));
+        given().with().get(URL).then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/featured-schema.json"));
     }
 }
