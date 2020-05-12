@@ -228,7 +228,7 @@ public final class Constants {
 
     public static boolean isDevelopment () {
 
-        return "DEVELOPMENT".equals(ENV);
+        return "DEVELOPMENT".equalsIgnoreCase(ENV);
     }
 
     public static String getUserAvatar (String username) {
