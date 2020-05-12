@@ -1,9 +1,10 @@
 package com.diluv.api.data;
 
-import java.util.List;
-
+import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.google.gson.annotations.Expose;
+
+import java.util.List;
 
 /**
  * Represents the data for a game that we support.
@@ -33,7 +34,7 @@ public class DataGame {
      * A URL that links to the image of the game.
      */
     @Expose
-    private final String imageURL;
+    private final String logoURL;
 
     /**
      * A URL that links to the banner of the game.
@@ -54,8 +55,8 @@ public class DataGame {
         this.slug = rs.getSlug();
         this.name = rs.getName();
         this.url = rs.getUrl();
-        this.imageURL = rs.getImageURL();
-        this.bannerURL = rs.getBannerURL();
+        this.logoURL = Constants.getGameLogoURL(this.slug);
+        this.bannerURL = Constants.getGameBannerURL(this.slug);
         this.versions = versions;
     }
 }

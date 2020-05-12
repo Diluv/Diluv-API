@@ -80,7 +80,7 @@ public class DataBaseProject {
         this.name = projectRecord.getName();
         this.slug = projectRecord.getSlug();
         this.summary = projectRecord.getSummary();
-        this.logo = Constants.getLogo(projectRecord.getGameSlug(), projectRecord.getProjectTypeSlug(), projectRecord.getId());
+        this.logo = Constants.getProjectLogo(projectRecord.getGameSlug(), projectRecord.getProjectTypeSlug(), projectRecord.getId());
         this.downloads = projectRecord.getCachedDownloads();
         this.createdAt = projectRecord.getCreatedAt();
         this.updatedAt = projectRecord.getUpdatedAt();

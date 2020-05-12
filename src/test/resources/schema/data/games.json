@@ -11,7 +11,7 @@
         "url": {
             "type": "string"
         },
-        "imageURL": {
+        "logoURL": {
             "type": "string"
         },
         "bannerURL": {
@@ -25,7 +25,7 @@
         "name",
         "slug",
         "url",
-        "imageURL",
+        "logoURL",
         "bannerURL"
     ],
     "additionalProperties": false

@@ -226,9 +226,9 @@ public final class Constants {
         return null;
     }
 
-    public static boolean isProduction () {
+    public static boolean isDevelopment () {
 
-        return "PRODUCTION".equals(ENV);
+        return "DEVELOPMENT".equals(ENV);
     }
 
     public static String getUserAvatar (String username) {
@@ -236,10 +236,27 @@ public final class Constants {
         return String.format("%s/users/%s/avatar.png", CDN_URL, username);
     }
 
-    public static String getLogo (String gameSlug, String projectTypeSlug, long projectId) {
-        if(!isProduction()){
+    public static String getProjectLogo (String gameSlug, String projectTypeSlug, long projectId) {
+
+        if (isDevelopment()) {
             return "https://images.placeholders.dev/?width=400&height=400";
         }
         return String.format("%s/games/%s/%s/%d/logo.png", CDN_URL, gameSlug, projectTypeSlug, projectId);
+    }
+
+    public static String getGameLogoURL (String gameSlug) {
+
+        if (isDevelopment()) {
+            return "https://images.placeholders.dev/?width=250&height=130";
+        }
+        return String.format("%s/games/%s/logo.png", CDN_URL, gameSlug);
+    }
+
+    public static String getGameBannerURL (String gameSlug) {
+
+        if (isDevelopment()) {
+            return "https://images.placeholders.dev/?width=1200&height=150";
+        }
+        return String.format("%s/games/%s/banner.png", CDN_URL, gameSlug);
     }
 }
