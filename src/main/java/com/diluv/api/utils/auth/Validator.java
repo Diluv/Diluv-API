@@ -1,15 +1,20 @@
 package com.diluv.api.utils.auth;
 
-import com.diluv.api.utils.MismatchException;
-import com.diluv.api.utils.error.ErrorMessage;
-import com.diluv.confluencia.database.record.GameVersionRecord;
-import com.diluv.confluencia.database.record.ProjectRecord;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.diluv.api.utils.MismatchException;
+import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.confluencia.database.record.GameVersionRecord;
+import com.diluv.confluencia.database.record.ProjectRecord;
 
 import static com.diluv.api.Main.DATABASE;
 

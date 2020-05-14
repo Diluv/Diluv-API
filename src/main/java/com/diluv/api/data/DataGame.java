@@ -1,10 +1,10 @@
 package com.diluv.api.data;
 
+import java.util.List;
+
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.google.gson.annotations.Expose;
-
-import java.util.List;
 
 /**
  * Represents the data for a game that we support.

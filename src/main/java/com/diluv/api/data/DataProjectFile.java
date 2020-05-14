@@ -1,9 +1,9 @@
 package com.diluv.api.data;
 
+import java.util.List;
+
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.google.gson.annotations.Expose;
-
-import java.util.List;
 
 /**
  * Represents a file uploaded to a project.

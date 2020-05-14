@@ -33,16 +33,6 @@ public class Database {
         this.newsDAO = new NewsDatabase();
     }
 
-    public Database (GameDAO gameDAO, ProjectDAO projectDAO, FileDAO fileDAO, UserDAO userDAO, SecurityDAO emailDAO, NewsDAO newsDAO) {
-
-        this.gameDAO = gameDAO;
-        this.projectDAO = projectDAO;
-        this.fileDAO = fileDAO;
-        this.userDAO = userDAO;
-        this.securityDAO = emailDAO;
-        this.newsDAO = newsDAO;
-    }
-
     public void init (String host, String user, String password, boolean deleteAll) {
 
         Confluencia.init(host, user, password, deleteAll);

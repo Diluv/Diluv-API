@@ -1,15 +1,15 @@
 package com.diluv.api.utils.permissions;
 
-import com.diluv.api.utils.auth.tokens.Token;
-import com.diluv.confluencia.database.record.ProjectAuthorRecord;
-import com.diluv.confluencia.database.record.ProjectRecord;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
+
+import com.diluv.api.utils.auth.tokens.Token;
+import com.diluv.confluencia.database.record.ProjectAuthorRecord;
+import com.diluv.confluencia.database.record.ProjectRecord;
 
 import static com.diluv.api.Main.DATABASE;
 

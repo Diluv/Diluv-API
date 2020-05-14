@@ -76,7 +76,7 @@ public class PasswordUtility {
         HttpURLConnection connection = null;
 
         try {
-        	
+
             URL url = new URL("https://api.pwnedpasswords.com/range/" + hash);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -85,31 +85,29 @@ public class PasswordUtility {
             connection.setDoOutput(true);
 
             try (InputStream inputStream = getStreamWithGzip(connection)) {
-            	
+
                 return IOUtils.readLines(inputStream, Charset.defaultCharset());
             }
         }
-        
+
         catch (Exception e) {
-        	
+
             DiluvAPIServer.LOGGER.catching(e);
             return Collections.emptyList();
-        } 
-        
-        finally {
+        } finally {
             if (connection != null) {
                 connection.disconnect();
             }
         }
     }
-    
-    public static InputStream getStreamWithGzip(HttpURLConnection connection) throws IOException {
-    	
+
+    public static InputStream getStreamWithGzip (HttpURLConnection connection) throws IOException {
+
         if ("gzip".equals(connection.getContentEncoding())) {
-        	
+
             return new GZIPInputStream(connection.getInputStream());
         }
-        
+
         return connection.getInputStream();
     }
 }

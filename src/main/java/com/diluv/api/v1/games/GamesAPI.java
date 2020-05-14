@@ -1,5 +1,33 @@
 package com.diluv.api.v1.games;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.cache.Cache;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.atom.Content;
+import org.jboss.resteasy.plugins.providers.atom.Entry;
+import org.jboss.resteasy.plugins.providers.atom.Feed;
+import org.jboss.resteasy.plugins.providers.atom.Link;
+import org.jboss.resteasy.plugins.providers.atom.Person;
+
 import com.diluv.api.data.*;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
@@ -10,29 +38,19 @@ import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.error.ErrorType;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.record.*;
+import com.diluv.confluencia.database.record.CategoryRecord;
+import com.diluv.confluencia.database.record.GameRecord;
+import com.diluv.confluencia.database.record.GameVersionRecord;
+import com.diluv.confluencia.database.record.ProjectAuthorRecord;
+import com.diluv.confluencia.database.record.ProjectFileRecord;
+import com.diluv.confluencia.database.record.ProjectLinkRecord;
+import com.diluv.confluencia.database.record.ProjectRecord;
+import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.NewsSort;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.github.slugify.Slugify;
-
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.cache.Cache;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.atom.*;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -253,7 +271,7 @@ public class GamesAPI {
         final String baseUrl = String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
         Feed feed = new Feed();
         feed.setId(URI.create(baseUrl + "/feed.atom"));
-        feed.getLinks().add(new Link("self", baseUrl+"/"));
+        feed.getLinks().add(new Link("self", baseUrl + "/"));
         feed.setUpdated(new Date());
         feed.setTitle(projectRecord.getName() + " File Feed");
         for (ProjectFileRecord record : projectFileRecords) {

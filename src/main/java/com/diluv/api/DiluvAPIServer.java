@@ -1,8 +1,5 @@
 package com.diluv.api;
 
-import java.io.File;
-import java.nio.file.Paths;
-
 import javax.ws.rs.core.Application;
 
 import org.apache.logging.log4j.LogManager;
@@ -13,8 +10,6 @@ import org.jboss.resteasy.spi.ResteasyDeployment;
 
 import com.diluv.api.v1.APIV1;
 import io.undertow.Undertow;
-import io.undertow.server.handlers.resource.PathResourceManager;
-import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 

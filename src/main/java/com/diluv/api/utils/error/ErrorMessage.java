@@ -1,8 +1,8 @@
 package com.diluv.api.utils.error;
 
-import com.diluv.api.utils.response.ErrorResponse;
-
 import javax.ws.rs.core.Response;
+
+import com.diluv.api.utils.response.ErrorResponse;
 
 public enum ErrorMessage {
 

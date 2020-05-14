@@ -1,6 +1,17 @@
 package com.diluv.api.provider;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.HashSet;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import org.jboss.resteasy.plugins.providers.atom.AtomFeedProvider;
 import org.jboss.resteasy.plugins.providers.atom.Entry;
@@ -11,18 +22,7 @@ import org.jboss.resteasy.plugins.providers.jaxb.JAXBUnmarshalException;
 import org.jboss.resteasy.plugins.providers.resteasy_atom.i18n.Messages;
 import org.jboss.resteasy.resteasy_jaxrs.i18n.LogMessages;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.HashSet;
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 /**
  * This class was created by <Bill Burke>. It's distributed as

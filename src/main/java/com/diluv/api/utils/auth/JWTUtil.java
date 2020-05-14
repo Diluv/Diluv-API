@@ -55,7 +55,7 @@ public class JWTUtil {
                         }
                     }
                     catch (JOSEException | BadJOSEException | NumberFormatException e) {
-                    	DiluvAPIServer.LOGGER.catching(e);
+                        DiluvAPIServer.LOGGER.catching(e);
                         return null;
                     }
                 }

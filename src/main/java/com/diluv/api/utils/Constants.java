@@ -1,5 +1,20 @@
 package com.diluv.api.utils;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.validator.GenericValidator;
+
 import com.diluv.api.DiluvAPIServer;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -13,21 +28,6 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.validator.GenericValidator;
-
-import javax.annotation.Nullable;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class Constants {
 
