@@ -24,6 +24,12 @@ public class DiluvAPIServer {
         this.server = new UndertowJaxrsServer();
     }
 
+    /**
+     * Starts the undertow server.
+     *
+     * @param host The host ip the server will run on
+     * @param port The port the server will run on.
+     */
     public void start (String host, int port) {
 
         this.deploy("API V1", "/v1", APIV1.class);
@@ -32,12 +38,13 @@ public class DiluvAPIServer {
         LOGGER.info("Server started on {}:{}", host, port);
     }
 
-    public void stop () {
-
-        LOGGER.info("Server stopping");
-        this.server.stop();
-        LOGGER.info("Server stopped");
-    }
+    // NEEDED????
+    //    public void stop () {
+    //
+    //        LOGGER.info("Server stopping");
+    //        this.server.stop();
+    //        LOGGER.info("Server stopped");
+    //    }
 
     private void deploy (String name, String path, Class<? extends Application> application) {
 

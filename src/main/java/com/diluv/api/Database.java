@@ -16,22 +16,12 @@ import com.diluv.confluencia.database.dao.UserDAO;
 
 public class Database {
 
-    public final GameDAO gameDAO;
-    public final ProjectDAO projectDAO;
-    public final FileDAO fileDAO;
-    public final UserDAO userDAO;
-    public final SecurityDAO securityDAO;
-    public final NewsDAO newsDAO;
-
-    public Database () {
-
-        this.gameDAO = new GameDatabase();
-        this.projectDAO = new ProjectDatabase();
-        this.fileDAO = new FileDatabase();
-        this.userDAO = new UserDatabase();
-        this.securityDAO = new SecurityDatabase();
-        this.newsDAO = new NewsDatabase();
-    }
+    public final GameDAO gameDAO = new GameDatabase();
+    public final ProjectDAO projectDAO = new ProjectDatabase();
+    public final FileDAO fileDAO = new FileDatabase();
+    public final UserDAO userDAO = new UserDatabase();
+    public final SecurityDAO securityDAO = new SecurityDatabase();
+    public final NewsDAO newsDAO = new NewsDatabase();
 
     public void init (String host, String user, String password, boolean deleteAll) {
 

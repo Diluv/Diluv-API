@@ -40,7 +40,10 @@ import static com.diluv.api.Main.DATABASE;
 @Path("/auth")
 public class AuthAPI {
 
-    private final GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder gacb = new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder().setTimeStepSizeInMillis(TimeUnit.SECONDS.toMillis(30)).setWindowSize(5);
+    private final GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder gacb =
+        new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder()
+            .setTimeStepSizeInMillis(TimeUnit.SECONDS.toMillis(30))
+            .setWindowSize(5);
 
     private final GoogleAuthenticator ga = new GoogleAuthenticator(this.gacb.build());
 

@@ -27,7 +27,7 @@ import com.google.gson.JsonSyntaxException;
 public class GsonProvider implements MessageBodyWriter<Object>, MessageBodyReader<Object> {
 
     @Override
-    public boolean isReadable (Class<?> type, Type genericType, java.lang.annotation.Annotation[] annotations, MediaType mediaType) {
+    public boolean isReadable (Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
 
         return true;
     }
