@@ -1,14 +1,14 @@
 package com.diluv.api.endpoints.v1;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
-
-import static io.restassured.RestAssured.given;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
-import static org.hamcrest.Matchers.equalTo;
 
 public class AuthTest {
 
@@ -21,70 +21,107 @@ public class AuthTest {
     }
 
     @Test
-    public void testRegister () {
+    public void register () {
 
         // Valid user
-        given().multiPart("email", "testing@diluv.com").multiPart("username", "testing").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(200);
+        Map<String, Object> multiPart = new HashMap<>();
+        multiPart.put("email", "testing@diluv.com");
+        multiPart.put("username", "testing");
+        multiPart.put("password", "CDyDJZ4aHYTyDQhNcL9N");
+        multiPart.put("terms", "true");
+        Request.postOk(URL + "/register", multiPart, null);
 
         // Password compromised
-        given().multiPart("email", "testing2@diluv.com").multiPart("username", "testing2").multiPart("password", "password").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_COMPROMISED_PASSWORD.getMessage()));
+        multiPart.put("email", "testing2@diluv.com");
+        multiPart.put("username", "testing2");
+        multiPart.put("password", "password");
+        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_COMPROMISED_PASSWORD);
 
         // Banned domains
-        given().multiPart("email", "testing2@banned.com").multiPart("username", "testing2").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_BLACKLISTED_EMAIL.getMessage()));
+        multiPart.put("email", "testing2@banned.com");
+        multiPart.put("password", "CDyDJZ4aHYTyDQhNcL9N");
+        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_BLACKLISTED_EMAIL);
 
-        given().multiPart("email", "test@banned2.com").multiPart("username", "testing2").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_BLACKLISTED_EMAIL.getMessage()));
+        multiPart.put("email", "testing2@banned2.com");
+        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_BLACKLISTED_EMAIL);
 
         // Email used
-        given().multiPart("email", "lclc98@diluv.com").multiPart("username", "testing2").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_EMAIL.getMessage()));
+        multiPart.put("email", "lclc98@diluv.com");
+        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_TAKEN_EMAIL);
 
         // Username used
-        given().multiPart("email", "testing2@diluv.com").multiPart("username", "lclc98").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "true").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_USERNAME.getMessage()));
+        multiPart.put("email", "testing2@diluv.com");
+        multiPart.put("username", "lclc98");
+        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_TAKEN_USERNAME);
 
         // Terms false
-        given().multiPart("email", "testing2@diluv.com").multiPart("username", "lclc98").multiPart("password", "CDyDJZ4aHYTyDQhNcL9N").multiPart("terms", "false").with().post(URL + "/register").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_INVALID_TERMS.getMessage()));
+        multiPart.put("terms", "false");
+        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_INVALID_TERMS);
     }
 
     @Test
-    public void testVerify () {
+    public void verify () {
 
-        given().multiPart("email", "tempuser@diluv.com").multiPart("code", "c1632ff7-367e-485f-91dd-92ab75903fa4").with().post(URL + "/verify").then().assertThat().statusCode(200);
+        Map<String, Object> multiPart = new HashMap<>();
+        multiPart.put("email", "tempuser@diluv.com");
+        multiPart.put("code", "c1632ff7-367e-485f-91dd-92ab75903fa4");
+        Request.postOk(URL + "/verify", multiPart, null);
 
-        given().multiPart("email", "darkhax@diluv.com").multiPart("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_VERIFIED.getMessage()));
+        multiPart.put("email", "darkhax@diluv.com");
+        multiPart.put("code", "1");
+        Request.postError(URL + "/verify", multiPart, 400, ErrorMessage.USER_VERIFIED);
 
-        given().multiPart("email", "jaredlll08@diluv.com").multiPart("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_VERIFIED.getMessage()));
+        multiPart.put("email", "jaredlll08@diluv.com");
+        Request.postError(URL + "/verify", multiPart, 400, ErrorMessage.USER_VERIFIED);
 
-        given().multiPart("email", "testing@diluv.com").multiPart("code", "1").with().post(URL + "/verify").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_USER.getMessage()));
+        multiPart.put("email", "testing@diluv.com");
+        Request.postError(URL + "/verify", multiPart, 400, ErrorMessage.NOT_FOUND_USER);
     }
 
     @Test
-    public void testCheckUsername () {
+    public void checkUsername () {
 
-        given().with().get(URL + "/checkusername/lclc98").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_USERNAME.getMessage()));
+        Request.getError(URL + "/checkusername/lclc98", 400, ErrorMessage.USER_TAKEN_USERNAME);
+        Request.getError(URL + "/checkusername/darkhax", 400, ErrorMessage.USER_TAKEN_USERNAME);
 
-        given().with().get(URL + "/checkusername/darkhax").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_TAKEN_USERNAME.getMessage()));
-
-        given().with().get(URL + "/checkusername/nonexisting").then().assertThat().statusCode(200);
+        Request.getOk(URL + "/checkusername/nonexisting", null);
     }
 
     @Test
-    public void testResend () {
+    public void resend () {
 
-        given().multiPart("username", "jaredlll08").multiPart("email", "jaredlll08@diluv.com").with().post(URL + "/resend").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_USER.getMessage()));
+        Map<String, Object> multiPart = new HashMap<>();
+        multiPart.put("username", "jaredlll08");
+        multiPart.put("email", "jaredlll08@diluv.com");
+        Request.postError(URL + "/resend", multiPart, 400, ErrorMessage.NOT_FOUND_USER);
 
-        given().multiPart("username", "tempuser2").multiPart("email", "tempuser2@diluv.com").with().post(URL + "/resend").then().assertThat().statusCode(200);
+        multiPart.put("username", "tempuser2");
+        multiPart.put("email", "tempuser2@diluv.com");
+        Request.postOk(URL + "/resend", multiPart, null);
     }
 
     @Test
     public void requestResetPassword () {
 
-        given().multiPart("username", "jaredlll08").multiPart("email", "jaredlll08@diluv.com").with().post(URL + "/request-reset-password").then().assertThat().statusCode(200);
+        Map<String, Object> multiPart = new HashMap<>();
+        multiPart.put("username", "jaredlll08");
+        multiPart.put("email", "jaredlll08@diluv.com");
+        Request.postOk(URL + "/request-reset-password", multiPart, null);
     }
 
     @Test
     public void resetPassword () {
 
-        given().multiPart("code", "invalid").multiPart("email", "jaredlll08@diluv.com").multiPart("password", "password").with().post(URL + "/reset-password").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_PASSWORD_RESET.getMessage()));
-        given().multiPart("code", "daf1f148-effd-400e-9b65-a4bf96e5215d").multiPart("email", "jaredlll08@diluv.com").multiPart("password", "password").with().post(URL + "/reset-password").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.USER_COMPROMISED_PASSWORD.getMessage()));
-        given().multiPart("code", "daf1f148-effd-400e-9b65-a4bf96e5215d").multiPart("email", "jaredlll08@diluv.com").multiPart("password", "qjeghExvF4SA6HuJLWjM").with().post(URL + "/reset-password").then().assertThat().statusCode(200);
+        Map<String, Object> multiPart = new HashMap<>();
+        multiPart.put("email", "jaredlll08@diluv.com");
+        multiPart.put("password", "password");
+        multiPart.put("code", "invalid");
+        Request.postError(URL + "/reset-password", multiPart, 400, ErrorMessage.NOT_FOUND_PASSWORD_RESET);
+
+        multiPart.put("code", "daf1f148-effd-400e-9b65-a4bf96e5215d");
+        Request.postError(URL + "/reset-password", multiPart, 400, ErrorMessage.USER_COMPROMISED_PASSWORD);
+
+        multiPart.put("password", "qjeghExvF4SA6HuJLWjM");
+        Request.postOk(URL + "/reset-password", multiPart, null);
     }
 }

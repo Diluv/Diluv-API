@@ -140,6 +140,7 @@ public class ProjectsAPI {
         }
 
         if (DATABASE.fileDAO.existsByProjectIdAndVersion(form.projectId, form.version)) {
+
             return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
         }
 

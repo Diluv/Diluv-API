@@ -29,6 +29,15 @@
         "updatedAt": {
             "type": "number"
         },
+        "permissions": {
+            "type": "array"
+        },
+        "released": {
+            "type": "boolean"
+        },
+        "review": {
+            "type": "boolean"
+        },
         "contributors": {
             "$ref": "contributors.json"
         },

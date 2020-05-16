@@ -3,10 +3,8 @@ package com.diluv.api.endpoints.v1;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
-
-import static io.restassured.RestAssured.given;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 
 public class FeaturedTest {
 
@@ -21,6 +19,6 @@ public class FeaturedTest {
     @Test
     public void getFeatured () {
 
-        given().with().get(URL).then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/featured-schema.json"));
+        Request.getOk(URL, "schema/featured-schema.json");
     }
 }

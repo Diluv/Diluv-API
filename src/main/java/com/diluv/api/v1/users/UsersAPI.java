@@ -1,20 +1,5 @@
 package com.diluv.api.v1.users;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.cache.Cache;
-
 import com.diluv.api.data.DataAuthorizedUser;
 import com.diluv.api.data.DataCategory;
 import com.diluv.api.data.DataProject;
@@ -28,6 +13,16 @@ import com.diluv.confluencia.database.record.CategoryRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.UserRecord;
 import com.diluv.confluencia.database.sort.ProjectSort;
+
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.cache.Cache;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -100,15 +95,18 @@ public class UsersAPI {
         long page = Pagination.getPage(queryPage);
         int limit = Pagination.getLimit(queryLimit);
 
+        UserRecord userRecord = DATABASE.userDAO.findOneByUsername(username);
+        if (userRecord == null) {
+            return ErrorMessage.NOT_FOUND_USER.respond();
+        }
+
         boolean authorized = false;
 
         if (token != null) {
-            final UserRecord userRecord = DATABASE.userDAO.findOneByUserId(token.getUserId());
             authorized = userRecord.getUsername().equalsIgnoreCase(username);
         }
 
         List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, ProjectSort.fromString(sort, ProjectSort.NEW));
-
         final List<DataProject> projects = projectRecords.stream().map(projectRecord -> {
             final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
             List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());

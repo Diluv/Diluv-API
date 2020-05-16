@@ -2,6 +2,7 @@ package com.diluv.api.endpoints.v1;
 
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
 
@@ -12,11 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-
-import static io.restassured.RestAssured.get;
-import static io.restassured.RestAssured.given;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
-import static org.hamcrest.Matchers.equalTo;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProjectTest {
 
@@ -31,8 +29,10 @@ public class ProjectTest {
     @Test
     public void getProjectById () {
 
-        get(URL + "/100000000").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_PROJECT.getMessage()));
-        get(URL + "/1").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-schema.json"));
+        Request.getError(URL + "/100000000", 400, ErrorMessage.NOT_FOUND_PROJECT);
+
+        Request.getOk(URL + "/1", "schema/project-schema.json");
+        Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1", "schema/project-schema.json");
     }
 
     @Test
@@ -40,20 +40,50 @@ public class ProjectTest {
 
         final ClassLoader classLoader = this.getClass().getClassLoader();
         final File logo = new File(classLoader.getResource("logo.png").getFile());
-        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.0").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).with().post(URL + "/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
+
+        Map<String, Object> multiPart = new HashMap<>();
+        multiPart.put("project_id", 1);
+        multiPart.put("version", "1.1.0");
+        multiPart.put("releaseType", "release");
+        multiPart.put("classifier", "binary");
+        multiPart.put("changelog", "Changelog");
+        multiPart.put("filename", "logo.png");
+        multiPart.put("file", logo);
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, "schema/project-files-schema.json");
 
         // Game Version
-        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.1").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("game_versions", "1.15,1.15.2").with().post(URL + "/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
-        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.2").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("game_versions", "1.15,1.15.2,invalid").with().post(URL + "/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION.getMessage()));
+        multiPart.put("version", "1.1.1");
+        multiPart.put("game_versions", "1.15,1.15.2");
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, "schema/project-files-schema.json");
+
+        multiPart.put("version", "1.1.2");
+        multiPart.put("game_versions", "1.15,1.15.2,invalid");
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION);
 
         // Dependencies
-        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.3").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("dependencies", "2,3").with().post(URL + "/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
-        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.4").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("dependencies", "1,2,3").with().post(URL + "/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.PROJECT_FILE_INVALID_SAME_ID.getMessage()));
-        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.5").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("dependencies", "invalid").with().post(URL + "/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID.getMessage()));
-        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.6").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("dependencies", "1000000").with().post(URL + "/files").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID.getMessage()));
+        multiPart.remove("game_versions");
+        multiPart.put("version", "1.1.3");
+        multiPart.put("dependencies", "2,3");
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, "schema/project-files-schema.json");
+
+        multiPart.put("version", "1.1.4");
+        multiPart.put("dependencies", "1,2,3");
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_SAME_ID);
+
+        multiPart.put("version", "1.1.5");
+        multiPart.put("dependencies", "invalid");
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
+
+        multiPart.put("version", "1.1.6");
+        multiPart.put("dependencies", "1000000");
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
 
         // Game Version + Dependencies
-        given().header("Authorization", "Bearer " + TestUtil.VALID_TOKEN).multiPart("project_id", 1).multiPart("version", "1.1.7").multiPart("releaseType", "release").multiPart("classifier", "binary").multiPart("changelog", "Changelog").multiPart("filename", "logo.png").multiPart("file", logo).multiPart("game_versions", "1.15,1.15.2").multiPart("dependencies", "2,3").with().post(URL + "/files").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/project-files-schema.json"));
+        multiPart.put("version", "1.1.7");
+        multiPart.put("dependencies", "2,3");
+        multiPart.put("game_versions", "1.15,1.15.2");
+
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, "schema/project-files-schema.json");
     }
 
     @AfterAll

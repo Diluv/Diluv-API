@@ -3,12 +3,9 @@ package com.diluv.api.endpoints.v1;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
-
-import static io.restassured.RestAssured.given;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
-import static org.hamcrest.Matchers.equalTo;
 
 public class NewsTest {
 
@@ -23,14 +20,14 @@ public class NewsTest {
     @Test
     public void getNews () {
 
-        given().with().get(URL).then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/news-list-schema.json"));
+        Request.getOk(URL, "schema/news-list-schema.json");
     }
 
     @Test
     public void getNewsBySlug () {
 
-        given().with().get(URL + "/invalid").then().assertThat().statusCode(400).body(matchesJsonSchemaInClasspath("schema/error-schema.json")).body("message", equalTo(ErrorMessage.NOT_FOUND_NEWS.getMessage()));
+        Request.getError(URL + "/invalid", 400, ErrorMessage.NOT_FOUND_NEWS);
 
-        given().with().get(URL + "/example").then().assertThat().statusCode(200).body(matchesJsonSchemaInClasspath("schema/news-schema.json"));
+        Request.getOk(URL + "/example", "schema/news-schema.json");
     }
 }

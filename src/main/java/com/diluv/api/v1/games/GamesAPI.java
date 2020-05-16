@@ -244,7 +244,6 @@ public class GamesAPI {
 
         if (token != null) {
             List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(projectRecord, token, records);
-            //TODO Not called???
             if (permissions != null) {
                 final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributorAuthorized::new).collect(Collectors.toList());
                 return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, categories, projectAuthors, projectLinks, permissions));
