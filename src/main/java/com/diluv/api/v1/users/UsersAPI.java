@@ -1,7 +1,7 @@
 package com.diluv.api.v1.users;
 
 import com.diluv.api.data.DataAuthorizedUser;
-import com.diluv.api.data.DataCategory;
+import com.diluv.api.data.DataTag;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.Pagination;
@@ -9,7 +9,7 @@ import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.record.CategoryRecord;
+import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.UserRecord;
 import com.diluv.confluencia.database.sort.ProjectSort;
@@ -108,9 +108,9 @@ public class UsersAPI {
 
         List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, ProjectSort.fromString(sort, ProjectSort.NEW));
         final List<DataProject> projects = projectRecords.stream().map(projectRecord -> {
-            final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
-            List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
-            return new DataProject(projectRecord, categories);
+            final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
+            List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
+            return new DataProject(projectRecord, tags);
         }).collect(Collectors.toList());
 
         return ResponseUtil.successResponse(projects);

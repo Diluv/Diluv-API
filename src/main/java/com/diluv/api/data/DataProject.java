@@ -19,14 +19,14 @@ public class DataProject extends DataBaseProject {
     @Expose
     private final List<DataProjectLink> links;
 
-    public DataProject (ProjectRecord projectRecord, List<DataCategory> categories) {
+    public DataProject (ProjectRecord projectRecord, List<DataTag> tags) {
 
-        this(projectRecord, categories, null, null);
+        this(projectRecord, tags, null, null);
     }
 
-    public DataProject (ProjectRecord projectRecord, List<DataCategory> categories, List<DataProjectContributor> projectAuthorRecords, List<DataProjectLink> links) {
+    public DataProject (ProjectRecord projectRecord, List<DataTag> tags, List<DataProjectContributor> projectAuthorRecords, List<DataProjectLink> links) {
 
-        super(projectRecord, categories, projectAuthorRecords);
+        super(projectRecord, tags, projectAuthorRecords);
         this.description = projectRecord.getDescription();
         this.links = links;
     }

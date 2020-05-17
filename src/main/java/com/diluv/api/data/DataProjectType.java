@@ -35,7 +35,7 @@ public class DataProjectType {
     private final long maxFileSize;
 
     @Expose
-    private final List<DataCategory> categories;
+    private final List<DataTag> tags;
 
     @Expose
     private final long projectCount;
@@ -45,7 +45,7 @@ public class DataProjectType {
         this(rs, null);
     }
 
-    public DataProjectType (ProjectTypeRecord rs, List<DataCategory> categories) {
+    public DataProjectType (ProjectTypeRecord rs, List<DataTag> tags) {
 
         this.name = rs.getName();
         this.slug = rs.getSlug();
@@ -53,6 +53,6 @@ public class DataProjectType {
         this.maxFileSize = rs.getMaxFileSize();
         this.projectCount = rs.getProjectCount();
 
-        this.categories = categories;
+        this.tags = tags;
     }
 }

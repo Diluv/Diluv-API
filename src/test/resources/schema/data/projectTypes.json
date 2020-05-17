@@ -17,8 +17,8 @@
         "projectCount": {
             "type": "number"
         },
-        "categories": {
-            "$ref": "categories.json"
+        "tags": {
+            "$ref": "tags.json"
         }
     },
     "required": [

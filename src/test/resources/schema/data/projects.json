@@ -41,8 +41,8 @@
         "contributors": {
             "$ref": "contributors.json"
         },
-        "categories": {
-            "$ref": "categories.json"
+        "tags": {
+            "$ref": "tags.json"
         },
         "links": {
             "type": "array",

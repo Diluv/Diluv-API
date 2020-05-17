@@ -38,7 +38,7 @@ import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.error.ErrorType;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.record.CategoryRecord;
+import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
@@ -136,10 +136,10 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
         }
 
-        final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
-        List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
+        final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
 
-        return ResponseUtil.successResponse(new DataProjectType(projectTypesRecords, categories));
+        return ResponseUtil.successResponse(new DataProjectType(projectTypesRecords, tags));
     }
 
     @GET
@@ -172,9 +172,9 @@ public class GamesAPI {
         }
 
         final List<DataBaseProject> projects = projectRecords.stream().map(projectRecord -> {
-            final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
-            List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
-            return new DataBaseProject(projectRecord, categories);
+            final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
+            List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
+            return new DataBaseProject(projectRecord, tags);
         }).collect(Collectors.toList());
 
         return ResponseUtil.successResponse(projects);
@@ -239,19 +239,19 @@ public class GamesAPI {
 
         final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
 
-        final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
-        List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
+        final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
+        List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
 
         if (token != null) {
             List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(projectRecord, token, records);
             if (permissions != null) {
                 final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributorAuthorized::new).collect(Collectors.toList());
-                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, categories, projectAuthors, projectLinks, permissions));
+                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, tags, projectAuthors, projectLinks, permissions));
             }
         }
 
         final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributor::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataProject(projectRecord, categories, projectAuthors, projectLinks));
+        return ResponseUtil.successResponse(new DataProject(projectRecord, tags, projectAuthors, projectLinks));
     }
 
     @Cache(maxAge = 30, mustRevalidate = true)
@@ -396,8 +396,8 @@ public class GamesAPI {
             return ErrorMessage.ERROR_SAVING_IMAGE.respond();
         }
 
-        final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
-        List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataProject(projectRecord, categories));
+        final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
+        List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
+        return ResponseUtil.successResponse(new DataProject(projectRecord, tags));
     }
 }

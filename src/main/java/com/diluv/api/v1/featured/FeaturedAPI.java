@@ -13,11 +13,11 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataBaseProject;
-import com.diluv.api.data.DataCategory;
+import com.diluv.api.data.DataTag;
 import com.diluv.api.data.DataFeatured;
 import com.diluv.api.data.DataGame;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.record.CategoryRecord;
+import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 
@@ -39,9 +39,9 @@ public class FeaturedAPI {
         final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findFeaturedProjects();
 
         final List<DataBaseProject> projects = projectRecords.stream().map(projectRecord -> {
-            final List<CategoryRecord> categoryRecords = DATABASE.projectDAO.findAllCategoriesByProjectId(projectRecord.getId());
-            List<DataCategory> categories = categoryRecords.stream().map(DataCategory::new).collect(Collectors.toList());
-            return new DataBaseProject(projectRecord, categories);
+            final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
+            List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
+            return new DataBaseProject(projectRecord, tags);
         }).collect(Collectors.toList());
 
         final long projectCount = DATABASE.projectDAO.countAll();

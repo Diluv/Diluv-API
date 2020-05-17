@@ -61,7 +61,7 @@ public class DataBaseProject {
      * The users who contributed to the project.
      */
     @Expose
-    private final List<DataCategory> categories;
+    private final List<DataTag> tags;
 
     /**
      * The users who contributed to the project.
@@ -69,12 +69,12 @@ public class DataBaseProject {
     @Expose
     private final List<DataProjectContributor> contributors = new ArrayList<>();
 
-    public DataBaseProject (ProjectRecord projectRecord, List<DataCategory> categories) {
+    public DataBaseProject (ProjectRecord projectRecord, List<DataTag> tags) {
 
-        this(projectRecord, categories, null);
+        this(projectRecord, tags, null);
     }
 
-    public DataBaseProject (ProjectRecord projectRecord, List<DataCategory> categories, List<DataProjectContributor> projectAuthorRecords) {
+    public DataBaseProject (ProjectRecord projectRecord, List<DataTag> tags, List<DataProjectContributor> projectAuthorRecords) {
 
         this.id = projectRecord.getId();
         this.name = projectRecord.getName();
@@ -84,7 +84,7 @@ public class DataBaseProject {
         this.downloads = projectRecord.getCachedDownloads();
         this.createdAt = projectRecord.getCreatedAt();
         this.updatedAt = projectRecord.getUpdatedAt();
-        this.categories = categories;
+        this.tags = tags;
         this.contributors.add(new DataProjectContributor(projectRecord.getUserId(), projectRecord.getUsername(), projectRecord.getUserDisplayName(), projectRecord.getUserCreatedAt(), "owner"));
         if (projectAuthorRecords != null) {
             this.contributors.addAll(projectAuthorRecords);

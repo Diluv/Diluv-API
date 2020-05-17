@@ -10,15 +10,11 @@
                 },
                 "name": {
                     "type": "string"
-                },
-                "iconURL": {
-                    "type": "string"
                 }
             },
             "required": [
                 "slug",
-                "name",
-                "iconURL"
+                "name"
             ],
             "additionalProperties": false
         }
