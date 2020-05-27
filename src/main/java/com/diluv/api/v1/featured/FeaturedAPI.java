@@ -25,12 +25,12 @@ import static com.diluv.api.Main.DATABASE;
 
 @GZIP
 @Path("/featured")
+@Produces(MediaType.APPLICATION_JSON)
 public class FeaturedAPI {
 
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getGames () {
 
         final List<GameRecord> gameRecords = DATABASE.gameDAO.findFeaturedGames();

@@ -38,6 +38,7 @@ import static com.diluv.api.Main.DATABASE;
 
 @GZIP
 @Path("/auth")
+@Produces(MediaType.APPLICATION_JSON)
 public class AuthAPI {
 
     private final GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder gacb =
@@ -49,7 +50,6 @@ public class AuthAPI {
 
     @POST
     @Path("/register")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response register (@MultipartForm RegisterForm form) {
 
         if (!Validator.validateUsername(form.username)) {
@@ -113,7 +113,6 @@ public class AuthAPI {
 
     @POST
     @Path("/verify")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response verify (@MultipartForm VerifyForm form) {
 
         if (!Validator.validateEmail(form.email)) {
@@ -171,7 +170,6 @@ public class AuthAPI {
 
     @POST
     @Path("/request-reset-password")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response requestResetPassword (@MultipartForm RequestResetPasswordForm form) {
 
         final String formEmail = form.email.toLowerCase();
@@ -208,7 +206,6 @@ public class AuthAPI {
 
     @POST
     @Path("/reset-password")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response resetPassword (@MultipartForm ResetPasswordForm form) {
 
         final String email = form.email.toLowerCase();
@@ -254,7 +251,6 @@ public class AuthAPI {
 
     @POST
     @Path("/resend")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response resend (@MultipartForm ResendForm form) {
 
         if (!Validator.validateEmail(form.email)) {
@@ -311,7 +307,6 @@ public class AuthAPI {
 
     @GET
     @Path("/checkusername/{username}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response checkUsername (@PathParam("username") String username) {
 
         if (DATABASE.userDAO.existsUserByUsername(username) || DATABASE.userDAO.existsTempUserByUsername(username)) {

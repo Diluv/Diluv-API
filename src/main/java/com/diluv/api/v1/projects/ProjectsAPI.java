@@ -47,12 +47,12 @@ import static com.diluv.api.Main.DATABASE;
 
 @GZIP
 @Path("/projects")
+@Produces(MediaType.APPLICATION_JSON)
 public class ProjectsAPI {
 
     @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/{projectId}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("projectId") Long projectId) {
 
         final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
@@ -84,7 +84,6 @@ public class ProjectsAPI {
     @POST
     @Path("/files")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response postProjectFile (@HeaderParam("Authorization") Token token, @MultipartForm ProjectFileUploadForm form) {
 
         if (token == null) {

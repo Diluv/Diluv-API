@@ -28,11 +28,11 @@ import static com.diluv.api.Main.DATABASE;
 
 @GZIP
 @Path("/users")
+@Produces(MediaType.APPLICATION_JSON)
 public class UsersAPI {
 
     @GET
     @Path("/self")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getSelf (@HeaderParam("Authorization") String auth) {
 
         if (auth == null) {
@@ -60,7 +60,6 @@ public class UsersAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{username}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getUser (@PathParam("username") String username, @HeaderParam("Authorization") String auth) {
 
         final UserRecord userRecord = DATABASE.userDAO.findOneByUsername(username);
@@ -88,7 +87,6 @@ public class UsersAPI {
 
     @GET
     @Path("/{username}/projects")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort) {
 
         final Token token = JWTUtil.getToken(auth);

@@ -56,6 +56,7 @@ import static com.diluv.api.Main.DATABASE;
 
 @GZIP
 @Path("/games")
+@Produces(MediaType.APPLICATION_JSON)
 public class GamesAPI {
 
     private final Slugify slugify = new Slugify();
@@ -63,7 +64,6 @@ public class GamesAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getGames (@QueryParam("sort") String sort) {
 
         final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(GameSort.fromString(sort, GameSort.NAME));
@@ -74,7 +74,6 @@ public class GamesAPI {
     @Cache(maxAge = 7200, mustRevalidate = true)
     @GET
     @Path("/sort")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getGames () {
 
         List<String> games = Arrays.stream(GameSort.values()).map(Enum::name).collect(Collectors.toList());
@@ -88,7 +87,6 @@ public class GamesAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getGame (@PathParam("gameSlug") String gameSlug) {
 
         final GameRecord gameRecord = DATABASE.gameDAO.findOneBySlug(gameSlug);
@@ -105,7 +103,6 @@ public class GamesAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/types")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getProjectTypes (@PathParam("gameSlug") String gameSlug) {
 
         if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
@@ -121,7 +118,6 @@ public class GamesAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getProjectType (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
 
         final ProjectTypeRecord projectTypesRecords = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
@@ -144,7 +140,6 @@ public class GamesAPI {
 
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/projects")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort, @QueryParam("version") String version) {
 
         long page = Pagination.getPage(queryPage);
@@ -216,7 +211,6 @@ public class GamesAPI {
     @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
 
         final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
@@ -291,7 +285,6 @@ public class GamesAPI {
     @Cache(maxAge = 60, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort, @QueryParam("version") String version) {
 
         long page = Pagination.getPage(queryPage);
@@ -335,7 +328,6 @@ public class GamesAPI {
     @POST
     @Path("/{gameSlug}/{projectTypeSlug}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response postProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @MultipartForm ProjectCreateForm form) {
 
         if (token == null) {

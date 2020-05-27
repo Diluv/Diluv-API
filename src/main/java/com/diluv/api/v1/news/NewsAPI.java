@@ -25,12 +25,12 @@ import static com.diluv.api.Main.DATABASE;
 
 @GZIP
 @Path("/news")
+@Produces(MediaType.APPLICATION_JSON)
 public class NewsAPI {
 
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getNews (@QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort) {
 
         long page = Pagination.getPage(queryPage);
@@ -45,7 +45,6 @@ public class NewsAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{slug}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getNewsBySlug (@PathParam("slug") String slug) {
 
         final NewsRecord newsRecord = DATABASE.newsDAO.findOneByNewsSlug(slug);
