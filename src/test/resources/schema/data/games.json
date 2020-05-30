@@ -12,10 +12,10 @@
             "type": "string"
         },
         "logoURL": {
-            "type": "string"
+            "$ref": "image.json"
         },
         "bannerURL": {
-            "type": "string"
+            "$ref": "image.json"
         },
         "versions": {
             "$ref": "game_versions.json"

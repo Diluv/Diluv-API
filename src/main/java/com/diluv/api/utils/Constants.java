@@ -16,6 +16,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.validator.GenericValidator;
 
 import com.diluv.api.DiluvAPIServer;
+import com.diluv.api.data.DataImage;
+import com.diluv.api.data.DataImageSource;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -244,19 +246,33 @@ public final class Constants {
         return String.format("%s/games/%s/%s/%d/logo.png", CDN_URL, gameSlug, projectTypeSlug, projectId);
     }
 
-    public static String getGameLogoURL (String gameSlug) {
+    public static DataImage getGameLogoURL (String gameSlug) {
 
         if (isDevelopment()) {
-            return "https://images.placeholders.dev/?width=250&height=130";
+            final String url = "https://images.placeholders.dev/?width=250&height=130";
+            return new DataImage(url, new DataImageSource[]{new DataImageSource(url, "image/svg+xml")});
         }
-        return String.format("%s/games/%s/logo.png", CDN_URL, gameSlug);
+
+        final String baseURL = String.format("%s/games/%s/logo", CDN_URL, gameSlug);
+        final String pngURL = baseURL + ".png";
+        return new DataImage(pngURL, new DataImageSource[]{
+            new DataImageSource(pngURL, "image/png"),
+            new DataImageSource(baseURL + ".webp", "image/webp")
+        });
     }
 
-    public static String getGameBannerURL (String gameSlug) {
+    public static DataImage getGameBannerURL (String gameSlug) {
 
         if (isDevelopment()) {
-            return "https://images.placeholders.dev/?width=1200&height=150";
+            final String url = "https://images.placeholders.dev/?width=1200&height=150";
+            return new DataImage(url, new DataImageSource[]{new DataImageSource(url, "image/svg+xml")});
         }
-        return String.format("%s/games/%s/banner.png", CDN_URL, gameSlug);
+
+        final String baseURL = String.format("%s/games/%s/banner", CDN_URL, gameSlug);
+        final String pngURL = baseURL + ".png";
+        return new DataImage(pngURL, new DataImageSource[]{
+            new DataImageSource(pngURL, "image/png"),
+            new DataImageSource(baseURL + ".webp", "image/webp")
+        });
     }
 }

@@ -34,13 +34,13 @@ public class DataGame {
      * A URL that links to the image of the game.
      */
     @Expose
-    private final String logoURL;
+    private final DataImage logoURL;
 
     /**
      * A URL that links to the banner of the game.
      */
     @Expose
-    private final String bannerURL;
+    private final DataImage bannerURL;
 
     @Expose
     private final List<DataGameVersion> versions;
