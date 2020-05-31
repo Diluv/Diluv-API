@@ -250,13 +250,12 @@ public final class Constants {
 
         if (isDevelopment()) {
             final String url = "https://images.placeholders.dev/?width=250&height=130";
-            return new DataImage(url, new DataImageSource[]{new DataImageSource(url, "image/svg+xml")});
+            return new DataImage(new DataImageSource(url, "image/png"), new DataImageSource[]{new DataImageSource(url, "image/svg+xml")});
         }
 
         final String baseURL = String.format("%s/games/%s/logo", CDN_URL, gameSlug);
         final String pngURL = baseURL + ".png";
-        return new DataImage(pngURL, new DataImageSource[]{
-            new DataImageSource(pngURL, "image/png"),
+        return new DataImage(new DataImageSource(pngURL, "image/png"), new DataImageSource[]{
             new DataImageSource(baseURL + ".webp", "image/webp")
         });
     }
@@ -265,13 +264,12 @@ public final class Constants {
 
         if (isDevelopment()) {
             final String url = "https://images.placeholders.dev/?width=1200&height=150";
-            return new DataImage(url, new DataImageSource[]{new DataImageSource(url, "image/svg+xml")});
+            return new DataImage(new DataImageSource(url, "image/png"), new DataImageSource[]{new DataImageSource(url, "image/svg+xml")});
         }
 
         final String baseURL = String.format("%s/games/%s/banner", CDN_URL, gameSlug);
         final String pngURL = baseURL + ".png";
-        return new DataImage(pngURL, new DataImageSource[]{
-            new DataImageSource(pngURL, "image/png"),
+        return new DataImage(new DataImageSource(pngURL, "image/png"), new DataImageSource[]{
             new DataImageSource(baseURL + ".webp", "image/webp")
         });
     }
