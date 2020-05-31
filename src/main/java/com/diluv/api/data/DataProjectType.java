@@ -8,31 +8,13 @@ import com.google.gson.annotations.Expose;
 /**
  * Represents a supported project type for a supported game.
  */
-public class DataProjectType {
-
-    /**
-     * The display name for the project type.
-     */
-    @Expose
-    private final String name;
-
-    /**
-     * The slug for the project type.
-     */
-    @Expose
-    private final String slug;
+public class DataProjectType extends DataBaseProjectType {
 
     /**
      * The slug of the game the project type belongs to.
      */
     @Expose
-    private final String gameSlug;
-
-    /**
-     * The default max byte size for files of this type.
-     */
-    @Expose
-    private final long maxFileSize;
+    private final DataBaseGame game;
 
     @Expose
     private final List<DataTag> tags;
@@ -47,10 +29,8 @@ public class DataProjectType {
 
     public DataProjectType (ProjectTypeRecord rs, List<DataTag> tags) {
 
-        this.name = rs.getName();
-        this.slug = rs.getSlug();
-        this.gameSlug = rs.getGameSlug();
-        this.maxFileSize = rs.getMaxFileSize();
+        super(rs);
+        this.game = new DataBaseGame(rs.getGameSlug(), rs.getGameName());
         this.projectCount = rs.getProjectCount();
 
         this.tags = tags;

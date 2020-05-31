@@ -19,6 +19,18 @@
         },
         "versions": {
             "$ref": "game_versions.json"
+        },
+        "projectCount": {
+            "type": "number"
+        },
+        "projectTypes": {
+            "type": "array",
+            "items": {
+                "$ref": "projectTypes.json"
+            }
+        },
+        "sort": {
+            "type": "array"
         }
     },
     "required": [
@@ -26,7 +38,8 @@
         "slug",
         "url",
         "logoURL",
-        "bannerURL"
+        "bannerURL",
+        "projectCount"
     ],
     "additionalProperties": false
 }

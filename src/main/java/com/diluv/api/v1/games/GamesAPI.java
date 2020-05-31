@@ -38,7 +38,6 @@ import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.error.ErrorType;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
@@ -46,8 +45,8 @@ import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.diluv.confluencia.database.record.ProjectLinkRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
+import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.sort.GameSort;
-import com.diluv.confluencia.database.sort.NewsSort;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.github.slugify.Slugify;
@@ -59,6 +58,9 @@ import static com.diluv.api.Main.DATABASE;
 @Produces(MediaType.APPLICATION_JSON)
 public class GamesAPI {
 
+    private final List<String> gameSort = Arrays.stream(GameSort.values()).map(Enum::name).collect(Collectors.toList());
+    private final List<String> projectSort = Arrays.stream(ProjectSort.values()).map(Enum::name).collect(Collectors.toList());
+
     private final Slugify slugify = new Slugify();
 
     @Cache(maxAge = 300, mustRevalidate = true)
@@ -67,21 +69,9 @@ public class GamesAPI {
     public Response getGames (@QueryParam("sort") String sort) {
 
         final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(GameSort.fromString(sort, GameSort.NAME));
+
         final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(games);
-    }
-
-    @Cache(maxAge = 7200, mustRevalidate = true)
-    @GET
-    @Path("/sort")
-    public Response getGames () {
-
-        List<String> games = Arrays.stream(GameSort.values()).map(Enum::name).collect(Collectors.toList());
-        List<String> news = Arrays.stream(NewsSort.values()).map(Enum::name).collect(Collectors.toList());
-        List<String> projects = Arrays.stream(ProjectSort.values()).map(Enum::name).collect(Collectors.toList());
-        List<String> projectFiles = Arrays.stream(ProjectFileSort.values()).map(Enum::name).collect(Collectors.toList());
-
-        return ResponseUtil.successResponse(new DataSort(games, news, projects, projectFiles));
+        return ResponseUtil.successResponse(new DataGameList(games, gameSort));
     }
 
     @Cache(maxAge = 300, mustRevalidate = true)
@@ -95,24 +85,15 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_GAME.respond();
         }
 
+        final List<ProjectTypeRecord> projectTypeRecords = DATABASE.projectDAO.findAllProjectTypesByGameSlug(gameSlug);
+        final List<DataProjectType> projectTypes = projectTypeRecords.stream().map(DataProjectType::new).collect(Collectors.toList());
+
         final List<GameVersionRecord> gameVersionRecords = DATABASE.gameDAO.findAllGameVersionsByGameSlug(gameSlug);
-        List<DataGameVersion> versions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataGame(gameRecord, versions));
-    }
+        final List<DataGameVersion> versions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
 
-    @Cache(maxAge = 300, mustRevalidate = true)
-    @GET
-    @Path("/{gameSlug}/types")
-    public Response getProjectTypes (@PathParam("gameSlug") String gameSlug) {
+        final long projectCount = DATABASE.projectDAO.countAllByGameSlug(gameSlug);
 
-        if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
-
-            return ErrorMessage.NOT_FOUND_GAME.respond();
-        }
-
-        final List<ProjectTypeRecord> projectTypesRecords = DATABASE.projectDAO.findAllProjectTypesByGameSlug(gameSlug);
-        final List<DataProjectType> projectTypes = projectTypesRecords.stream().map(DataProjectType::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(projectTypes);
+        return ResponseUtil.successResponse(new DataGame(gameRecord, projectTypes, versions, projectSort, projectCount));
     }
 
     @Cache(maxAge = 300, mustRevalidate = true)

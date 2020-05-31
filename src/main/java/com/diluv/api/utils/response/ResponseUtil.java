@@ -6,6 +6,6 @@ public final class ResponseUtil {
 
     public static Response successResponse (Object data) {
 
-        return Response.ok(new DataResponse<>(data)).build();
+        return Response.ok(data).build();
     }
 }

@@ -3,7 +3,7 @@
     "type": "object",
     "properties": {
         "id": {
-            "type": "number"
+            "type": "integer"
         },
         "name": {
             "type": "string"
@@ -14,56 +14,29 @@
         "summary": {
             "type": "string"
         },
-        "description": {
-            "type": "string"
-        },
         "logo": {
             "type": "string"
         },
         "downloads": {
-            "type": "number"
+            "type": "integer"
         },
         "createdAt": {
-            "type": "number"
+            "type": "integer"
         },
         "updatedAt": {
-            "type": "number"
-        },
-        "permissions": {
-            "type": "array"
-        },
-        "released": {
-            "type": "boolean"
-        },
-        "review": {
-            "type": "boolean"
-        },
-        "contributors": {
-            "$ref": "contributors.json"
+            "type": "integer"
         },
         "tags": {
             "$ref": "tags.json"
         },
-        "links": {
-            "type": "array",
-            "items": [
-                {
-                    "type": "object",
-                    "properties": {
-                        "type": {
-                            "type": "string"
-                        },
-                        "url": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "type",
-                        "url"
-                    ],
-                    "additionalProperties": false
-                }
-            ]
+        "game": {
+            "$ref": "baseGame.json"
+        },
+        "projectType": {
+            "$ref": "baseProjectType.json"
+        },
+        "contributors": {
+            "$ref": "contributors.json"
         }
     },
     "required": [
@@ -71,10 +44,13 @@
         "name",
         "slug",
         "summary",
+        "logo",
         "downloads",
         "createdAt",
         "updatedAt",
+        "tags",
+        "game",
+        "projectType",
         "contributors"
-    ],
-    "additionalProperties": false
+    ]
 }

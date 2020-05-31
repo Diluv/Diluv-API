@@ -58,10 +58,22 @@ public class DataBaseProject {
     private final long updatedAt;
 
     /**
-     * The users who contributed to the project.
+     * The tags of the project to be found under.
      */
     @Expose
     private final List<DataTag> tags;
+
+    /**
+     * The game data related to the project
+     */
+    @Expose
+    private final DataBaseGame game;
+
+    /**
+     * The project type data related to the project
+     */
+    @Expose
+    private final DataBaseProjectType projectType;
 
     /**
      * The users who contributed to the project.
@@ -74,18 +86,20 @@ public class DataBaseProject {
         this(projectRecord, tags, null);
     }
 
-    public DataBaseProject (ProjectRecord projectRecord, List<DataTag> tags, List<DataProjectContributor> projectAuthorRecords) {
+    public DataBaseProject (ProjectRecord rs, List<DataTag> tags, List<DataProjectContributor> projectAuthorRecords) {
 
-        this.id = projectRecord.getId();
-        this.name = projectRecord.getName();
-        this.slug = projectRecord.getSlug();
-        this.summary = projectRecord.getSummary();
-        this.logo = Constants.getProjectLogo(projectRecord.getGameSlug(), projectRecord.getProjectTypeSlug(), projectRecord.getId());
-        this.downloads = projectRecord.getCachedDownloads();
-        this.createdAt = projectRecord.getCreatedAt();
-        this.updatedAt = projectRecord.getUpdatedAt();
+        this.id = rs.getId();
+        this.name = rs.getName();
+        this.slug = rs.getSlug();
+        this.summary = rs.getSummary();
+        this.logo = Constants.getProjectLogo(rs.getGameSlug(), rs.getProjectTypeSlug(), rs.getId());
+        this.downloads = rs.getCachedDownloads();
+        this.createdAt = rs.getCreatedAt();
+        this.updatedAt = rs.getUpdatedAt();
         this.tags = tags;
-        this.contributors.add(new DataProjectContributor(projectRecord.getUserId(), projectRecord.getUsername(), projectRecord.getUserDisplayName(), projectRecord.getUserCreatedAt(), "owner"));
+        this.game = new DataBaseGame(rs.getGameSlug(), rs.getGameName());
+        this.projectType = new DataBaseProjectType(rs.getProjectTypeSlug(), rs.getProjectTypeName());
+        this.contributors.add(new DataProjectContributor(rs.getUserId(), rs.getUsername(), rs.getUserDisplayName(), rs.getUserCreatedAt(), "owner"));
         if (projectAuthorRecords != null) {
             this.contributors.addAll(projectAuthorRecords);
         }

@@ -9,20 +9,7 @@ import com.google.gson.annotations.Expose;
 /**
  * Represents the data for a game that we support.
  */
-public class DataGame {
-
-    /**
-     * The slug for the game. This is a unique string that identifies the game in URLs and API
-     * requests.
-     */
-    @Expose
-    private final String slug;
-
-    /**
-     * The display name for the game.
-     */
-    @Expose
-    private final String name;
+public class DataGame extends DataBaseGame {
 
     /**
      * A URL that links to the official home page of the game.
@@ -43,20 +30,35 @@ public class DataGame {
     private final DataImage bannerURL;
 
     @Expose
+    private final List<DataProjectType> projectTypes;
+
+    @Expose
     private final List<DataGameVersion> versions;
+
+    @Expose
+    private final List<String> sort;
+
+    @Expose
+    private final Long projectCount;
 
     public DataGame (GameRecord rs) {
 
-        this(rs, null);
+        this(rs, null, null, null, null);
     }
 
-    public DataGame (GameRecord rs, List<DataGameVersion> versions) {
+    public DataGame (GameRecord rs,
+                     List<DataProjectType> projectTypes,
+                     List<DataGameVersion> versions,
+                     List<String> sort,
+                     Long projectCount) {
 
-        this.slug = rs.getSlug();
-        this.name = rs.getName();
+        super(rs);
         this.url = rs.getUrl();
-        this.logoURL = Constants.getGameLogoURL(this.slug);
-        this.bannerURL = Constants.getGameBannerURL(this.slug);
+        this.logoURL = Constants.getGameLogoURL(rs.getSlug());
+        this.bannerURL = Constants.getGameBannerURL(rs.getSlug());
+        this.projectTypes = projectTypes;
         this.versions = versions;
+        this.sort = sort;
+        this.projectCount = projectCount;
     }
 }

@@ -2,17 +2,20 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "data": {
+        "games": {
             "type": "array",
             "items": [
                 {
-                    "$ref": "data/games.json"
+                    "$ref": "data/baseGame.json"
                 }
             ]
+        },
+        "sort": {
+            "type": "array"
+        },
+        "projectCount": {
+            "type": "number"
         }
     },
-    "required": [
-        "data"
-    ],
     "additionalProperties": false
 }

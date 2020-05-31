@@ -2,33 +2,33 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "data": {
-            "games": {
-                "type": "array",
-                "items": [
-                    {
-                        "$ref": "data/projects.json"
-                    }
-                ]
-            },
-            "projects": {
-                "type": "array",
-                "items": [
-                    {
-                        "$ref": "data/games.json"
-                    }
-                ]
-            },
-            "projectCount": {
-                "type": "number"
-            },
-            "userCount": {
-                "type": "number"
-            }
+        "games": {
+            "type": "array",
+            "items": [
+                {
+                    "$ref": "data/baseGame.json"
+                }
+            ]
+        },
+        "projects": {
+            "type": "array",
+            "items": [
+                {
+                    "$ref": "data/projects.json"
+                }
+            ]
+        },
+        "projectCount": {
+            "type": "number"
+        },
+        "contributorCount": {
+            "type": "number"
         }
     },
     "required": [
-        "data"
-    ],
-    "additionalProperties": false
+        "games",
+        "projects",
+        "projectCount",
+        "contributorCount"
+    ]
 }

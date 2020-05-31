@@ -28,25 +28,11 @@ public class GameTest {
     }
 
     @Test
-    public void getSort () {
-
-        Request.getOk(URL + "/sort", "schema/sort-schema.json");
-    }
-
-    @Test
     public void getGameBySlug () {
 
         Request.getError(URL + "/invalid", 400, ErrorMessage.NOT_FOUND_GAME);
 
         Request.getOk(URL + "/minecraft-je", "schema/game-schema.json");
-    }
-
-    @Test
-    public void getProjectTypesByGameSlug () {
-
-        Request.getError(URL + "/invalid/types", 400, ErrorMessage.NOT_FOUND_GAME);
-
-        Request.getOk(URL + "/minecraft-je/types", "schema/project-types-list-schema.json");
     }
 
     @Test
