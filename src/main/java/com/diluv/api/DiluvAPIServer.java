@@ -38,14 +38,6 @@ public class DiluvAPIServer {
         LOGGER.info("Server started on {}:{}", host, port);
     }
 
-    // NEEDED????
-    //    public void stop () {
-    //
-    //        LOGGER.info("Server stopping");
-    //        this.server.stop();
-    //        LOGGER.info("Server stopped");
-    //    }
-
     private void deploy (String name, String path, Class<? extends Application> application) {
 
         this.deploy(name, "/", path, application);

@@ -52,6 +52,7 @@ public class APIV1 extends Application {
         classes.add(ProjectsAPI.class);
         classes.add(NewsAPI.class);
         classes.add(UsersAPI.class);
+        classes.add(GenericAPI.class);
 
         return classes;
     }
