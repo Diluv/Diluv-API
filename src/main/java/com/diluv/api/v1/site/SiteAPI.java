@@ -5,28 +5,28 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.data.DataGameList;
-import com.diluv.api.data.site.DataSiteIndex;
-
-import com.diluv.api.v1.games.GamesAPI;
-import com.diluv.confluencia.database.sort.GameSort;
-
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataBaseProject;
-import com.diluv.api.data.DataFeatured;
 import com.diluv.api.data.DataGame;
+import com.diluv.api.data.DataGameList;
 import com.diluv.api.data.DataTag;
+import com.diluv.api.data.site.DataSiteIndex;
+import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
+import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.record.TagRecord;
+import com.diluv.confluencia.database.sort.GameSort;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -65,5 +65,21 @@ public class SiteAPI {
 
         final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(new DataGameList(games, GamesAPI.GAME_SORTS));
+    }
+
+    @Cache(maxAge = 300, mustRevalidate = true)
+    @GET
+    @Path("/games/{gameSlug}")
+    public Response getGameDefaultType (@PathParam("gameSlug") String gameSlug) {
+
+        final GameRecord gameRecord = DATABASE.gameDAO.findOneBySlug(gameSlug);
+        if (gameRecord == null) {
+
+            return ErrorMessage.NOT_FOUND_GAME.respond();
+        }
+
+        // TODO GameRecord should store it's "default" project type and return it here instead of doing this.
+        final List<ProjectTypeRecord> projectTypeRecords = DATABASE.projectDAO.findAllProjectTypesByGameSlug(gameSlug);
+        return ResponseUtil.successResponse(projectTypeRecords.get(0).getSlug());
     }
 }
