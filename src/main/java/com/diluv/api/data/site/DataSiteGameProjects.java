@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataBaseProjectType;
+import com.diluv.api.data.DataProjectType;
 import com.google.gson.annotations.Expose;
 
 public class DataSiteGameProjects {
@@ -16,12 +17,12 @@ public class DataSiteGameProjects {
     private final List<DataBaseProjectType> types;
 
     @Expose
-    private final DataSiteProjectType currentType;
+    private final DataProjectType currentType;
 
     @Expose
     private final List<String> sorts;
 
-    public DataSiteGameProjects (List<DataBaseProject> projects, List<DataBaseProjectType> types, DataSiteProjectType currentType, List<String> sorts) {
+    public DataSiteGameProjects (List<DataBaseProject> projects, List<DataBaseProjectType> types, DataProjectType currentType, List<String> sorts) {
 
         this.projects = projects;
         this.types = types;

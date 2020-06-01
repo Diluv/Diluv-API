@@ -12,10 +12,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.diluv.api.data.DataGameVersion;
+import com.diluv.api.data.DataProjectType;
 import com.diluv.api.data.site.DataSiteGameVersion;
-import com.diluv.api.data.site.DataSiteProjectType;
-
-import com.diluv.confluencia.database.record.GameVersionRecord;
 
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
@@ -24,7 +22,6 @@ import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataBaseProjectType;
 import com.diluv.api.data.DataGame;
 import com.diluv.api.data.DataGameList;
-import com.diluv.api.data.DataProjectType;
 import com.diluv.api.data.DataTag;
 import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
@@ -136,6 +133,6 @@ public class SiteAPI {
 
         List<DataGameVersion> gameVersions = DATABASE.gameDAO.findAllGameVersionsByGameSlug(gameSlug).stream().map(DataGameVersion::new).collect(Collectors.toList());
 
-        return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataSiteProjectType(currentType, tags, new DataSiteGameVersion(game, gameVersions)), GamesAPI.PROJECT_SORTS));
+        return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataProjectType(currentType, tags, new DataSiteGameVersion(game, gameVersions)), GamesAPI.PROJECT_SORTS));
     }
 }
