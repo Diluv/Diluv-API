@@ -15,10 +15,14 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataBaseProject;
+import com.diluv.api.data.DataBaseProjectType;
 import com.diluv.api.data.DataGame;
 import com.diluv.api.data.DataGameList;
+import com.diluv.api.data.DataProjectType;
 import com.diluv.api.data.DataTag;
+import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
+import com.diluv.api.utils.Pagination;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.GamesAPI;
@@ -27,6 +31,7 @@ import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.sort.GameSort;
+import com.diluv.confluencia.database.sort.ProjectSort;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -61,6 +66,7 @@ public class SiteAPI {
     @GET
     @Path("/games")
     public Response getGames (@QueryParam("sort") String sort) {
+
         final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(GameSort.fromString(sort, GameSort.NAME));
 
         final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
@@ -81,5 +87,45 @@ public class SiteAPI {
         // TODO GameRecord should store it's "default" project type and return it here instead of doing this.
         final List<ProjectTypeRecord> projectTypeRecords = DATABASE.projectDAO.findAllProjectTypesByGameSlug(gameSlug);
         return ResponseUtil.successResponse(projectTypeRecords.get(0).getSlug());
+    }
+
+
+    @GET
+    @Path("/games/{gameSlug}/{projectTypeSlug}/projects")
+    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort, @QueryParam("version") String version) {
+
+        long page = Pagination.getPage(queryPage);
+        int limit = Pagination.getLimit(queryLimit);
+        final List<ProjectRecord> projectRecords;
+
+        if (version == null) {
+            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, page, limit, ProjectSort.fromString(sort, ProjectSort.POPULARITY));
+        }
+        else {
+            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectTypeAndVersion(gameSlug, projectTypeSlug, page, limit, ProjectSort.fromString(sort, ProjectSort.POPULARITY), version);
+        }
+
+        if (projectRecords.isEmpty()) {
+
+            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+
+                return ErrorMessage.NOT_FOUND_GAME.respond();
+            }
+
+            if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+
+                return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
+            }
+        }
+        final List<DataBaseProject> projects = projectRecords.stream().map(projectRecord -> {
+            final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
+            List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
+            return new DataBaseProject(projectRecord, tags);
+        }).collect(Collectors.toList());
+
+        List<DataBaseProjectType> types = DATABASE.projectDAO.findAllProjectTypesByGameSlug(gameSlug).stream().map(DataBaseProjectType::new).collect(Collectors.toList());
+        ProjectTypeRecord currentType = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+
+        return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataProjectType(currentType), GamesAPI.PROJECT_SORTS));
     }
 }

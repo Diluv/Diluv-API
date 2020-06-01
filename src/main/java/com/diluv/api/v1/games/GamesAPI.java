@@ -59,7 +59,7 @@ import static com.diluv.api.Main.DATABASE;
 public class GamesAPI {
 
     public static final List<String> GAME_SORTS = Arrays.stream(GameSort.values()).map(Enum::name).collect(Collectors.toList());
-    private final List<String> projectSort = Arrays.stream(ProjectSort.values()).map(Enum::name).collect(Collectors.toList());
+    public static final List<String> PROJECT_SORTS = Arrays.stream(ProjectSort.values()).map(Enum::name).collect(Collectors.toList());
 
     private final Slugify slugify = new Slugify();
 
@@ -93,7 +93,7 @@ public class GamesAPI {
 
         final long projectCount = DATABASE.projectDAO.countAllByGameSlug(gameSlug);
 
-        return ResponseUtil.successResponse(new DataGame(gameRecord, projectTypes, versions, projectSort, projectCount));
+        return ResponseUtil.successResponse(new DataGame(gameRecord, projectTypes, versions, PROJECT_SORTS, projectCount));
     }
 
     @Cache(maxAge = 300, mustRevalidate = true)
