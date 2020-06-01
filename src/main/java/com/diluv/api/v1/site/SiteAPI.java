@@ -11,6 +11,12 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.data.DataGameVersion;
+import com.diluv.api.data.site.DataSiteGameVersion;
+import com.diluv.api.data.site.DataSiteProjectType;
+
+import com.diluv.confluencia.database.record.GameVersionRecord;
+
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 
@@ -105,9 +111,10 @@ public class SiteAPI {
             projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectTypeAndVersion(gameSlug, projectTypeSlug, page, limit, ProjectSort.fromString(sort, ProjectSort.POPULARITY), version);
         }
 
+        GameRecord game = DATABASE.gameDAO.findOneBySlug(gameSlug);
         if (projectRecords.isEmpty()) {
 
-            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+            if (game == null) {
 
                 return ErrorMessage.NOT_FOUND_GAME.respond();
             }
@@ -126,6 +133,9 @@ public class SiteAPI {
         List<DataBaseProjectType> types = DATABASE.projectDAO.findAllProjectTypesByGameSlug(gameSlug).stream().map(DataBaseProjectType::new).collect(Collectors.toList());
         ProjectTypeRecord currentType = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
         List<DataTag> tags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug).stream().map(DataTag::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataProjectType(currentType, tags), GamesAPI.PROJECT_SORTS));
+
+        List<DataGameVersion> gameVersions = DATABASE.gameDAO.findAllGameVersionsByGameSlug(gameSlug).stream().map(DataGameVersion::new).collect(Collectors.toList());
+
+        return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataSiteProjectType(currentType, tags, new DataSiteGameVersion(game, gameVersions)), GamesAPI.PROJECT_SORTS));
     }
 }
