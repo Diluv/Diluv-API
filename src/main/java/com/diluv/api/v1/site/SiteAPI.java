@@ -131,8 +131,7 @@ public class SiteAPI {
         ProjectTypeRecord currentType = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
         List<DataTag> tags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug).stream().map(DataTag::new).collect(Collectors.toList());
 
-        List<DataGameVersion> gameVersions = DATABASE.gameDAO.findAllGameVersionsByGameSlug(gameSlug).stream().map(DataGameVersion::new).collect(Collectors.toList());
 
-        return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataProjectType(currentType, tags, new DataSiteGameVersion(game, gameVersions)), GamesAPI.PROJECT_SORTS));
+        return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataProjectType(currentType, tags), GamesAPI.PROJECT_SORTS));
     }
 }
