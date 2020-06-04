@@ -35,4 +35,13 @@ public class DataProjectType extends DataBaseProjectType {
 
         this.tags = tags;
     }
+
+    public DataProjectType (ProjectTypeRecord rs, List<DataTag> tags, DataBaseGame customGame) {
+
+        super(rs);
+        this.projectCount = rs.getProjectCount();
+
+        this.tags = tags;
+        this.game = customGame;
+    }
 }

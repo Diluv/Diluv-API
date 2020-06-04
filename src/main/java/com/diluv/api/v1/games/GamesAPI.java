@@ -58,8 +58,8 @@ import static com.diluv.api.Main.DATABASE;
 @Produces(MediaType.APPLICATION_JSON)
 public class GamesAPI {
 
-    private final List<String> gameSort = Arrays.stream(GameSort.values()).map(Enum::name).collect(Collectors.toList());
-    private final List<String> projectSort = Arrays.stream(ProjectSort.values()).map(Enum::name).collect(Collectors.toList());
+    public static final List<String> GAME_SORTS = Arrays.stream(GameSort.values()).map(Enum::name).collect(Collectors.toList());
+    public static final List<String> PROJECT_SORTS = Arrays.stream(ProjectSort.values()).map(Enum::name).collect(Collectors.toList());
 
     private final Slugify slugify = new Slugify();
 
@@ -71,7 +71,7 @@ public class GamesAPI {
         final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(GameSort.fromString(sort, GameSort.NAME));
 
         final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataGameList(games, gameSort));
+        return ResponseUtil.successResponse(new DataGameList(games, GAME_SORTS));
     }
 
     @Cache(maxAge = 300, mustRevalidate = true)
@@ -93,7 +93,7 @@ public class GamesAPI {
 
         final long projectCount = DATABASE.projectDAO.countAllByGameSlug(gameSlug);
 
-        return ResponseUtil.successResponse(new DataGame(gameRecord, projectTypes, versions, projectSort, projectCount));
+        return ResponseUtil.successResponse(new DataGame(gameRecord, projectTypes, versions, PROJECT_SORTS, projectCount));
     }
 
     @Cache(maxAge = 300, mustRevalidate = true)
