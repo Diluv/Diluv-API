@@ -1,5 +1,6 @@
 package com.diluv.api.utils;
 
+@Deprecated
 public class Pagination {
     public static int getLimit (Integer queryLimit) {
 

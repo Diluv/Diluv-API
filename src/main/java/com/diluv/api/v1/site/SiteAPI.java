@@ -11,21 +11,18 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.data.DataGameVersion;
-import com.diluv.api.data.DataProjectType;
-import com.diluv.api.data.site.DataSiteGameVersion;
-
 import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataBaseProjectType;
 import com.diluv.api.data.DataGame;
 import com.diluv.api.data.DataGameList;
+import com.diluv.api.data.DataProjectType;
 import com.diluv.api.data.DataTag;
 import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
-import com.diluv.api.utils.Pagination;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.GamesAPI;
@@ -95,17 +92,20 @@ public class SiteAPI {
 
     @GET
     @Path("/games/{gameSlug}/{projectTypeSlug}/projects")
-    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort, @QueryParam("version") String version) {
+    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectParams query) {
 
-        long page = Pagination.getPage(queryPage);
-        int limit = Pagination.getLimit(queryLimit);
+        long page = query.getPage();
+        int limit = query.getLimit();
+        ProjectSort sort = query.getSort(ProjectSort.POPULARITY);
+        String search = query.getSearch();
+
         final List<ProjectRecord> projectRecords;
 
-        if (version == null) {
-            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, page, limit, ProjectSort.fromString(sort, ProjectSort.POPULARITY));
+        if (query.version == null) {
+            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort);
         }
         else {
-            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectTypeAndVersion(gameSlug, projectTypeSlug, page, limit, ProjectSort.fromString(sort, ProjectSort.POPULARITY), version);
+            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectTypeAndVersion(gameSlug, projectTypeSlug, search, page, limit, sort, query.version);
         }
 
         GameRecord game = DATABASE.gameDAO.findOneBySlug(gameSlug);
@@ -130,7 +130,6 @@ public class SiteAPI {
         List<DataBaseProjectType> types = DATABASE.projectDAO.findAllProjectTypesByGameSlug(gameSlug).stream().map(DataBaseProjectType::new).collect(Collectors.toList());
         ProjectTypeRecord currentType = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
         List<DataTag> tags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug).stream().map(DataTag::new).collect(Collectors.toList());
-
 
         return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataProjectType(currentType, tags), GamesAPI.PROJECT_SORTS));
     }
