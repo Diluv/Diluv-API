@@ -9,9 +9,9 @@ public class DataGameList {
     private final List<DataGame> games;
 
     @Expose
-    private final List<String> sort;
+    private final List<DataSort> sort;
 
-    public DataGameList (List<DataGame> games, List<String> sort) {
+    public DataGameList (List<DataGame> games, List<DataSort> sort) {
 
         this.games = games;
         this.sort = sort;

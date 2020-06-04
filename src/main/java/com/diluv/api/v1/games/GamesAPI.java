@@ -3,7 +3,6 @@ package com.diluv.api.v1.games;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,6 +50,7 @@ import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
+import com.diluv.confluencia.database.sort.Sort;
 import com.github.slugify.Slugify;
 
 import static com.diluv.api.Main.DATABASE;
@@ -60,8 +60,8 @@ import static com.diluv.api.Main.DATABASE;
 @Produces(MediaType.APPLICATION_JSON)
 public class GamesAPI {
 
-    public static final List<String> GAME_SORTS = Arrays.stream(GameSort.values()).map(Enum::name).collect(Collectors.toList());
-    public static final List<String> PROJECT_SORTS = Arrays.stream(ProjectSort.values()).map(Enum::name).collect(Collectors.toList());
+    public static final List<DataSort> GAME_SORTS = GameSort.LIST.stream().map(DataSort::new).collect(Collectors.toList());
+    public static final List<DataSort> PROJECT_SORTS = ProjectSort.LIST.stream().map(DataSort::new).collect(Collectors.toList());
 
     private final Slugify slugify = new Slugify();
 
@@ -127,7 +127,7 @@ public class GamesAPI {
 
         long page = query.getPage();
         int limit = query.getLimit();
-        ProjectSort sort = query.getSort(ProjectSort.POPULARITY);
+        Sort sort = query.getSort(ProjectSort.POPULAR);
         String search = query.getSearch();
 
         final List<ProjectRecord> projectRecords;

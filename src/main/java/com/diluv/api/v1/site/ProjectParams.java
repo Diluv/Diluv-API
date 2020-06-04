@@ -5,6 +5,7 @@ import javax.ws.rs.QueryParam;
 import org.apache.commons.validator.GenericValidator;
 
 import com.diluv.confluencia.database.sort.ProjectSort;
+import com.diluv.confluencia.database.sort.Sort;
 
 public class ProjectParams {
 
@@ -49,10 +50,10 @@ public class ProjectParams {
         return this.limit;
     }
 
-    public ProjectSort getSort (ProjectSort defaultSort) {
+    public Sort getSort (Sort defaultSort) {
 
-        for (ProjectSort b : ProjectSort.values()) {
-            if (b.name().equalsIgnoreCase(this.sort)) {
+        for (Sort b : ProjectSort.LIST) {
+            if (b.getSort().equalsIgnoreCase(this.sort)) {
                 return b;
             }
         }

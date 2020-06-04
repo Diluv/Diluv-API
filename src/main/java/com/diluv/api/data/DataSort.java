@@ -1,28 +1,19 @@
 package com.diluv.api.data;
 
-import java.util.List;
-
+import com.diluv.confluencia.database.sort.Sort;
 import com.google.gson.annotations.Expose;
 
 public class DataSort {
 
     @Expose
-    private final List<String> games;
+    private final String sort;
 
     @Expose
-    private final List<String> news;
+    private final String displayName;
 
-    @Expose
-    private final List<String> projects;
+    public DataSort (Sort sort) {
 
-    @Expose
-    private final List<String> projectFiles;
-
-    public DataSort (List<String> games, List<String> news, List<String> projects, List<String> projectFiles) {
-
-        this.games = games;
-        this.news = news;
-        this.projects = projects;
-        this.projectFiles = projectFiles;
+        this.sort = sort.getSort();
+        this.displayName = sort.getDisplayName();
     }
 }

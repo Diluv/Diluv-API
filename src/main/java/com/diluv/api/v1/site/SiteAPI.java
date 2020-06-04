@@ -1,26 +1,6 @@
 package com.diluv.api.v1.site;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.cache.Cache;
-
-import com.diluv.api.data.DataBaseProject;
-import com.diluv.api.data.DataBaseProjectType;
-import com.diluv.api.data.DataGame;
-import com.diluv.api.data.DataGameList;
-import com.diluv.api.data.DataProjectType;
-import com.diluv.api.data.DataTag;
+import com.diluv.api.data.*;
 import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -32,6 +12,18 @@ import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
+import com.diluv.confluencia.database.sort.Sort;
+
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
+import org.jboss.resteasy.annotations.cache.Cache;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -96,7 +88,7 @@ public class SiteAPI {
 
         long page = query.getPage();
         int limit = query.getLimit();
-        ProjectSort sort = query.getSort(ProjectSort.POPULARITY);
+        Sort sort = query.getSort(ProjectSort.POPULAR);
         String search = query.getSearch();
 
         final List<ProjectRecord> projectRecords;

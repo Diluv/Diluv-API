@@ -36,7 +36,7 @@ public class DataGame extends DataBaseGame {
     private final List<DataGameVersion> versions;
 
     @Expose
-    private final List<String> sort;
+    private final List<DataSort> sort;
 
     @Expose
     private final Long projectCount;
@@ -49,7 +49,7 @@ public class DataGame extends DataBaseGame {
     public DataGame (GameRecord rs,
                      List<DataProjectType> projectTypes,
                      List<DataGameVersion> versions,
-                     List<String> sort,
+                     List<DataSort> sort,
                      Long projectCount) {
 
         super(rs);
