@@ -47,7 +47,7 @@ dependencies {
 
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.14.2'
     testImplementation group: 'org.testcontainers', name: 'mariadb', version: '1.14.2'
-    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.14.2'
+    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.14.3'
 }
 
 test {
