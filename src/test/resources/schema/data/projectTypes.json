@@ -16,6 +16,9 @@
         },
         "tags": {
             "$ref": "tags.json"
+        },
+        "defaultType": {
+            "type": "boolean"
         }
     },
     "required": [

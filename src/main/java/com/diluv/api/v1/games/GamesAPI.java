@@ -72,7 +72,7 @@ public class GamesAPI {
 
         final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(GameSort.fromString(sort, GameSort.NAME));
 
-        final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
+        final List<DataBaseGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(new DataGameList(games, GAME_SORTS));
     }
 

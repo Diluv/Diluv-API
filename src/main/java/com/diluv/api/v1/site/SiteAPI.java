@@ -1,6 +1,7 @@
 package com.diluv.api.v1.site;
 
 import com.diluv.api.data.*;
+import com.diluv.api.data.site.DataSiteGame;
 import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -61,7 +62,10 @@ public class SiteAPI {
 
         final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(GameSort.fromString(sort, GameSort.NAME));
 
-        final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
+        final List<DataBaseGame> games = gameRecords.stream().map(x -> {
+            final String projectTypeRecords = DATABASE.projectDAO.findDefaultProjectTypesByGameSlug(x.getSlug());
+            return new DataSiteGame(x, projectTypeRecords);
+        }).collect(Collectors.toList());
         return ResponseUtil.successResponse(new DataGameList(games, GamesAPI.GAME_SORTS));
     }
 
@@ -76,9 +80,8 @@ public class SiteAPI {
             return ErrorMessage.NOT_FOUND_GAME.respond();
         }
 
-        // TODO GameRecord should store it's "default" project type and return it here instead of doing this.
-        final List<ProjectTypeRecord> projectTypeRecords = DATABASE.projectDAO.findAllProjectTypesByGameSlug(gameSlug);
-        return ResponseUtil.successResponse(projectTypeRecords.get(0).getSlug());
+        final String projectTypeRecords = DATABASE.projectDAO.findDefaultProjectTypesByGameSlug(gameSlug);
+        return ResponseUtil.successResponse(projectTypeRecords);
     }
 
 
