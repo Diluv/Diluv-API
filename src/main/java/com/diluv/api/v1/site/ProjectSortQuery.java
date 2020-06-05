@@ -7,7 +7,7 @@ import org.apache.commons.validator.GenericValidator;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 
-public class ProjectParams {
+public class ProjectSortQuery {
 
     @QueryParam("page")
     private Long page;
@@ -53,7 +53,7 @@ public class ProjectParams {
     public Sort getSort (Sort defaultSort) {
 
         for (Sort b : ProjectSort.LIST) {
-            if (b.getSort().equalsIgnoreCase(this.sort)) {
+            if (b.getSlug().equalsIgnoreCase(this.sort)) {
                 return b;
             }
         }

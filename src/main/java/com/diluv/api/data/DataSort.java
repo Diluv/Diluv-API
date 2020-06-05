@@ -6,14 +6,14 @@ import com.google.gson.annotations.Expose;
 public class DataSort {
 
     @Expose
-    private final String sort;
+    private final String slug;
 
     @Expose
     private final String displayName;
 
     public DataSort (Sort sort) {
 
-        this.sort = sort.getSort();
+        this.slug = sort.getSlug();
         this.displayName = sort.getDisplayName();
     }
 }

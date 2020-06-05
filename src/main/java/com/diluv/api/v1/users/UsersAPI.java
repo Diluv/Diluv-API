@@ -4,17 +4,20 @@ import com.diluv.api.data.DataAuthorizedUser;
 import com.diluv.api.data.DataTag;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataUser;
-import com.diluv.api.utils.Pagination;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.api.v1.site.ProjectSortQuery;
 import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.UserRecord;
 import com.diluv.confluencia.database.sort.ProjectSort;
 
+import com.diluv.confluencia.database.sort.Sort;
+
 import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.cache.Cache;
 
 import javax.ws.rs.*;
@@ -87,11 +90,12 @@ public class UsersAPI {
 
     @GET
     @Path("/{username}/projects")
-    public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort) {
+    public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @Query ProjectSortQuery query) {
 
         final Token token = JWTUtil.getToken(auth);
-        long page = Pagination.getPage(queryPage);
-        int limit = Pagination.getLimit(queryLimit);
+        long page = query.getPage();
+        int limit = query.getLimit();
+        Sort sort = query.getSort(ProjectSort.POPULAR);
 
         UserRecord userRecord = DATABASE.userDAO.findOneByUsername(username);
         if (userRecord == null) {
@@ -104,7 +108,7 @@ public class UsersAPI {
             authorized = userRecord.getUsername().equalsIgnoreCase(username);
         }
 
-        List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, ProjectSort.fromString(sort, ProjectSort.NEW));
+        List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, sort);
         final List<DataProject> projects = projectRecords.stream().map(projectRecord -> {
             final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
             List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());

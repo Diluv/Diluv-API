@@ -38,7 +38,7 @@ import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.error.ErrorType;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.api.v1.site.ProjectParams;
+import com.diluv.api.v1.site.ProjectSortQuery;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
@@ -123,7 +123,7 @@ public class GamesAPI {
 
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/projects")
-    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectParams query) {
+    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectSortQuery query) {
 
         long page = query.getPage();
         int limit = query.getLimit();
