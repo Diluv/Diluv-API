@@ -23,12 +23,6 @@ public class DataGame extends DataBaseGame {
     @Expose
     private final DataImage logoURL;
 
-    /**
-     * A URL that links to the banner of the game.
-     */
-    @Expose
-    private final DataImage bannerURL;
-
     @Expose
     private final List<DataProjectType> projectTypes;
 
@@ -55,7 +49,6 @@ public class DataGame extends DataBaseGame {
         super(rs);
         this.url = rs.getUrl();
         this.logoURL = Constants.getGameLogoURL(rs.getSlug());
-        this.bannerURL = Constants.getGameBannerURL(rs.getSlug());
         this.projectTypes = projectTypes;
         this.versions = versions;
         this.sort = sort;

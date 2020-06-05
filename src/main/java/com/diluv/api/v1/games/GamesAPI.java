@@ -14,7 +14,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -31,14 +30,15 @@ import org.jboss.resteasy.plugins.providers.atom.Person;
 import com.diluv.api.data.*;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
-import com.diluv.api.utils.Pagination;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.error.ErrorType;
 import com.diluv.api.utils.permissions.ProjectPermissions;
+import com.diluv.api.utils.query.GameQuery;
+import com.diluv.api.utils.query.ProjectFileQuery;
+import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.api.v1.site.ProjectSortQuery;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
@@ -68,9 +68,11 @@ public class GamesAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/")
-    public Response getGames (@QueryParam("sort") String sort) {
+    public Response getGames (@Query GameQuery query) {
 
-        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(GameSort.fromString(sort, GameSort.NAME));
+        final Sort sort = query.getSort(GameSort.NAME);
+
+        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(sort);
 
         final List<DataBaseGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(new DataGameList(games, GAME_SORTS));
@@ -123,7 +125,7 @@ public class GamesAPI {
 
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/projects")
-    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectSortQuery query) {
+    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectQuery query) {
 
         long page = query.getPage();
         int limit = query.getLimit();
@@ -270,10 +272,12 @@ public class GamesAPI {
     @Cache(maxAge = 60, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
-    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @QueryParam("page") Long queryPage, @QueryParam("limit") Integer queryLimit, @QueryParam("sort") String sort, @QueryParam("version") String version) {
+    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @Query ProjectFileQuery query) {
 
-        long page = Pagination.getPage(queryPage);
-        int limit = Pagination.getLimit(queryLimit);
+        long page = query.getPage();
+        int limit = query.getLimit();
+        Sort sort = query.getSort(ProjectFileSort.NEW);
+        String version = query.version;
 
         final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (projectRecord == null) {
@@ -293,10 +297,10 @@ public class GamesAPI {
         final List<ProjectFileRecord> projectFileRecords;
 
         if (version == null) {
-            projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord.getId(), authorized, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW));
+            projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord.getId(), authorized, page, limit, sort);
         }
         else {
-            projectFileRecords = DATABASE.fileDAO.findAllByProjectIdWhereVersion(projectRecord.getId(), authorized, page, limit, ProjectFileSort.fromString(sort, ProjectFileSort.NEW), version);
+            projectFileRecords = DATABASE.fileDAO.findAllByProjectIdWhereVersion(projectRecord.getId(), authorized, page, limit, sort, version);
         }
 
         final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> {

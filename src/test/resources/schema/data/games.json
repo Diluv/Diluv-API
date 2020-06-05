@@ -14,9 +14,6 @@
         "logoURL": {
             "$ref": "image.json"
         },
-        "bannerURL": {
-            "$ref": "image.json"
-        },
         "versions": {
             "$ref": "game_versions.json"
         },
@@ -38,7 +35,6 @@
         "slug",
         "url",
         "logoURL",
-        "bannerURL",
         "projectCount"
     ],
     "additionalProperties": false

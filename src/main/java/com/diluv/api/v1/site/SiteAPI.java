@@ -1,10 +1,32 @@
 package com.diluv.api.v1.site;
 
-import com.diluv.api.data.*;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
+import org.jboss.resteasy.annotations.cache.Cache;
+
+import com.diluv.api.data.DataBaseGame;
+import com.diluv.api.data.DataBaseProject;
+import com.diluv.api.data.DataBaseProjectType;
+import com.diluv.api.data.DataGame;
+import com.diluv.api.data.DataGameList;
+import com.diluv.api.data.DataProjectType;
+import com.diluv.api.data.DataTag;
 import com.diluv.api.data.site.DataSiteGame;
 import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
 import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.utils.query.GameQuery;
+import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.confluencia.database.record.GameRecord;
@@ -14,17 +36,6 @@ import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
-
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.cache.Cache;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -58,9 +69,11 @@ public class SiteAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/games")
-    public Response getGames (@QueryParam("sort") String sort) {
+    public Response getGames (@Query GameQuery query) {
 
-        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(GameSort.fromString(sort, GameSort.NAME));
+        final Sort sort = query.getSort(GameSort.NAME);
+
+        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(sort);
 
         final List<DataBaseGame> games = gameRecords.stream().map(x -> {
             final String projectTypeRecords = DATABASE.projectDAO.findDefaultProjectTypesByGameSlug(x.getSlug());
@@ -87,7 +100,7 @@ public class SiteAPI {
 
     @GET
     @Path("/games/{gameSlug}/{projectTypeSlug}/projects")
-    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectSortQuery query) {
+    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectQuery query) {
 
         long page = query.getPage();
         int limit = query.getLimit();

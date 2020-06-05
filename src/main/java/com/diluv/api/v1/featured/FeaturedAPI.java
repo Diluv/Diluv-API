@@ -13,13 +13,13 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataBaseProject;
-import com.diluv.api.data.DataTag;
 import com.diluv.api.data.DataFeatured;
 import com.diluv.api.data.DataGame;
+import com.diluv.api.data.DataTag;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
+import com.diluv.confluencia.database.record.TagRecord;
 
 import static com.diluv.api.Main.DATABASE;
 

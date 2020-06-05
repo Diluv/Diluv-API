@@ -19,7 +19,6 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
-import com.diluv.api.data.DataTag;
 import com.diluv.api.data.DataGameVersion;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataProjectAuthorized;
@@ -27,6 +26,7 @@ import com.diluv.api.data.DataProjectContributor;
 import com.diluv.api.data.DataProjectContributorAuthorized;
 import com.diluv.api.data.DataProjectFileInQueue;
 import com.diluv.api.data.DataProjectLink;
+import com.diluv.api.data.DataTag;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.MismatchException;
 import com.diluv.api.utils.auth.Validator;
@@ -35,13 +35,13 @@ import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.ProjectFileUploadForm;
-import com.diluv.confluencia.database.record.TagRecord;
 import com.diluv.confluencia.database.record.GameVersionRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.diluv.confluencia.database.record.ProjectLinkRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
+import com.diluv.confluencia.database.record.TagRecord;
 
 import static com.diluv.api.Main.DATABASE;
 

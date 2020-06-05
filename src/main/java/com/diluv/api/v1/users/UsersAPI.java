@@ -1,31 +1,34 @@
 package com.diluv.api.v1.users;
 
-import com.diluv.api.data.DataAuthorizedUser;
-import com.diluv.api.data.DataTag;
-import com.diluv.api.data.DataProject;
-import com.diluv.api.data.DataUser;
-import com.diluv.api.utils.auth.JWTUtil;
-import com.diluv.api.utils.auth.tokens.Token;
-import com.diluv.api.utils.error.ErrorMessage;
-import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.api.v1.site.ProjectSortQuery;
-import com.diluv.confluencia.database.record.TagRecord;
-import com.diluv.confluencia.database.record.ProjectRecord;
-import com.diluv.confluencia.database.record.UserRecord;
-import com.diluv.confluencia.database.sort.ProjectSort;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import com.diluv.confluencia.database.sort.Sort;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.cache.Cache;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import com.diluv.api.data.DataAuthorizedUser;
+import com.diluv.api.data.DataProject;
+import com.diluv.api.data.DataTag;
+import com.diluv.api.data.DataUser;
+import com.diluv.api.utils.auth.JWTUtil;
+import com.diluv.api.utils.auth.tokens.Token;
+import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.utils.query.ProjectQuery;
+import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.confluencia.database.record.ProjectRecord;
+import com.diluv.confluencia.database.record.TagRecord;
+import com.diluv.confluencia.database.record.UserRecord;
+import com.diluv.confluencia.database.sort.ProjectSort;
+import com.diluv.confluencia.database.sort.Sort;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -90,7 +93,7 @@ public class UsersAPI {
 
     @GET
     @Path("/{username}/projects")
-    public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @Query ProjectSortQuery query) {
+    public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @Query ProjectQuery query) {
 
         final Token token = JWTUtil.getToken(auth);
         long page = query.getPage();

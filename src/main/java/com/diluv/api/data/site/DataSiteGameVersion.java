@@ -1,11 +1,11 @@
 package com.diluv.api.data.site;
 
+import java.util.List;
+
 import com.diluv.api.data.DataBaseGame;
 import com.diluv.api.data.DataGameVersion;
 import com.diluv.confluencia.database.record.GameRecord;
 import com.google.gson.annotations.Expose;
-
-import java.util.List;
 
 public class DataSiteGameVersion extends DataBaseGame {
 

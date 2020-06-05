@@ -19,11 +19,6 @@ public class DataSiteGame extends DataBaseGame {
     @Expose
     private final DataImage logoURL;
 
-    /**
-     * A URL that links to the banner of the game.
-     */
-    @Expose
-    private final DataImage bannerURL;
 
     @Expose
     private final String defaultProjectType;
@@ -34,7 +29,6 @@ public class DataSiteGame extends DataBaseGame {
 
         this.url = rs.getUrl();
         this.logoURL = Constants.getGameLogoURL(rs.getSlug());
-        this.bannerURL = Constants.getGameBannerURL(rs.getSlug());
         this.defaultProjectType = defaultProjectType;
     }
 }

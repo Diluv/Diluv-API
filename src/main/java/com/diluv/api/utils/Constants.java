@@ -259,18 +259,4 @@ public final class Constants {
             new DataImageSource(baseURL + ".webp", "image/webp")
         });
     }
-
-    public static DataImage getGameBannerURL (String gameSlug) {
-
-        if (isDevelopment()) {
-            final String url = "https://images.placeholders.dev/?width=1200&height=150";
-            return new DataImage(new DataImageSource(url + "&text=fallback", "image/png"), new DataImageSource[]{new DataImageSource(url + "&text=" + gameSlug, "image/svg+xml")});
-        }
-
-        final String baseURL = String.format("%s/games/%s/banner", CDN_URL, gameSlug);
-        final String pngURL = baseURL + ".png";
-        return new DataImage(new DataImageSource(pngURL, "image/png"), new DataImageSource[]{
-            new DataImageSource(baseURL + ".webp", "image/webp")
-        });
-    }
 }

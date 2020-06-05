@@ -10,7 +10,7 @@ public class DataImageSource {
     @Expose
     private final String type;
 
-    public DataImageSource(String src, String type) {
+    public DataImageSource (String src, String type) {
 
         this.src = src;
         this.type = type;
