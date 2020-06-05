@@ -50,7 +50,10 @@ public class SiteAPI {
     public Response getIndex () {
 
         final List<GameRecord> gameRecords = DATABASE.gameDAO.findFeaturedGames();
-        final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
+        final List<DataSiteGame> games = gameRecords.stream().map(x -> {
+            final String projectTypeRecords = DATABASE.projectDAO.findDefaultProjectTypesByGameSlug(x.getSlug());
+            return new DataSiteGame(x, projectTypeRecords);
+        }).collect(Collectors.toList());
 
         final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findFeaturedProjects();
 
