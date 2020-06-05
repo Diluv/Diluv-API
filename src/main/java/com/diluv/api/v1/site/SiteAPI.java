@@ -102,18 +102,19 @@ public class SiteAPI {
     @Path("/games/{gameSlug}/{projectTypeSlug}/projects")
     public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectQuery query) {
 
-        long page = query.getPage();
-        int limit = query.getLimit();
-        Sort sort = query.getSort(ProjectSort.POPULAR);
-        String search = query.getSearch();
+        final long page = query.getPage();
+        final int limit = query.getLimit();
+        final Sort sort = query.getSort(ProjectSort.POPULAR);
+        final String search = query.getSearch();
+        final String versions = query.getVersions();
 
         final List<ProjectRecord> projectRecords;
 
-        if (query.version == null) {
+        if (versions == null) {
             projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort);
         }
         else {
-            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectTypeAndVersion(gameSlug, projectTypeSlug, search, page, limit, sort, query.version);
+            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectTypeAndVersion(gameSlug, projectTypeSlug, search, page, limit, sort, versions);
         }
 
         GameRecord game = DATABASE.gameDAO.findOneBySlug(gameSlug);

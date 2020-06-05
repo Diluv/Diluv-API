@@ -127,17 +127,19 @@ public class GamesAPI {
     @Path("/{gameSlug}/{projectTypeSlug}/projects")
     public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectQuery query) {
 
-        long page = query.getPage();
-        int limit = query.getLimit();
-        Sort sort = query.getSort(ProjectSort.POPULAR);
-        String search = query.getSearch();
+        final long page = query.getPage();
+        final int limit = query.getLimit();
+        final Sort sort = query.getSort(ProjectSort.POPULAR);
+        final String search = query.getSearch();
+        final String versions = query.getVersions();
+        final String tags = query.getTags();
 
         final List<ProjectRecord> projectRecords;
-        if (query.version == null) {
+        if (versions == null) {
             projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort);
         }
         else {
-            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectTypeAndVersion(gameSlug, projectTypeSlug, search, page, limit, sort, query.version);
+            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectTypeAndVersion(gameSlug, projectTypeSlug, search, page, limit, sort, versions);
         }
 
         if (projectRecords.isEmpty()) {
@@ -155,8 +157,8 @@ public class GamesAPI {
 
         final List<DataBaseProject> projects = projectRecords.stream().map(projectRecord -> {
             final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
-            List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
-            return new DataBaseProject(projectRecord, tags);
+            final List<DataTag> dataTags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
+            return new DataBaseProject(projectRecord, dataTags);
         }).collect(Collectors.toList());
 
         return ResponseUtil.successResponse(projects);
@@ -277,7 +279,7 @@ public class GamesAPI {
         long page = query.getPage();
         int limit = query.getLimit();
         Sort sort = query.getSort(ProjectFileSort.NEW);
-        String version = query.version;
+        String version = query.getVersions();
 
         final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (projectRecord == null) {

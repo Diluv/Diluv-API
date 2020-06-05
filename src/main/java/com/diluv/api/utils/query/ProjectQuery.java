@@ -9,8 +9,11 @@ import com.diluv.confluencia.database.sort.Sort;
 
 public class ProjectQuery extends PaginationQuery {
 
-    @QueryParam("version")
-    public String version;
+    @QueryParam("versions")
+    private String versions;
+
+    @QueryParam("tags")
+    private String tags;
 
     @QueryParam("search")
     private String search;
@@ -24,6 +27,16 @@ public class ProjectQuery extends PaginationQuery {
             }
         }
         return defaultSort;
+    }
+
+    public String getVersions () {
+
+        return this.versions;
+    }
+
+    public String getTags () {
+
+        return this.tags;
     }
 
     public String getSearch () {
