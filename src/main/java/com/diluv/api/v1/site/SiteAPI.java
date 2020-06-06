@@ -4,23 +4,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.data.*;
+import com.diluv.api.utils.auth.tokens.Token;
+
+import com.diluv.api.utils.permissions.ProjectPermissions;
+import com.diluv.confluencia.database.record.ProjectAuthorRecord;
+import com.diluv.confluencia.database.record.ProjectLinkRecord;
+
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.cache.Cache;
 
-import com.diluv.api.data.DataBaseGame;
-import com.diluv.api.data.DataBaseProject;
-import com.diluv.api.data.DataBaseProjectType;
-import com.diluv.api.data.DataGame;
-import com.diluv.api.data.DataGameList;
-import com.diluv.api.data.DataProjectType;
-import com.diluv.api.data.DataTag;
 import com.diluv.api.data.site.DataSiteGame;
 import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
@@ -144,5 +145,37 @@ public class SiteAPI {
         List<DataTag> tags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug).stream().map(DataTag::new).collect(Collectors.toList());
 
         return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataProjectType(currentType, tags), GamesAPI.PROJECT_SORTS));
+    }
+
+
+    @Cache(maxAge = 30, mustRevalidate = true)
+    @GET
+    @Path("/projects/{gameSlug}/{projectTypeSlug}/{projectSlug}")
+    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
+
+        final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (projectRecord == null || !projectRecord.isReleased() && token == null) {
+            return ErrorMessage.NOT_FOUND_PROJECT.respond();
+        }
+
+        final List<ProjectLinkRecord> projectLinkRecords = DATABASE.projectDAO.findAllLinksByProjectId(projectRecord.getId());
+        final List<DataProjectLink> projectLinks = projectLinkRecords.stream().map(DataProjectLink::new).collect(Collectors.toList());
+
+        final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
+
+        final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
+        List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
+
+        if (token != null) {
+            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(projectRecord, token, records);
+
+            if (permissions != null) {
+                final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributorAuthorized::new).collect(Collectors.toList());
+                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, tags, projectAuthors, projectLinks, permissions));
+            }
+        }
+
+        final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributor::new).collect(Collectors.toList());
+        return ResponseUtil.successResponse(new DataProject(projectRecord, tags, projectAuthors, projectLinks));
     }
 }
