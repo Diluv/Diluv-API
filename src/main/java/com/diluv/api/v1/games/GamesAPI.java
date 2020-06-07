@@ -70,12 +70,17 @@ public class GamesAPI {
     @Path("/")
     public Response getGames (@Query GameQuery query) {
 
+        final long page = query.getPage();
+        final int limit = query.getLimit();
         final Sort sort = query.getSort(GameSort.NAME);
+        final String search = query.getSearch();
 
-        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(sort);
+        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(page, limit, sort, search);
+
+        final long gameCount = DATABASE.gameDAO.countAll(search);
 
         final List<DataBaseGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataGameList(games, GAME_SORTS));
+        return ResponseUtil.successResponse(new DataGameList(games, GAME_SORTS, gameCount));
     }
 
     @Cache(maxAge = 300, mustRevalidate = true)

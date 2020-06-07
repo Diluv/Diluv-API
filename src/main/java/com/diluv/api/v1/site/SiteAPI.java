@@ -11,26 +11,24 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.data.*;
-import com.diluv.api.utils.auth.tokens.Token;
-
-import com.diluv.api.utils.permissions.ProjectPermissions;
-import com.diluv.confluencia.database.record.ProjectAuthorRecord;
-import com.diluv.confluencia.database.record.ProjectLinkRecord;
-
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.cache.Cache;
 
+import com.diluv.api.data.*;
 import com.diluv.api.data.site.DataSiteGame;
 import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
+import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.query.GameQuery;
 import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.confluencia.database.record.GameRecord;
+import com.diluv.confluencia.database.record.ProjectAuthorRecord;
+import com.diluv.confluencia.database.record.ProjectLinkRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.record.TagRecord;
@@ -72,12 +70,16 @@ public class SiteAPI {
     @Path("/games")
     public Response getGames (@Query GameQuery query) {
 
+        final long page = query.getPage();
+        final int limit = query.getLimit();
         final Sort sort = query.getSort(GameSort.NAME);
+        final String search = query.getSearch();
 
-        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(sort);
+        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(page, limit, sort, search);
 
+        final long gameCount = DATABASE.gameDAO.countAll(search);
         final List<DataBaseGame> games = gameRecords.stream().map(DataSiteGame::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataGameList(games, GamesAPI.GAME_SORTS));
+        return ResponseUtil.successResponse(new DataGameList(games, GamesAPI.GAME_SORTS, gameCount));
     }
 
     @Cache(maxAge = 300, mustRevalidate = true)
