@@ -170,7 +170,7 @@ public class GamesAPI {
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getProjectFeed (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
 
-        final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, "%%", 1, 25, ProjectSort.NEW);
+        final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, "", 1, 25, ProjectSort.NEW);
 
         if (projectRecords.isEmpty()) {
             return Response.status(ErrorType.BAD_REQUEST.getCode()).build();

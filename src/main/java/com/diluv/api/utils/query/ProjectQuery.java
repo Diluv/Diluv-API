@@ -42,8 +42,8 @@ public class ProjectQuery extends PaginationQuery {
     public String getSearch () {
 
         if (GenericValidator.isBlankOrNull(this.search)) {
-            return "%%";
+            return "";
         }
-        return "%" + this.search + "%";
+        return  this.search ;
     }
 }

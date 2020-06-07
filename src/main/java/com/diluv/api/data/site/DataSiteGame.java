@@ -23,12 +23,12 @@ public class DataSiteGame extends DataBaseGame {
     @Expose
     private final String defaultProjectType;
 
-    public DataSiteGame (GameRecord rs, String defaultProjectType) {
+    public DataSiteGame (GameRecord rs) {
 
         super(rs);
 
         this.url = rs.getUrl();
         this.logoURL = Constants.getGameLogoURL(rs.getSlug());
-        this.defaultProjectType = defaultProjectType;
+        this.defaultProjectType = rs.getDefaultProjectType();
     }
 }

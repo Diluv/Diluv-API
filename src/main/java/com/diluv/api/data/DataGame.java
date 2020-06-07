@@ -35,6 +35,9 @@ public class DataGame extends DataBaseGame {
     @Expose
     private final Long projectCount;
 
+    @Expose
+    private final String defaultProjectType;
+
     public DataGame (GameRecord rs) {
 
         this(rs, null, null, null, null);
@@ -48,6 +51,7 @@ public class DataGame extends DataBaseGame {
 
         super(rs);
         this.url = rs.getUrl();
+        this.defaultProjectType = rs.getDefaultProjectType();
         this.logoURL = Constants.getGameLogoURL(rs.getSlug());
         this.projectTypes = projectTypes;
         this.versions = versions;
