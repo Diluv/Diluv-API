@@ -9,7 +9,7 @@ import com.google.gson.annotations.Expose;
 public class DataSiteIndex {
 
     @Expose
-    private final List<DataGame> featuredGames;
+    private final List<DataSiteGame> featuredGames;
 
     @Expose
     private final List<DataBaseProject> featuredProjects;
@@ -20,7 +20,7 @@ public class DataSiteIndex {
     @Expose
     private final long contributorCount;
 
-    public DataSiteIndex (List<DataGame> featuredGames, List<DataBaseProject> featuredProjects, long projectCount, long contributorCount) {
+    public DataSiteIndex (List<DataSiteGame> featuredGames, List<DataBaseProject> featuredProjects, long projectCount, long contributorCount) {
 
         this.featuredGames = featuredGames;
         this.featuredProjects = featuredProjects;
