@@ -34,9 +34,12 @@ public class ProjectQuery extends PaginationQuery {
         return this.versions;
     }
 
-    public String getTags () {
+    public String[] getTags () {
 
-        return this.tags;
+        if (this.tags == null) {
+            return new String[0];
+        }
+        return this.tags.split(",");
     }
 
     public String getSearch () {
@@ -44,6 +47,6 @@ public class ProjectQuery extends PaginationQuery {
         if (GenericValidator.isBlankOrNull(this.search)) {
             return "";
         }
-        return  this.search ;
+        return this.search;
     }
 }

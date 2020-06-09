@@ -106,15 +106,9 @@ public class SiteAPI {
         final Sort sort = query.getSort(ProjectSort.POPULAR);
         final String search = query.getSearch();
         final String versions = query.getVersions();
+        final String[] tags = query.getTags();
 
-        final List<ProjectRecord> projectRecords;
-
-        if (versions == null) {
-            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort);
-        }
-        else {
-            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectTypeAndVersion(gameSlug, projectTypeSlug, search, page, limit, sort, versions);
-        }
+        final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllByGameAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort,versions,tags);
 
         GameRecord game = DATABASE.gameDAO.findOneBySlug(gameSlug);
         if (projectRecords.isEmpty()) {
@@ -131,15 +125,15 @@ public class SiteAPI {
         }
         final List<DataBaseProject> projects = projectRecords.stream().map(projectRecord -> {
             final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
-            List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
-            return new DataBaseProject(projectRecord, tags);
+            final List<DataTag> dataTags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
+            return new DataBaseProject(projectRecord, dataTags);
         }).collect(Collectors.toList());
 
-        List<DataBaseProjectType> types = DATABASE.projectDAO.findAllProjectTypesByGameSlug(gameSlug).stream().map(DataBaseProjectType::new).collect(Collectors.toList());
-        ProjectTypeRecord currentType = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug, search);
-        List<DataTag> tags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug).stream().map(DataTag::new).collect(Collectors.toList());
+        final  List<DataBaseProjectType> types = DATABASE.projectDAO.findAllProjectTypesByGameSlug(gameSlug).stream().map(DataBaseProjectType::new).collect(Collectors.toList());
+        final ProjectTypeRecord currentType = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug, search);
+        final List<DataTag> dataTags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug).stream().map(DataTag::new).collect(Collectors.toList());
 
-        return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataProjectType(currentType, tags), GamesAPI.PROJECT_SORTS));
+        return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataProjectType(currentType, dataTags), GamesAPI.PROJECT_SORTS));
     }
 
 

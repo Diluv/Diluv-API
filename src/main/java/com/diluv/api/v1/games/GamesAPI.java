@@ -137,15 +137,9 @@ public class GamesAPI {
         final Sort sort = query.getSort(ProjectSort.POPULAR);
         final String search = query.getSearch();
         final String versions = query.getVersions();
-        final String tags = query.getTags();
+        final String[] tags = query.getTags();
 
-        final List<ProjectRecord> projectRecords;
-        if (versions == null) {
-            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort);
-        }
-        else {
-            projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectTypeAndVersion(gameSlug, projectTypeSlug, search, page, limit, sort, versions);
-        }
+        final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllByGameAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags);
 
         if (projectRecords.isEmpty()) {
 
@@ -175,7 +169,7 @@ public class GamesAPI {
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getProjectFeed (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
 
-        final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllProjectsByGameSlugAndProjectType(gameSlug, projectTypeSlug, "", 1, 25, ProjectSort.NEW);
+        final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllByGameAndProjectType(gameSlug, projectTypeSlug, "", 1, 25, ProjectSort.NEW);
 
         if (projectRecords.isEmpty()) {
             return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
