@@ -31,7 +31,7 @@ public class FeaturedAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/")
-    public Response getGames () {
+    public Response getFeatured () {
 
         final List<GameRecord> gameRecords = DATABASE.gameDAO.findFeaturedGames();
         final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
