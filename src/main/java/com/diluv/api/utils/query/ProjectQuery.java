@@ -13,7 +13,7 @@ public class ProjectQuery extends PaginationQuery {
     private String versions;
 
     @QueryParam("tags")
-    private String tags;
+    private String[] tags;
 
     @QueryParam("search")
     private String search;
@@ -36,10 +36,11 @@ public class ProjectQuery extends PaginationQuery {
 
     public String[] getTags () {
 
+        // Shouldn't happen but have it in case
         if (this.tags == null) {
             return new String[0];
         }
-        return this.tags.split(",");
+        return this.tags;
     }
 
     public String getSearch () {

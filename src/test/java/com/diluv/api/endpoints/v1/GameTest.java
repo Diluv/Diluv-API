@@ -51,6 +51,9 @@ public class GameTest {
         Request.getError(URL + "/minecraft-je/invalid/projects", 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
 
         Request.getOk(URL + "/minecraft-je/mods/projects", "schema/project-list-schema.json");
+        Request.getOk(URL + "/minecraft-je/mods/projects?sort=name", "schema/project-list-schema.json");
+        Request.getOk(URL + "/minecraft-je/mods/projects?name=book", "schema/project-list-schema.json");
+        Request.getOk(URL + "/minecraft-je/mods/projects?tags=magic&tags=tech", "schema/project-list-schema.json");
     }
 
     @Test
