@@ -27,7 +27,7 @@ public class Validator {
 
     public static boolean validateUsername (String username) {
 
-        if (GenericValidator.isBlankOrNull(username) || username.length() > 50 || username.length() < 3) {
+        if (GenericValidator.isBlankOrNull(username) || username.length() > 30 || username.length() < 3) {
             return false;
         }
         return GenericValidator.matchRegexp(username, "([A-Za-z0-9-_]+)");

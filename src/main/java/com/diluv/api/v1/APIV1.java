@@ -47,7 +47,7 @@ public class APIV1 extends Application {
         // Enables exception handler
         classes.add(GenericExceptionMapper.class);
 
-        classes.add(AuthAPI.class);
+//        classes.add(AuthAPI.class);
         classes.add(FeaturedAPI.class);
         classes.add(GamesAPI.class);
         classes.add(ProjectsAPI.class);
