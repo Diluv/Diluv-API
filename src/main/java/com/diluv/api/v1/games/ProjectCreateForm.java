@@ -15,6 +15,17 @@ public class ProjectCreateForm {
     @FormParam("description")
     public String description;
 
+    @FormParam("tags")
+    private String tags;
+
     @FormParam("logo")
     public InputStream logo;
+
+    public String[] getTags () {
+
+        if(this.tags == null){
+            return new String[0];
+        }
+        return this.tags.split(",");
+    }
 }

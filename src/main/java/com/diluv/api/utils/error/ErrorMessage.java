@@ -25,6 +25,7 @@ public enum ErrorMessage {
     // Project Errors
     PROJECT_INVALID_NAME(ErrorType.BAD_REQUEST, "project.invalid.name"),
     PROJECT_INVALID_LOGO(ErrorType.BAD_REQUEST, "project.invalid.logo"),
+    PROJECT_INVALID_TAGS(ErrorType.BAD_REQUEST, "project.invalid.tags"),
     PROJECT_INVALID_SUMMARY(ErrorType.BAD_REQUEST, "project.invalid.summary"),
     PROJECT_INVALID_DESCRIPTION(ErrorType.BAD_REQUEST, "project.invalid.description"),
     PROJECT_TAKEN_SLUG(ErrorType.BAD_REQUEST, "project.taken.slug"),
@@ -46,6 +47,7 @@ public enum ErrorMessage {
     FAILED_CREATE_TEMP_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.create_temp_user"),
     FAILED_CREATE_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.create_user"),
     FAILED_CREATE_PROJECT(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project"),
+    FAILED_CREATE_PROJECT_TAGS(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_tags"),
     FAILED_CREATE_PROJECT_FILE(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_file"),
     FAILED_CREATE_PASSWORD_RESET(ErrorType.INTERNAL_SERVER_ERROR, "database.create_password_reset"),
 

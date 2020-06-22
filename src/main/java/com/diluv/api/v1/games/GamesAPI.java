@@ -344,6 +344,12 @@ public class GamesAPI {
             return ErrorMessage.PROJECT_INVALID_DESCRIPTION.respond();
         }
 
+        String[] tags = form.getTags();
+        List<TagRecord> tagRecords = Validator.validateTags(gameSlug, projectTypeSlug, tags);
+        if (tagRecords.size() != tags.length) {
+            return ErrorMessage.PROJECT_INVALID_TAGS.respond();
+        }
+
         if (form.logo == null) {
             return ErrorMessage.PROJECT_INVALID_LOGO.respond();
         }
@@ -363,11 +369,18 @@ public class GamesAPI {
         if (DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) != null) {
             return ErrorMessage.PROJECT_TAKEN_SLUG.respond();
         }
-        if (!DATABASE.projectDAO.insertProject(projectSlug, name, summary, description, token.getUserId(), gameSlug, projectTypeSlug)) {
+        Long projectId = DATABASE.projectDAO.insertProject(projectSlug, name, summary, description, token.getUserId(), gameSlug, projectTypeSlug);
+
+        if (projectId == null) {
             return ErrorMessage.FAILED_CREATE_PROJECT.respond();
         }
 
-        final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        List<Long> tagIds = tagRecords.stream().map(TagRecord::getId).collect(Collectors.toList());
+        if (!DATABASE.projectDAO.insertProjectTags(projectId, tagIds)) {
+            return ErrorMessage.FAILED_CREATE_PROJECT_TAGS.respond();
+        }
+
+        final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
 
         if (projectRecord == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
@@ -378,8 +391,7 @@ public class GamesAPI {
             return ErrorMessage.ERROR_SAVING_IMAGE.respond();
         }
 
-        final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
-        List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataProject(projectRecord, tags));
+        List<DataTag> dataTags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
+        return ResponseUtil.successResponse(new DataProject(projectRecord, dataTags));
     }
 }

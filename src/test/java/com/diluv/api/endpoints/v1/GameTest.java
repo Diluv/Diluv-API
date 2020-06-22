@@ -96,7 +96,7 @@ public class GameTest {
     }
 
     @Test
-    public void postProjectByGameSlugAndProjectType () {
+    public void postProject () {
 
         final ClassLoader classLoader = this.getClass().getClassLoader();
         final File logo = new File(classLoader.getResource("logo.png").getFile());
@@ -110,8 +110,17 @@ public class GameTest {
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, 400, ErrorMessage.PROJECT_TAKEN_SLUG);
 
+        multiPart.put("name", "Bookshelf3");
+        multiPart.put("tags", "invalid,magic");
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, 400, ErrorMessage.PROJECT_INVALID_TAGS);
+
         // Ok
         multiPart.put("name", "Bookshelf2");
+        multiPart.remove("tags");
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, "schema/project-schema.json");
+
+        multiPart.put("name", "Bookshelf3");
+        multiPart.put("tags", "tech,magic");
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, "schema/project-schema.json");
     }
 }

@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.diluv.confluencia.database.record.TagRecord;
 
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -137,5 +140,23 @@ public class Validator {
             }
         }
         return projectRecords;
+    }
+
+    public static List<TagRecord> validateTags (String gameSlug, String projectTypeSlug, String[] tags) {
+
+        if (tags.length > 0) {
+            List<TagRecord> projectTypeTags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+            List<String> tagList = Arrays.asList(tags);
+
+            List<TagRecord> tagRecords = new ArrayList<>();
+            for (TagRecord record : projectTypeTags) {
+                if (tagList.contains(record.getSlug())) {
+                    tagRecords.add(record);
+                }
+            }
+
+            return tagRecords;
+        }
+        return Collections.emptyList();
     }
 }

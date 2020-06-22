@@ -22,6 +22,10 @@ import com.diluv.api.v1.projects.ProjectsAPI;
 import com.diluv.api.v1.site.SiteAPI;
 import com.diluv.api.v1.users.UsersAPI;
 
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormAnnotationReader;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartReader;
+
 public class APIV1 extends Application {
 
     @Override
