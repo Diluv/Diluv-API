@@ -76,8 +76,8 @@ public class AuthAPI {
         final String username = form.username.toLowerCase();
 
         final String domain = email.split("@")[1];
-        if (DATABASE.securityDAO.existsBlacklist(email, domain)) {
-            return ErrorMessage.USER_BLACKLISTED_EMAIL.respond();
+        if (DATABASE.securityDAO.existsBlocklist(email, domain)) {
+            return ErrorMessage.USER_BLOCKLISTED_EMAIL.respond();
         }
 
         if (DATABASE.userDAO.existsUserByUsername(username) || DATABASE.userDAO.existsTempUserByUsername(username)) {

@@ -20,7 +20,7 @@ public enum ErrorMessage {
     USER_TAKEN_EMAIL(ErrorType.BAD_REQUEST, "user.taken.email"),
     USER_TAKEN_USERNAME(ErrorType.BAD_REQUEST, "user.taken.username"),
     USER_VERIFIED(ErrorType.BAD_REQUEST, "user.verified"),
-    USER_BLACKLISTED_EMAIL(ErrorType.BAD_REQUEST, "user.blacklisted.email"),
+    USER_BLOCKLISTED_EMAIL(ErrorType.BAD_REQUEST, "user.blocklisted.email"),
 
     // Project Errors
     PROJECT_INVALID_NAME(ErrorType.BAD_REQUEST, "project.invalid.name"),

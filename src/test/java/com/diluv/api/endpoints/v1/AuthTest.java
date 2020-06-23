@@ -40,10 +40,10 @@
 //        // Banned domains
 //        multiPart.put("email", "testing2@banned.com");
 //        multiPart.put("password", "CDyDJZ4aHYTyDQhNcL9N");
-//        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_BLACKLISTED_EMAIL);
+//        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_BLOCKLISTED_EMAIL);
 //
 //        multiPart.put("email", "testing2@banned2.com");
-//        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_BLACKLISTED_EMAIL);
+//        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_BLOCKLISTED_EMAIL);
 //
 //        // Email used
 //        multiPart.put("email", "lclc98@diluv.com");
