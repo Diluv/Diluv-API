@@ -63,8 +63,8 @@ public class SiteAPI {
 
         final long projectCount = DATABASE.projectDAO.countAll();
         final long userCount = DATABASE.userDAO.countAll();
-        final long gameCount = DATABASE.gameDAO.countAll("");
-        final long projectTypeCount = 0;
+        final long gameCount = DATABASE.gameDAO.countAll();
+        final long projectTypeCount = DATABASE.gameDAO.countAllProjectTypes();
         return ResponseUtil.successResponse(new DataSiteIndex(games, projectCount, userCount, gameCount, projectTypeCount));
     }
 
