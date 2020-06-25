@@ -305,7 +305,7 @@ public class GamesAPI {
         }
 
         final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> {
-            final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsById(projectRecord.getId());
+            final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsById(record.getId());
             List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
             final List<Long> dependencies = DATABASE.fileDAO.findAllProjectDependenciesById(record.getId());
             return record.isReleased() ?

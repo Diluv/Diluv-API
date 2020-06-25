@@ -207,7 +207,7 @@ public class SiteAPI {
         }
 
         final List<DataSiteProjectFileDisplay> projectFiles = projectFileRecords.stream().map(record -> {
-            final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsById(projectRecord.getId());
+            final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsById(record.getId());
             List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
             return record.isReleased() ?
                 new DataSiteProjectFileDisplay(record, gameVersions, gameSlug, projectTypeSlug, projectSlug) :
