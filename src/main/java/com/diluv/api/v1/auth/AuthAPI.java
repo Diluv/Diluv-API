@@ -92,13 +92,13 @@ public class AuthAPI {
             return ErrorMessage.ERROR_ALGORITHM.respond();
         }
 
-        final String verificationCode = UUID.randomUUID().toString();
-        if (!DATABASE.userDAO.insertTempUser(email, username, bcryptPassword, "bcrypt", verificationCode)) {
+        final String code = UUID.randomUUID().toString();
+        if (!DATABASE.userDAO.insertTempUser(email, username, bcryptPassword, "bcrypt", code)) {
             return ErrorMessage.FAILED_CREATE_TEMP_USER.respond();
         }
 
         if (Constants.POSTMARK_API_TOKEN != null) {
-            final MessageResponse emailResponse = EmailUtil.sendVerificationEmail(email, verificationCode);
+            final MessageResponse emailResponse = EmailUtil.sendVerificationEmail(email, code);
             if (emailResponse == null) {
                 return ErrorMessage.FAILED_SEND_EMAIL.respond();
             }
@@ -277,12 +277,12 @@ public class AuthAPI {
             return ErrorMessage.NOT_FOUND_USER.respond();
         }
 
-        final String verificationCode = UUID.randomUUID().toString();
+        final String code = UUID.randomUUID().toString();
 
         // User record is fetched from the database to prevent ways to spoof emails.
         final String email = tUserRecord.getEmail();
 
-        if (!DATABASE.userDAO.updateTempUser(email, username, verificationCode)) {
+        if (!DATABASE.userDAO.updateTempUser(email, username, code)) {
             return ErrorMessage.FAILED_CREATE_TEMP_USER.respond();
         }
 
@@ -293,7 +293,7 @@ public class AuthAPI {
             }
         }
         if (Constants.POSTMARK_API_TOKEN != null) {
-            final MessageResponse emailResponse = EmailUtil.sendVerificationEmail(email, verificationCode);
+            final MessageResponse emailResponse = EmailUtil.sendVerificationEmail(email, code);
             if (emailResponse == null) {
                 return ErrorMessage.FAILED_SEND_EMAIL.respond();
             }

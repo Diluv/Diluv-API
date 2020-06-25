@@ -11,11 +11,11 @@ import com.wildbit.java.postmark.client.data.model.message.MessageResponse;
 import com.wildbit.java.postmark.client.exception.PostmarkException;
 
 public class EmailUtil {
-    public static MessageResponse sendVerificationEmail (String email, String verificationCode) {
+    public static MessageResponse sendVerificationEmail (String email, String code) {
 
         try {
             final ApiClient client = Postmark.getApiClient(Constants.POSTMARK_API_TOKEN);
-            final String url = String.format("%s/validate?code=%s&email=%s", Constants.WEBSITE_URL, verificationCode, email);
+            final String url = String.format("%s/validate?code=%s&email=%s", Constants.WEBSITE_URL, code, email);
             if (Constants.EMAIL_VERIFICATION == null) {
                 DiluvAPIServer.LOGGER.error("Failed to load email_verification.html.");
                 return null;
