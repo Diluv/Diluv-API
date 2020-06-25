@@ -2,6 +2,7 @@ package com.diluv.api.data;
 
 import java.util.List;
 
+import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.google.gson.annotations.Expose;
 
@@ -21,6 +22,12 @@ public class DataProjectFile {
      */
     @Expose
     private final String name;
+
+    /**
+     * The download url for the file
+     */
+    @Expose
+    private final String downloadURL;
 
     /**
      * The byte size of the file.
@@ -104,6 +111,7 @@ public class DataProjectFile {
 
         this.id = rs.getId();
         this.name = rs.getName();
+        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getProjectId(), rs.getId(), rs.getName());
         this.size = rs.getSize();
         this.changelog = rs.getChangelog();
         this.sha512 = rs.getSha512();

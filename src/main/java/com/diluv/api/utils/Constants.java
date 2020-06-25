@@ -48,7 +48,7 @@ public final class Constants {
     public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
 
     // CDN
-    public static final String CDN_URL = getValueOrDefault("CDN_URL", "https://cdn.diluv.com");
+    public static final String CDN_URL = getValueOrDefault("CDN_URL", "https://download.nodecdn.net/containers/diluv");
     public static final String CDN_FOLDER = getValueOrDefault("CDN_FOLDER", "public");
     public static final String PROCESSING_FOLDER = getValueOrDefault("PROCESSING_FOLDER", "processing");
 
@@ -258,5 +258,10 @@ public final class Constants {
         return new DataImage(new DataImageSource(pngURL, "image/png"), new DataImageSource[]{
             new DataImageSource(baseURL + ".webp", "image/webp")
         });
+    }
+
+    public static String getFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) {
+
+        return String.format("%s/%s/%s/%d/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName);
     }
 }

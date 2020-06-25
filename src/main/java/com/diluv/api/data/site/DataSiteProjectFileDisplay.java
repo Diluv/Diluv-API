@@ -3,6 +3,7 @@ package com.diluv.api.data.site;
 import java.util.List;
 
 import com.diluv.api.data.DataGameVersion;
+import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.google.gson.annotations.Expose;
 
@@ -22,6 +23,12 @@ public class DataSiteProjectFileDisplay {
      */
     @Expose
     private final String name;
+
+    /**
+     * The download url for the file
+     */
+    @Expose
+    private final String downloadURL;
 
     /**
      * The byte size of the file.
@@ -93,6 +100,7 @@ public class DataSiteProjectFileDisplay {
 
         this.id = rs.getId();
         this.name = rs.getName();
+        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getProjectId(), rs.getId(), rs.getName());
         this.size = rs.getSize();
         this.sha512 = rs.getSha512();
         this.releaseType = rs.getReleaseType();

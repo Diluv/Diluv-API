@@ -8,6 +8,9 @@
         "name": {
             "type": "string"
         },
+        "downloadURL": {
+            "type": "string"
+        },
         "changelog": {
             "type": "string"
         },
