@@ -41,7 +41,7 @@ public class GameTest {
         Request.getError(URL + "/invalid/invalid", 400, ErrorMessage.NOT_FOUND_GAME);
         Request.getError(URL + "/minecraft-je/invalid", 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
 
-        Request.getOk(URL + "/minecraft-je/mods", "schema/project-types-schema.json");
+        Request.getOk(URL + "/minecraft-je/forge-mods", "schema/project-types-schema.json");
     }
 
     @Test
@@ -50,10 +50,10 @@ public class GameTest {
         Request.getError(URL + "/invalid/invalid/projects", 400, ErrorMessage.NOT_FOUND_GAME);
         Request.getError(URL + "/minecraft-je/invalid/projects", 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
 
-        Request.getOk(URL + "/minecraft-je/mods/projects", "schema/project-list-schema.json");
-        Request.getOk(URL + "/minecraft-je/mods/projects?sort=name", "schema/project-list-schema.json");
-        Request.getOk(URL + "/minecraft-je/mods/projects?name=book", "schema/project-list-schema.json");
-        Request.getOk(URL + "/minecraft-je/mods/projects?tags=magic&tags=tech", "schema/project-list-schema.json");
+        Request.getOk(URL + "/minecraft-je/forge-mods/projects", "schema/project-list-schema.json");
+        Request.getOk(URL + "/minecraft-je/forge-mods/projects?sort=name", "schema/project-list-schema.json");
+        Request.getOk(URL + "/minecraft-je/forge-mods/projects?name=book", "schema/project-list-schema.json");
+        Request.getOk(URL + "/minecraft-je/forge-mods/projects?tags=magic&tags=tech", "schema/project-list-schema.json");
     }
 
     @Test
@@ -61,7 +61,7 @@ public class GameTest {
 
         Request.getFeed(URL + "/invalid/invalid/feed.atom", 400);
         Request.getFeed(URL + "/minecraft-je/invalid/feed.atom", 400);
-        Request.getFeed(URL + "/minecraft-je/mods/feed.atom", 200);
+        Request.getFeed(URL + "/minecraft-je/forge-mods/feed.atom", 200);
     }
 
     @Test
@@ -69,10 +69,10 @@ public class GameTest {
 
         Request.getError(URL + "/invalid/invalid/test", 400, ErrorMessage.NOT_FOUND_GAME);
         Request.getError(URL + "/minecraft-je/invalid/test", 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
-        Request.getError(URL + "/minecraft-je/mods/test", 400, ErrorMessage.NOT_FOUND_PROJECT);
+        Request.getError(URL + "/minecraft-je/forge-mods/test", 400, ErrorMessage.NOT_FOUND_PROJECT);
 
-        Request.getOk(URL + "/minecraft-je/mods/bookshelf", "schema/project-schema.json");
-        Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/bookshelf", "schema/project-schema.json");
+        Request.getOk(URL + "/minecraft-je/forge-mods/bookshelf", "schema/project-schema.json");
+        Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods/bookshelf", "schema/project-schema.json");
     }
 
     @Test
@@ -80,8 +80,8 @@ public class GameTest {
 
         Request.getFeed(URL + "/invalid/invalid/invalid/feed.atom", 400);
         Request.getFeed(URL + "/minecraft-je/invalid/invalid/feed.atom", 400);
-        Request.getFeed(URL + "/minecraft-je/mods/invalid/feed.atom", 400);
-        Request.getFeed(URL + "/minecraft-je/mods/bookshelf/feed.atom", 200);
+        Request.getFeed(URL + "/minecraft-je/forge-mods/invalid/feed.atom", 400);
+        Request.getFeed(URL + "/minecraft-je/forge-mods/bookshelf/feed.atom", 200);
     }
 
     @Test
@@ -89,10 +89,10 @@ public class GameTest {
 
         Request.getError(URL + "/invalid/invalid/test/files", 400, ErrorMessage.NOT_FOUND_GAME);
         Request.getError(URL + "/minecraft-je/invalid/invalidproject/files", 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
-        Request.getError(URL + "/minecraft-je/mods/invalidproject/files", 400, ErrorMessage.NOT_FOUND_PROJECT);
+        Request.getError(URL + "/minecraft-je/forge-mods/invalidproject/files", 400, ErrorMessage.NOT_FOUND_PROJECT);
 
-        Request.getOk(URL + "/minecraft-je/mods/crafttweaker/files", "schema/project-files-list-schema.json");
-        Request.getOk(URL + "/minecraft-je/mods/bookshelf/files", "schema/project-files-list-schema.json");
+        Request.getOk(URL + "/minecraft-je/forge-mods/crafttweaker/files", "schema/project-files-list-schema.json");
+        Request.getOk(URL + "/minecraft-je/forge-mods/bookshelf/files", "schema/project-files-list-schema.json");
     }
 
     @Test
@@ -108,19 +108,19 @@ public class GameTest {
         multiPart.put("logo", logo);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_GAME);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, 400, ErrorMessage.PROJECT_TAKEN_SLUG);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, 400, ErrorMessage.PROJECT_TAKEN_SLUG);
 
         multiPart.put("name", "Bookshelf3");
         multiPart.put("tags", "invalid,magic");
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, 400, ErrorMessage.PROJECT_INVALID_TAGS);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, 400, ErrorMessage.PROJECT_INVALID_TAGS);
 
         // Ok
         multiPart.put("name", "Bookshelf2");
         multiPart.remove("tags");
-        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, "schema/project-schema.json");
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, "schema/project-schema.json");
 
         multiPart.put("name", "Bookshelf3");
         multiPart.put("tags", "tech,magic");
-        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, "schema/project-schema.json");
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, "schema/project-schema.json");
     }
 }
