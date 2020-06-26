@@ -21,64 +21,6 @@
 //    }
 //
 //    @Test
-//    public void register () {
-//
-//        // Valid user
-//        Map<String, Object> multiPart = new HashMap<>();
-//        multiPart.put("email", "testing@diluv.com");
-//        multiPart.put("username", "testing");
-//        multiPart.put("password", "CDyDJZ4aHYTyDQhNcL9N");
-//        multiPart.put("terms", "true");
-//        Request.postOk(URL + "/register", multiPart, null);
-//
-//        // Password compromised
-//        multiPart.put("email", "testing2@diluv.com");
-//        multiPart.put("username", "testing2");
-//        multiPart.put("password", "password");
-//        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_COMPROMISED_PASSWORD);
-//
-//        // Banned domains
-//        multiPart.put("email", "testing2@banned.com");
-//        multiPart.put("password", "CDyDJZ4aHYTyDQhNcL9N");
-//        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_BLOCKLISTED_EMAIL);
-//
-//        multiPart.put("email", "testing2@banned2.com");
-//        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_BLOCKLISTED_EMAIL);
-//
-//        // Email used
-//        multiPart.put("email", "lclc98@diluv.com");
-//        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_TAKEN_EMAIL);
-//
-//        // Username used
-//        multiPart.put("email", "testing2@diluv.com");
-//        multiPart.put("username", "lclc98");
-//        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_TAKEN_USERNAME);
-//
-//        // Terms false
-//        multiPart.put("terms", "false");
-//        Request.postError(URL + "/register", multiPart, 400, ErrorMessage.USER_INVALID_TERMS);
-//    }
-//
-//    @Test
-//    public void verify () {
-//
-//        Map<String, Object> multiPart = new HashMap<>();
-//        multiPart.put("email", "tempuser@diluv.com");
-//        multiPart.put("code", "c1632ff7-367e-485f-91dd-92ab75903fa4");
-//        Request.postOk(URL + "/verify", multiPart, null);
-//
-//        multiPart.put("email", "darkhax@diluv.com");
-//        multiPart.put("code", "1");
-//        Request.postError(URL + "/verify", multiPart, 400, ErrorMessage.USER_VERIFIED);
-//
-//        multiPart.put("email", "jaredlll08@diluv.com");
-//        Request.postError(URL + "/verify", multiPart, 400, ErrorMessage.USER_VERIFIED);
-//
-//        multiPart.put("email", "testing@diluv.com");
-//        Request.postError(URL + "/verify", multiPart, 400, ErrorMessage.NOT_FOUND_USER);
-//    }
-//
-//    @Test
 //    public void checkUsername () {
 //
 //        Request.getError(URL + "/checkusername/lclc98", 400, ErrorMessage.USER_TAKEN_USERNAME);
