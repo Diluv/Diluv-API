@@ -262,6 +262,6 @@ public final class Constants {
 
     public static String getFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) {
 
-        return String.format("%s/%s/%s/%d/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName);
+        return String.format("%s/games/%s/%s/%d/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName);
     }
 }
