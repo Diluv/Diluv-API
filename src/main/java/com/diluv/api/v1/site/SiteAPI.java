@@ -1,5 +1,6 @@
 package com.diluv.api.v1.site;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,9 +13,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.diluv.api.Database;
+import com.diluv.api.data.site.DataSiteAuthorProjects;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;
 import com.diluv.api.data.site.DataSiteProjectFilesPage;
 import com.diluv.api.utils.auth.JWTUtil;
+import com.diluv.api.utils.query.AuthorProjectsQuery;
 import com.diluv.api.utils.query.ProjectFileQuery;
 import com.diluv.confluencia.database.record.GameVersionRecord;
 import com.diluv.confluencia.database.record.ProjectFileRecord;
@@ -221,15 +224,16 @@ public class SiteAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/author/{username}")
-    public Response getUser (@PathParam("username") String username, @HeaderParam("Authorization") String auth) {
+    public Response getUser (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @Query AuthorProjectsQuery query) {
 
         final UserRecord userRecord = DATABASE.userDAO.findOneByUsername(username);
-
         if (userRecord == null) {
 
             return ErrorMessage.NOT_FOUND_USER.respond();
         }
 
+
+        boolean authorized = false;
         if (auth != null) {
 
             final Token token = JWTUtil.getToken(auth);
@@ -238,11 +242,27 @@ public class SiteAPI {
                 final UserRecord tokenUser = DATABASE.userDAO.findOneByUserId(token.getUserId());
 
                 if (tokenUser.getUsername().equalsIgnoreCase(username)) {
-                    return ResponseUtil.successResponse(new DataAuthorizedUser(userRecord));
+                    authorized = true;
+
                 }
             }
         }
+        List<ProjectRecord> projects = DATABASE.projectDAO.findAllByUsername(username, authorized, query.getPage(), query.getLimit(), query.getSort(ProjectFileSort.NEW));
 
-        return ResponseUtil.successResponse(new DataUser(userRecord));
+        DataUser user = new DataUser(userRecord);
+        // TODO code for if the user is authorized to get an authorized project
+        List<DataProject> dataProjects = projects
+            .stream()
+            .map(projectRecord -> new DataProject(projectRecord, DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId())
+                .stream()
+                .map(DataTag::new)
+                .collect(Collectors.toList())))
+            .collect(Collectors.toList());
+
+        if (authorized) {
+            user = new DataAuthorizedUser(userRecord);
+        }
+
+        return ResponseUtil.successResponse(new DataSiteAuthorProjects(user, dataProjects));
     }
 }
