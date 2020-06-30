@@ -33,7 +33,7 @@ dependencies {
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
     implementation group: 'org.jboss.resteasy', name: 'resteasy-undertow', version: '4.5.3.Final'
-    implementation group: 'org.jboss.resteasy', name: 'resteasy-multipart-provider', version: '4.5.3.Final'
+    implementation group: 'org.jboss.resteasy', name: 'resteasy-multipart-provider', version: '4.5.5.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-atom-provider', version: '4.5.3.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-cdi', version: '4.5.3.Final'
     implementation group: 'org.jboss.weld.servlet', name: 'weld-servlet', version: '2.4.8.Final'
