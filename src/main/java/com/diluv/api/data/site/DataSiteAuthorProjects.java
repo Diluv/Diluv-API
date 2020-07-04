@@ -19,10 +19,14 @@ public class DataSiteAuthorProjects {
     @Expose
     private final List<DataProject> projects;
 
-    public DataSiteAuthorProjects (DataUser user, List<DataProject> projects) {
+    @Expose
+    private final List<DataSort> sort;
+
+    public DataSiteAuthorProjects (DataUser user, List<DataProject> projects, List<DataSort> sort) {
 
         this.user = user;
         this.projects = projects;
+        this.sort = sort;
     }
 }
 

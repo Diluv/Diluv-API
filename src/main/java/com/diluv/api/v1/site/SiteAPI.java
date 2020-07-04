@@ -263,6 +263,6 @@ public class SiteAPI {
             user = new DataAuthorizedUser(userRecord);
         }
 
-        return ResponseUtil.successResponse(new DataSiteAuthorProjects(user, dataProjects));
+        return ResponseUtil.successResponse(new DataSiteAuthorProjects(user, dataProjects, GamesAPI.GAME_SORTS));
     }
 }
