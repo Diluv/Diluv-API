@@ -263,6 +263,8 @@ public class SiteAPI {
             user = new DataAuthorizedUser(userRecord);
         }
 
-        return ResponseUtil.successResponse(new DataSiteAuthorProjects(user, dataProjects, GamesAPI.GAME_SORTS));
+        long projectCount = DATABASE.projectDAO.countAllByUsername(username, authorized);
+
+        return ResponseUtil.successResponse(new DataSiteAuthorProjects(user, dataProjects, GamesAPI.GAME_SORTS, projectCount));
     }
 }
