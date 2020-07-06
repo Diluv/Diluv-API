@@ -22,11 +22,15 @@ public class DataSiteAuthorProjects {
     @Expose
     private final List<DataSort> sort;
 
-    public DataSiteAuthorProjects (DataUser user, List<DataProject> projects, List<DataSort> sort) {
+    @Expose
+    private final long projectCount;
+
+    public DataSiteAuthorProjects (DataUser user, List<DataProject> projects, List<DataSort> sort, long projectCount) {
 
         this.user = user;
         this.projects = projects;
         this.sort = sort;
+        this.projectCount = projectCount;
     }
 }
 
