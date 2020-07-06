@@ -14,7 +14,7 @@ public class Main {
      */
     public static void main (String[] args) {
 
-        DATABASE.init(Constants.DB_HOSTNAME, Constants.DB_USERNAME, Constants.DB_PASSWORD, true);
+        DATABASE.init(Constants.DB_HOSTNAME, Constants.DB_USERNAME, Constants.DB_PASSWORD);
         SERVER.start("0.0.0.0", 4567);
     }
 }

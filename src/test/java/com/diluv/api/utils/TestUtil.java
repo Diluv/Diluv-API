@@ -28,7 +28,7 @@ public class TestUtil {
     public static void start () {
 
         if (!running) {
-            Confluencia.init(TestUtil.CONTAINER.getJdbcUrl(), TestUtil.CONTAINER.getUsername(), TestUtil.CONTAINER.getPassword(), true);
+            Confluencia.init(CONTAINER.getJdbcUrl(), CONTAINER.getUsername(), CONTAINER.getPassword());
             DiluvAPIServer server = new DiluvAPIServer();
             server.start(IP, PORT);
 

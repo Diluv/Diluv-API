@@ -17,8 +17,8 @@ public class Database {
     public final SecurityDatabase securityDAO = new SecurityDatabase();
     public final NewsDatabase newsDAO = new NewsDatabase();
 
-    public void init (String host, String user, String password, boolean deleteAll) {
+    public void init (String host, String user, String password) {
 
-        Confluencia.init(host, user, password, deleteAll);
+        Confluencia.init(host, user, password);
     }
 }
