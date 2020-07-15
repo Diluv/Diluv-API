@@ -1,6 +1,5 @@
 package com.diluv.api.v1.site;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,40 +11,39 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.Database;
-import com.diluv.api.data.site.DataSiteAuthorProjects;
-import com.diluv.api.data.site.DataSiteProjectFileDisplay;
-import com.diluv.api.data.site.DataSiteProjectFilesPage;
-import com.diluv.api.utils.auth.JWTUtil;
-import com.diluv.api.utils.query.AuthorProjectsQuery;
-import com.diluv.api.utils.query.ProjectFileQuery;
-import com.diluv.confluencia.database.record.GameVersionRecord;
-import com.diluv.confluencia.database.record.ProjectFileRecord;
-import com.diluv.confluencia.database.record.UserRecord;
-import com.diluv.confluencia.database.sort.ProjectFileSort;
-
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.*;
+import com.diluv.api.data.site.DataCreateProject;
+import com.diluv.api.data.site.DataSiteAuthorProjects;
 import com.diluv.api.data.site.DataSiteGame;
 import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
+import com.diluv.api.data.site.DataSiteProjectFileDisplay;
+import com.diluv.api.data.site.DataSiteProjectFilesPage;
+import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
+import com.diluv.api.utils.query.AuthorProjectsQuery;
 import com.diluv.api.utils.query.GameQuery;
+import com.diluv.api.utils.query.ProjectFileQuery;
 import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.confluencia.database.record.GameRecord;
+import com.diluv.confluencia.database.record.GameVersionRecord;
 import com.diluv.confluencia.database.record.ProjectAuthorRecord;
+import com.diluv.confluencia.database.record.ProjectFileRecord;
 import com.diluv.confluencia.database.record.ProjectLinkRecord;
 import com.diluv.confluencia.database.record.ProjectRecord;
 import com.diluv.confluencia.database.record.ProjectTypeRecord;
 import com.diluv.confluencia.database.record.TagRecord;
+import com.diluv.confluencia.database.record.UserRecord;
 import com.diluv.confluencia.database.sort.GameSort;
+import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 
@@ -266,5 +264,13 @@ public class SiteAPI {
         long projectCount = DATABASE.projectDAO.countAllByUsername(username, authorized);
 
         return ResponseUtil.successResponse(new DataSiteAuthorProjects(user, dataProjects, GamesAPI.GAME_SORTS, projectCount));
+    }
+
+    @GET
+    @Path("/create/games/{gameSlug}/{projectTypeSlug}")
+    public Response createProject (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
+
+        List<TagRecord> tags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        return ResponseUtil.successResponse(new DataCreateProject(tags.stream().map(DataTag::new).collect(Collectors.toList())));
     }
 }

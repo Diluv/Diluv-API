@@ -5,6 +5,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
@@ -344,9 +345,9 @@ public class GamesAPI {
             return ErrorMessage.PROJECT_INVALID_DESCRIPTION.respond();
         }
 
-        String[] tags = form.getTags();
+       Set<String> tags = form.getTags();
         List<TagRecord> tagRecords = Validator.validateTags(gameSlug, projectTypeSlug, tags);
-        if (tagRecords.size() != tags.length) {
+        if (tagRecords.size() != tags.size()) {
             return ErrorMessage.PROJECT_INVALID_TAGS.respond();
         }
 

@@ -139,15 +139,14 @@ public class Validator {
         return projectRecords;
     }
 
-    public static List<TagRecord> validateTags (String gameSlug, String projectTypeSlug, String[] tags) {
+    public static List<TagRecord> validateTags (String gameSlug, String projectTypeSlug, Set<String> tags) {
 
-        if (tags.length > 0) {
+        if (!tags.isEmpty()) {
             List<TagRecord> projectTypeTags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
-            List<String> tagList = Arrays.asList(tags);
 
             List<TagRecord> tagRecords = new ArrayList<>();
             for (TagRecord record : projectTypeTags) {
-                if (tagList.contains(record.getSlug())) {
+                if (tags.contains(record.getSlug())) {
                     tagRecords.add(record);
                 }
             }
