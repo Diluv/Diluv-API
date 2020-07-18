@@ -86,22 +86,11 @@ public class Request {
         return response.body(matchesJsonSchemaInClasspath(schema));
     }
 
-    public static void postOk (String url, Map<String, Object> multiPart, String schema) {
-
-        postRequest(url, new HashMap<>(), multiPart, 200, schema);
-    }
-
     public static void postOkWithAuth (String token, String url, Map<String, Object> multiPart, String schema) {
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
         postRequest(url, headers, multiPart, 200, schema);
-    }
-
-    public static void postError (String url, Map<String, Object> multiPart, int status, ErrorMessage error) {
-
-        postRequest(url, new HashMap<>(), multiPart, status, "schema/error-schema.json")
-            .body("message", equalTo(error.getMessage()));
     }
 
     public static void postErrorWithAuth (String token, String url, Map<String, Object> multiPart, int status, ErrorMessage error) {
@@ -110,5 +99,47 @@ public class Request {
         headers.put("Authorization", "Bearer " + token);
         postRequest(url, headers, multiPart, status, "schema/error-schema.json")
             .body("message", equalTo(error.getMessage()));
+    }
+
+    public static ValidatableResponse patchRequest (String url, Map<String, String> headers, Map<String, Object> multiPart, int status, String schema) {
+
+        RequestSpecification request = given().headers(headers);
+        for (String key : multiPart.keySet()) {
+            Object o = multiPart.get(key);
+            if (o instanceof File) {
+                request = request.multiPart(key, (File) o);
+            }
+            else if (o instanceof String) {
+                request = request.multiPart(key, (String) o);
+            }
+            else {
+                request = request.multiPart(key, o);
+            }
+        }
+        ValidatableResponse response = request
+            .patch(url)
+            .then()
+            .assertThat()
+            .statusCode(status);
+
+        if (schema == null) {
+            return response;
+        }
+        return response.body(matchesJsonSchemaInClasspath(schema));
+    }
+
+    public static void patchErrorWithAuth (String token, String url, Map<String, Object> multiPart, int status, ErrorMessage error) {
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + token);
+        patchRequest(url, headers, multiPart, status, "schema/error-schema.json")
+            .body("message", equalTo(error.getMessage()));
+    }
+
+    public static void patchOkWithAuth (String token, String url, Map<String, Object> multiPart) {
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + token);
+        patchRequest(url, headers, multiPart, 204, null);
     }
 }

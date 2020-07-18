@@ -110,9 +110,9 @@ public class GameTest {
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, 400, ErrorMessage.PROJECT_TAKEN_SLUG);
 
-        multiPart.put("name", "Bookshelf3");
-        multiPart.put("tags", "invalid,magic");
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, 400, ErrorMessage.PROJECT_INVALID_TAGS);
+//        multiPart.put("name", "Bookshelf3");
+//        multiPart.put("tags", "invalid,magic");
+//        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, 400, ErrorMessage.PROJECT_INVALID_TAGS);
 
         // Ok
         multiPart.put("name", "Bookshelf2");
@@ -122,5 +122,33 @@ public class GameTest {
         multiPart.put("name", "Bookshelf3");
         multiPart.put("tags", "tech,magic");
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, "schema/project-schema.json");
+    }
+
+    @Test
+    public void patchProject () {
+
+        final ClassLoader classLoader = this.getClass().getClassLoader();
+        final File logo = new File(classLoader.getResource("logo.png").getFile());
+
+        Map<String, Object> multiPart = new HashMap<>();
+        multiPart.put("name", "Bookshelf");
+        multiPart.put("summary", "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        multiPart.put("description", "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        multiPart.put("logo", logo);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/invalid/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_GAME);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+
+//        multiPart.put("name", "Dark Elevators New");
+//        multiPart.put("tags", "invalid,magic");
+//        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods/dark-elevators", multiPart, 400, ErrorMessage.PROJECT_INVALID_TAGS);
+
+        // Ok
+        multiPart.put("name", "Dark Elevators New");
+        multiPart.remove("tags");
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods/dark-elevators", multiPart);
+
+//        multiPart.put("name", "Dark Elevators New");
+//        multiPart.put("tags", "tech,magic");
+//        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods/dark-elevators", multiPart, "schema/project-schema.json");
     }
 }

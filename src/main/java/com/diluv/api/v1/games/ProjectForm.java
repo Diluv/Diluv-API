@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.FormParam;
 
-public class ProjectCreateForm {
+public class ProjectForm {
 
     @FormParam("name")
     public String name;

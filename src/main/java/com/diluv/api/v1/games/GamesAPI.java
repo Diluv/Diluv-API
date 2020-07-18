@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -18,6 +19,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.cache.Cache;
@@ -237,6 +239,103 @@ public class GamesAPI {
         return ResponseUtil.successResponse(new DataProject(projectRecord, tags, projectAuthors, projectLinks));
     }
 
+    @PATCH
+    @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
+    public Response patchProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectForm form) {
+
+        if (token == null) {
+            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        }
+
+        if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+            return ErrorMessage.NOT_FOUND_GAME.respond();
+        }
+
+        if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+            return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
+        }
+
+        ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (projectRecord == null) {
+            return ErrorMessage.NOT_FOUND_PROJECT.respond();
+        }
+
+        if (!ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.PROJECT_EDIT)) {
+
+            return ErrorMessage.USER_NOT_AUTHORIZED.respond();
+        }
+
+        long projectId = projectRecord.getId();
+
+        String newName = projectRecord.getName();
+        if (!GenericValidator.isBlankOrNull(form.name)) {
+            String name = form.name.trim();
+            if (!name.equals(newName)) {
+                if (!Validator.validateProjectName(name)) {
+                    return ErrorMessage.PROJECT_INVALID_NAME.respond();
+                }
+
+                newName = name;
+            }
+        }
+
+        String newSummary = projectRecord.getSummary();
+        if (!GenericValidator.isBlankOrNull(form.summary)) {
+            String summary = form.summary.trim();
+            if (!summary.equals(newSummary)) {
+                if (!Validator.validateProjectSummary(summary)) {
+                    return ErrorMessage.PROJECT_INVALID_SUMMARY.respond();
+                }
+
+                newSummary = summary;
+            }
+        }
+
+        String newDescription = projectRecord.getDescription();
+        if (!GenericValidator.isBlankOrNull(form.description)) {
+            String description = form.description.trim();
+            if (!description.equals(newDescription)) {
+                if (!Validator.validateProjectDescription(description)) {
+                    return ErrorMessage.PROJECT_INVALID_DESCRIPTION.respond();
+                }
+
+                newDescription = description;
+            }
+        }
+
+        if (!DATABASE.projectDAO.updateProject(projectId, newName, newSummary, newDescription)) {
+            return ErrorMessage.FAILED_UPDATE_PROJECT.respond();
+        }
+
+        //TODO Tags
+//        Set<String> tags = form.getTags();
+//        List<TagRecord> tagRecords = Validator.validateTags(gameSlug, projectTypeSlug, tags);
+//        if (tagRecords.size() != tags.size()) {
+//            return ErrorMessage.PROJECT_INVALID_TAGS.respond();
+//        }
+//
+//
+//        List<Long> tagIds = tagRecords.stream().map(TagRecord::getId).collect(Collectors.toList());
+//        if (!DATABASE.projectDAO.updateProjectTags(projectId, tagIds)) {
+//            return ErrorMessage.FAILED_CREATE_PROJECT_TAGS.respond();
+//        }
+
+        if (form.logo != null) {
+            final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
+
+            if (image == null) {
+                return ErrorMessage.PROJECT_INVALID_LOGO.respond();
+            }
+
+            final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, projectId));
+            if (!ImageUtil.saveImage(image, file)) {
+                return ErrorMessage.ERROR_SAVING_IMAGE.respond();
+            }
+        }
+
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
     @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/feed.atom")
@@ -319,7 +418,7 @@ public class GamesAPI {
     @POST
     @Path("/{gameSlug}/{projectTypeSlug}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @MultipartForm ProjectCreateForm form) {
+    public Response postProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @MultipartForm ProjectForm form) {
 
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
@@ -345,7 +444,7 @@ public class GamesAPI {
             return ErrorMessage.PROJECT_INVALID_DESCRIPTION.respond();
         }
 
-       Set<String> tags = form.getTags();
+        Set<String> tags = form.getTags();
         List<TagRecord> tagRecords = Validator.validateTags(gameSlug, projectTypeSlug, tags);
         if (tagRecords.size() != tags.size()) {
             return ErrorMessage.PROJECT_INVALID_TAGS.respond();
