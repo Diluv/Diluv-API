@@ -2,8 +2,6 @@ package com.diluv.api.data.site;
 
 import java.util.List;
 
-import com.diluv.api.data.DataBaseProject;
-import com.diluv.api.data.DataGame;
 import com.google.gson.annotations.Expose;
 
 public class DataSiteIndex {

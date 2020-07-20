@@ -1,6 +1,6 @@
 package com.diluv.api.data;
 
-import com.diluv.confluencia.database.record.GameRecord;
+import com.diluv.confluencia.database.record.GamesEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -21,7 +21,7 @@ public class DataBaseGame {
     @Expose
     private final String name;
 
-    public DataBaseGame (GameRecord rs) {
+    public DataBaseGame (GamesEntity rs) {
 
         this(rs.getSlug(), rs.getName());
     }

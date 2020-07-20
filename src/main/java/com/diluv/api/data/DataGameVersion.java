@@ -1,6 +1,6 @@
 package com.diluv.api.data;
 
-import com.diluv.confluencia.database.record.GameVersionRecord;
+import com.diluv.confluencia.database.record.GameVersionsEntity;
 import com.google.gson.annotations.Expose;
 
 public class DataGameVersion {
@@ -17,10 +17,10 @@ public class DataGameVersion {
     @Expose
     private final long released;
 
-    public DataGameVersion (GameVersionRecord rs) {
+    public DataGameVersion (GameVersionsEntity rs) {
 
         this.version = rs.getVersion();
         this.type = rs.getType();
-        this.released = rs.getReleased();
+        this.released = rs.getReleasedAt().getTime();
     }
 }

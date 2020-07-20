@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.diluv.confluencia.database.record.TagRecord;
 
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import com.diluv.api.utils.MismatchException;
 import com.diluv.api.utils.error.ErrorMessage;
-import com.diluv.confluencia.database.record.GameVersionRecord;
-import com.diluv.confluencia.database.record.ProjectRecord;
+import com.diluv.confluencia.database.record.GameVersionsEntity;
+import com.diluv.confluencia.database.record.GamesEntity;
+import com.diluv.confluencia.database.record.ProjectTypesEntity;
+import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.TagsEntity;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -75,17 +75,16 @@ public class Validator {
         return classifier != null && VALID_CLASSIFIERS.contains(classifier.toLowerCase());
     }
 
-    public static List<GameVersionRecord> validateGameVersions (String gameSlug, String formGameVersions) throws MismatchException {
+    public static List<GameVersionsEntity> validateGameVersions (GamesEntity game, String formGameVersions) throws MismatchException {
 
-        List<GameVersionRecord> gameVersionRecords = new ArrayList<>();
+        List<GameVersionsEntity> gameVersionRecords = game.getGameVersions();
         if (formGameVersions != null) {
             String[] gameVersions = formGameVersions.split(",");
             if (gameVersions.length > 0) {
                 //TODO make game versions unique
-                gameVersionRecords = DATABASE.gameDAO.findGameVersionsByGameSlugAndVersions(gameSlug, gameVersions);
                 if (gameVersionRecords.size() != gameVersions.length) {
                     List<String> versionNotFound = new ArrayList<>(Arrays.asList(gameVersions));
-                    for (GameVersionRecord record : gameVersionRecords) {
+                    for (GameVersionsEntity record : gameVersionRecords) {
                         for (String gameVersion : gameVersions) {
                             if (record.getVersion().equalsIgnoreCase(gameVersion)) {
                                 versionNotFound.remove(gameVersion);
@@ -102,9 +101,9 @@ public class Validator {
         return gameVersionRecords;
     }
 
-    public static List<ProjectRecord> validateDependencies (long projectId, String formDependencies) throws NumberFormatException, MismatchException {
+    public static List<ProjectsEntity> validateDependencies (long projectId, String formDependencies) throws NumberFormatException, MismatchException {
 
-        List<ProjectRecord> projectRecords = new ArrayList<>();
+        List<ProjectsEntity> projectRecords = new ArrayList<>();
         if (formDependencies != null) {
             String[] dependenciesString = formDependencies.split(",");
             if (dependenciesString.length > 0) {
@@ -122,7 +121,7 @@ public class Validator {
                 projectRecords = DATABASE.projectDAO.findAllProjectsByProjectIds(dependencies);
                 if (projectRecords.size() != dependencies.length) {
                     List<Long> projectNotFound = Arrays.stream(dependencies).boxed().collect(Collectors.toList());
-                    for (ProjectRecord record : projectRecords) {
+                    for (ProjectsEntity record : projectRecords) {
                         for (long id : dependencies) {
                             if (record.getId() == id) {
                                 projectNotFound.remove(id);
@@ -139,14 +138,15 @@ public class Validator {
         return projectRecords;
     }
 
-    public static List<TagRecord> validateTags (String gameSlug, String projectTypeSlug, Set<String> tags) {
+    public static List<TagsEntity> validateTags (ProjectTypesEntity projectType, String[] tags) {
 
-        if (!tags.isEmpty()) {
-            List<TagRecord> projectTypeTags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        if (tags.length > 0) {
+            List<TagsEntity> projectTypeTags = projectType.getTags();
+            List<String> tagList = Arrays.asList(tags);
 
-            List<TagRecord> tagRecords = new ArrayList<>();
-            for (TagRecord record : projectTypeTags) {
-                if (tags.contains(record.getSlug())) {
+            List<TagsEntity> tagRecords = new ArrayList<>();
+            for (TagsEntity record : projectTypeTags) {
+                if (tagList.contains(record.getSlug())) {
                     tagRecords.add(record);
                 }
             }

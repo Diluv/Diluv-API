@@ -44,6 +44,9 @@
         "uploaderUsername": {
             "type": "string"
         },
+        "uploaderDisplayName": {
+            "type": "string"
+        },
         "updatedAt": {
             "type": "number"
         },

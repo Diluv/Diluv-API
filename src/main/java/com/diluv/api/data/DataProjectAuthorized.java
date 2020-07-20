@@ -2,7 +2,7 @@ package com.diluv.api.data;
 
 import java.util.List;
 
-import com.diluv.confluencia.database.record.ProjectRecord;
+import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -28,9 +28,9 @@ public class DataProjectAuthorized extends DataProject {
     @Expose
     private final List<String> permissions;
 
-    public DataProjectAuthorized (ProjectRecord projectRecord, List<DataTag> tags, List<DataProjectContributor> projectAuthor, List<DataProjectLink> links, List<String> permissions) {
+    public DataProjectAuthorized (ProjectsEntity projectRecord, List<String> permissions) {
 
-        super(projectRecord, tags, projectAuthor, links);
+        super(projectRecord);
         this.released = projectRecord.isReleased();
         this.review = projectRecord.isReview();
         this.permissions = permissions;

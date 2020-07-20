@@ -47,7 +47,6 @@ public enum ErrorMessage {
     FAILED_CREATE_TEMP_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.create_temp_user"),
     FAILED_CREATE_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.create_user"),
     FAILED_CREATE_PROJECT(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project"),
-    FAILED_UPDATE_PROJECT(ErrorType.INTERNAL_SERVER_ERROR, "database.update_project"),
     FAILED_CREATE_PROJECT_TAGS(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_tags"),
     FAILED_CREATE_PROJECT_FILE(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_file"),
     FAILED_CREATE_PASSWORD_RESET(ErrorType.INTERNAL_SERVER_ERROR, "database.create_password_reset"),

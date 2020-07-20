@@ -1,6 +1,6 @@
 package com.diluv.api.data;
 
-import com.diluv.confluencia.database.record.ProjectTypeRecord;
+import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -20,7 +20,7 @@ public class DataBaseProjectType {
     @Expose
     private final String name;
 
-    public DataBaseProjectType (ProjectTypeRecord rs) {
+    public DataBaseProjectType (ProjectTypesEntity rs) {
 
         this(rs.getSlug(), rs.getName());
     }

@@ -1,8 +1,9 @@
 package com.diluv.api.data;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import com.diluv.confluencia.database.record.ProjectTypeRecord;
+import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -20,28 +21,21 @@ public class DataProjectType extends DataBaseProjectType {
     private final List<DataTag> tags;
 
     @Expose
-    private final long projectCount;
+    private final Long projectCount;
 
-    public DataProjectType (ProjectTypeRecord rs) {
-
-        this(rs, null);
-    }
-
-    public DataProjectType (ProjectTypeRecord rs, List<DataTag> tags) {
+    public DataProjectType (ProjectTypesEntity rs) {
 
         super(rs);
-        this.game = new DataBaseGame(rs.getGameSlug(), rs.getGameName());
-        this.projectCount = rs.getProjectCount();
-
-        this.tags = tags;
+        this.game = new DataBaseGame(rs.getGame());
+        this.tags = rs.getTags().stream().map(DataTag::new).collect(Collectors.toList());
+        this.projectCount = null;
     }
 
-    public DataProjectType (ProjectTypeRecord rs, List<DataTag> tags, DataBaseGame customGame) {
+    public DataProjectType (ProjectTypesEntity rs, long projectCount) {
 
         super(rs);
-        this.projectCount = rs.getProjectCount();
-
-        this.tags = tags;
-        this.game = customGame;
+        this.game = new DataBaseGame(rs.getGame());
+        this.tags = rs.getTags().stream().map(DataTag::new).collect(Collectors.toList());
+        this.projectCount = projectCount;
     }
 }

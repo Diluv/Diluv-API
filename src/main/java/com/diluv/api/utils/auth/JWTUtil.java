@@ -3,13 +3,14 @@ package com.diluv.api.utils.auth;
 import java.text.ParseException;
 import java.util.Base64;
 
+import com.diluv.confluencia.database.record.PersistedGrantsEntity;
+
 import org.apache.commons.codec.digest.DigestUtils;
 
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.permissions.ProjectPermissions;
-import com.diluv.confluencia.database.record.ReferenceTokenRecord;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.proc.BadJOSEException;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -63,16 +64,16 @@ public class JWTUtil {
                 String type = "reference_token";
                 byte[] sha256 = DigestUtils.sha256(token + ":" + type);
                 String key = Base64.getEncoder().encodeToString(sha256);
-                ReferenceTokenRecord record = DATABASE.securityDAO.findPersistedGrantByKeyAndType(key, type);
+                PersistedGrantsEntity record = DATABASE.securityDAO.findPersistedGrantByKeyAndType(key, type);
                 if (record == null)
                     return null;
 
                 long currentTime = System.currentTimeMillis();
 
-                if (currentTime < record.getCreationTime()) {
+                if (currentTime < record.getCreationTime().getTime()) {
                     return null;
                 }
-                if (currentTime > record.getExpiration()) {
+                if (currentTime > record.getExpiration().getTime()) {
                     return null;
                 }
 

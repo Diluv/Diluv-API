@@ -1,9 +1,11 @@
 package com.diluv.api.data;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.diluv.api.utils.Constants;
-import com.diluv.confluencia.database.record.GameRecord;
+import com.diluv.confluencia.database.record.FeaturedGamesEntity;
+import com.diluv.confluencia.database.record.GamesEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -38,23 +40,26 @@ public class DataGame extends DataBaseGame {
     @Expose
     private final String defaultProjectType;
 
-    public DataGame (GameRecord rs) {
+    public DataGame (GamesEntity rs) {
 
-        this(rs, null, null, null, null);
+        this(rs, null, null);
     }
 
-    public DataGame (GameRecord rs,
-                     List<DataProjectType> projectTypes,
-                     List<DataGameVersion> versions,
+    public DataGame (FeaturedGamesEntity rs) {
+
+        this(rs.getGame(), null, null);
+    }
+
+    public DataGame (GamesEntity rs,
                      List<DataSort> sort,
                      Long projectCount) {
 
         super(rs);
         this.url = rs.getUrl();
-        this.defaultProjectType = rs.getDefaultProjectType();
+        this.defaultProjectType = rs.getDefaultProjectTypeEntity().getSlug();
+        this.projectTypes = rs.getProjectTypes().stream().map(DataProjectType::new).collect(Collectors.toList());
+        this.versions = rs.getGameVersions().stream().map(DataGameVersion::new).collect(Collectors.toList());
         this.logoURL = Constants.getGameLogoURL(rs.getSlug());
-        this.projectTypes = projectTypes;
-        this.versions = versions;
         this.sort = sort;
         this.projectCount = projectCount;
     }

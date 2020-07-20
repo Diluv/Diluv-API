@@ -24,8 +24,7 @@
     "required": [
         "name",
         "slug",
-        "game",
-        "projectCount"
+        "game"
     ],
     "additionalProperties": false
 }

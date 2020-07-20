@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.diluv.api.data.DataGameVersion;
 import com.diluv.api.utils.Constants;
-import com.diluv.confluencia.database.record.ProjectFileRecord;
+import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -96,18 +96,22 @@ public class DataSiteProjectFileDisplay {
     @Expose
     private final String uploaderUsername;
 
-    public DataSiteProjectFileDisplay(ProjectFileRecord rs, List<DataGameVersion> gameVersions, String gameSlug, String projectTypeSlug, String projectSlug) {
+    @Expose
+    private final String uploaderDisplayName;
+
+    public DataSiteProjectFileDisplay (ProjectFilesEntity rs, List<DataGameVersion> gameVersions, String gameSlug, String projectTypeSlug, String projectSlug) {
 
         this.id = rs.getId();
         this.name = rs.getName();
-        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getProjectId(), rs.getId(), rs.getName());
+        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getId(), rs.getId(), rs.getName());
         this.size = rs.getSize();
         this.sha512 = rs.getSha512();
         this.releaseType = rs.getReleaseType();
         this.classifier = rs.getClassifier();
-        this.createdAt = rs.getCreatedAt();
-        this.uploaderUserId = rs.getUserId();
-        this.uploaderUsername = rs.getUsername();
+        this.createdAt = rs.getCreatedAt().getTime();
+        this.uploaderUserId = rs.getUser().getId();
+        this.uploaderUsername = rs.getUser().getUsername();
+        this.uploaderDisplayName = rs.getUser().getDisplayName();
         this.gameVersions = gameVersions;
         this.gameSlug = gameSlug;
         this.projectTypeSlug = projectTypeSlug;

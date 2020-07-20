@@ -1,6 +1,7 @@
 package com.diluv.api.data;
 
-import com.diluv.confluencia.database.record.ProjectAuthorRecord;
+import com.diluv.confluencia.database.record.ProjectAuthorsEntity;
+import com.diluv.confluencia.database.record.UsersEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -14,15 +15,15 @@ public class DataProjectContributor extends DataUser {
     @Expose
     private final String role;
 
-    public DataProjectContributor (ProjectAuthorRecord projectAuthor) {
+    public DataProjectContributor (ProjectAuthorsEntity author) {
 
-        super(projectAuthor.getUserId(), projectAuthor.getUsername(), projectAuthor.getDisplayName(), projectAuthor.getCreatedAt());
-        this.role = projectAuthor.getRole();
+        super(author.getUser());
+        this.role = author.getRole();
     }
 
-    public DataProjectContributor (long userId, String username, String displayName, long createdAt, String role) {
+    public DataProjectContributor (UsersEntity user, String role) {
 
-        super(userId, username, displayName, createdAt);
+        super(user);
         this.role = role;
     }
 }

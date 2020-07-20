@@ -1,10 +1,9 @@
 package com.diluv.api.data.site;
 
-import com.diluv.api.data.DataBaseProject;
-import com.diluv.api.data.DataProject;
-import com.google.gson.annotations.Expose;
-
 import java.util.List;
+
+import com.diluv.api.data.DataBaseProject;
+import com.google.gson.annotations.Expose;
 
 public class DataSiteProjectFilesPage {
 

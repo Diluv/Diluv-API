@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import com.diluv.confluencia.database.record.ProjectsEntity;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.validator.GenericValidator;
 
@@ -238,12 +240,14 @@ public final class Constants {
         return String.format("%s/users/%s/avatar.png", CDN_URL, username);
     }
 
-    public static String getProjectLogo (String gameSlug, String projectTypeSlug, long projectId) {
+    public static String getProjectLogo (ProjectsEntity project) {
 
         if (isDevelopment()) {
             return "https://images.placeholders.dev/?width=400&height=400";
         }
-        return String.format("%s/games/%s/%s/%d/logo.png", CDN_URL, gameSlug, projectTypeSlug, projectId);
+        final String gameSlug = project.getGame().getSlug();
+        final String projectTypeSlug = project.getProjectType().getSlug();
+        return String.format("%s/games/%s/%s/%d/logo.png", CDN_URL, gameSlug, projectTypeSlug, project.getId());
     }
 
     public static DataImage getGameLogoURL (String gameSlug) {

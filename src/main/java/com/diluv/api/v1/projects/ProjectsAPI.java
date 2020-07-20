@@ -1,8 +1,8 @@
 package com.diluv.api.v1.projects;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -14,19 +14,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.confluencia.database.record.ProjectFileDependenciesEntity;
+import com.diluv.confluencia.database.record.ProjectFileGameVersionsEntity;
+
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
-import com.diluv.api.data.DataGameVersion;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataProjectAuthorized;
-import com.diluv.api.data.DataProjectContributor;
-import com.diluv.api.data.DataProjectContributorAuthorized;
 import com.diluv.api.data.DataProjectFileInQueue;
-import com.diluv.api.data.DataProjectLink;
-import com.diluv.api.data.DataTag;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.MismatchException;
 import com.diluv.api.utils.auth.Validator;
@@ -35,13 +33,10 @@ import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.ProjectFileUploadForm;
-import com.diluv.confluencia.database.record.GameVersionRecord;
-import com.diluv.confluencia.database.record.ProjectAuthorRecord;
-import com.diluv.confluencia.database.record.ProjectFileRecord;
-import com.diluv.confluencia.database.record.ProjectLinkRecord;
-import com.diluv.confluencia.database.record.ProjectRecord;
-import com.diluv.confluencia.database.record.ProjectTypeRecord;
-import com.diluv.confluencia.database.record.TagRecord;
+import com.diluv.confluencia.database.record.GameVersionsEntity;
+import com.diluv.confluencia.database.record.ProjectFilesEntity;
+import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.UsersEntity;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -55,30 +50,20 @@ public class ProjectsAPI {
     @Path("/{projectId}")
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("projectId") Long projectId) {
 
-        final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
+        final ProjectsEntity projectRecord = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
         if (projectRecord == null || !projectRecord.isReleased() && token == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-        final List<ProjectLinkRecord> projectLinkRecords = DATABASE.projectDAO.findAllLinksByProjectId(projectRecord.getId());
-        final List<DataProjectLink> projectLinks = projectLinkRecords.stream().map(DataProjectLink::new).collect(Collectors.toList());
-
-        final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
-
-        final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
-        List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
-
         if (token != null) {
-            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(projectRecord, token, records);
+            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(projectRecord, token);
 
             if (permissions != null) {
-                final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributorAuthorized::new).collect(Collectors.toList());
-                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, tags, projectAuthors, projectLinks, permissions));
+                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, permissions));
             }
         }
 
-        final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributor::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataProject(projectRecord, tags, projectAuthors, projectLinks));
+        return ResponseUtil.successResponse(new DataProject(projectRecord));
     }
 
     @POST
@@ -94,14 +79,11 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_PROJECT_ID.respond();
         }
 
-        final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByProjectId(form.projectId);
+        final ProjectsEntity projectRecord = DATABASE.projectDAO.findOneProjectByProjectId(form.projectId);
 
         if (projectRecord == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
-
-        final String gameSlug = projectRecord.getGameSlug();
-        final String projectTypeSlug = projectRecord.getProjectTypeSlug();
 
         if (!ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD)) {
 
@@ -138,20 +120,21 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
         }
 
-        if (DATABASE.fileDAO.existsByProjectIdAndVersion(form.projectId, form.version)) {
+        //TODO FIX
+//        if (DATABASE.fileDAO.existsByProjectIdAndVersion(form.projectId, form.version)) {
+//
+//            return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
+//        }
 
-            return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
-        }
-
-        List<GameVersionRecord> gameVersionRecords;
+        List<GameVersionsEntity> gameVersionRecords;
         try {
-            gameVersionRecords = Validator.validateGameVersions(gameSlug, form.gameVersions);
+            gameVersionRecords = Validator.validateGameVersions(projectRecord.getGame(), form.gameVersions);
         }
         catch (MismatchException e) {
             return e.getErrorMessage().respond();
         }
 
-        List<ProjectRecord> dependencyRecords;
+        List<ProjectsEntity> dependencyRecords;
         try {
             dependencyRecords = Validator.validateDependencies(form.projectId, form.dependencies);
         }
@@ -162,11 +145,9 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID.respond();
         }
 
-        final ProjectTypeRecord projectTypeRecord = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
-
         final String fileName = FilenameUtils.getName(form.fileName);
         final File tempFile = FileUtil.getTempFile(projectRecord.getId(), fileName);
-        final String sha512 = FileUtil.writeFile(form.file, projectTypeRecord.getMaxFileSize(), tempFile);
+        final String sha512 = FileUtil.writeFile(form.file, projectRecord.getProjectType().getMaxFileSize(), tempFile);
 
         if (tempFile == null) {
 
@@ -178,30 +159,52 @@ public class ProjectsAPI {
             return ErrorMessage.FAILED_SHA512.respond();
         }
 
-        final Long projectFileId = DATABASE.fileDAO.insertProjectFile(fileName, form.version, tempFile.length(), form.changelog, sha512, form.releaseType.toLowerCase(), form.classifier.toLowerCase(), projectRecord.getId(), token.getUserId());
+        ProjectFilesEntity projectFile = new ProjectFilesEntity();
+        projectFile.setName(fileName);
+        projectFile.setVersion(form.version);
+        projectFile.setSize(tempFile.length());
+        projectFile.setChangelog(form.changelog);
+        projectFile.setSha512(sha512);
+        projectFile.setReleaseType(form.releaseType);
+        projectFile.setClassifier(form.classifier);
+        projectFile.setProject(projectRecord);
+        projectFile.setUser(new UsersEntity(token.getUserId()));
 
-        if (projectFileId == null) {
+        if(!gameVersionRecords.isEmpty()) {
+            List<ProjectFileGameVersionsEntity> tagIds = new ArrayList<>();
+            for (GameVersionsEntity gameVersions : gameVersionRecords) {
+                ProjectFileGameVersionsEntity gameVersionsEntity = new ProjectFileGameVersionsEntity();
+                gameVersionsEntity.setGameVersion(gameVersions);
+                tagIds.add(gameVersionsEntity);
+            }
+            projectFile.setGameVersions(tagIds);
+        }
+
+        if(!dependencyRecords.isEmpty()) {
+            List<ProjectFileDependenciesEntity> tagIds = new ArrayList<>();
+            for (ProjectsEntity dep : dependencyRecords) {
+                ProjectFileDependenciesEntity dependency = new ProjectFileDependenciesEntity();
+                dependency.setDependencyProject(dep);
+                tagIds.add(dependency);
+            }
+            projectFile.setDependencies(tagIds);
+        }
+
+        if (!DATABASE.fileDAO.insertProjectFile(projectFile)) {
 
             return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
         }
 
-        if (!gameVersionRecords.isEmpty()) {
-            List<Long> versionIds = gameVersionRecords.stream().map(GameVersionRecord::getId).collect(Collectors.toList());
 
-            if (!DATABASE.fileDAO.insertProjectFileGameVersions(projectFileId, versionIds)) {
-                return ErrorMessage.FAILED_CREATE_PROJECT_FILE_GAME_VERSION.respond();
-            }
+        projectFile = DATABASE.fileDAO.findOneById(projectFile.getId());
+        if (projectFile == null) {
+            return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-        List<Long> dependencies = dependencyRecords.stream().map(ProjectRecord::getId).collect(Collectors.toList());
+        final String gameSlug = projectRecord.getGame().getSlug();
+        final String projectTypeSlug = projectRecord.getProjectType().getSlug();
 
-        if (!dependencyRecords.isEmpty()) {
-            if (!DATABASE.fileDAO.insertProjectFileDependency(projectFileId, dependencies)) {
-                return ErrorMessage.FAILED_CREATE_PROJECT_FILE_GAME_VERSION.respond();
-            }
-        }
-
-        File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, projectRecord.getId(), projectFileId, fileName);
+        File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, projectRecord.getId(), projectFile.getId(), fileName);
         destination.getParentFile().mkdirs();
         final boolean moved = tempFile.renameTo(destination);
 
@@ -212,10 +215,6 @@ public class ProjectsAPI {
             return ErrorMessage.ERROR_WRITING.respond();
         }
 
-        final ProjectFileRecord record = DATABASE.fileDAO.findOneProjectFileQueueByFileId(projectFileId);
-
-        List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
-
-        return ResponseUtil.successResponse(new DataProjectFileInQueue(record, dependencies, gameVersions, gameSlug, projectTypeSlug, projectRecord.getSlug()));
+        return ResponseUtil.successResponse(new DataProjectFileInQueue(projectFile, gameSlug, projectTypeSlug, projectRecord.getSlug()));
     }
 }

@@ -1,6 +1,6 @@
 package com.diluv.api.data;
 
-import com.diluv.confluencia.database.record.NewsRecord;
+import com.diluv.confluencia.database.record.NewsEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -38,19 +38,24 @@ public class DataNewsPost {
     @Expose
     private final String username;
 
+    //TODO
+    @Expose
+    private final String displayName;
+
     /**
      * The date when the post was created.
      */
     @Expose
     private final long createdAt;
 
-    public DataNewsPost (NewsRecord news) {
+    public DataNewsPost (NewsEntity news) {
 
         this.slug = news.getSlug();
         this.title = news.getTitle();
         this.summary = news.getSummary();
         this.description = news.getDescription();
-        this.username = news.getUsername();
-        this.createdAt = news.getCreatedAt();
+        this.username = news.getUser().getUsername();
+        this.displayName = news.getUser().getDisplayName();
+        this.createdAt = news.getCreatedAt().getTime();
     }
 }

@@ -4,12 +4,12 @@ import java.util.List;
 
 public class Token {
     private final long userId;
-    private final List<String> projectPermissions;
+    private final List<String> globalProjectPermissions;
 
-    public Token (long userId, List<String> projectPermissions) {
+    public Token (long userId, List<String> globalProjectPermissions) {
 
         this.userId = userId;
-        this.projectPermissions = projectPermissions;
+        this.globalProjectPermissions = globalProjectPermissions;
     }
 
     public long getUserId () {
@@ -17,8 +17,8 @@ public class Token {
         return this.userId;
     }
 
-    public List<String> getProjectPermissions () {
+    public List<String> getGlobalProjectPermissions () {
 
-        return this.projectPermissions;
+        return this.globalProjectPermissions;
     }
 }
