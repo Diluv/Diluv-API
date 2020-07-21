@@ -49,20 +49,20 @@ public class ProjectsAPI {
     @Path("/{projectId}")
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("projectId") Long projectId) {
 
-        final ProjectsEntity projectRecord = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
-        if (projectRecord == null || !projectRecord.isReleased() && token == null) {
+        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
+        if (project == null || !project.isReleased() && token == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
         if (token != null) {
-            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(projectRecord, token);
+            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
 
             if (permissions != null) {
-                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, permissions));
+                return ResponseUtil.successResponse(new DataProjectAuthorized(project, permissions));
             }
         }
 
-        return ResponseUtil.successResponse(new DataProject(projectRecord));
+        return ResponseUtil.successResponse(new DataProject(project));
     }
 
     @POST
@@ -78,13 +78,13 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_PROJECT_ID.respond();
         }
 
-        final ProjectsEntity projectRecord = DATABASE.projectDAO.findOneProjectByProjectId(form.projectId);
+        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByProjectId(form.projectId);
 
-        if (projectRecord == null) {
+        if (project == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-        if (!ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD)) {
+        if (!ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD)) {
 
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
         }
@@ -126,7 +126,7 @@ public class ProjectsAPI {
 
         List<GameVersionsEntity> gameVersionRecords;
         try {
-            gameVersionRecords = Validator.validateGameVersions(projectRecord.getGame(), form.gameVersions);
+            gameVersionRecords = Validator.validateGameVersions(project.getGame(), form.gameVersions);
         }
         catch (MismatchException e) {
             return e.getErrorMessage().respond();
@@ -144,8 +144,8 @@ public class ProjectsAPI {
         }
 
         final String fileName = FilenameUtils.getName(form.fileName);
-        final File tempFile = FileUtil.getTempFile(projectRecord.getId(), fileName);
-        final String sha512 = FileUtil.writeFile(form.file, projectRecord.getProjectType().getMaxFileSize(), tempFile);
+        final File tempFile = FileUtil.getTempFile(project.getId(), fileName);
+        final String sha512 = FileUtil.writeFile(form.file, project.getProjectType().getMaxFileSize(), tempFile);
 
         if (tempFile == null) {
 
@@ -165,7 +165,7 @@ public class ProjectsAPI {
         projectFile.setSha512(sha512);
         projectFile.setReleaseType(form.releaseType);
         projectFile.setClassifier(form.classifier);
-        projectFile.setProject(projectRecord);
+        projectFile.setProject(project);
         projectFile.setUser(new UsersEntity(token.getUserId()));
 
         if (!gameVersionRecords.isEmpty()) {
@@ -199,10 +199,10 @@ public class ProjectsAPI {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-        final String gameSlug = projectRecord.getGame().getSlug();
-        final String projectTypeSlug = projectRecord.getProjectType().getSlug();
+        final String gameSlug = project.getGame().getSlug();
+        final String projectTypeSlug = project.getProjectType().getSlug();
 
-        File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, projectRecord.getId(), projectFile.getId(), fileName);
+        File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, project.getId(), projectFile.getId(), fileName);
         destination.getParentFile().mkdirs();
         final boolean moved = tempFile.renameTo(destination);
 
@@ -213,6 +213,6 @@ public class ProjectsAPI {
             return ErrorMessage.ERROR_WRITING.respond();
         }
 
-        return ResponseUtil.successResponse(new DataProjectFileInQueue(projectFile, gameSlug, projectTypeSlug, projectRecord.getSlug()));
+        return ResponseUtil.successResponse(new DataProjectFileInQueue(projectFile, gameSlug, projectTypeSlug, project.getSlug()));
     }
 }

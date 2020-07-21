@@ -34,9 +34,9 @@ public class FeaturedAPI {
         final List<FeaturedGamesEntity> gameRecords = DATABASE.gameDAO.findFeaturedGames();
         final List<DataGame> games = gameRecords.stream().map(DataGame::new).collect(Collectors.toList());
 
-        final List<FeaturedProjectsEntity> projectRecords = DATABASE.projectDAO.findFeaturedProjects();
+        final List<FeaturedProjectsEntity> featuredProjects = DATABASE.projectDAO.findFeaturedProjects();
 
-        final List<DataBaseProject> projects = projectRecords.stream().map(DataBaseProject::new).collect(Collectors.toList());
+        final List<DataBaseProject> projects = featuredProjects.stream().map(DataBaseProject::new).collect(Collectors.toList());
 
         final long projectCount = DATABASE.projectDAO.countAllByGameSlug("");
         final long userCount = DATABASE.userDAO.countAll();

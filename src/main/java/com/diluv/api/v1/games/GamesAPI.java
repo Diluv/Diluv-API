@@ -133,9 +133,9 @@ public class GamesAPI {
         final String versions = query.getVersions();
         final String[] tags = query.getTags();
 
-        final List<ProjectsEntity> projectRecords = DATABASE.projectDAO.findAllByGameAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags);
+        final List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByGameAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags);
 
-        if (projectRecords.isEmpty()) {
+        if (projects.isEmpty()) {
 
             if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
 
@@ -148,9 +148,7 @@ public class GamesAPI {
             }
         }
 
-        final List<DataBaseProject> projects = projectRecords.stream().map(DataBaseProject::new).collect(Collectors.toList());
-
-        return ResponseUtil.successResponse(projects);
+        return ResponseUtil.successResponse(projects.stream().map(DataBaseProject::new).collect(Collectors.toList()));
     }
 
     @Cache(maxAge = 30, mustRevalidate = true)
@@ -159,9 +157,9 @@ public class GamesAPI {
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getProjectFeed (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
 
-        final List<ProjectsEntity> projectRecords = DATABASE.projectDAO.findAllByGameAndProjectType(gameSlug, projectTypeSlug, "", 1, 25, ProjectSort.NEW);
+        final List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByGameAndProjectType(gameSlug, projectTypeSlug, "", 1, 25, ProjectSort.NEW);
 
-        if (projectRecords.isEmpty()) {
+        if (projects.isEmpty()) {
             return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
         }
 
@@ -171,17 +169,17 @@ public class GamesAPI {
         feed.getLinks().add(new Link("self", baseUrl));
         feed.setUpdated(new Date());
         feed.setTitle("Project Feed");
-        for (ProjectsEntity record : projectRecords) {
+        for (ProjectsEntity project : projects) {
             Content content = new Content();
-            content.setText(record.getSummary());
+            content.setText(project.getSummary());
             Entry entry = new Entry();
-            entry.setId(URI.create(baseUrl + "/" + record.getSlug()));
-            entry.setTitle(record.getName());
-            entry.setUpdated(new Date(record.getUpdatedAt().getTime()));
+            entry.setId(URI.create(baseUrl + "/" + project.getSlug()));
+            entry.setTitle(project.getName());
+            entry.setUpdated(project.getUpdatedAt());
             entry.setContent(content);
 
             //TODO Maybe show all authors?
-            entry.getAuthors().add(new Person(record.getOwner().getDisplayName()));
+            entry.getAuthors().add(new Person(project.getOwner().getDisplayName()));
             feed.getEntries().add(entry);
         }
 
@@ -193,8 +191,8 @@ public class GamesAPI {
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
 
-        final ProjectsEntity projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-        if (projectRecord == null || !projectRecord.isReleased() && token == null) {
+        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (project == null || !project.isReleased() && token == null) {
             if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
 
                 return ErrorMessage.NOT_FOUND_GAME.respond();
@@ -209,13 +207,13 @@ public class GamesAPI {
         }
 
         if (token != null) {
-            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(projectRecord, token);
+            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
             if (permissions != null) {
-                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, permissions));
+                return ResponseUtil.successResponse(new DataProjectAuthorized(project, permissions));
             }
         }
 
-        return ResponseUtil.successResponse(new DataProject(projectRecord));
+        return ResponseUtil.successResponse(new DataProject(project));
     }
 
     @PATCH
@@ -234,71 +232,70 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
         }
 
-        ProjectsEntity projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-        if (projectRecord == null) {
+        ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (project == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-        if (!ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.PROJECT_EDIT)) {
+        if (!ProjectPermissions.hasPermission(project, token, ProjectPermissions.PROJECT_EDIT)) {
 
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
         }
 
-        long projectId = projectRecord.getId();
 
-        String newName = projectRecord.getName();
         if (!GenericValidator.isBlankOrNull(form.name)) {
             String name = form.name.trim();
-            if (!name.equals(newName)) {
+            if (!name.equals(project.getName())) {
                 if (!Validator.validateProjectName(name)) {
                     return ErrorMessage.PROJECT_INVALID_NAME.respond();
                 }
 
-                newName = name;
+                project.setName(name);
             }
         }
 
-        String newSummary = projectRecord.getSummary();
         if (!GenericValidator.isBlankOrNull(form.summary)) {
             String summary = form.summary.trim();
-            if (!summary.equals(newSummary)) {
+            if (!summary.equals(project.getSummary())) {
                 if (!Validator.validateProjectSummary(summary)) {
                     return ErrorMessage.PROJECT_INVALID_SUMMARY.respond();
                 }
 
-                newSummary = summary;
+                project.setSummary(summary);
             }
         }
 
-        String newDescription = projectRecord.getDescription();
         if (!GenericValidator.isBlankOrNull(form.description)) {
             String description = form.description.trim();
-            if (!description.equals(newDescription)) {
+            if (!description.equals(project.getDescription())) {
                 if (!Validator.validateProjectDescription(description)) {
                     return ErrorMessage.PROJECT_INVALID_DESCRIPTION.respond();
                 }
 
-                newDescription = description;
+                project.setDescription(description);
             }
         }
 
-        //TODO
-//        if (!DATABASE.projectDAO.updateProject(projectId, newName, newSummary, newDescription)) {
-//            return ErrorMessage.FAILED_UPDATE_PROJECT.respond();
-//        }
+        String[] tags = form.getTags();
+        if (tags.length > 0) {
+            List<TagsEntity> tagRecords = Validator.validateTags(project.getProjectType(), tags);
+            if (tagRecords.size() != tags.length) {
+                return ErrorMessage.PROJECT_INVALID_TAGS.respond();
+            }
 
-        //TODO Tags
-//        Set<String> tags = form.getTags();
-//        List<TagRecord> tagRecords = Validator.validateTags(gameSlug, projectTypeSlug, tags);
-//        if (tagRecords.size() != tags.size()) {
-//            return ErrorMessage.PROJECT_INVALID_TAGS.respond();
-//        }
-//
-//
-//        List<Long> tagIds = tagRecords.stream().map(TagRecord::getId).collect(Collectors.toList());
-//        if (!DATABASE.projectDAO.updateProjectTags(projectId, tagIds)) {
-//            return ErrorMessage.FAILED_CREATE_PROJECT_TAGS.respond();
-//        }
+            project.getTags().clear();
+
+            for (TagsEntity tag : tagRecords) {
+                ProjectTagsEntity tagsEntity = new ProjectTagsEntity();
+                tagsEntity.setProject(project);
+                tagsEntity.setTag(tag);
+                project.getTags().add(tagsEntity);
+            }
+
+        }
+        if (!DATABASE.projectDAO.updateProject(project)) {
+            return ErrorMessage.FAILED_UPDATE_PROJECT.respond();
+        }
 
         if (form.logo != null) {
             final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
@@ -307,7 +304,7 @@ public class GamesAPI {
                 return ErrorMessage.PROJECT_INVALID_LOGO.respond();
             }
 
-            final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, projectId));
+            final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, project.getId()));
             if (!ImageUtil.saveImage(image, file)) {
                 return ErrorMessage.ERROR_SAVING_IMAGE.respond();
             }
@@ -322,26 +319,26 @@ public class GamesAPI {
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getProjectFileFeed (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
 
-        final ProjectsEntity projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-        if (projectRecord == null) {
+        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (project == null) {
             return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
         }
 
-        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord, false, 1, 25, ProjectFileSort.NEW, null);
+        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(project, false, 1, 25, ProjectFileSort.NEW, null);
 
         final String baseUrl = String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
         Feed feed = new Feed();
         feed.setId(URI.create(baseUrl + "/feed.atom"));
         feed.getLinks().add(new Link("self", baseUrl + "/"));
         feed.setUpdated(new Date());
-        feed.setTitle(projectRecord.getName() + " File Feed");
+        feed.setTitle(project.getName() + " File Feed");
         for (ProjectFilesEntity record : projectFileRecords) {
             Content content = new Content();
             content.setText(record.getChangelog());
             Entry entry = new Entry();
             entry.setId(URI.create(baseUrl + "/files/" + record.getId()));
             entry.setTitle(record.getName());
-            entry.setUpdated(new Date(record.getUpdatedAt().getTime()));
+            entry.setUpdated(record.getUpdatedAt());
             entry.setContent(content);
             entry.getAuthors().add(new Person(record.getUser().getDisplayName()));
             feed.getEntries().add(entry);
@@ -360,8 +357,8 @@ public class GamesAPI {
         Sort sort = query.getSort(ProjectFileSort.NEW);
         String gameVersion = query.getGameVersion();
 
-        final ProjectsEntity projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-        if (projectRecord == null) {
+        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (project == null) {
 
             if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
                 return ErrorMessage.NOT_FOUND_GAME.respond();
@@ -374,8 +371,8 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-        boolean authorized = token != null && ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD);
-        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord, authorized, page, limit, sort, gameVersion);
+        boolean authorized = token != null && ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
+        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(project, authorized, page, limit, sort, gameVersion);
 
         final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> record.isReleased() ?
             new DataProjectFileAvailable(record, gameSlug, projectTypeSlug, projectSlug) :

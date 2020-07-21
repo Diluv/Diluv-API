@@ -15,8 +15,8 @@ public class ProjectService {
 
     public static ProjectsEntity getAuthorizedProject (String gameSlug, String projectTypeSlug, String projectSlug, Token token) throws ResponseException {
 
-        final ProjectsEntity projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-        if (projectRecord == null) {
+        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (project == null) {
             if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
                 throw new ResponseException(ErrorMessage.NOT_FOUND_GAME.respond());
             }
@@ -28,25 +28,25 @@ public class ProjectService {
             throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
         }
 
-        if (!projectRecord.isReleased()) {
+        if (!project.isReleased()) {
             if (token == null) {
                 throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
             }
 
-            if (token.getUserId() == projectRecord.getOwner().getId()) {
-                return projectRecord;
+            if (token.getUserId() == project.getOwner().getId()) {
+                return project;
             }
-            List<ProjectAuthorsEntity> records = projectRecord.getAuthors();
+            List<ProjectAuthorsEntity> records = project.getAuthors();
             Optional<ProjectAuthorsEntity> record = records.stream().filter(r -> r.getUser().getId() == token.getUserId()).findAny();
 
             if (record.isPresent()) {
-                return projectRecord;
+                return project;
             }
 
             throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
         }
 
 
-        return projectRecord;
+        return project;
     }
 }

@@ -20,10 +20,10 @@ public class DataProject extends DataBaseProject {
     @Expose
     private final List<DataProjectLink> links;
 
-    public DataProject (ProjectsEntity projectRecord) {
+    public DataProject (ProjectsEntity project) {
 
-        super(projectRecord);
-        this.description = projectRecord.getDescription();
-        this.links = projectRecord.getLinks().stream().map(DataProjectLink::new).collect(Collectors.toList());
+        super(project);
+        this.description = project.getDescription();
+        this.links = project.getLinks().stream().map(DataProjectLink::new).collect(Collectors.toList());
     }
 }

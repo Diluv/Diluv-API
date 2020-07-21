@@ -83,9 +83,9 @@ public class DataBaseProject {
     @Expose
     private final List<DataProjectContributor> contributors = new ArrayList<>();
 
-    public DataBaseProject (FeaturedProjectsEntity projectRecord) {
+    public DataBaseProject (FeaturedProjectsEntity featuredProject) {
 
-        this(projectRecord.getProject());
+        this(featuredProject.getProject());
     }
 
     public DataBaseProject (ProjectsEntity rs) {

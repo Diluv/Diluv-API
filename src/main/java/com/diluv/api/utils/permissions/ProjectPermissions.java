@@ -31,25 +31,25 @@ public enum ProjectPermissions {
         return this.name;
     }
 
-    public static boolean hasPermission (ProjectsEntity projectRecord, @Nullable Token token, ProjectPermissions permissions) {
+    public static boolean hasPermission (ProjectsEntity project, @Nullable Token token, ProjectPermissions permissions) {
 
         if (token == null)
             return false;
 
-        List<String> userPermissions = getAuthorizedUserPermissions(projectRecord, token);
+        List<String> userPermissions = getAuthorizedUserPermissions(project, token);
 
         return userPermissions != null && userPermissions.contains(permissions.getName());
     }
 
     @Nullable
-    public static List<String> getAuthorizedUserPermissions (ProjectsEntity projectRecord, Token token) {
+    public static List<String> getAuthorizedUserPermissions (ProjectsEntity project, Token token) {
 
-        if (token.getUserId() == projectRecord.getOwner().getId()) {
+        if (token.getUserId() == project.getOwner().getId()) {
 
             return getSubsetPermissions(getAllPermissions(), token);
         }
 
-        final Optional<ProjectAuthorsEntity> record = projectRecord.getAuthors().stream().filter(r -> r.getUser().getId() == token.getUserId()).findAny();
+        final Optional<ProjectAuthorsEntity> record = project.getAuthors().stream().filter(r -> r.getUser().getId() == token.getUserId()).findAny();
 
         if (record.isPresent()) {
             ProjectAuthorsEntity r = record.get();

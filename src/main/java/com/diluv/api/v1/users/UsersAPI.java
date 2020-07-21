@@ -109,9 +109,8 @@ public class UsersAPI {
             authorized = userRecord.getUsername().equalsIgnoreCase(username);
         }
 
-        List<ProjectsEntity> projectRecords = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, sort);
-        final List<DataProject> projects = projectRecords.stream().map(DataProject::new).collect(Collectors.toList());
+        List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, sort);
 
-        return ResponseUtil.successResponse(projects);
+        return ResponseUtil.successResponse(projects.stream().map(DataProject::new).collect(Collectors.toList()));
     }
 }

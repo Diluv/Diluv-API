@@ -103,7 +103,7 @@ public class Validator {
 
     public static List<ProjectsEntity> validateDependencies (long projectId, String formDependencies) throws NumberFormatException, MismatchException {
 
-        List<ProjectsEntity> projectRecords = new ArrayList<>();
+        List<ProjectsEntity> projects = new ArrayList<>();
         if (formDependencies != null) {
             String[] dependenciesString = formDependencies.split(",");
             if (dependenciesString.length > 0) {
@@ -118,12 +118,12 @@ public class Validator {
                 }
                 //TODO make dependency unique
 
-                projectRecords = DATABASE.projectDAO.findAllProjectsByProjectIds(dependencies);
-                if (projectRecords.size() != dependencies.length) {
+                projects = DATABASE.projectDAO.findAllProjectsByProjectIds(dependencies);
+                if (projects.size() != dependencies.length) {
                     List<Long> projectNotFound = Arrays.stream(dependencies).boxed().collect(Collectors.toList());
-                    for (ProjectsEntity record : projectRecords) {
+                    for (ProjectsEntity project : projects) {
                         for (long id : dependencies) {
-                            if (record.getId() == id) {
+                            if (project.getId() == id) {
                                 projectNotFound.remove(id);
                             }
                         }
@@ -135,7 +135,7 @@ public class Validator {
                 }
             }
         }
-        return projectRecords;
+        return projects;
     }
 
     public static List<TagsEntity> validateTags (ProjectTypesEntity projectType, String[] tags) {

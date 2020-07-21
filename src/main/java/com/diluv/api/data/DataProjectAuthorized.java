@@ -28,11 +28,11 @@ public class DataProjectAuthorized extends DataProject {
     @Expose
     private final List<String> permissions;
 
-    public DataProjectAuthorized (ProjectsEntity projectRecord, List<String> permissions) {
+    public DataProjectAuthorized (ProjectsEntity project, List<String> permissions) {
 
-        super(projectRecord);
-        this.released = projectRecord.isReleased();
-        this.review = projectRecord.isReview();
+        super(project);
+        this.released = project.isReleased();
+        this.review = project.isReview();
         this.permissions = permissions;
     }
 }
