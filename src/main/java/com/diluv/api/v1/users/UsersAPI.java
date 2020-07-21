@@ -17,7 +17,6 @@ import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataAuthorizedUser;
 import com.diluv.api.data.DataProject;
-import com.diluv.api.data.DataTag;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
@@ -25,7 +24,6 @@ import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.database.record.ProjectsEntity;
-import com.diluv.confluencia.database.record.TagsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;

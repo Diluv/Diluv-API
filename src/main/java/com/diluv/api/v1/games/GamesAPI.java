@@ -96,7 +96,7 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_GAME.respond();
         }
 
-        final long projectCount = DATABASE.gameDAO.countAllProjectsBySlug(gameSlug);
+        final long projectCount = DATABASE.projectDAO.countAllByGameSlug(gameSlug);
 
         return ResponseUtil.successResponse(new DataGame(gameRecord, PROJECT_SORTS, projectCount));
     }
@@ -327,7 +327,7 @@ public class GamesAPI {
             return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
         }
 
-        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord.getId(), false, 1, 25, ProjectFileSort.NEW, null);
+        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord, false, 1, 25, ProjectFileSort.NEW, null);
 
         final String baseUrl = String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
         Feed feed = new Feed();
@@ -358,7 +358,7 @@ public class GamesAPI {
         long page = query.getPage();
         int limit = query.getLimit();
         Sort sort = query.getSort(ProjectFileSort.NEW);
-        String version = query.getVersions();
+        String gameVersion = query.getGameVersion();
 
         final ProjectsEntity projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (projectRecord == null) {
@@ -375,7 +375,7 @@ public class GamesAPI {
         }
 
         boolean authorized = token != null && ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD);
-        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord.getId(), authorized, page, limit, sort, version);
+        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord, authorized, page, limit, sort, gameVersion);
 
         final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> record.isReleased() ?
             new DataProjectFileAvailable(record, gameSlug, projectTypeSlug, projectSlug) :

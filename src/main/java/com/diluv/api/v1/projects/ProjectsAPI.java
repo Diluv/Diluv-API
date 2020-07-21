@@ -14,9 +14,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.confluencia.database.record.ProjectFileDependenciesEntity;
-import com.diluv.confluencia.database.record.ProjectFileGameVersionsEntity;
-
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
@@ -34,6 +31,8 @@ import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.ProjectFileUploadForm;
 import com.diluv.confluencia.database.record.GameVersionsEntity;
+import com.diluv.confluencia.database.record.ProjectFileDependenciesEntity;
+import com.diluv.confluencia.database.record.ProjectFileGameVersionsEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
@@ -120,11 +119,10 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
         }
 
-        //TODO FIX
-//        if (DATABASE.fileDAO.existsByProjectIdAndVersion(form.projectId, form.version)) {
-//
-//            return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
-//        }
+        if (DATABASE.fileDAO.existsByProjectIdAndVersion(form.projectId, form.version)) {
+
+            return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
+        }
 
         List<GameVersionsEntity> gameVersionRecords;
         try {
@@ -170,7 +168,7 @@ public class ProjectsAPI {
         projectFile.setProject(projectRecord);
         projectFile.setUser(new UsersEntity(token.getUserId()));
 
-        if(!gameVersionRecords.isEmpty()) {
+        if (!gameVersionRecords.isEmpty()) {
             List<ProjectFileGameVersionsEntity> tagIds = new ArrayList<>();
             for (GameVersionsEntity gameVersions : gameVersionRecords) {
                 ProjectFileGameVersionsEntity gameVersionsEntity = new ProjectFileGameVersionsEntity();
@@ -180,7 +178,7 @@ public class ProjectsAPI {
             projectFile.setGameVersions(tagIds);
         }
 
-        if(!dependencyRecords.isEmpty()) {
+        if (!dependencyRecords.isEmpty()) {
             List<ProjectFileDependenciesEntity> tagIds = new ArrayList<>();
             for (ProjectsEntity dep : dependencyRecords) {
                 ProjectFileDependenciesEntity dependency = new ProjectFileDependenciesEntity();

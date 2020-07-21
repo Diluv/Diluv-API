@@ -3,14 +3,13 @@ package com.diluv.api.utils.auth;
 import java.text.ParseException;
 import java.util.Base64;
 
-import com.diluv.confluencia.database.record.PersistedGrantsEntity;
-
 import org.apache.commons.codec.digest.DigestUtils;
 
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.permissions.ProjectPermissions;
+import com.diluv.confluencia.database.record.PersistedGrantsEntity;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.proc.BadJOSEException;
 import com.nimbusds.jose.proc.SecurityContext;

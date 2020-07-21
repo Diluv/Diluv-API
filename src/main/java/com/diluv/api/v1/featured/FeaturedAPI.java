@@ -9,21 +9,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.confluencia.database.record.FeaturedGamesEntity;
-
-import com.diluv.confluencia.database.record.FeaturedProjectsEntity;
-
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataFeatured;
 import com.diluv.api.data.DataGame;
-import com.diluv.api.data.DataTag;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.record.GamesEntity;
-import com.diluv.confluencia.database.record.ProjectsEntity;
-import com.diluv.confluencia.database.record.TagsEntity;
+import com.diluv.confluencia.database.record.FeaturedGamesEntity;
+import com.diluv.confluencia.database.record.FeaturedProjectsEntity;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -44,7 +38,7 @@ public class FeaturedAPI {
 
         final List<DataBaseProject> projects = projectRecords.stream().map(DataBaseProject::new).collect(Collectors.toList());
 
-        final long projectCount = DATABASE.gameDAO.countAllProjectsBySlug("");
+        final long projectCount = DATABASE.projectDAO.countAllByGameSlug("");
         final long userCount = DATABASE.userDAO.countAll();
 
         return ResponseUtil.successResponse(new DataFeatured(games, projects, projectCount, userCount));

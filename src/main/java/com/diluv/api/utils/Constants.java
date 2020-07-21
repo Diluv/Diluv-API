@@ -12,14 +12,13 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import com.diluv.confluencia.database.record.ProjectsEntity;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.validator.GenericValidator;
 
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.data.DataImage;
 import com.diluv.api.data.DataImageSource;
+import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.JWKSource;

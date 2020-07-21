@@ -23,7 +23,7 @@ public class ProjectForm {
 
     public String[] getTags () {
 
-        if(this.tags == null){
+        if (this.tags == null) {
             return new String[0];
         }
         return this.tags.split(",");

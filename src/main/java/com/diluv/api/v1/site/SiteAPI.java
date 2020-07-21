@@ -1,7 +1,27 @@
 package com.diluv.api.v1.site;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
+import org.jboss.resteasy.annotations.cache.Cache;
+
 import com.diluv.api.data.*;
-import com.diluv.api.data.site.*;
+import com.diluv.api.data.site.DataSiteAuthorProjects;
+import com.diluv.api.data.site.DataSiteGame;
+import com.diluv.api.data.site.DataSiteGameProjects;
+import com.diluv.api.data.site.DataSiteIndex;
+import com.diluv.api.data.site.DataSiteProjectFileDisplay;
+import com.diluv.api.data.site.DataSiteProjectFilesPage;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
@@ -14,22 +34,18 @@ import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.api.v1.utilities.ProjectService;
-import com.diluv.confluencia.database.record.*;
+import com.diluv.confluencia.database.record.FeaturedGamesEntity;
+import com.diluv.confluencia.database.record.GameVersionsEntity;
+import com.diluv.confluencia.database.record.GamesEntity;
+import com.diluv.confluencia.database.record.ProjectFileGameVersionsEntity;
+import com.diluv.confluencia.database.record.ProjectFilesEntity;
+import com.diluv.confluencia.database.record.ProjectTypesEntity;
+import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
-
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.cache.Cache;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -46,7 +62,7 @@ public class SiteAPI {
         final List<FeaturedGamesEntity> gameRecords = DATABASE.gameDAO.findFeaturedGames();
         final List<DataSiteGame> games = gameRecords.stream().map(DataSiteGame::new).collect(Collectors.toList());
 
-        final long projectCount = DATABASE.gameDAO.countAllProjectsBySlug("");
+        final long projectCount = DATABASE.projectDAO.countAllByGameSlug("");
         final long userCount = DATABASE.userDAO.countAll();
         final long gameCount = DATABASE.gameDAO.countAllBySearch("");
         final long projectTypeCount = DATABASE.gameDAO.countAllProjectTypes();
@@ -150,12 +166,12 @@ public class SiteAPI {
         long page = query.getPage();
         int limit = query.getLimit();
         Sort sort = query.getSort(ProjectFileSort.NEW);
-        String version = query.getVersions();
+        String gameVersion = query.getGameVersion();
 
         final ProjectsEntity projectRecord = ProjectService.getAuthorizedProject(gameSlug, projectTypeSlug, projectSlug, token);
 
         boolean authorized = ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD);
-        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord.getId(), authorized, page, limit, sort, version);
+        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord, authorized, page, limit, sort, gameVersion);
 
         final List<DataSiteProjectFileDisplay> projectFiles = projectFileRecords.stream().map(record -> {
             final List<GameVersionsEntity> gameVersionRecords = record.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
