@@ -1,8 +1,6 @@
 package com.diluv.api.data;
 
-import java.util.List;
-
-import com.diluv.confluencia.database.record.ProjectFileRecord;
+import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -16,9 +14,9 @@ public class DataProjectFileAvailable extends DataProjectFile {
     @Expose
     private final long updatedAt;
 
-    public DataProjectFileAvailable (ProjectFileRecord rs, List<Long> dependencies, List<DataGameVersion> gameVersions, String projectSlug, String projectTypeSlug, String gameSlug) {
+    public DataProjectFileAvailable (ProjectFilesEntity rs, String projectSlug, String projectTypeSlug, String gameSlug) {
 
-        super(rs, dependencies, gameVersions, projectSlug, projectTypeSlug, gameSlug);
-        this.updatedAt = rs.getUpdatedAt();
+        super(rs, projectSlug, projectTypeSlug, gameSlug);
+        this.updatedAt = rs.getUpdatedAt().getTime();
     }
 }

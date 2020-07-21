@@ -2,9 +2,11 @@ package com.diluv.api.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.diluv.api.utils.Constants;
-import com.diluv.confluencia.database.record.ProjectRecord;
+import com.diluv.confluencia.database.record.FeaturedProjectsEntity;
+import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -81,27 +83,27 @@ public class DataBaseProject {
     @Expose
     private final List<DataProjectContributor> contributors = new ArrayList<>();
 
-    public DataBaseProject (ProjectRecord projectRecord, List<DataTag> tags) {
+    public DataBaseProject (FeaturedProjectsEntity featuredProject) {
 
-        this(projectRecord, tags, null);
+        this(featuredProject.getProject());
     }
 
-    public DataBaseProject (ProjectRecord rs, List<DataTag> tags, List<DataProjectContributor> projectAuthorRecords) {
+    public DataBaseProject (ProjectsEntity rs) {
 
         this.id = rs.getId();
         this.name = rs.getName();
         this.slug = rs.getSlug();
         this.summary = rs.getSummary();
-        this.logo = Constants.getProjectLogo(rs.getGameSlug(), rs.getProjectTypeSlug(), rs.getId());
+        this.logo = Constants.getProjectLogo(rs);
         this.downloads = rs.getCachedDownloads();
-        this.createdAt = rs.getCreatedAt();
-        this.updatedAt = rs.getUpdatedAt();
-        this.tags = tags;
-        this.game = new DataBaseGame(rs.getGameSlug(), rs.getGameName());
-        this.projectType = new DataBaseProjectType(rs.getProjectTypeSlug(), rs.getProjectTypeName());
-        this.contributors.add(new DataProjectContributor(rs.getUserId(), rs.getUsername(), rs.getUserDisplayName(), rs.getUserCreatedAt(), "owner"));
-        if (projectAuthorRecords != null) {
-            this.contributors.addAll(projectAuthorRecords);
+        this.createdAt = rs.getCreatedAt().getTime();
+        this.updatedAt = rs.getUpdatedAt().getTime();
+        this.tags = rs.getTags().stream().map(DataTag::new).collect(Collectors.toList());
+        this.game = new DataBaseGame(rs.getGame());
+        this.projectType = new DataBaseProjectType(rs.getProjectType());
+        this.contributors.add(new DataProjectContributor(rs.getOwner(), "owner"));
+        if (!rs.getAuthors().isEmpty()) {
+            this.contributors.addAll(rs.getAuthors().stream().map(DataProjectContributor::new).collect(Collectors.toList()));
         }
     }
 }

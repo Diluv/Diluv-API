@@ -14,17 +14,12 @@ import com.diluv.api.provider.GsonProvider;
 import com.diluv.api.provider.NotFoundExceptionMapper;
 import com.diluv.api.provider.ParameterProviderV1;
 import com.diluv.api.utils.Constants;
-import com.diluv.api.v1.auth.AuthAPI;
 import com.diluv.api.v1.featured.FeaturedAPI;
 import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.api.v1.news.NewsAPI;
 import com.diluv.api.v1.projects.ProjectsAPI;
 import com.diluv.api.v1.site.SiteAPI;
 import com.diluv.api.v1.users.UsersAPI;
-
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormAnnotationReader;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartReader;
 
 public class APIV1 extends Application {
 
@@ -51,7 +46,6 @@ public class APIV1 extends Application {
         // Enables exception handler
         classes.add(GenericExceptionMapper.class);
 
-//        classes.add(AuthAPI.class);
         classes.add(FeaturedAPI.class);
         classes.add(GamesAPI.class);
         classes.add(ProjectsAPI.class);

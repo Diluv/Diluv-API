@@ -1,8 +1,10 @@
 package com.diluv.api.data;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import com.diluv.confluencia.database.record.ProjectAuthorRecord;
+import com.diluv.confluencia.database.record.ProjectAuthorPermissionsEntity;
+import com.diluv.confluencia.database.record.ProjectAuthorsEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -16,9 +18,9 @@ public class DataProjectContributorAuthorized extends DataProjectContributor {
     @Expose
     private final List<String> permissions;
 
-    public DataProjectContributorAuthorized (ProjectAuthorRecord projectAuthor) {
+    public DataProjectContributorAuthorized (ProjectAuthorsEntity projectAuthor) {
 
         super(projectAuthor);
-        this.permissions = projectAuthor.getPermissions();
+        this.permissions = projectAuthor.getPermissions().stream().map(ProjectAuthorPermissionsEntity::getPermission).collect(Collectors.toList());
     }
 }

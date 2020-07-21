@@ -17,16 +17,14 @@ import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataAuthorizedUser;
 import com.diluv.api.data.DataProject;
-import com.diluv.api.data.DataTag;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.record.ProjectRecord;
-import com.diluv.confluencia.database.record.TagRecord;
-import com.diluv.confluencia.database.record.UserRecord;
+import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 
@@ -53,7 +51,7 @@ public class UsersAPI {
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
-        final UserRecord userRecord = DATABASE.userDAO.findOneByUserId(token.getUserId());
+        final UsersEntity userRecord = DATABASE.userDAO.findOneByUserId(token.getUserId());
 
         if (userRecord == null) {
 
@@ -68,7 +66,7 @@ public class UsersAPI {
     @Path("/{username}")
     public Response getUser (@PathParam("username") String username, @HeaderParam("Authorization") String auth) {
 
-        final UserRecord userRecord = DATABASE.userDAO.findOneByUsername(username);
+        final UsersEntity userRecord = DATABASE.userDAO.findOneByUsername(username);
 
         if (userRecord == null) {
 
@@ -80,7 +78,7 @@ public class UsersAPI {
             final Token token = JWTUtil.getToken(auth);
 
             if (token != null) {
-                final UserRecord tokenUser = DATABASE.userDAO.findOneByUserId(token.getUserId());
+                final UsersEntity tokenUser = DATABASE.userDAO.findOneByUserId(token.getUserId());
 
                 if (tokenUser.getUsername().equalsIgnoreCase(username)) {
                     return ResponseUtil.successResponse(new DataAuthorizedUser(userRecord));
@@ -100,7 +98,7 @@ public class UsersAPI {
         int limit = query.getLimit();
         Sort sort = query.getSort(ProjectSort.POPULAR);
 
-        UserRecord userRecord = DATABASE.userDAO.findOneByUsername(username);
+        UsersEntity userRecord = DATABASE.userDAO.findOneByUsername(username);
         if (userRecord == null) {
             return ErrorMessage.NOT_FOUND_USER.respond();
         }
@@ -111,13 +109,8 @@ public class UsersAPI {
             authorized = userRecord.getUsername().equalsIgnoreCase(username);
         }
 
-        List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, sort);
-        final List<DataProject> projects = projectRecords.stream().map(projectRecord -> {
-            final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
-            List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
-            return new DataProject(projectRecord, tags);
-        }).collect(Collectors.toList());
+        List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, sort);
 
-        return ResponseUtil.successResponse(projects);
+        return ResponseUtil.successResponse(projects.stream().map(DataProject::new).collect(Collectors.toList()));
     }
 }

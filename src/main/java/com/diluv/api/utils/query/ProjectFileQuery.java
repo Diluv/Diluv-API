@@ -7,8 +7,8 @@ import com.diluv.confluencia.database.sort.Sort;
 
 public class ProjectFileQuery extends PaginationQuery {
 
-    @QueryParam("versions")
-    private String versions;
+    @QueryParam("game_version")
+    private String gameVersion;
 
     @Override
     public Sort getSort (Sort defaultSort) {
@@ -21,8 +21,8 @@ public class ProjectFileQuery extends PaginationQuery {
         return defaultSort;
     }
 
-    public String getVersions () {
+    public String getGameVersion () {
 
-        return this.versions;
+        return this.gameVersion;
     }
 }

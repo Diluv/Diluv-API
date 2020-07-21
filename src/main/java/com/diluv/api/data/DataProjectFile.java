@@ -1,9 +1,10 @@
 package com.diluv.api.data;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.diluv.api.utils.Constants;
-import com.diluv.confluencia.database.record.ProjectFileRecord;
+import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -107,21 +108,25 @@ public class DataProjectFile {
     @Expose
     private final String uploaderUsername;
 
-    public DataProjectFile (ProjectFileRecord rs, List<Long> dependencies, List<DataGameVersion> gameVersions, String gameSlug, String projectTypeSlug, String projectSlug) {
+    @Expose
+    private final String uploaderDisplayName;
+
+    public DataProjectFile (ProjectFilesEntity rs, String gameSlug, String projectTypeSlug, String projectSlug) {
 
         this.id = rs.getId();
         this.name = rs.getName();
-        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getProjectId(), rs.getId(), rs.getName());
+        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getId(), rs.getId(), rs.getName());
         this.size = rs.getSize();
         this.changelog = rs.getChangelog();
         this.sha512 = rs.getSha512();
         this.releaseType = rs.getReleaseType();
         this.classifier = rs.getClassifier();
-        this.createdAt = rs.getCreatedAt();
-        this.uploaderUserId = rs.getUserId();
-        this.uploaderUsername = rs.getUsername();
-        this.dependencies = dependencies;
-        this.gameVersions = gameVersions;
+        this.createdAt = rs.getCreatedAt().getTime();
+        this.uploaderUserId = rs.getUser().getId();
+        this.uploaderUsername = rs.getUser().getUsername();
+        this.uploaderDisplayName = rs.getUser().getDisplayName();
+        this.dependencies = rs.getDependencies().stream().map(a -> a.getDependencyProject().getId()).collect(Collectors.toList());
+        this.gameVersions = rs.getGameVersions().stream().map(a -> new DataGameVersion(a.getGameVersion())).collect(Collectors.toList());
         this.gameSlug = gameSlug;
         this.projectTypeSlug = projectTypeSlug;
         this.projectSlug = projectSlug;

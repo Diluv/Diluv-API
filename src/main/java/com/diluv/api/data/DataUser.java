@@ -1,7 +1,7 @@
 package com.diluv.api.data;
 
 import com.diluv.api.utils.Constants;
-import com.diluv.confluencia.database.record.UserRecord;
+import com.diluv.confluencia.database.record.UsersEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -38,21 +38,12 @@ public class DataUser {
     @Expose
     private final long createdAt;
 
-    public DataUser (UserRecord userRecord) {
+    public DataUser (UsersEntity userRecord) {
 
         this.userId = userRecord.getId();
         this.username = userRecord.getUsername();
         this.displayName = userRecord.getDisplayName();
         this.avatarURL = Constants.getUserAvatar(userRecord.getUsername());
-        this.createdAt = userRecord.getCreatedAt();
-    }
-
-    public DataUser (long userId, String username, String displayName, long createdAt) {
-
-        this.userId = userId;
-        this.username = username;
-        this.displayName = displayName;
-        this.avatarURL = Constants.getUserAvatar(username);
-        this.createdAt = createdAt;
+        this.createdAt = userRecord.getCreatedAt().getTime();
     }
 }

@@ -1,6 +1,6 @@
 package com.diluv.api.data;
 
-import com.diluv.confluencia.database.record.ProjectLinkRecord;
+import com.diluv.confluencia.database.record.ProjectLinksEntity;
 import com.google.gson.annotations.Expose;
 
 public class DataProjectLink {
@@ -11,7 +11,7 @@ public class DataProjectLink {
     @Expose
     private final String url;
 
-    public DataProjectLink (ProjectLinkRecord rs) {
+    public DataProjectLink (ProjectLinksEntity rs) {
 
         this.type = rs.getType();
         this.url = rs.getUrl();

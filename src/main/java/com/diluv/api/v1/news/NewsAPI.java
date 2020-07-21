@@ -10,17 +10,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.utils.query.NewsQuery;
-
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataNewsPost;
 import com.diluv.api.utils.error.ErrorMessage;
-import com.diluv.api.utils.query.PaginationQuery;
+import com.diluv.api.utils.query.NewsQuery;
 import com.diluv.api.utils.response.ResponseUtil;
-import com.diluv.confluencia.database.record.NewsRecord;
+import com.diluv.confluencia.database.record.NewsEntity;
 import com.diluv.confluencia.database.sort.NewsSort;
 import com.diluv.confluencia.database.sort.Sort;
 
@@ -40,7 +38,7 @@ public class NewsAPI {
         int limit = query.getLimit();
         Sort sort = query.getSort(NewsSort.NEW);
 
-        final List<NewsRecord> newsRecords = DATABASE.newsDAO.findAll(page, limit, sort);
+        final List<NewsEntity> newsRecords = DATABASE.newsDAO.findAll(page, limit, sort);
         final List<DataNewsPost> newsPosts = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
 
         return ResponseUtil.successResponse(newsPosts);
@@ -51,7 +49,7 @@ public class NewsAPI {
     @Path("/{slug}")
     public Response getNewsBySlug (@PathParam("slug") String slug) {
 
-        final NewsRecord newsRecord = DATABASE.newsDAO.findOneByNewsSlug(slug);
+        final NewsEntity newsRecord = DATABASE.newsDAO.findOneByNewsSlug(slug);
 
         if (newsRecord == null) {
 

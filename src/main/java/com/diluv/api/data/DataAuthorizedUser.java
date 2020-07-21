@@ -1,6 +1,6 @@
 package com.diluv.api.data;
 
-import com.diluv.confluencia.database.record.UserRecord;
+import com.diluv.confluencia.database.record.UsersEntity;
 import com.google.gson.annotations.Expose;
 
 /**
@@ -20,7 +20,7 @@ public class DataAuthorizedUser extends DataUser {
     @Expose
     private final boolean mfa;
 
-    public DataAuthorizedUser (UserRecord userRecord) {
+    public DataAuthorizedUser (UsersEntity userRecord) {
 
         super(userRecord);
 

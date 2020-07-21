@@ -16,13 +16,13 @@ import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.*;
-import com.diluv.api.data.site.DataCreateProject;
 import com.diluv.api.data.site.DataSiteAuthorProjects;
 import com.diluv.api.data.site.DataSiteGame;
 import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;
 import com.diluv.api.data.site.DataSiteProjectFilesPage;
+import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -33,15 +33,15 @@ import com.diluv.api.utils.query.ProjectFileQuery;
 import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.GamesAPI;
-import com.diluv.confluencia.database.record.GameRecord;
-import com.diluv.confluencia.database.record.GameVersionRecord;
-import com.diluv.confluencia.database.record.ProjectAuthorRecord;
-import com.diluv.confluencia.database.record.ProjectFileRecord;
-import com.diluv.confluencia.database.record.ProjectLinkRecord;
-import com.diluv.confluencia.database.record.ProjectRecord;
-import com.diluv.confluencia.database.record.ProjectTypeRecord;
-import com.diluv.confluencia.database.record.TagRecord;
-import com.diluv.confluencia.database.record.UserRecord;
+import com.diluv.api.v1.utilities.ProjectService;
+import com.diluv.confluencia.database.record.FeaturedGamesEntity;
+import com.diluv.confluencia.database.record.GameVersionsEntity;
+import com.diluv.confluencia.database.record.GamesEntity;
+import com.diluv.confluencia.database.record.ProjectFileGameVersionsEntity;
+import com.diluv.confluencia.database.record.ProjectFilesEntity;
+import com.diluv.confluencia.database.record.ProjectTypesEntity;
+import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
@@ -59,12 +59,12 @@ public class SiteAPI {
     @Path("/")
     public Response getIndex () {
 
-        final List<GameRecord> gameRecords = DATABASE.gameDAO.findFeaturedGames();
+        final List<FeaturedGamesEntity> gameRecords = DATABASE.gameDAO.findFeaturedGames();
         final List<DataSiteGame> games = gameRecords.stream().map(DataSiteGame::new).collect(Collectors.toList());
 
-        final long projectCount = DATABASE.projectDAO.countAll();
+        final long projectCount = DATABASE.projectDAO.countAllByGameSlug("");
         final long userCount = DATABASE.userDAO.countAll();
-        final long gameCount = DATABASE.gameDAO.countAll();
+        final long gameCount = DATABASE.gameDAO.countAllBySearch("");
         final long projectTypeCount = DATABASE.gameDAO.countAllProjectTypes();
         return ResponseUtil.successResponse(new DataSiteIndex(games, projectCount, userCount, gameCount, projectTypeCount));
     }
@@ -79,9 +79,9 @@ public class SiteAPI {
         final Sort sort = query.getSort(GameSort.NAME);
         final String search = query.getSearch();
 
-        final List<GameRecord> gameRecords = DATABASE.gameDAO.findAll(page, limit, sort, search);
+        final List<GamesEntity> gameRecords = DATABASE.gameDAO.findAll(page, limit, sort, search);
 
-        final long gameCount = DATABASE.gameDAO.countAll(search);
+        final long gameCount = DATABASE.gameDAO.countAllBySearch(search);
         final List<DataBaseGame> games = gameRecords.stream().map(DataSiteGame::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(new DataGameList(games, GamesAPI.GAME_SORTS, gameCount));
     }
@@ -91,13 +91,13 @@ public class SiteAPI {
     @Path("/games/{gameSlug}")
     public Response getGameDefaultType (@PathParam("gameSlug") String gameSlug) {
 
-        final GameRecord gameRecord = DATABASE.gameDAO.findOneBySlug(gameSlug);
+        final GamesEntity gameRecord = DATABASE.gameDAO.findOneBySlug(gameSlug);
         if (gameRecord == null) {
 
             return ErrorMessage.NOT_FOUND_GAME.respond();
         }
 
-        return ResponseUtil.successResponse(gameRecord.getDefaultProjectType());
+        return ResponseUtil.successResponse(gameRecord.getDefaultProjectTypeEntity().getSlug());
     }
 
 
@@ -112,10 +112,10 @@ public class SiteAPI {
         final String versions = query.getVersions();
         final String[] tags = query.getTags();
 
-        final List<ProjectRecord> projectRecords = DATABASE.projectDAO.findAllByGameAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags);
+        final List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByGameAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags);
 
-        GameRecord game = DATABASE.gameDAO.findOneBySlug(gameSlug);
-        if (projectRecords.isEmpty()) {
+        GamesEntity game = DATABASE.gameDAO.findOneBySlug(gameSlug);
+        if (projects.isEmpty()) {
 
             if (game == null) {
 
@@ -127,17 +127,14 @@ public class SiteAPI {
                 return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
             }
         }
-        final List<DataBaseProject> projects = projectRecords.stream().map(projectRecord -> {
-            final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
-            final List<DataTag> dataTags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
-            return new DataBaseProject(projectRecord, dataTags);
-        }).collect(Collectors.toList());
+        final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
 
-        final List<DataBaseProjectType> types = DATABASE.projectDAO.findAllProjectTypesByGameSlug(gameSlug).stream().map(DataBaseProjectType::new).collect(Collectors.toList());
-        final ProjectTypeRecord currentType = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug, search);
-        final List<DataTag> dataTags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug).stream().map(DataTag::new).collect(Collectors.toList());
+        final List<DataBaseProjectType> types = game.getProjectTypes().stream().map(DataBaseProjectType::new).collect(Collectors.toList());
+        final ProjectTypesEntity currentType = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
 
-        return ResponseUtil.successResponse(new DataSiteGameProjects(projects, types, new DataProjectType(currentType, dataTags), GamesAPI.PROJECT_SORTS));
+        final long projectCount = DATABASE.projectDAO.countAllByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+
+        return ResponseUtil.successResponse(new DataSiteGameProjects(dataProjects, types, new DataProjectType(currentType, projectCount), GamesAPI.PROJECT_SORTS));
     }
 
 
@@ -146,77 +143,44 @@ public class SiteAPI {
     @Path("/projects/{gameSlug}/{projectTypeSlug}/{projectSlug}")
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
 
-        final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-        if (projectRecord == null || !projectRecord.isReleased() && token == null) {
+        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (project == null || !project.isReleased() && token == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
 
-        final List<ProjectLinkRecord> projectLinkRecords = DATABASE.projectDAO.findAllLinksByProjectId(projectRecord.getId());
-        final List<DataProjectLink> projectLinks = projectLinkRecords.stream().map(DataProjectLink::new).collect(Collectors.toList());
-
-        final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
-
-        final List<TagRecord> tagRecords = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId());
-        List<DataTag> tags = tagRecords.stream().map(DataTag::new).collect(Collectors.toList());
-
         if (token != null) {
-            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(projectRecord, token, records);
+            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
 
             if (permissions != null) {
-                final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributorAuthorized::new).collect(Collectors.toList());
-                return ResponseUtil.successResponse(new DataProjectAuthorized(projectRecord, tags, projectAuthors, projectLinks, permissions));
+                return ResponseUtil.successResponse(new DataProjectAuthorized(project, permissions));
             }
         }
 
-        final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributor::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataProject(projectRecord, tags, projectAuthors, projectLinks));
+        return ResponseUtil.successResponse(new DataProject(project));
     }
 
     @GET
     @Path("/games/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
-    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @Query ProjectFileQuery query) {
+    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @Query ProjectFileQuery query) throws ResponseException {
 
         long page = query.getPage();
         int limit = query.getLimit();
         Sort sort = query.getSort(ProjectFileSort.NEW);
-        String version = query.getVersions();
+        String gameVersion = query.getGameVersion();
 
-        final ProjectRecord projectRecord = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-        if (projectRecord == null) {
+        final ProjectsEntity project = ProjectService.getAuthorizedProject(gameSlug, projectTypeSlug, projectSlug, token);
 
-            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
-                return ErrorMessage.NOT_FOUND_GAME.respond();
-            }
-
-            if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
-                return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
-            }
-
-            return ErrorMessage.NOT_FOUND_PROJECT.respond();
-        }
-
-        final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
-
-        boolean authorized = token != null && ProjectPermissions.hasPermission(projectRecord, token, ProjectPermissions.FILE_UPLOAD);
-        final List<ProjectFileRecord> projectFileRecords;
-
-        if (version == null) {
-            projectFileRecords = DATABASE.fileDAO.findAllByProjectId(projectRecord.getId(), authorized, page, limit, sort);
-        }
-        else {
-            projectFileRecords = DATABASE.fileDAO.findAllByProjectIdWhereVersion(projectRecord.getId(), authorized, page, limit, sort, version);
-        }
+        boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
+        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(project, authorized, page, limit, sort, gameVersion);
 
         final List<DataSiteProjectFileDisplay> projectFiles = projectFileRecords.stream().map(record -> {
-            final List<GameVersionRecord> gameVersionRecords = DATABASE.fileDAO.findAllGameVersionsById(record.getId());
+            final List<GameVersionsEntity> gameVersionRecords = record.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
             List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
             return record.isReleased() ?
                 new DataSiteProjectFileDisplay(record, gameVersions, gameSlug, projectTypeSlug, projectSlug) :
                 new DataSiteProjectFileDisplay(record, gameVersions, gameSlug, projectTypeSlug, projectSlug);
         }).collect(Collectors.toList());
-        List<DataTag> tags = DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId()).stream().map(DataTag::new).collect(Collectors.toList());
-        final List<DataProjectContributor> projectAuthors = records.stream().map(DataProjectContributor::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(new DataSiteProjectFilesPage(new DataBaseProject(projectRecord, tags, projectAuthors), projectFiles));
+        return ResponseUtil.successResponse(new DataSiteProjectFilesPage(new DataBaseProject(project), projectFiles));
     }
 
     @Cache(maxAge = 300, mustRevalidate = true)
@@ -224,7 +188,7 @@ public class SiteAPI {
     @Path("/author/{username}")
     public Response getUser (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @Query AuthorProjectsQuery query) {
 
-        final UserRecord userRecord = DATABASE.userDAO.findOneByUsername(username);
+        final UsersEntity userRecord = DATABASE.userDAO.findOneByUsername(username);
         if (userRecord == null) {
 
             return ErrorMessage.NOT_FOUND_USER.respond();
@@ -237,7 +201,7 @@ public class SiteAPI {
             final Token token = JWTUtil.getToken(auth);
 
             if (token != null) {
-                final UserRecord tokenUser = DATABASE.userDAO.findOneByUserId(token.getUserId());
+                final UsersEntity tokenUser = DATABASE.userDAO.findOneByUserId(token.getUserId());
 
                 if (tokenUser.getUsername().equalsIgnoreCase(username)) {
                     authorized = true;
@@ -245,32 +209,23 @@ public class SiteAPI {
                 }
             }
         }
-        List<ProjectRecord> projects = DATABASE.projectDAO.findAllByUsername(username, authorized, query.getPage(), query.getLimit(), query.getSort(ProjectFileSort.NEW));
+        List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByUsername(username, authorized, query.getPage(), query.getLimit(), query.getSort(ProjectFileSort.NEW));
 
-        DataUser user = new DataUser(userRecord);
+
         // TODO code for if the user is authorized to get an authorized project
-        List<DataProject> dataProjects = projects
-            .stream()
-            .map(projectRecord -> new DataProject(projectRecord, DATABASE.projectDAO.findAllTagsByProjectId(projectRecord.getId())
-                .stream()
-                .map(DataTag::new)
-                .collect(Collectors.toList())))
-            .collect(Collectors.toList());
-
+        DataUser user;
+        List<DataProject> dataProjects;
         if (authorized) {
+            dataProjects = projects.stream().map(DataProject::new).collect(Collectors.toList());
             user = new DataAuthorizedUser(userRecord);
+        }
+        else {
+            dataProjects = projects.stream().map(DataProject::new).collect(Collectors.toList());
+            user = new DataUser(userRecord);
         }
 
         long projectCount = DATABASE.projectDAO.countAllByUsername(username, authorized);
 
         return ResponseUtil.successResponse(new DataSiteAuthorProjects(user, dataProjects, GamesAPI.GAME_SORTS, projectCount));
-    }
-
-    @GET
-    @Path("/create/games/{gameSlug}/{projectTypeSlug}")
-    public Response createProject (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
-
-        List<TagRecord> tags = DATABASE.projectDAO.findAllTagsByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
-        return ResponseUtil.successResponse(new DataCreateProject(tags.stream().map(DataTag::new).collect(Collectors.toList())));
     }
 }

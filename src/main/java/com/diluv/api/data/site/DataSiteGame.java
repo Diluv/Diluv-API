@@ -3,7 +3,8 @@ package com.diluv.api.data.site;
 import com.diluv.api.data.DataBaseGame;
 import com.diluv.api.data.DataImage;
 import com.diluv.api.utils.Constants;
-import com.diluv.confluencia.database.record.GameRecord;
+import com.diluv.confluencia.database.record.FeaturedGamesEntity;
+import com.diluv.confluencia.database.record.GamesEntity;
 import com.google.gson.annotations.Expose;
 
 public class DataSiteGame extends DataBaseGame {
@@ -19,16 +20,24 @@ public class DataSiteGame extends DataBaseGame {
     @Expose
     private final DataImage logoURL;
 
-
     @Expose
     private final String defaultProjectType;
 
-    public DataSiteGame (GameRecord rs) {
+    public DataSiteGame (FeaturedGamesEntity rs) {
+
+        super(rs.getGame());
+
+        this.url = rs.getGame().getUrl();
+        this.logoURL = Constants.getGameLogoURL(rs.getGame().getSlug());
+        this.defaultProjectType = rs.getGame().getDefaultProjectTypeEntity().getSlug();
+    }
+
+    public DataSiteGame (GamesEntity rs) {
 
         super(rs);
 
         this.url = rs.getUrl();
         this.logoURL = Constants.getGameLogoURL(rs.getSlug());
-        this.defaultProjectType = rs.getDefaultProjectType();
+        this.defaultProjectType = rs.getDefaultProjectTypeEntity().getSlug();
     }
 }

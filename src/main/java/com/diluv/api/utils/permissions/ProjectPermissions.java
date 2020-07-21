@@ -8,10 +8,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import com.diluv.api.utils.auth.tokens.Token;
-import com.diluv.confluencia.database.record.ProjectAuthorRecord;
-import com.diluv.confluencia.database.record.ProjectRecord;
-
-import static com.diluv.api.Main.DATABASE;
+import com.diluv.confluencia.database.record.ProjectAuthorPermissionsEntity;
+import com.diluv.confluencia.database.record.ProjectAuthorsEntity;
+import com.diluv.confluencia.database.record.ProjectsEntity;
 
 public enum ProjectPermissions {
 
@@ -27,53 +26,55 @@ public enum ProjectPermissions {
         this.name = name;
     }
 
-    public String getName () {
+    private String getName () {
 
         return this.name;
     }
 
-    public static boolean hasPermission (ProjectRecord projectRecord, Token token, ProjectPermissions permissions) {
+    public static boolean hasPermission (ProjectsEntity project, @Nullable Token token, ProjectPermissions permissions) {
 
-        List<String> userPermissions = getAuthorizedUserPermissions(projectRecord, token);
+        if (token == null)
+            return false;
+
+        List<String> userPermissions = getAuthorizedUserPermissions(project, token);
 
         return userPermissions != null && userPermissions.contains(permissions.getName());
     }
 
-    protected static List<String> getAuthorizedUserPermissions (ProjectRecord projectRecord, Token token) {
-
-        final List<ProjectAuthorRecord> records = DATABASE.projectDAO.findAllProjectAuthorsByProjectId(projectRecord.getId());
-
-        return getAuthorizedUserPermissions(projectRecord, token, records);
-    }
-
     @Nullable
-    public static List<String> getAuthorizedUserPermissions (ProjectRecord projectRecord, Token token, List<ProjectAuthorRecord> records) {
+    public static List<String> getAuthorizedUserPermissions (ProjectsEntity project, Token token) {
 
-        if (token.getUserId() == projectRecord.getUserId()) {
+        if (token.getUserId() == project.getOwner().getId()) {
 
-            List<String> permissions = getAllPermissions();
-            permissions.retainAll(token.getProjectPermissions());
-
-            return permissions;
+            return getSubsetPermissions(getAllPermissions(), token);
         }
 
-        final Optional<ProjectAuthorRecord> record = records.stream().filter(par -> par.getUserId() == token.getUserId()).findFirst();
+        final Optional<ProjectAuthorsEntity> record = project.getAuthors().stream().filter(r -> r.getUser().getId() == token.getUserId()).findAny();
 
         if (record.isPresent()) {
-            ProjectAuthorRecord r = record.get();
-
-            List<String> permissions = r.getPermissions();
-            permissions.retainAll(token.getProjectPermissions());
-
-            return permissions;
+            ProjectAuthorsEntity r = record.get();
+            final List<String> permissions = r.getPermissions().stream().map(ProjectAuthorPermissionsEntity::getPermission).collect(Collectors.toList());
+            return getSubsetPermissions(permissions, token);
         }
 
         return null;
+    }
+
+    /**
+     * Intersection of the two sets for project permissions.
+     *
+     * @param permissions The permissions the user has for the project
+     * @param token The token containing the global permissions
+     * @return The intersection of the permissions.
+     */
+    private static List<String> getSubsetPermissions (List<String> permissions, Token token) {
+
+        permissions.retainAll(token.getGlobalProjectPermissions());
+        return permissions;
     }
 
     public static List<String> getAllPermissions () {
 
         return Arrays.stream(ProjectPermissions.values()).map(ProjectPermissions::getName).collect(Collectors.toList());
     }
-
 }

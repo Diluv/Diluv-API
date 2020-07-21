@@ -17,6 +17,9 @@
         "username": {
             "type": "string"
         },
+        "displayName": {
+            "type": "string"
+        },
         "createdAt": {
             "type": "number"
         }

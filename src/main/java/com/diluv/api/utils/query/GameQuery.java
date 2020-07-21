@@ -28,6 +28,6 @@ public class GameQuery extends PaginationQuery {
         if (GenericValidator.isBlankOrNull(this.search)) {
             return "";
         }
-        return  this.search ;
+        return this.search;
     }
 }
