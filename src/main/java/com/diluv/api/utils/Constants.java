@@ -39,7 +39,6 @@ public final class Constants {
     public static final String AUTH_BASE_URL = getValueOrDefault("AUTH_BASE_URL", "https://auth.diluv.com");
     public static final ConfigurableJWTProcessor<SecurityContext> JWT_PROCESSOR = getJWTProcessor();
 
-    public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
     public static final String WEBSITE_URL = getValueOrDefault("WEBSITE_URL", "https://diluv.com");
     public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.singleton(WEBSITE_URL));
 
