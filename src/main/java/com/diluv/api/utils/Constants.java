@@ -53,12 +53,6 @@ public final class Constants {
     public static final String CDN_FOLDER = getValueOrDefault("CDN_FOLDER", "public");
     public static final String PROCESSING_FOLDER = getValueOrDefault("PROCESSING_FOLDER", "processing");
 
-    // Emails
-    public static final String POSTMARK_API_TOKEN = getValueOrDefault("POSTMARK_API_TOKEN", null);
-    public static final String NOREPLY_EMAIL = getValueOrDefault("NOREPLY_EMAIL", "noreply@diluv.com");
-    public static final String PASSWORD_RESET = Constants.readResourceFileToString("/templates/password_reset.html", false);
-    public static final String EMAIL_VERIFICATION = Constants.readResourceFileToString("/templates/email_verification.html", false);
-
     /**
      * Reads a string from an environment variable. If the variable can not be found the
      * program will terminate.
