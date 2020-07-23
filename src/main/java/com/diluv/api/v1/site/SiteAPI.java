@@ -141,19 +141,22 @@ public class SiteAPI {
     @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/projects/{gameSlug}/{projectTypeSlug}/{projectSlug}")
-    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
+    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) throws ResponseException {
 
-        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-        if (project == null || !project.isReleased() && token == null) {
-            return ErrorMessage.NOT_FOUND_PROJECT.respond();
+        if (token == null) {
+            final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+            if (project == null || !project.isReleased()) {
+                return ErrorMessage.NOT_FOUND_PROJECT.respond();
+            }
+            return ResponseUtil.successResponse(new DataProject(project));
         }
 
-        if (token != null) {
-            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
+        final ProjectsEntity project = ProjectService.getAuthorizedProject(gameSlug, projectTypeSlug, projectSlug, token);
 
-            if (permissions != null) {
-                return ResponseUtil.successResponse(new DataProjectAuthorized(project, permissions));
-            }
+        List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
+
+        if (permissions != null) {
+            return ResponseUtil.successResponse(new DataProjectAuthorized(project, permissions));
         }
 
         return ResponseUtil.successResponse(new DataProject(project));

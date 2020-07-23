@@ -35,6 +35,7 @@ import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.ProjectFileUploadForm;
+import com.diluv.api.v1.utilities.ProjectService;
 import com.diluv.confluencia.database.record.GameVersionsEntity;
 import com.diluv.confluencia.database.record.ProjectFileDependenciesEntity;
 import com.diluv.confluencia.database.record.ProjectFileGameVersionsEntity;
@@ -56,17 +57,20 @@ public class ProjectsAPI {
     @Path("/{projectId}")
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("projectId") Long projectId) throws ResponseException {
 
-        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
-        if (project == null || !project.isReleased() && token == null) {
-            return ErrorMessage.NOT_FOUND_PROJECT.respond();
+        if (token == null) {
+            final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
+            if (project == null || !project.isReleased()) {
+                return ErrorMessage.NOT_FOUND_PROJECT.respond();
+            }
+            return ResponseUtil.successResponse(new DataProject(project));
         }
 
-        if (token != null) {
-            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
+        final ProjectsEntity project = ProjectService.getAuthorizedProject(projectId, token);
 
-            if (permissions != null) {
-                return ResponseUtil.successResponse(new DataProjectAuthorized(project, permissions));
-            }
+        List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
+
+        if (permissions != null) {
+            return ResponseUtil.successResponse(new DataProjectAuthorized(project, permissions));
         }
 
         return ResponseUtil.successResponse(new DataProject(project));
