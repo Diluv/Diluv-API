@@ -1,12 +1,12 @@
 package com.diluv.api.utils;
 
-import com.diluv.api.utils.error.ErrorMessage;
-import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.diluv.api.utils.error.ErrorMessage;
+import io.restassured.response.ValidatableResponse;
+import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;

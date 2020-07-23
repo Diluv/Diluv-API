@@ -3,6 +3,7 @@ package com.diluv.api.v1.projects;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -16,18 +17,22 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
+import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataProjectAuthorized;
 import com.diluv.api.data.DataProjectFileInQueue;
+import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.MismatchException;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
+import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.ProjectFileUploadForm;
 import com.diluv.confluencia.database.record.GameVersionsEntity;
@@ -36,6 +41,8 @@ import com.diluv.confluencia.database.record.ProjectFileGameVersionsEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
+import com.diluv.confluencia.database.sort.ProjectSort;
+import com.diluv.confluencia.database.sort.Sort;
 
 import static com.diluv.api.Main.DATABASE;
 
@@ -47,7 +54,7 @@ public class ProjectsAPI {
     @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/{projectId}")
-    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("projectId") Long projectId) {
+    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("projectId") Long projectId) throws ResponseException {
 
         final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
         if (project == null || !project.isReleased() && token == null) {
@@ -63,6 +70,19 @@ public class ProjectsAPI {
         }
 
         return ResponseUtil.successResponse(new DataProject(project));
+    }
+
+    @Cache(maxAge = 30, mustRevalidate = true)
+    @GET
+    @Path("/hash/{hash}")
+    public Response getProjectByHash (@HeaderParam("Authorization") Token token, @PathParam("hash") String projectFileHash, @Query ProjectQuery query) {
+
+        final long page = query.getPage();
+        final int limit = query.getLimit();
+        final Sort sort = query.getSort(ProjectSort.POPULAR);
+        final List<ProjectsEntity> projects = DATABASE.projectDAO.findProjectsByProjectFileHash(projectFileHash, page, limit, sort);
+
+        return ResponseUtil.successResponse(projects.stream().map(DataBaseProject::new).collect(Collectors.toList()));
     }
 
     @POST

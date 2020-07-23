@@ -1,21 +1,21 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "properties": {
-    "games": {
-      "type": "array",
-      "items": [
-        {
-          "$ref": "data/baseGame.json"
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "games": {
+            "type": "array",
+            "items": [
+                {
+                    "$ref": "data/baseGame.json"
+                }
+            ]
+        },
+        "sort": {
+            "type": "array"
+        },
+        "gameCount": {
+            "type": "number"
         }
-      ]
     },
-    "sort": {
-      "type": "array"
-    },
-    "gameCount": {
-      "type": "number"
-    }
-  },
-  "additionalProperties": false
+    "additionalProperties": false
 }

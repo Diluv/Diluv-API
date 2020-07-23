@@ -1,11 +1,11 @@
 package com.diluv.api.utils;
 
+import org.testcontainers.containers.MariaDBContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.confluencia.Confluencia;
 import io.restassured.RestAssured;
-
-import org.testcontainers.containers.MariaDBContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 public class TestUtil {

@@ -1,11 +1,11 @@
 package com.diluv.api.endpoints.v1;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 public class UserTest {
     private static final String URL = "/v1/users";

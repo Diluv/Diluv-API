@@ -28,6 +28,13 @@ public class ProjectService {
             throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
         }
 
+        return getAuthorizedProject(project, token);
+    }
+
+    public static ProjectsEntity getAuthorizedProject (long projectId, Token token) throws ResponseException {
+
+        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
+
         if (!project.isReleased()) {
             if (token == null) {
                 throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
@@ -46,6 +53,28 @@ public class ProjectService {
             throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
         }
 
+        return project;
+    }
+
+    public static ProjectsEntity getAuthorizedProject (ProjectsEntity project, Token token) throws ResponseException {
+
+        if (!project.isReleased()) {
+            if (token == null) {
+                throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
+            }
+
+            if (token.getUserId() == project.getOwner().getId()) {
+                return project;
+            }
+            List<ProjectAuthorsEntity> records = project.getAuthors();
+            Optional<ProjectAuthorsEntity> record = records.stream().filter(r -> r.getUser().getId() == token.getUserId()).findAny();
+
+            if (record.isPresent()) {
+                return project;
+            }
+
+            throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
+        }
 
         return project;
     }

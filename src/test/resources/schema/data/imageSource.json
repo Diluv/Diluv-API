@@ -1,17 +1,17 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "properties": {
-    "src": {
-      "type": "string"
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "src": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        }
     },
-    "type": {
-      "type": "string"
-    }
-  },
-  "required": [
-    "src",
-    "type"
-  ],
-  "additionalProperties": false
+    "required": [
+        "src",
+        "type"
+    ],
+    "additionalProperties": false
 }
