@@ -9,6 +9,7 @@ public class DataSiteProjectFilesPage {
 
     @Expose
     private final DataBaseProject project;
+
     @Expose
     private final List<DataSiteProjectFileDisplay> files;
 

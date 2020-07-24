@@ -13,6 +13,7 @@ import com.diluv.api.provider.GenericExceptionMapper;
 import com.diluv.api.provider.GsonProvider;
 import com.diluv.api.provider.NotFoundExceptionMapper;
 import com.diluv.api.provider.ParameterProviderV1;
+import com.diluv.api.provider.ResponseExceptionMapper;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.v1.featured.FeaturedAPI;
 import com.diluv.api.v1.games.GamesAPI;
@@ -45,6 +46,8 @@ public class APIV1 extends Application {
 
         // Enables exception handler
         classes.add(GenericExceptionMapper.class);
+
+        classes.add(ResponseExceptionMapper.class);
 
         classes.add(FeaturedAPI.class);
         classes.add(GamesAPI.class);

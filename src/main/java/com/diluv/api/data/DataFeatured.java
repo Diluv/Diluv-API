@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 
 public class DataFeatured {
+
     @Expose
     private final List<DataGame> games;
 

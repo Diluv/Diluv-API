@@ -11,6 +11,7 @@ public class DataSiteAuthorProjects {
 
     @Expose
     private final DataUser user;
+
     @Expose
     private final List<DataProject> projects;
 

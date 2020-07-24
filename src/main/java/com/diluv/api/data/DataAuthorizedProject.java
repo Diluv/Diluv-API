@@ -8,7 +8,7 @@ import com.google.gson.annotations.Expose;
 /**
  * Represents the authorized view of the project data.
  */
-public class DataProjectAuthorized extends DataProject {
+public class DataAuthorizedProject extends DataProject {
 
     /**
      * Is the project released to the public.
@@ -28,7 +28,7 @@ public class DataProjectAuthorized extends DataProject {
     @Expose
     private final List<String> permissions;
 
-    public DataProjectAuthorized (ProjectsEntity project, List<String> permissions) {
+    public DataAuthorizedProject (ProjectsEntity project, List<String> permissions) {
 
         super(project);
         this.released = project.isReleased();

@@ -78,6 +78,6 @@ public enum ErrorMessage {
 
     public Response respond () {
 
-        return Response.status(this.type.code).entity(new ErrorResponse(this.getType().getError(), this.getMessage())).build();
+        return Response.status(this.type.code).entity(new ErrorResponse(this.type.getError(), this.message)).build();
     }
 }

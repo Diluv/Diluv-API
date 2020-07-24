@@ -18,7 +18,6 @@ import org.jboss.resteasy.annotations.cache.Cache;
 import com.diluv.api.data.DataAuthorizedUser;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataUser;
-import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.query.ProjectQuery;
@@ -37,14 +36,7 @@ public class UsersAPI {
 
     @GET
     @Path("/self")
-    public Response getSelf (@HeaderParam("Authorization") String auth) {
-
-        if (auth == null) {
-
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        final Token token = JWTUtil.getToken(auth);
+    public Response getSelf (@HeaderParam("Authorization") Token token) {
 
         if (token == null) {
 
@@ -64,7 +56,7 @@ public class UsersAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{username}")
-    public Response getUser (@PathParam("username") String username, @HeaderParam("Authorization") String auth) {
+    public Response getUser (@HeaderParam("Authorization") Token token, @PathParam("username") String username) {
 
         final UsersEntity userRecord = DATABASE.userDAO.findOneByUsername(username);
 
@@ -73,17 +65,8 @@ public class UsersAPI {
             return ErrorMessage.NOT_FOUND_USER.respond();
         }
 
-        if (auth != null) {
-
-            final Token token = JWTUtil.getToken(auth);
-
-            if (token != null) {
-                final UsersEntity tokenUser = DATABASE.userDAO.findOneByUserId(token.getUserId());
-
-                if (tokenUser.getUsername().equalsIgnoreCase(username)) {
-                    return ResponseUtil.successResponse(new DataAuthorizedUser(userRecord));
-                }
-            }
+        if (token != null && token.getUserId() == userRecord.getId()) {
+            return ResponseUtil.successResponse(new DataAuthorizedUser(userRecord));
         }
 
         return ResponseUtil.successResponse(new DataUser(userRecord));
@@ -91,9 +74,8 @@ public class UsersAPI {
 
     @GET
     @Path("/{username}/projects")
-    public Response getProjectsByUsername (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @Query ProjectQuery query) {
+    public Response getProjectsByUsername (@HeaderParam("Authorization") Token token, @PathParam("username") String username, @Query ProjectQuery query) {
 
-        final Token token = JWTUtil.getToken(auth);
         long page = query.getPage();
         int limit = query.getLimit();
         Sort sort = query.getSort(ProjectSort.POPULAR);
@@ -110,7 +92,6 @@ public class UsersAPI {
         }
 
         List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, sort);
-
         return ResponseUtil.successResponse(projects.stream().map(DataProject::new).collect(Collectors.toList()));
     }
 }

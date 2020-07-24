@@ -23,7 +23,6 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataProject;
-import com.diluv.api.data.DataProjectAuthorized;
 import com.diluv.api.data.DataProjectFileInQueue;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.FileUtil;
@@ -57,36 +56,22 @@ public class ProjectsAPI {
     @Path("/{projectId}")
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("projectId") Long projectId) throws ResponseException {
 
-        if (token == null) {
-            final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
-            if (project == null || !project.isReleased()) {
-                return ErrorMessage.NOT_FOUND_PROJECT.respond();
-            }
-            return ResponseUtil.successResponse(new DataProject(project));
-        }
-
-        final ProjectsEntity project = ProjectService.getAuthorizedProject(projectId, token);
-
-        List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
-
-        if (permissions != null) {
-            return ResponseUtil.successResponse(new DataProjectAuthorized(project, permissions));
-        }
-
-        return ResponseUtil.successResponse(new DataProject(project));
+        final DataProject project = ProjectService.getDataProject(projectId, token);
+        return ResponseUtil.successResponse(project);
     }
 
     @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/hash/{hash}")
-    public Response getProjectByHash (@HeaderParam("Authorization") Token token, @PathParam("hash") String projectFileHash, @Query ProjectQuery query) {
+    public Response getProjectByHash (@PathParam("hash") String projectFileHash, @Query ProjectQuery query) {
 
         final long page = query.getPage();
         final int limit = query.getLimit();
         final Sort sort = query.getSort(ProjectSort.POPULAR);
         final List<ProjectsEntity> projects = DATABASE.projectDAO.findProjectsByProjectFileHash(projectFileHash, page, limit, sort);
 
-        return ResponseUtil.successResponse(projects.stream().map(DataBaseProject::new).collect(Collectors.toList()));
+        final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
+        return ResponseUtil.successResponse(dataProjects);
     }
 
     @POST

@@ -23,7 +23,6 @@ import com.diluv.api.data.site.DataSiteIndex;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;
 import com.diluv.api.data.site.DataSiteProjectFilesPage;
 import com.diluv.api.provider.ResponseException;
-import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
@@ -143,23 +142,9 @@ public class SiteAPI {
     @Path("/projects/{gameSlug}/{projectTypeSlug}/{projectSlug}")
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) throws ResponseException {
 
-        if (token == null) {
-            final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
-            if (project == null || !project.isReleased()) {
-                return ErrorMessage.NOT_FOUND_PROJECT.respond();
-            }
-            return ResponseUtil.successResponse(new DataProject(project));
-        }
+        DataProject project = ProjectService.getDataProject(gameSlug, projectTypeSlug, projectSlug, token);
 
-        final ProjectsEntity project = ProjectService.getAuthorizedProject(gameSlug, projectTypeSlug, projectSlug, token);
-
-        List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
-
-        if (permissions != null) {
-            return ResponseUtil.successResponse(new DataProjectAuthorized(project, permissions));
-        }
-
-        return ResponseUtil.successResponse(new DataProject(project));
+        return ResponseUtil.successResponse(project);
     }
 
     @GET
@@ -171,10 +156,22 @@ public class SiteAPI {
         Sort sort = query.getSort(ProjectFileSort.NEW);
         String gameVersion = query.getGameVersion();
 
-        final ProjectsEntity project = ProjectService.getAuthorizedProject(gameSlug, projectTypeSlug, projectSlug, token);
+        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (project == null) {
 
-        boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
-        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProjectId(project, authorized, page, limit, sort, gameVersion);
+            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+                return ErrorMessage.NOT_FOUND_GAME.respond();
+            }
+
+            if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+                return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
+            }
+
+            return ErrorMessage.NOT_FOUND_PROJECT.respond();
+        }
+
+        boolean authorized = token != null && ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
+        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProject(project, authorized, page, limit, sort, gameVersion);
 
         final List<DataSiteProjectFileDisplay> projectFiles = projectFileRecords.stream().map(record -> {
             final List<GameVersionsEntity> gameVersionRecords = record.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
@@ -189,7 +186,7 @@ public class SiteAPI {
     @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/author/{username}")
-    public Response getUser (@PathParam("username") String username, @HeaderParam("Authorization") String auth, @Query AuthorProjectsQuery query) {
+    public Response getUser (@HeaderParam("Authorization") Token token, @PathParam("username") String username, @Query AuthorProjectsQuery query) {
 
         final UsersEntity userRecord = DATABASE.userDAO.findOneByUsername(username);
         if (userRecord == null) {
@@ -197,38 +194,19 @@ public class SiteAPI {
             return ErrorMessage.NOT_FOUND_USER.respond();
         }
 
-
-        boolean authorized = false;
-        if (auth != null) {
-
-            final Token token = JWTUtil.getToken(auth);
-
-            if (token != null) {
-                final UsersEntity tokenUser = DATABASE.userDAO.findOneByUserId(token.getUserId());
-
-                if (tokenUser.getUsername().equalsIgnoreCase(username)) {
-                    authorized = true;
-
-                }
-            }
-        }
-        List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByUsername(username, authorized, query.getPage(), query.getLimit(), query.getSort(ProjectFileSort.NEW));
-
-
-        // TODO code for if the user is authorized to get an authorized project
-        DataUser user;
-        List<DataProject> dataProjects;
-        if (authorized) {
-            dataProjects = projects.stream().map(DataProject::new).collect(Collectors.toList());
-            user = new DataAuthorizedUser(userRecord);
-        }
-        else {
-            dataProjects = projects.stream().map(DataProject::new).collect(Collectors.toList());
-            user = new DataUser(userRecord);
-        }
-
+        boolean authorized = token != null && token.getUserId() == userRecord.getId();
         long projectCount = DATABASE.projectDAO.countAllByUsername(username, authorized);
 
+        List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByUsername(username, authorized, query.getPage(), query.getLimit(), query.getSort(ProjectFileSort.NEW));
+
+        if (authorized) {
+            List<DataProject> dataProjects = projects.stream().map(a -> new DataAuthorizedProject(a, ProjectPermissions.getAuthorizedUserPermissions(a, token))).collect(Collectors.toList());
+            DataUser user = new DataAuthorizedUser(userRecord);
+            return ResponseUtil.successResponse(new DataSiteAuthorProjects(user, dataProjects, GamesAPI.GAME_SORTS, projectCount));
+        }
+
+        List<DataProject> dataProjects = projects.stream().map(DataProject::new).collect(Collectors.toList());
+        DataUser user = new DataUser(userRecord);
         return ResponseUtil.successResponse(new DataSiteAuthorProjects(user, dataProjects, GamesAPI.GAME_SORTS, projectCount));
     }
 }
