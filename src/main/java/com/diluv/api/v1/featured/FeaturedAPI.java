@@ -10,7 +10,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataFeatured;
@@ -24,7 +23,6 @@ import static com.diluv.api.Main.DATABASE;
 @Produces(MediaType.APPLICATION_JSON)
 public class FeaturedAPI {
 
-    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/")
     public Response getFeatured () {

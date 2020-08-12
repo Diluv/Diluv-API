@@ -142,4 +142,10 @@ public class Request {
         headers.put("Authorization", "Bearer " + token);
         patchRequest(url, headers, multiPart, 204, null);
     }
+    public static void patchOkWithAuth (String token, String url, Map<String, Object> multiPart, String schema) {
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + token);
+        patchRequest(url, headers, multiPart, 200, schema);
+    }
 }

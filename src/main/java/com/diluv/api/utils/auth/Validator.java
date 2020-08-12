@@ -155,4 +155,9 @@ public class Validator {
         }
         return Collections.emptyList();
     }
+
+    public static boolean validateUserDisplayName (String username, String displayName) {
+
+        return username.equalsIgnoreCase(displayName);
+    }
 }

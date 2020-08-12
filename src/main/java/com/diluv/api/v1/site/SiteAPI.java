@@ -13,7 +13,6 @@ import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.*;
 import com.diluv.api.data.site.DataSiteAuthorProjects;
@@ -53,7 +52,6 @@ import static com.diluv.api.Main.DATABASE;
 @Produces(MediaType.APPLICATION_JSON)
 public class SiteAPI {
 
-    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/")
     public Response getIndex () {
@@ -68,7 +66,6 @@ public class SiteAPI {
         return ResponseUtil.successResponse(new DataSiteIndex(games, projectCount, userCount, gameCount, projectTypeCount));
     }
 
-    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/games")
     public Response getGames (@Query GameQuery query) {
@@ -85,7 +82,6 @@ public class SiteAPI {
         return ResponseUtil.successResponse(new DataGameList(games, GamesAPI.GAME_SORTS, gameCount));
     }
 
-    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/games/{gameSlug}")
     public Response getGameDefaultType (@PathParam("gameSlug") String gameSlug) {
@@ -137,7 +133,6 @@ public class SiteAPI {
     }
 
 
-    @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/projects/{gameSlug}/{projectTypeSlug}/{projectSlug}")
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) throws ResponseException {
@@ -183,7 +178,6 @@ public class SiteAPI {
         return ResponseUtil.successResponse(new DataSiteProjectFilesPage(new DataBaseProject(project), projectFiles));
     }
 
-    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/author/{username}")
     public Response getUser (@HeaderParam("Authorization") Token token, @PathParam("username") String username, @Query AuthorProjectsQuery query) {

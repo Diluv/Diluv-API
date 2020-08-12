@@ -12,7 +12,6 @@ import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.cache.Cache;
 
 import com.diluv.api.data.DataNewsPost;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -29,7 +28,6 @@ import static com.diluv.api.Main.DATABASE;
 @Produces(MediaType.APPLICATION_JSON)
 public class NewsAPI {
 
-    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/")
     public Response getNews (@Query NewsQuery query) {
@@ -44,7 +42,6 @@ public class NewsAPI {
         return ResponseUtil.successResponse(newsPosts);
     }
 
-    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{slug}")
     public Response getNewsBySlug (@PathParam("slug") String slug) {

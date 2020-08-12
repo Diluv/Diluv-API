@@ -18,7 +18,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.cache.Cache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import com.diluv.api.data.DataBaseProject;
@@ -51,7 +50,6 @@ import static com.diluv.api.Main.DATABASE;
 @Produces(MediaType.APPLICATION_JSON)
 public class ProjectsAPI {
 
-    @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/{projectId}")
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("projectId") Long projectId) throws ResponseException {
@@ -60,7 +58,6 @@ public class ProjectsAPI {
         return ResponseUtil.successResponse(project);
     }
 
-    @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/hash/{hash}")
     public Response getProjectByHash (@PathParam("hash") String projectFileHash, @Query ProjectQuery query) {

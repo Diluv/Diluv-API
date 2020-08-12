@@ -10,6 +10,13 @@ public enum ErrorMessage {
     USER_INVALID_TOKEN(ErrorType.UNAUTHORIZED, "user.invalid.token"),
     USER_REQUIRED_TOKEN(ErrorType.UNAUTHORIZED, "user.required.token"),
     USER_NOT_AUTHORIZED(ErrorType.UNAUTHORIZED, "user.unauthorized"),
+    USER_INVALID_DISPLAY_NAME(ErrorType.BAD_REQUEST, "user.invalid.display_name"),
+    USER_INVALID_EMAIL(ErrorType.BAD_REQUEST, "user.invalid.email"),
+    USER_INVALID_PASSWORD(ErrorType.BAD_REQUEST, "user.invalid.password"),
+    USER_INVALID_NEW_PASSWORD(ErrorType.BAD_REQUEST, "user.invalid.new_password"),
+    USER_INVALID_MFA(ErrorType.BAD_REQUEST, "user.invalid.mfa"),
+    USER_INVALID_MFA_SECRET(ErrorType.BAD_REQUEST, "user.invalid.mfa_secret"),
+    USER_INVALID_MFA_AND_MFA_SECRET(ErrorType.BAD_REQUEST, "user.invalid.mfa_and_mfa_secret"),
 
     // Project Errors
     PROJECT_INVALID_NAME(ErrorType.BAD_REQUEST, "project.invalid.name"),
@@ -33,11 +40,11 @@ public enum ErrorMessage {
 
 
     FAILED_CREATE_PROJECT(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project"),
-    FAILED_UPDATE_PROJECT(ErrorType.BAD_REQUEST.INTERNAL_SERVER_ERROR, "database.update_project"),
-    FAILED_CREATE_PROJECT_TAGS(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_tags"),
+    FAILED_UPDATE_PROJECT(ErrorType.INTERNAL_SERVER_ERROR, "database.update_project"),
     FAILED_CREATE_PROJECT_FILE(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_file"),
-
-    FAILED_CREATE_PROJECT_FILE_GAME_VERSION(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_file_game_version"),
+    FAILED_INSERT_MFA_RECOVERY(ErrorType.INTERNAL_SERVER_ERROR, "database.insert_mfa_recovery"),
+    FAILED_DELETE_MFA_RECOVERY(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_mfa_recovery"),
+    FAILED_UPDATE_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.update_user"),
 
     FAILED_SHA512(ErrorType.INTERNAL_SERVER_ERROR, "failed.sha512"),
 
@@ -49,9 +56,7 @@ public enum ErrorMessage {
     NOT_FOUND_PROJECT(ErrorType.BAD_REQUEST, "notfound.project"),
     NOT_FOUND_NEWS(ErrorType.BAD_REQUEST, "notfound.news"),
 
-    ERROR_TOKEN(ErrorType.BAD_REQUEST, "error.token"),
     ERROR_WRITING(ErrorType.INTERNAL_SERVER_ERROR, "error.writing"),
-    ERROR_ALGORITHM(ErrorType.INTERNAL_SERVER_ERROR, "error.algorithm"),
     ERROR_SAVING_IMAGE(ErrorType.INTERNAL_SERVER_ERROR, "error.saving_image"),
 
     NOT_FOUND(ErrorType.BAD_REQUEST, "generic.404"),

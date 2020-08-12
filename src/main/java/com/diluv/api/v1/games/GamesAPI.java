@@ -22,7 +22,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.cache.Cache;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.atom.Content;
 import org.jboss.resteasy.plugins.providers.atom.Entry;
@@ -69,7 +68,6 @@ public class GamesAPI {
 
     private final Slugify slugify = new Slugify();
 
-    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/")
     public Response getGames (@Query GameQuery query) {
@@ -89,7 +87,6 @@ public class GamesAPI {
         return ResponseUtil.successResponse(new DataGameList(games, GAME_SORTS, gameCount));
     }
 
-    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}")
     public Response getGame (@PathParam("gameSlug") String gameSlug) {
@@ -106,7 +103,6 @@ public class GamesAPI {
         return ResponseUtil.successResponse(new DataGame(gameRecord, PROJECT_SORTS, projectCount));
     }
 
-    @Cache(maxAge = 300, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}")
     public Response getProjectType (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
@@ -158,7 +154,6 @@ public class GamesAPI {
         return ResponseUtil.successResponse(dataProjects);
     }
 
-    @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/feed.atom")
     @Produces(MediaType.APPLICATION_ATOM_XML)
@@ -193,7 +188,6 @@ public class GamesAPI {
         return Response.ok(feed).build();
     }
 
-    @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
     public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) throws ResponseException {
@@ -300,7 +294,6 @@ public class GamesAPI {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    @Cache(maxAge = 30, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/feed.atom")
     @Produces(MediaType.APPLICATION_ATOM_XML)
@@ -334,7 +327,6 @@ public class GamesAPI {
         return Response.ok(feed).build();
     }
 
-    @Cache(maxAge = 60, mustRevalidate = true)
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
     public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @Query ProjectFileQuery query) {
