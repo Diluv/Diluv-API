@@ -65,7 +65,7 @@ public class ProjectsAPI {
         final long page = query.getPage();
         final int limit = query.getLimit();
         final Sort sort = query.getSort(ProjectSort.POPULAR);
-        final List<ProjectsEntity> projects = DATABASE.projectDAO.findProjectsByProjectFileHash(projectFileHash, page, limit, sort);
+        final List<ProjectsEntity> projects = DATABASE.project.findProjectsByProjectFileHash(projectFileHash, page, limit, sort);
 
         final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(dataProjects);
@@ -84,7 +84,7 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_PROJECT_ID.respond();
         }
 
-        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByProjectId(form.projectId);
+        final ProjectsEntity project = DATABASE.project.findOneProjectByProjectId(form.projectId);
 
         if (project == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
@@ -125,7 +125,7 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
         }
 
-        if (DATABASE.fileDAO.existsByProjectIdAndVersion(form.projectId, form.version)) {
+        if (DATABASE.file.existsByProjectIdAndVersion(form.projectId, form.version)) {
 
             return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
         }
@@ -194,13 +194,13 @@ public class ProjectsAPI {
             projectFile.setDependencies(tagIds);
         }
 
-        if (!DATABASE.fileDAO.insertProjectFile(projectFile)) {
+        if (!DATABASE.file.insertProjectFile(projectFile)) {
 
             return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
         }
 
 
-        projectFile = DATABASE.fileDAO.findOneById(projectFile.getId());
+        projectFile = DATABASE.file.findOneById(projectFile.getId());
         if (projectFile == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }

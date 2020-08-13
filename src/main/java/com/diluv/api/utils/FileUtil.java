@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.james.mime4j.io.LimitedInputStream;
+import org.bouncycastle.jcajce.provider.digest.SHA3;
 import org.bouncycastle.util.encoders.Hex;
 
 import com.diluv.api.DiluvAPIServer;
@@ -20,13 +21,13 @@ public class FileUtil {
 
     public static String writeFile (InputStream input, long limit, File destination) {
 
-        try (DigestInputStream hashStream = new DigestInputStream(input, MessageDigest.getInstance("SHA-512")); LimitedInputStream in = new LimitedInputStream(hashStream, limit)) {
+        try (DigestInputStream hashStream = new DigestInputStream(input, new SHA3.Digest512()); LimitedInputStream in = new LimitedInputStream(hashStream, limit)) {
 
             FileUtils.copyInputStreamToFile(in, destination);
             return Hex.toHexString(hashStream.getMessageDigest().digest());
         }
 
-        catch (IOException | NoSuchAlgorithmException e) {
+        catch (IOException e) {
 
             return null;
         }

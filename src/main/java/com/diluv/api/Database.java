@@ -10,12 +10,12 @@ import com.diluv.confluencia.database.UserDatabase;
 
 public class Database {
 
-    public final GameDatabase gameDAO = new GameDatabase();
-    public final ProjectDatabase projectDAO = new ProjectDatabase();
-    public final FileDatabase fileDAO = new FileDatabase();
-    public final UserDatabase userDAO = new UserDatabase();
-    public final SecurityDatabase securityDAO = new SecurityDatabase();
-    public final NewsDatabase newsDAO = new NewsDatabase();
+    public final GameDatabase game = new GameDatabase();
+    public final ProjectDatabase project = new ProjectDatabase();
+    public final FileDatabase file = new FileDatabase();
+    public final UserDatabase user = new UserDatabase();
+    public final SecurityDatabase security = new SecurityDatabase();
+    public final NewsDatabase news = new NewsDatabase();
 
     public void init (String host, String user, String password) {
 

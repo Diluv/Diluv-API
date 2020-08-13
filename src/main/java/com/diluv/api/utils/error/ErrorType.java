@@ -6,8 +6,9 @@ public enum ErrorType {
 
     INTERNAL_SERVER_ERROR(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Internal Server Error"),
     BAD_REQUEST(HttpStatus.SC_BAD_REQUEST, "Bad Request"),
-    UNAUTHORIZED(HttpStatus.SC_UNAUTHORIZED, "Unauthorized");
-
+    UNAUTHORIZED(HttpStatus.SC_UNAUTHORIZED, "Unauthorized"),
+    NOT_FOUND(HttpStatus.SC_NOT_FOUND, "404"),
+    ;
     int code;
     String error;
 

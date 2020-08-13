@@ -45,21 +45,23 @@ public enum ErrorMessage {
     FAILED_INSERT_MFA_RECOVERY(ErrorType.INTERNAL_SERVER_ERROR, "database.insert_mfa_recovery"),
     FAILED_DELETE_MFA_RECOVERY(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_mfa_recovery"),
     FAILED_UPDATE_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.update_user"),
+    FAILED_INSERT_PROJECT_FILE_DOWNLOADS(ErrorType.INTERNAL_SERVER_ERROR, "database.insert_project_file_downloads"),
 
     FAILED_SHA512(ErrorType.INTERNAL_SERVER_ERROR, "failed.sha512"),
 
     FAILED_TEMP_FILE(ErrorType.INTERNAL_SERVER_ERROR, "error.temp_file"),
 
     NOT_FOUND_GAME(ErrorType.BAD_REQUEST, "notfound.game"),
+    NOT_FOUND_PROJECT(ErrorType.BAD_REQUEST, "notfound.project"),
+    NOT_FOUND_PROJECT_FILE(ErrorType.BAD_REQUEST, "notfound.project_file"),
     NOT_FOUND_PROJECT_TYPE(ErrorType.BAD_REQUEST, "notfound.project_type"),
     NOT_FOUND_USER(ErrorType.BAD_REQUEST, "notfound.user"),
-    NOT_FOUND_PROJECT(ErrorType.BAD_REQUEST, "notfound.project"),
     NOT_FOUND_NEWS(ErrorType.BAD_REQUEST, "notfound.news"),
 
     ERROR_WRITING(ErrorType.INTERNAL_SERVER_ERROR, "error.writing"),
     ERROR_SAVING_IMAGE(ErrorType.INTERNAL_SERVER_ERROR, "error.saving_image"),
 
-    NOT_FOUND(ErrorType.BAD_REQUEST, "generic.404"),
+    NOT_FOUND(ErrorType.NOT_FOUND, "generic.404"),
     THROWABLE(ErrorType.INTERNAL_SERVER_ERROR, "generic.throwable");
 
     private final ErrorType type;

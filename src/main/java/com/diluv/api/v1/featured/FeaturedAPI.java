@@ -27,18 +27,18 @@ public class FeaturedAPI {
     @Path("/")
     public Response getFeatured () {
 
-        final List<DataGame> games = DATABASE.gameDAO.findFeaturedGames()
+        final List<DataGame> games = DATABASE.game.findFeaturedGames()
             .stream()
             .map(DataGame::new)
             .collect(Collectors.toList());
 
-        final List<DataBaseProject> projects = DATABASE.projectDAO.findFeaturedProjects()
+        final List<DataBaseProject> projects = DATABASE.project.findFeaturedProjects()
             .stream()
             .map(DataBaseProject::new)
             .collect(Collectors.toList());
 
-        final long projectCount = DATABASE.projectDAO.countAllByGameSlug("");
-        final long userCount = DATABASE.userDAO.countAll();
+        final long projectCount = DATABASE.project.countAllByGameSlug("");
+        final long userCount = DATABASE.user.countAll();
 
         return ResponseUtil.successResponse(new DataFeatured(games, projects, projectCount, userCount));
     }

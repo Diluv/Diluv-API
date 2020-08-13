@@ -16,13 +16,13 @@ public class ProjectService {
 
     public static DataProject getDataProject (String gameSlug, String projectTypeSlug, String projectSlug, Token token) throws ResponseException {
 
-        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        final ProjectsEntity project = DATABASE.project.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (project == null) {
-            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+            if (DATABASE.game.findOneBySlug(gameSlug) == null) {
                 throw new ResponseException(ErrorMessage.NOT_FOUND_GAME.respond());
             }
 
-            if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+            if (DATABASE.project.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
                 throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond());
             }
 
@@ -34,7 +34,7 @@ public class ProjectService {
 
     public static DataProject getDataProject (long projectId, Token token) throws ResponseException {
 
-        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByProjectId(projectId);
+        final ProjectsEntity project = DATABASE.project.findOneProjectByProjectId(projectId);
 
         if (project == null) {
             throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());

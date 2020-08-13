@@ -63,7 +63,7 @@ public class JWTUtil {
                 String type = "reference_token";
                 byte[] sha256 = DigestUtils.sha256(token + ":" + type);
                 String key = Base64.getEncoder().encodeToString(sha256);
-                PersistedGrantsEntity record = DATABASE.securityDAO.findPersistedGrantByKeyAndType(key, type);
+                PersistedGrantsEntity record = DATABASE.security.findPersistedGrantByKeyAndType(key, type);
                 if (record == null)
                     return null;
 

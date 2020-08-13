@@ -64,7 +64,7 @@ public class UsersAPI {
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
-        final UsersEntity userRecord = DATABASE.userDAO.findOneByUserId(token.getUserId());
+        final UsersEntity userRecord = DATABASE.user.findOneByUserId(token.getUserId());
 
         if (userRecord == null) {
 
@@ -83,7 +83,7 @@ public class UsersAPI {
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
-        final UsersEntity user = DATABASE.userDAO.findOneByUserId(token.getUserId());
+        final UsersEntity user = DATABASE.user.findOneByUserId(token.getUserId());
 
         if (user == null) {
 
@@ -126,7 +126,7 @@ public class UsersAPI {
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
-        final UsersEntity user = DATABASE.userDAO.findOneByUserId(token.getUserId());
+        final UsersEntity user = DATABASE.user.findOneByUserId(token.getUserId());
 
         if (user == null) {
 
@@ -164,11 +164,11 @@ public class UsersAPI {
             user.setMfaSecret(form.mfaSecret);
             user.setMfa(true);
 
-            if (!DATABASE.userDAO.insertUserMFARecovery(entities)) {
+            if (!DATABASE.user.insertUserMFARecovery(entities)) {
                 return ErrorMessage.FAILED_INSERT_MFA_RECOVERY.respond();
             }
 
-            if (!DATABASE.userDAO.updateUser(user)) {
+            if (!DATABASE.user.updateUser(user)) {
                 return ErrorMessage.FAILED_UPDATE_USER.respond();
             }
         }
@@ -176,11 +176,11 @@ public class UsersAPI {
             user.setMfa(false);
             user.setMfaSecret(null);
 
-            if (!DATABASE.userDAO.deleteUserMFARecovery(user)) {
+            if (!DATABASE.user.deleteUserMFARecovery(user)) {
                 return ErrorMessage.FAILED_DELETE_MFA_RECOVERY.respond();
             }
 
-            if (!DATABASE.userDAO.updateUser(user)) {
+            if (!DATABASE.user.updateUser(user)) {
                 return ErrorMessage.FAILED_UPDATE_USER.respond();
             }
         }
@@ -192,7 +192,7 @@ public class UsersAPI {
     @Path("/{username}")
     public Response getUser (@HeaderParam("Authorization") Token token, @PathParam("username") String username) {
 
-        final UsersEntity userRecord = DATABASE.userDAO.findOneByUsername(username);
+        final UsersEntity userRecord = DATABASE.user.findOneByUsername(username);
 
         if (userRecord == null) {
 
@@ -214,7 +214,7 @@ public class UsersAPI {
         int limit = query.getLimit();
         Sort sort = query.getSort(ProjectSort.POPULAR);
 
-        UsersEntity userRecord = DATABASE.userDAO.findOneByUsername(username);
+        UsersEntity userRecord = DATABASE.user.findOneByUsername(username);
         if (userRecord == null) {
             return ErrorMessage.NOT_FOUND_USER.respond();
         }
@@ -225,7 +225,7 @@ public class UsersAPI {
             authorized = userRecord.getUsername().equalsIgnoreCase(username);
         }
 
-        List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByUsername(username, authorized, page, limit, sort);
+        List<ProjectsEntity> projects = DATABASE.project.findAllByUsername(username, authorized, page, limit, sort);
         return ResponseUtil.successResponse(projects.stream().map(DataProject::new).collect(Collectors.toList()));
     }
 }

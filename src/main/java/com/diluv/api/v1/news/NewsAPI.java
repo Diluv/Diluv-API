@@ -36,7 +36,7 @@ public class NewsAPI {
         int limit = query.getLimit();
         Sort sort = query.getSort(NewsSort.NEW);
 
-        final List<NewsEntity> newsRecords = DATABASE.newsDAO.findAll(page, limit, sort);
+        final List<NewsEntity> newsRecords = DATABASE.news.findAll(page, limit, sort);
         final List<DataNewsPost> newsPosts = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
 
         return ResponseUtil.successResponse(newsPosts);
@@ -46,7 +46,7 @@ public class NewsAPI {
     @Path("/{slug}")
     public Response getNewsBySlug (@PathParam("slug") String slug) {
 
-        final NewsEntity newsRecord = DATABASE.newsDAO.findOneByNewsSlug(slug);
+        final NewsEntity newsRecord = DATABASE.news.findOneByNewsSlug(slug);
 
         if (newsRecord == null) {
 

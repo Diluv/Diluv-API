@@ -118,7 +118,7 @@ public class Validator {
                 }
                 //TODO make dependency unique
 
-                projects = DATABASE.projectDAO.findAllProjectsByProjectIds(dependencies);
+                projects = DATABASE.project.findAllProjectsByProjectIds(dependencies);
                 if (projects.size() != dependencies.length) {
                     List<Long> projectNotFound = Arrays.stream(dependencies).boxed().collect(Collectors.toList());
                     for (ProjectsEntity project : projects) {

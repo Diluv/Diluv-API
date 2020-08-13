@@ -77,12 +77,12 @@ public class GamesAPI {
         final Sort sort = query.getSort(GameSort.NAME);
         final String search = query.getSearch();
 
-        final List<DataBaseGame> games = DATABASE.gameDAO.findAll(page, limit, sort, search)
+        final List<DataBaseGame> games = DATABASE.game.findAll(page, limit, sort, search)
             .stream()
             .map(DataGame::new)
             .collect(Collectors.toList());
 
-        final long gameCount = DATABASE.gameDAO.countAllBySearch(search);
+        final long gameCount = DATABASE.game.countAllBySearch(search);
 
         return ResponseUtil.successResponse(new DataGameList(games, GAME_SORTS, gameCount));
     }
@@ -91,14 +91,14 @@ public class GamesAPI {
     @Path("/{gameSlug}")
     public Response getGame (@PathParam("gameSlug") String gameSlug) {
 
-        final GamesEntity gameRecord = DATABASE.gameDAO.findOneBySlug(gameSlug);
+        final GamesEntity gameRecord = DATABASE.game.findOneBySlug(gameSlug);
 
         if (gameRecord == null) {
 
             return ErrorMessage.NOT_FOUND_GAME.respond();
         }
 
-        final long projectCount = DATABASE.projectDAO.countAllByGameSlug(gameSlug);
+        final long projectCount = DATABASE.project.countAllByGameSlug(gameSlug);
 
         return ResponseUtil.successResponse(new DataGame(gameRecord, PROJECT_SORTS, projectCount));
     }
@@ -107,11 +107,11 @@ public class GamesAPI {
     @Path("/{gameSlug}/{projectTypeSlug}")
     public Response getProjectType (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
 
-        final ProjectTypesEntity projectTypesRecords = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        final ProjectTypesEntity projectTypesRecords = DATABASE.project.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
 
         if (projectTypesRecords == null) {
 
-            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+            if (DATABASE.game.findOneBySlug(gameSlug) == null) {
 
                 return ErrorMessage.NOT_FOUND_GAME.respond();
             }
@@ -119,7 +119,7 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
         }
 
-        final long projectCount = DATABASE.projectDAO.countAllByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        final long projectCount = DATABASE.project.countAllByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
         return ResponseUtil.successResponse(new DataProjectType(projectTypesRecords, projectCount));
     }
 
@@ -134,16 +134,16 @@ public class GamesAPI {
         final String versions = query.getVersions();
         final String[] tags = query.getTags();
 
-        final List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByGameAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags);
+        final List<ProjectsEntity> projects = DATABASE.project.findAllByGameAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags);
 
         if (projects.isEmpty()) {
 
-            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+            if (DATABASE.game.findOneBySlug(gameSlug) == null) {
 
                 return ErrorMessage.NOT_FOUND_GAME.respond();
             }
 
-            if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+            if (DATABASE.project.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
 
                 return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
             }
@@ -159,7 +159,7 @@ public class GamesAPI {
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getProjectFeed (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
 
-        final List<ProjectsEntity> projects = DATABASE.projectDAO.findAllByGameAndProjectType(gameSlug, projectTypeSlug, "", 1, 25, ProjectSort.NEW);
+        final List<ProjectsEntity> projects = DATABASE.project.findAllByGameAndProjectType(gameSlug, projectTypeSlug, "", 1, 25, ProjectSort.NEW);
 
         if (projects.isEmpty()) {
             return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
@@ -205,15 +205,15 @@ public class GamesAPI {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+        if (DATABASE.game.findOneBySlug(gameSlug) == null) {
             return ErrorMessage.NOT_FOUND_GAME.respond();
         }
 
-        if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+        if (DATABASE.project.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
             return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
         }
 
-        ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        ProjectsEntity project = DATABASE.project.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (project == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
@@ -274,7 +274,7 @@ public class GamesAPI {
             }
 
         }
-        if (!DATABASE.projectDAO.updateProject(project)) {
+        if (!DATABASE.project.updateProject(project)) {
             return ErrorMessage.FAILED_UPDATE_PROJECT.respond();
         }
 
@@ -299,12 +299,12 @@ public class GamesAPI {
     @Produces(MediaType.APPLICATION_ATOM_XML)
     public Response getProjectFileFeed (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
 
-        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        final ProjectsEntity project = DATABASE.project.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (project == null) {
             return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
         }
 
-        final List<ProjectFilesEntity> projectFiles = DATABASE.fileDAO.findAllByProject(project, false, 1, 25, ProjectFileSort.NEW, null);
+        final List<ProjectFilesEntity> projectFiles = DATABASE.file.findAllByProject(project, false, 1, 25, ProjectFileSort.NEW, null);
 
         final String baseUrl = String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
         Feed feed = new Feed();
@@ -336,14 +336,14 @@ public class GamesAPI {
         Sort sort = query.getSort(ProjectFileSort.NEW);
         String gameVersion = query.getGameVersion();
 
-        final ProjectsEntity project = DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        final ProjectsEntity project = DATABASE.project.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (project == null) {
 
-            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+            if (DATABASE.game.findOneBySlug(gameSlug) == null) {
                 return ErrorMessage.NOT_FOUND_GAME.respond();
             }
 
-            if (DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+            if (DATABASE.project.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
                 return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
             }
 
@@ -351,7 +351,7 @@ public class GamesAPI {
         }
 
         boolean authorized = token != null && ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
-        final List<ProjectFilesEntity> projectFileRecords = DATABASE.fileDAO.findAllByProject(project, authorized, page, limit, sort, gameVersion);
+        final List<ProjectFilesEntity> projectFileRecords = DATABASE.file.findAllByProject(project, authorized, page, limit, sort, gameVersion);
 
         final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> record.isReleased() ?
             new DataProjectFileAvailable(record, gameSlug, projectTypeSlug, projectSlug) :
@@ -368,10 +368,10 @@ public class GamesAPI {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        ProjectTypesEntity projectType = DATABASE.projectDAO.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        ProjectTypesEntity projectType = DATABASE.project.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
 
         if (projectType == null) {
-            if (DATABASE.gameDAO.findOneBySlug(gameSlug) == null) {
+            if (DATABASE.game.findOneBySlug(gameSlug) == null) {
                 return ErrorMessage.NOT_FOUND_GAME.respond();
             }
             return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
@@ -411,7 +411,7 @@ public class GamesAPI {
 
         final String projectSlug = this.slugify.slugify(name);
 
-        if (DATABASE.projectDAO.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) != null) {
+        if (DATABASE.project.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) != null) {
             return ErrorMessage.PROJECT_TAKEN_SLUG.respond();
         }
         ProjectsEntity project = new ProjectsEntity();
@@ -431,11 +431,11 @@ public class GamesAPI {
             project.setTags(tagIds);
         }
 
-        if (!DATABASE.projectDAO.insertProject(project)) {
+        if (!DATABASE.project.insertProject(project)) {
             return ErrorMessage.FAILED_CREATE_PROJECT.respond();
         }
 
-        project = DATABASE.projectDAO.findOneProjectByProjectId(project.getId());
+        project = DATABASE.project.findOneProjectByProjectId(project.getId());
         if (project == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }
