@@ -1,5 +1,28 @@
 package com.diluv.api.utils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.IsoFields;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.validator.GenericTypeValidator;
+import org.apache.commons.validator.GenericValidator;
+
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.data.DataImage;
 import com.diluv.api.data.DataImageSource;
@@ -16,25 +39,6 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.validator.GenericTypeValidator;
-import org.apache.commons.validator.GenericValidator;
-
-import javax.annotation.Nullable;
-
-import java.io.*;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.IsoFields;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class Constants {
 
@@ -306,9 +310,11 @@ public final class Constants {
                         }
                     }
                 }
-
-                return new Salt(AuthUtilities.writeSalt(week), week);
             }
+            else {
+                file.createNewFile();
+            }
+            return new Salt(AuthUtilities.writeSalt(week), week);
         }
         catch (IOException e) {
             e.printStackTrace();

@@ -15,7 +15,6 @@ import org.bouncycastle.util.encoders.Hex;
 public class AuthUtilities {
     private static final String symbols = "ABCDEFGHIJKLMNOPQSTUVWXYZ0123456789";
     private static final Random random = new SecureRandom();
-    private static final File file = new File("salt.txt");
 
     public static String getBcrypt (char[] password) {
 
@@ -36,7 +35,7 @@ public class AuthUtilities {
 
         String salt = getSecureRandomAlphanumeric(32);
 
-        try (FileWriter fileWriter = new FileWriter(file)) {
+        try (FileWriter fileWriter = new FileWriter(new File("salt.txt"))) {
             fileWriter.write(salt + ":" + week);
             fileWriter.flush();
         }
