@@ -15,8 +15,7 @@ import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataFeatured;
 import com.diluv.api.data.DataGame;
 import com.diluv.api.utils.response.ResponseUtil;
-
-import static com.diluv.api.Main.DATABASE;
+import com.diluv.confluencia.Confluencia;
 
 @GZIP
 @Path("/featured")
@@ -27,18 +26,18 @@ public class FeaturedAPI {
     @Path("/")
     public Response getFeatured () {
 
-        final List<DataGame> games = DATABASE.game.findFeaturedGames()
+        final List<DataGame> games = Confluencia.GAME.findFeaturedGames()
             .stream()
             .map(DataGame::new)
             .collect(Collectors.toList());
 
-        final List<DataBaseProject> projects = DATABASE.project.findFeaturedProjects()
+        final List<DataBaseProject> projects = Confluencia.PROJECT.findFeaturedProjects()
             .stream()
             .map(DataBaseProject::new)
             .collect(Collectors.toList());
 
-        final long projectCount = DATABASE.project.countAllByGameSlug("");
-        final long userCount = DATABASE.user.countAll();
+        final long projectCount = Confluencia.PROJECT.countAllByGameSlug("");
+        final long userCount = Confluencia.USER.countAll();
 
         return ResponseUtil.successResponse(new DataFeatured(games, projects, projectCount, userCount));
     }

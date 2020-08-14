@@ -31,6 +31,7 @@ import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.diluv.confluencia.database.record.UserMfaRecoveryEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
@@ -39,8 +40,6 @@ import com.diluv.confluencia.database.sort.Sort;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.warrenstrange.googleauth.KeyRepresentation;
-
-import static com.diluv.api.Main.DATABASE;
 
 @GZIP
 @Path("/users")
@@ -64,7 +63,7 @@ public class UsersAPI {
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
-        final UsersEntity userRecord = DATABASE.user.findOneByUserId(token.getUserId());
+        final UsersEntity userRecord = Confluencia.USER.findOneByUserId(token.getUserId());
 
         if (userRecord == null) {
 
@@ -83,7 +82,7 @@ public class UsersAPI {
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
-        final UsersEntity user = DATABASE.user.findOneByUserId(token.getUserId());
+        final UsersEntity user = Confluencia.USER.findOneByUserId(token.getUserId());
 
         if (user == null) {
 
@@ -126,7 +125,7 @@ public class UsersAPI {
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
-        final UsersEntity user = DATABASE.user.findOneByUserId(token.getUserId());
+        final UsersEntity user = Confluencia.USER.findOneByUserId(token.getUserId());
 
         if (user == null) {
 
@@ -164,11 +163,11 @@ public class UsersAPI {
             user.setMfaSecret(form.mfaSecret);
             user.setMfa(true);
 
-            if (!DATABASE.user.insertUserMFARecovery(entities)) {
+            if (!Confluencia.USER.insertUserMFARecovery(entities)) {
                 return ErrorMessage.FAILED_INSERT_MFA_RECOVERY.respond();
             }
 
-            if (!DATABASE.user.updateUser(user)) {
+            if (!Confluencia.USER.updateUser(user)) {
                 return ErrorMessage.FAILED_UPDATE_USER.respond();
             }
         }
@@ -176,11 +175,11 @@ public class UsersAPI {
             user.setMfa(false);
             user.setMfaSecret(null);
 
-            if (!DATABASE.user.deleteUserMFARecovery(user)) {
+            if (!Confluencia.USER.deleteUserMFARecovery(user)) {
                 return ErrorMessage.FAILED_DELETE_MFA_RECOVERY.respond();
             }
 
-            if (!DATABASE.user.updateUser(user)) {
+            if (!Confluencia.USER.updateUser(user)) {
                 return ErrorMessage.FAILED_UPDATE_USER.respond();
             }
         }
@@ -192,7 +191,7 @@ public class UsersAPI {
     @Path("/{username}")
     public Response getUser (@HeaderParam("Authorization") Token token, @PathParam("username") String username) {
 
-        final UsersEntity userRecord = DATABASE.user.findOneByUsername(username);
+        final UsersEntity userRecord = Confluencia.USER.findOneByUsername(username);
 
         if (userRecord == null) {
 
@@ -214,7 +213,7 @@ public class UsersAPI {
         int limit = query.getLimit();
         Sort sort = query.getSort(ProjectSort.POPULAR);
 
-        UsersEntity userRecord = DATABASE.user.findOneByUsername(username);
+        UsersEntity userRecord = Confluencia.USER.findOneByUsername(username);
         if (userRecord == null) {
             return ErrorMessage.NOT_FOUND_USER.respond();
         }
@@ -225,7 +224,7 @@ public class UsersAPI {
             authorized = userRecord.getUsername().equalsIgnoreCase(username);
         }
 
-        List<ProjectsEntity> projects = DATABASE.project.findAllByUsername(username, authorized, page, limit, sort);
+        List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByUsername(username, authorized, page, limit, sort);
         return ResponseUtil.successResponse(projects.stream().map(DataProject::new).collect(Collectors.toList()));
     }
 }

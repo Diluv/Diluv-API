@@ -13,13 +13,12 @@ import org.apache.commons.validator.routines.EmailValidator;
 
 import com.diluv.api.utils.MismatchException;
 import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GameVersionsEntity;
 import com.diluv.confluencia.database.record.GamesEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.diluv.confluencia.database.record.TagsEntity;
-
-import static com.diluv.api.Main.DATABASE;
 
 public class Validator {
 
@@ -118,7 +117,7 @@ public class Validator {
                 }
                 //TODO make dependency unique
 
-                projects = DATABASE.project.findAllProjectsByProjectIds(dependencies);
+                projects = Confluencia.PROJECT.findAllProjectsByProjectIds(dependencies);
                 if (projects.size() != dependencies.length) {
                     List<Long> projectNotFound = Arrays.stream(dependencies).boxed().collect(Collectors.toList());
                     for (ProjectsEntity project : projects) {

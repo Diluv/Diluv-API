@@ -34,6 +34,7 @@ import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.ProjectFileUploadForm;
 import com.diluv.api.v1.utilities.ProjectService;
+import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GameVersionsEntity;
 import com.diluv.confluencia.database.record.ProjectFileDependenciesEntity;
 import com.diluv.confluencia.database.record.ProjectFileGameVersionsEntity;
@@ -42,8 +43,6 @@ import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
-
-import static com.diluv.api.Main.DATABASE;
 
 @GZIP
 @Path("/projects")
@@ -65,7 +64,7 @@ public class ProjectsAPI {
         final long page = query.getPage();
         final int limit = query.getLimit();
         final Sort sort = query.getSort(ProjectSort.POPULAR);
-        final List<ProjectsEntity> projects = DATABASE.project.findProjectsByProjectFileHash(projectFileHash, page, limit, sort);
+        final List<ProjectsEntity> projects = Confluencia.PROJECT.findProjectsByProjectFileHash(projectFileHash, page, limit, sort);
 
         final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
         return ResponseUtil.successResponse(dataProjects);
@@ -84,7 +83,7 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_PROJECT_ID.respond();
         }
 
-        final ProjectsEntity project = DATABASE.project.findOneProjectByProjectId(form.projectId);
+        final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(form.projectId);
 
         if (project == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
@@ -125,7 +124,7 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
         }
 
-        if (DATABASE.file.existsByProjectIdAndVersion(form.projectId, form.version)) {
+        if (Confluencia.FILE.existsByProjectIdAndVersion(form.projectId, form.version)) {
 
             return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
         }
@@ -194,13 +193,13 @@ public class ProjectsAPI {
             projectFile.setDependencies(tagIds);
         }
 
-        if (!DATABASE.file.insertProjectFile(projectFile)) {
+        if (!Confluencia.FILE.insertProjectFile(projectFile)) {
 
             return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
         }
 
 
-        projectFile = DATABASE.file.findOneById(projectFile.getId());
+        projectFile = Confluencia.FILE.findOneById(projectFile.getId());
         if (projectFile == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
         }

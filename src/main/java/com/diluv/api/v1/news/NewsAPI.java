@@ -17,11 +17,10 @@ import com.diluv.api.data.DataNewsPost;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.query.NewsQuery;
 import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.NewsEntity;
 import com.diluv.confluencia.database.sort.NewsSort;
 import com.diluv.confluencia.database.sort.Sort;
-
-import static com.diluv.api.Main.DATABASE;
 
 @GZIP
 @Path("/news")
@@ -36,7 +35,7 @@ public class NewsAPI {
         int limit = query.getLimit();
         Sort sort = query.getSort(NewsSort.NEW);
 
-        final List<NewsEntity> newsRecords = DATABASE.news.findAll(page, limit, sort);
+        final List<NewsEntity> newsRecords = Confluencia.NEWS.findAll(page, limit, sort);
         final List<DataNewsPost> newsPosts = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
 
         return ResponseUtil.successResponse(newsPosts);
@@ -46,7 +45,7 @@ public class NewsAPI {
     @Path("/{slug}")
     public Response getNewsBySlug (@PathParam("slug") String slug) {
 
-        final NewsEntity newsRecord = DATABASE.news.findOneByNewsSlug(slug);
+        final NewsEntity newsRecord = Confluencia.NEWS.findOneByNewsSlug(slug);
 
         if (newsRecord == null) {
 

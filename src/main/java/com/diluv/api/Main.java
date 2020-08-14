@@ -1,10 +1,10 @@
 package com.diluv.api;
 
 import com.diluv.api.utils.Constants;
+import com.diluv.confluencia.Confluencia;
 
 public class Main {
 
-    public static Database DATABASE = new Database();
     public static DiluvAPIServer SERVER = new DiluvAPIServer();
 
     /**
@@ -14,7 +14,7 @@ public class Main {
      */
     public static void main (String[] args) {
 
-        DATABASE.init(Constants.DB_HOSTNAME, Constants.DB_USERNAME, Constants.DB_PASSWORD);
+        Confluencia.init(Constants.DB_HOSTNAME, Constants.DB_USERNAME, Constants.DB_PASSWORD);
         SERVER.start("0.0.0.0", 4567);
     }
 }

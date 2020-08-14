@@ -9,6 +9,7 @@ import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.permissions.ProjectPermissions;
+import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.PersistedGrantsEntity;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.proc.BadJOSEException;
@@ -17,8 +18,6 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
-
-import static com.diluv.api.Main.DATABASE;
 
 public class JWTUtil {
 
@@ -63,7 +62,7 @@ public class JWTUtil {
                 String type = "reference_token";
                 byte[] sha256 = DigestUtils.sha256(token + ":" + type);
                 String key = Base64.getEncoder().encodeToString(sha256);
-                PersistedGrantsEntity record = DATABASE.security.findPersistedGrantByKeyAndType(key, type);
+                PersistedGrantsEntity record = Confluencia.SECURITY.findPersistedGrantByKeyAndType(key, type);
                 if (record == null)
                     return null;
 
