@@ -36,6 +36,7 @@ import com.diluv.api.v1.games.ProjectFileUploadForm;
 import com.diluv.api.v1.utilities.ProjectService;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GameVersionsEntity;
+import com.diluv.confluencia.database.record.NodeCDNCommitsEntity;
 import com.diluv.confluencia.database.record.ProjectFileDependenciesEntity;
 import com.diluv.confluencia.database.record.ProjectFileGameVersionsEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
@@ -55,6 +56,25 @@ public class ProjectsAPI {
 
         final DataProject project = ProjectService.getDataProject(projectId, token);
         return ResponseUtil.successResponse(project);
+    }
+
+    @POST
+    @Path("/nodecdn/{hash}")
+    public Response postNodeCDNWebhook (@PathParam("hash") String hash) {
+
+        NodeCDNCommitsEntity entity = Confluencia.SECURITY.findOneNodeCDNCommitsByHash(hash);
+        if (entity == null) {
+            return ErrorMessage.NOT_FOUND.respond();
+        }
+
+        if (!Confluencia.SECURITY.updateNodeCDNCommits(entity)) {
+            return ErrorMessage.FAILED_UPDATE_NODECDN_COMMIT.respond();
+        }
+
+        if (!Confluencia.FILE.updateAllForRelease(entity.getCreatedAt())) {
+            return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();
+        }
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @GET

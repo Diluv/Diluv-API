@@ -41,11 +41,13 @@ public enum ErrorMessage {
 
     FAILED_CREATE_PROJECT(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project"),
     FAILED_UPDATE_PROJECT(ErrorType.INTERNAL_SERVER_ERROR, "database.update_project"),
+    FAILED_UPDATE_PROJECT_FILE(ErrorType.INTERNAL_SERVER_ERROR, "database.update_project_file"),
     FAILED_CREATE_PROJECT_FILE(ErrorType.INTERNAL_SERVER_ERROR, "database.create_project_file"),
     FAILED_INSERT_MFA_RECOVERY(ErrorType.INTERNAL_SERVER_ERROR, "database.insert_mfa_recovery"),
     FAILED_DELETE_MFA_RECOVERY(ErrorType.INTERNAL_SERVER_ERROR, "database.delete_mfa_recovery"),
     FAILED_UPDATE_USER(ErrorType.INTERNAL_SERVER_ERROR, "database.update_user"),
     FAILED_INSERT_PROJECT_FILE_DOWNLOADS(ErrorType.INTERNAL_SERVER_ERROR, "database.insert_project_file_downloads"),
+    FAILED_UPDATE_NODECDN_COMMIT(ErrorType.INTERNAL_SERVER_ERROR, "database.update_nodecdn_commit"),
 
     FAILED_SHA512(ErrorType.INTERNAL_SERVER_ERROR, "failed.sha512"),
 
