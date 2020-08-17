@@ -49,48 +49,47 @@ public class ProjectTest {
         final File logo = new File(classLoader.getResource("logo.png").getFile());
 
         Map<String, Object> multiPart = new HashMap<>();
-        multiPart.put("project_id", 1);
         multiPart.put("version", "1.1.0");
         multiPart.put("releaseType", "release");
         multiPart.put("classifier", "binary");
         multiPart.put("changelog", "Changelog");
         multiPart.put("filename", "logo.png");
         multiPart.put("file", logo);
-        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, "schema/project-files-schema.json");
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, "schema/project-files-schema.json");
 
         // Game Version
         multiPart.put("version", "1.1.1");
         multiPart.put("game_versions", "1.15,1.15.2");
-        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, "schema/project-files-schema.json");
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, "schema/project-files-schema.json");
 
         multiPart.put("version", "1.1.2");
         multiPart.put("game_versions", "1.15,1.15.2,invalid");
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION);
 
         // Dependencies
         multiPart.remove("game_versions");
         multiPart.put("version", "1.1.3");
         multiPart.put("dependencies", "2,3");
-        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, "schema/project-files-schema.json");
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, "schema/project-files-schema.json");
 
         multiPart.put("version", "1.1.4");
         multiPart.put("dependencies", "1,2,3");
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF);
 
         multiPart.put("version", "1.1.5");
         multiPart.put("dependencies", "invalid");
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
 
         multiPart.put("version", "1.1.6");
         multiPart.put("dependencies", "1000000");
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
 
         // Game Version + Dependencies
         multiPart.put("version", "1.1.7");
         multiPart.put("dependencies", "2,3");
         multiPart.put("game_versions", "1.15,1.15.2");
 
-        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, "schema/project-files-schema.json");
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, "schema/project-files-schema.json");
     }
 
     @AfterAll
