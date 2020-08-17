@@ -11,6 +11,12 @@ public class ErrorResponse {
      * The type of error that occurred, as a string.
      */
     @Expose
+    private final String type;
+
+    /**
+     * A unique key for the error the error that occurred.
+     */
+    @Expose
     private final String error;
 
     /**
@@ -19,8 +25,9 @@ public class ErrorResponse {
     @Expose
     private final String message;
 
-    public ErrorResponse (String error, String message) {
+    public ErrorResponse (String type, String error, String message) {
 
+        this.type = type;
         this.error = error;
         this.message = message;
     }

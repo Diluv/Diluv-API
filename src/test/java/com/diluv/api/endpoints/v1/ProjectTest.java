@@ -75,7 +75,7 @@ public class ProjectTest {
 
         multiPart.put("version", "1.1.4");
         multiPart.put("dependencies", "1,2,3");
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_SAME_ID);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF);
 
         multiPart.put("version", "1.1.5");
         multiPart.put("dependencies", "invalid");

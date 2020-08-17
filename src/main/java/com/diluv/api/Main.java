@@ -14,7 +14,12 @@ public class Main {
      */
     public static void main (String[] args) {
 
-        Confluencia.init(Constants.DB_HOSTNAME, Constants.DB_USERNAME, Constants.DB_PASSWORD);
-        SERVER.start("0.0.0.0", 4567);
+        try {
+            Confluencia.init(Constants.DB_HOSTNAME, Constants.DB_USERNAME, Constants.DB_PASSWORD);
+            SERVER.start("0.0.0.0", 4567);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -192,7 +192,8 @@ public class SiteAPI {
         final String salt = AuthUtilities.getIP(ip);
         if (salt != null) {
             if (!Confluencia.FILE.insertProjectFileDownloads(new ProjectFileDownloadsEntity(projectFile, ip))) {
-                return ErrorMessage.FAILED_INSERT_PROJECT_FILE_DOWNLOADS.respond();
+                //return ErrorMessage.FAILED_INSERT_PROJECT_FILE_DOWNLOADS.respond();
+                return ErrorMessage.THROWABLE.respond();
             }
         }
         return Response.status(Response.Status.NO_CONTENT).build();

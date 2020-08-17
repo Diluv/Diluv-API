@@ -1,11 +1,11 @@
 package com.diluv.api.provider;
 
+import com.diluv.api.utils.error.ErrorMessage;
+
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-
-import com.diluv.api.utils.error.ErrorMessage;
 
 @Provider
 public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundException> {
@@ -13,6 +13,6 @@ public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundExceptio
     @Override
     public Response toResponse (NotFoundException exception) {
 
-        return ErrorMessage.NOT_FOUND.respond();
+        return ErrorMessage.ENDPOINT_NOT_FOUND.respond();
     }
 }

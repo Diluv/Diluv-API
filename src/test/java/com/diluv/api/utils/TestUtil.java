@@ -1,11 +1,12 @@
 package com.diluv.api.utils;
 
-import org.testcontainers.containers.MariaDBContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.confluencia.Confluencia;
 import io.restassured.RestAssured;
+
+import org.junit.jupiter.api.Assertions;
+import org.testcontainers.containers.MariaDBContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 public class TestUtil {
@@ -28,12 +29,18 @@ public class TestUtil {
     public static void start () {
 
         if (!running) {
-            Confluencia.init(CONTAINER.getJdbcUrl(), CONTAINER.getUsername(), CONTAINER.getPassword());
-            DiluvAPIServer server = new DiluvAPIServer();
-            server.start(IP, PORT);
+            try {
+                Confluencia.init(CONTAINER.getJdbcUrl(), CONTAINER.getUsername(), CONTAINER.getPassword());
+                DiluvAPIServer server = new DiluvAPIServer();
+                server.start(IP, PORT);
 
-            RestAssured.port = PORT;
-            running = true;
+                RestAssured.port = PORT;
+                running = true;
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                Assertions.fail("Failed to connect to database", e);
+            }
         }
     }
 }

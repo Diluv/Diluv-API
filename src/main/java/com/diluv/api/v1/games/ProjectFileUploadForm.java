@@ -6,9 +6,6 @@ import javax.ws.rs.FormParam;
 
 public class ProjectFileUploadForm {
 
-    @FormParam("project_id")
-    public Long projectId;
-
     @FormParam("version")
     public String version;
 

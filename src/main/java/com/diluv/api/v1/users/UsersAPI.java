@@ -137,7 +137,7 @@ public class UsersAPI {
         }
 
         if ("enable".equalsIgnoreCase(form.mfaStatus)) {
-            if (form.mfa == null) {
+            if (!Validator.validateMFA(form.mfa)) {
                 return ErrorMessage.USER_INVALID_MFA.respond();
             }
 
@@ -164,11 +164,13 @@ public class UsersAPI {
             user.setMfa(true);
 
             if (!Confluencia.USER.insertUserMFARecovery(entities)) {
-                return ErrorMessage.FAILED_INSERT_MFA_RECOVERY.respond();
+                //return ErrorMessage.FAILED_INSERT_MFA_RECOVERY.respond();
+                return ErrorMessage.THROWABLE.respond();
             }
 
             if (!Confluencia.USER.updateUser(user)) {
-                return ErrorMessage.FAILED_UPDATE_USER.respond();
+                //return ErrorMessage.FAILED_UPDATE_USER.respond();
+                return ErrorMessage.THROWABLE.respond();
             }
         }
         else if ("disable".equalsIgnoreCase(form.mfaStatus)) {
@@ -176,11 +178,13 @@ public class UsersAPI {
             user.setMfaSecret(null);
 
             if (!Confluencia.USER.deleteUserMFARecovery(user)) {
-                return ErrorMessage.FAILED_DELETE_MFA_RECOVERY.respond();
+                //return ErrorMessage.FAILED_DELETE_MFA_RECOVERY.respond();
+                return ErrorMessage.THROWABLE.respond();
             }
 
             if (!Confluencia.USER.updateUser(user)) {
-                return ErrorMessage.FAILED_UPDATE_USER.respond();
+                //return ErrorMessage.FAILED_UPDATE_USER.respond();
+                return ErrorMessage.THROWABLE.respond();
             }
         }
 

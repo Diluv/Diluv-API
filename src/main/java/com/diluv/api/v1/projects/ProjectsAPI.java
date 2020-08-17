@@ -51,59 +51,23 @@ import com.diluv.confluencia.database.sort.Sort;
 public class ProjectsAPI {
 
     @GET
-    @Path("/{projectId}")
-    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("projectId") Long projectId) throws ResponseException {
+    @Path("/{id}")
+    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("id") Long id) throws ResponseException {
 
-        final DataProject project = ProjectService.getDataProject(projectId, token);
+        final DataProject project = ProjectService.getDataProject(id, token);
         return ResponseUtil.successResponse(project);
     }
 
     @POST
-    @Path("/nodecdn/{hash}")
-    public Response postNodeCDNWebhook (@PathParam("hash") String hash) {
-
-        NodeCDNCommitsEntity entity = Confluencia.SECURITY.findOneNodeCDNCommitsByHash(hash);
-        if (entity == null) {
-            return ErrorMessage.NOT_FOUND.respond();
-        }
-
-        if (!Confluencia.SECURITY.updateNodeCDNCommits(entity)) {
-            return ErrorMessage.FAILED_UPDATE_NODECDN_COMMIT.respond();
-        }
-
-        if (!Confluencia.FILE.updateAllForRelease(entity.getCreatedAt())) {
-            return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();
-        }
-        return Response.status(Response.Status.NO_CONTENT).build();
-    }
-
-    @GET
-    @Path("/hash/{hash}")
-    public Response getProjectByHash (@PathParam("hash") String projectFileHash, @Query ProjectQuery query) {
-
-        final long page = query.getPage();
-        final int limit = query.getLimit();
-        final Sort sort = query.getSort(ProjectSort.POPULAR);
-        final List<ProjectsEntity> projects = Confluencia.PROJECT.findProjectsByProjectFileHash(projectFileHash, page, limit, sort);
-
-        final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(dataProjects);
-    }
-
-    @POST
-    @Path("/files")
+    @Path("/{id}/files")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postProjectFile (@HeaderParam("Authorization") Token token, @MultipartForm ProjectFileUploadForm form) {
+    public Response postProjectFile (@HeaderParam("Authorization") Token token, @PathParam("id") Long projectId, @MultipartForm ProjectFileUploadForm form) {
 
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        if (form.projectId == null) {
-            return ErrorMessage.PROJECT_FILE_INVALID_PROJECT_ID.respond();
-        }
-
-        final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(form.projectId);
+        final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(projectId);
 
         if (project == null) {
             return ErrorMessage.NOT_FOUND_PROJECT.respond();
@@ -144,7 +108,7 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
         }
 
-        if (Confluencia.FILE.existsByProjectIdAndVersion(form.projectId, form.version)) {
+        if (Confluencia.FILE.existsByProjectIdAndVersion(projectId, form.version)) {
 
             return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
         }
@@ -159,7 +123,7 @@ public class ProjectsAPI {
 
         List<ProjectsEntity> dependencyRecords;
         try {
-            dependencyRecords = Validator.validateDependencies(form.projectId, form.dependencies);
+            dependencyRecords = Validator.validateDependencies(projectId, form.dependencies);
         }
         catch (MismatchException e) {
             return e.getErrorMessage().respond();
@@ -173,13 +137,13 @@ public class ProjectsAPI {
         final String sha512 = FileUtil.writeFile(form.file, project.getProjectType().getMaxFileSize(), tempFile);
 
         if (tempFile == null) {
-
-            return ErrorMessage.FAILED_TEMP_FILE.respond();
+            // return ErrorMessage.FAILED_TEMP_FILE.respond();
+            return ErrorMessage.THROWABLE.respond();
         }
 
         if (sha512 == null) {
-
-            return ErrorMessage.FAILED_SHA512.respond();
+            //return ErrorMessage.FAILED_SHA512.respond();
+            return ErrorMessage.THROWABLE.respond();
         }
 
         ProjectFilesEntity projectFile = new ProjectFilesEntity();
@@ -215,7 +179,8 @@ public class ProjectsAPI {
 
         if (!Confluencia.FILE.insertProjectFile(projectFile)) {
 
-            return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
+            //return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
+            return ErrorMessage.THROWABLE.respond();
         }
 
 
@@ -231,13 +196,49 @@ public class ProjectsAPI {
         destination.getParentFile().mkdirs();
         final boolean moved = tempFile.renameTo(destination);
 
+        // TODO if checks
         tempFile.delete();
         tempFile.getParentFile().delete();
 
         if (!moved) {
-            return ErrorMessage.ERROR_WRITING.respond();
+            //return ErrorMessage.ERROR_WRITING.respond();
+            return ErrorMessage.THROWABLE.respond();
         }
 
         return ResponseUtil.successResponse(new DataProjectFileInQueue(projectFile, gameSlug, projectTypeSlug, project.getSlug()));
+    }
+
+    @POST
+    @Path("/nodecdn/{hash}")
+    public Response postNodeCDNWebhook (@PathParam("hash") String hash) {
+
+        NodeCDNCommitsEntity entity = Confluencia.SECURITY.findOneNodeCDNCommitsByHash(hash);
+        if (entity == null) {
+            return ErrorMessage.ENDPOINT_NOT_FOUND.respond();
+        }
+
+        if (!Confluencia.SECURITY.updateNodeCDNCommits(entity)) {
+            // return ErrorMessage.FAILED_UPDATE_NODECDN_COMMIT.respond();
+            return ErrorMessage.THROWABLE.respond();
+        }
+
+        if (!Confluencia.FILE.updateAllForRelease(entity.getCreatedAt())) {
+            // return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();
+            return ErrorMessage.THROWABLE.respond();
+        }
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @GET
+    @Path("/hash/{hash}")
+    public Response getProjectByHash (@PathParam("hash") String projectFileHash, @Query ProjectQuery query) {
+
+        final long page = query.getPage();
+        final int limit = query.getLimit();
+        final Sort sort = query.getSort(ProjectSort.POPULAR);
+        final List<ProjectsEntity> projects = Confluencia.PROJECT.findProjectsByProjectFileHash(projectFileHash, page, limit, sort);
+
+        final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
+        return ResponseUtil.successResponse(dataProjects);
     }
 }

@@ -40,25 +40,24 @@ public class Validator {
         return !GenericValidator.isBlankOrNull(password) && password.length() <= 70 && password.length() >= 8;
     }
 
-    public static boolean validateProjectName (String projectName) {
+    public static boolean validateProjectName (String name) {
 
-        return !GenericValidator.isBlankOrNull(projectName) && projectName.length() <= 50 && projectName.length() >= 5;
+        return !GenericValidator.isBlankOrNull(name) && name.length() <= 50 && name.length() >= 5;
     }
 
-    public static boolean validateProjectSummary (String projectSummary) {
+    public static boolean validateProjectSummary (String summary) {
 
-        return !GenericValidator.isBlankOrNull(projectSummary) && projectSummary.length() <= 250 && projectSummary.length() >= 10;
+        return !GenericValidator.isBlankOrNull(summary) && summary.length() <= 250 && summary.length() >= 10;
     }
 
-    public static boolean validateProjectDescription (String projectDescription) {
+    public static boolean validateProjectDescription (String description) {
 
-        return !GenericValidator.isBlankOrNull(projectDescription) && projectDescription.length() <= 1000 && projectDescription.length() >= 50;
+        return !GenericValidator.isBlankOrNull(description) && description.length() <= 10000 && description.length() >= 50;
     }
 
-    public static boolean validateProjectFileChangelog (String formChangelog) {
+    public static boolean validateProjectFileChangelog (String changelog) {
 
-        // TODO
-        return true;
+        return changelog == null || changelog.length() <= 2000;
     }
 
     private static final Set<String> VALID_RELEASE_TYPES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("release", "beta", "alpha")));
@@ -112,7 +111,7 @@ public class Validator {
                     dependencies[i] = Long.parseLong(dependenciesString[i]);
 
                     if (projectId == dependencies[i]) {
-                        throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_SAME_ID);
+                        throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF);
                     }
                 }
                 //TODO make dependency unique
@@ -158,5 +157,10 @@ public class Validator {
     public static boolean validateUserDisplayName (String username, String displayName) {
 
         return username.equalsIgnoreCase(displayName);
+    }
+
+    public static boolean validateMFA (Integer mfa) {
+
+        return mfa != null && mfa >= 0 && mfa <= 99999999;
     }
 }
