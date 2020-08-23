@@ -227,6 +227,7 @@ public class ProjectsAPI {
             return ErrorMessage.ENDPOINT_NOT_FOUND.respond();
         }
 
+        entity.setCompleted(true);
         if (!Confluencia.SECURITY.updateNodeCDNCommits(entity)) {
             System.out.println("FAILED_UPDATE_NODECDN_COMMIT");
             // return ErrorMessage.FAILED_UPDATE_NODECDN_COMMIT.respond();
