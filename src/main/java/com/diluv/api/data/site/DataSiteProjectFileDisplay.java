@@ -103,7 +103,7 @@ public class DataSiteProjectFileDisplay {
 
         this.id = rs.getId();
         this.name = rs.getName();
-        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getId(), rs.getId(), rs.getName());
+        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
         this.size = rs.getSize();
         this.sha512 = rs.getSha512();
         this.releaseType = rs.getReleaseType();
