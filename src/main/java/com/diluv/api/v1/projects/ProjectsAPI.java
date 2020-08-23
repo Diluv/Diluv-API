@@ -142,11 +142,13 @@ public class ProjectsAPI {
         final String sha512 = FileUtil.writeFile(form.file, project.getProjectType().getMaxFileSize(), tempFile);
 
         if (tempFile == null) {
+            System.out.println("FAILED_TEMP_FILE");
             // return ErrorMessage.FAILED_TEMP_FILE.respond();
             return ErrorMessage.THROWABLE.respond();
         }
 
         if (sha512 == null) {
+            System.out.println("FAILED_SHA512");
             //return ErrorMessage.FAILED_SHA512.respond();
             return ErrorMessage.THROWABLE.respond();
         }
@@ -183,7 +185,7 @@ public class ProjectsAPI {
         }
 
         if (!Confluencia.FILE.insertProjectFile(projectFile)) {
-
+            System.out.println("FAILED_CREATE_PROJECT_FILE");
             //return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
             return ErrorMessage.THROWABLE.respond();
         }
@@ -191,7 +193,7 @@ public class ProjectsAPI {
 
         projectFile = Confluencia.FILE.findOneById(projectFile.getId());
         if (projectFile == null) {
-            return ErrorMessage.NOT_FOUND_PROJECT.respond();
+            return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
         }
 
         final String gameSlug = project.getGame().getSlug();
@@ -206,6 +208,7 @@ public class ProjectsAPI {
         tempFile.getParentFile().delete();
 
         if (!moved) {
+            System.out.println("ERROR_WRITING");
             //return ErrorMessage.ERROR_WRITING.respond();
             return ErrorMessage.THROWABLE.respond();
         }
