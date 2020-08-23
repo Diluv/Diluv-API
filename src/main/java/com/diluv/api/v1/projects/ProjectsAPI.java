@@ -228,11 +228,13 @@ public class ProjectsAPI {
         }
 
         if (!Confluencia.SECURITY.updateNodeCDNCommits(entity)) {
+            System.out.println("FAILED_UPDATE_NODECDN_COMMIT");
             // return ErrorMessage.FAILED_UPDATE_NODECDN_COMMIT.respond();
             return ErrorMessage.THROWABLE.respond();
         }
 
         if (!Confluencia.FILE.updateAllForRelease(entity.getCreatedAt())) {
+            System.out.println("FAILED_UPDATE_PROJECT_FILE");
             // return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();
             return ErrorMessage.THROWABLE.respond();
         }
