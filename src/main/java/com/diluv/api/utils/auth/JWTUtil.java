@@ -62,7 +62,7 @@ public class JWTUtil {
             }
             catch (JOSEException | BadJOSEException | NumberFormatException e) {
                 DiluvAPIServer.LOGGER.catching(e);
-                return JWTUtil.INVALID;
+                return INVALID;
             }
         }
 
@@ -77,10 +77,10 @@ public class JWTUtil {
         long currentTime = System.currentTimeMillis();
 
         if (currentTime < record.getCreationTime().getTime()) {
-            return null;
+            return INVALID;
         }
         if (currentTime > record.getExpiration().getTime()) {
-            return null;
+            return INVALID;
         }
 
         //TODO Implement a table
