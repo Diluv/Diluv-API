@@ -26,7 +26,7 @@ public class UserTest {
     @Test
     public void getSelf () {
 
-        Request.getError(URL + "/self", 401, ErrorMessage.USER_INVALID_TOKEN);
+        Request.getError(URL + "/self", 401, ErrorMessage.USER_REQUIRED_TOKEN);
         Request.getErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self", 401, ErrorMessage.USER_INVALID_TOKEN);
 
         Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", "schema/user-schema.json");

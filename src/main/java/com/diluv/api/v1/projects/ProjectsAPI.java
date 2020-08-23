@@ -26,6 +26,7 @@ import com.diluv.api.data.DataProjectFileInQueue;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.MismatchException;
+import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -65,6 +66,10 @@ public class ProjectsAPI {
 
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        }
+
+        if (token == JWTUtil.INVALID) {
+            return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
         final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(projectId);

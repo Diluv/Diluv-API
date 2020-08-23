@@ -1,9 +1,39 @@
 package com.diluv.api.v1.games;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.apache.commons.validator.GenericValidator;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.plugins.providers.atom.Content;
+import org.jboss.resteasy.plugins.providers.atom.Entry;
+import org.jboss.resteasy.plugins.providers.atom.Feed;
+import org.jboss.resteasy.plugins.providers.atom.Link;
+import org.jboss.resteasy.plugins.providers.atom.Person;
+
 import com.diluv.api.data.*;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
+import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -15,30 +45,18 @@ import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.utilities.ProjectService;
 import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.record.*;
+import com.diluv.confluencia.database.record.GamesEntity;
+import com.diluv.confluencia.database.record.ProjectFilesEntity;
+import com.diluv.confluencia.database.record.ProjectTagsEntity;
+import com.diluv.confluencia.database.record.ProjectTypesEntity;
+import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.TagsEntity;
+import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 import com.github.slugify.Slugify;
-
-import org.apache.commons.validator.GenericValidator;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.atom.*;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @GZIP
 @Path("/games")
@@ -185,6 +203,10 @@ public class GamesAPI {
 
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        }
+
+        if (token == JWTUtil.INVALID) {
+            return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
         if (Confluencia.GAME.findOneBySlug(gameSlug) == null) {
@@ -350,6 +372,10 @@ public class GamesAPI {
 
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        }
+
+        if (token == JWTUtil.INVALID) {
+            return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
         ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);

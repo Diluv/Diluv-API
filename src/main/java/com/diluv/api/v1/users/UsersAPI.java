@@ -26,6 +26,7 @@ import com.diluv.api.data.DataAuthorizedUser;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.AuthUtilities;
+import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -59,7 +60,10 @@ public class UsersAPI {
     public Response getSelf (@HeaderParam("Authorization") Token token) {
 
         if (token == null) {
+            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        }
 
+        if (token == JWTUtil.INVALID) {
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
@@ -78,7 +82,10 @@ public class UsersAPI {
     public Response patchSelf (@HeaderParam("Authorization") Token token, @MultipartForm UserUpdateForm form) {
 
         if (token == null) {
+            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        }
 
+        if (token == JWTUtil.INVALID) {
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
@@ -121,7 +128,10 @@ public class UsersAPI {
     public Response patchSelfMFA (@HeaderParam("Authorization") Token token, @MultipartForm User2FAForm form) {
 
         if (token == null) {
+            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        }
 
+        if (token == JWTUtil.INVALID) {
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
