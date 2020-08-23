@@ -1,6 +1,7 @@
 package com.diluv.api.v1.projects;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
@@ -201,16 +203,16 @@ public class ProjectsAPI {
 
         File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, project.getId(), projectFile.getId(), fileName);
         destination.getParentFile().mkdirs();
-        final boolean moved = tempFile.renameTo(destination);
-
-        // TODO if checks
-        tempFile.delete();
-        tempFile.getParentFile().delete();
-
-        if (!moved) {
+        try {
+            FileUtils.copyFile(tempFile, destination);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
             System.out.println("ERROR_WRITING");
-            //return ErrorMessage.ERROR_WRITING.respond();
             return ErrorMessage.THROWABLE.respond();
+        } finally {
+            tempFile.delete();
+            tempFile.getParentFile().delete();
         }
 
         return ResponseUtil.successResponse(new DataProjectFileInQueue(projectFile, gameSlug, projectTypeSlug, project.getSlug()));
