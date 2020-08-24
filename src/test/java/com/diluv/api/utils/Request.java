@@ -98,7 +98,7 @@ public class Request {
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
         postRequest(url, headers, multiPart, status, "schema/error-schema.json")
-            .body("message", equalTo(error.getMessage()));
+            .body("error", equalTo(error.getUniqueId()));
     }
 
     public static ValidatableResponse patchRequest (String url, Map<String, String> headers, Map<String, Object> multiPart, int status, String schema) {

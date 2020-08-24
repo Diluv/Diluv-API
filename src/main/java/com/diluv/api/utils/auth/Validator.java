@@ -75,24 +75,21 @@ public class Validator {
 
     public static List<GameVersionsEntity> validateGameVersions (GamesEntity game, String formGameVersions) throws MismatchException {
 
-        List<GameVersionsEntity> gameVersionRecords = game.getGameVersions();
+        final List<GameVersionsEntity> gameVersionRecords = new ArrayList<>();
         if (formGameVersions != null) {
             String[] gameVersions = formGameVersions.split(",");
             if (gameVersions.length > 0) {
-                //TODO make game versions unique
-                if (gameVersionRecords.size() != gameVersions.length) {
-                    List<String> versionNotFound = new ArrayList<>(Arrays.asList(gameVersions));
-                    for (GameVersionsEntity record : gameVersionRecords) {
-                        for (String gameVersion : gameVersions) {
-                            if (record.getVersion().equalsIgnoreCase(gameVersion)) {
-                                versionNotFound.remove(gameVersion);
-                            }
+                List<String> versionNotFound = new ArrayList<>(Arrays.asList(gameVersions));
+                for (GameVersionsEntity record : game.getGameVersions()) {
+                    for (String gameVersion : gameVersions) {
+                        if (record.getVersion().equalsIgnoreCase(gameVersion)) {
+                            versionNotFound.remove(gameVersion);
+                            gameVersionRecords.add(record);
                         }
                     }
-                    if (!versionNotFound.isEmpty()) {
-                        //String.join(", ", versionNotFound)
-                        throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION);
-                    }
+                }
+                if (!versionNotFound.isEmpty()) {
+                    throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION, String.join(", ", versionNotFound));
                 }
             }
         }
@@ -111,7 +108,7 @@ public class Validator {
                     dependencies[i] = Long.parseLong(dependenciesString[i]);
 
                     if (projectId == dependencies[i]) {
-                        throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF);
+                        throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF, "");
                     }
                 }
                 //TODO make dependency unique
@@ -128,7 +125,7 @@ public class Validator {
                     }
                     if (!projectNotFound.isEmpty()) {
                         //projectNotFound.stream().map(Object::toString).collect(Collectors.joining(", "))
-                        throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
+                        throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID, "");
                     }
                 }
             }

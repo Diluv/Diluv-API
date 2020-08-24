@@ -64,6 +64,11 @@ public enum ErrorMessage {
         return this.type;
     }
 
+    public String getUniqueId () {
+
+        return this.uniqueId;
+    }
+
     public String getMessage () {
 
         return this.message;

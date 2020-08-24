@@ -125,7 +125,7 @@ public class ProjectsAPI {
             gameVersionRecords = Validator.validateGameVersions(project.getGame(), form.gameVersions);
         }
         catch (MismatchException e) {
-            return e.getErrorMessage().respond();
+            return e.getErrorMessage().respond(e.getMessage());
         }
 
         List<ProjectsEntity> dependencyRecords;
@@ -133,7 +133,7 @@ public class ProjectsAPI {
             dependencyRecords = Validator.validateDependencies(projectId, form.dependencies);
         }
         catch (MismatchException e) {
-            return e.getErrorMessage().respond();
+            return e.getErrorMessage().respond(e.getMessage());
         }
         catch (NumberFormatException e) {
             return ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID.respond();
@@ -170,6 +170,7 @@ public class ProjectsAPI {
             List<ProjectFileGameVersionsEntity> tagIds = new ArrayList<>();
             for (GameVersionsEntity gameVersions : gameVersionRecords) {
                 ProjectFileGameVersionsEntity gameVersionsEntity = new ProjectFileGameVersionsEntity();
+                gameVersionsEntity.setProjectFile(projectFile);
                 gameVersionsEntity.setGameVersion(gameVersions);
                 tagIds.add(gameVersionsEntity);
             }
@@ -180,6 +181,7 @@ public class ProjectsAPI {
             List<ProjectFileDependenciesEntity> tagIds = new ArrayList<>();
             for (ProjectsEntity dep : dependencyRecords) {
                 ProjectFileDependenciesEntity dependency = new ProjectFileDependenciesEntity();
+                dependency.setProjectFile(projectFile);
                 dependency.setDependencyProject(dep);
                 tagIds.add(dependency);
             }
