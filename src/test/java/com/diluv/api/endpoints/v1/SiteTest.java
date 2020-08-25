@@ -20,6 +20,12 @@ public class SiteTest {
     }
 
     @Test
+    public void getProjectFile () {
+
+        Request.getOk(URL + "/files/1", "schema/project-files-schema.json");
+    }
+
+    @Test
     public void postProjectFileDownloads () {
 
         Map<String, String> headers = new HashMap<>();

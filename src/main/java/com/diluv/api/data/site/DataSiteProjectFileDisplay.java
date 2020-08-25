@@ -54,6 +54,10 @@ public class DataSiteProjectFileDisplay {
     @Expose
     private final String classifier;
 
+    // TODO
+    @Expose
+    private final String changelog;
+
     /**
      * The time when the file was created.
      */
@@ -99,22 +103,23 @@ public class DataSiteProjectFileDisplay {
     @Expose
     private final String uploaderDisplayName;
 
-    public DataSiteProjectFileDisplay (ProjectFilesEntity rs, List<DataGameVersion> gameVersions, String gameSlug, String projectTypeSlug, String projectSlug) {
+    public DataSiteProjectFileDisplay (ProjectFilesEntity rs, List<DataGameVersion> gameVersions) {
 
         this.id = rs.getId();
         this.name = rs.getName();
-        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
+        this.gameSlug = rs.getProject().getGame().getSlug();
+        this.projectTypeSlug = rs.getProject().getProjectType().getSlug();
+        this.projectSlug = rs.getProject().getSlug();
+        this.downloadURL = Constants.getFileURL(this.gameSlug, this.projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
         this.size = rs.getSize();
         this.sha512 = rs.getSha512();
         this.releaseType = rs.getReleaseType();
         this.classifier = rs.getClassifier();
+        this.changelog = rs.getChangelog();
         this.createdAt = rs.getCreatedAt().getTime();
         this.uploaderUserId = rs.getUser().getId();
         this.uploaderUsername = rs.getUser().getUsername();
         this.uploaderDisplayName = rs.getUser().getDisplayName();
         this.gameVersions = gameVersions;
-        this.gameSlug = gameSlug;
-        this.projectTypeSlug = projectTypeSlug;
-        this.projectSlug = projectSlug;
     }
 }

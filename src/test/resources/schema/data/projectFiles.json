@@ -66,7 +66,6 @@
     "required": [
         "id",
         "name",
-        "changelog",
         "sha512",
         "size",
         "createdAt",

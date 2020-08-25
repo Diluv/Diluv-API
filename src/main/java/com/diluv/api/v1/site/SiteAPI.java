@@ -174,10 +174,32 @@ public class SiteAPI {
             final List<GameVersionsEntity> gameVersionRecords = record.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
             List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
             return record.isReleased() ?
-                new DataSiteProjectFileDisplay(record, gameVersions, gameSlug, projectTypeSlug, projectSlug) :
-                new DataSiteProjectFileDisplay(record, gameVersions, gameSlug, projectTypeSlug, projectSlug);
+                new DataSiteProjectFileDisplay(record, gameVersions) :
+                new DataSiteProjectFileDisplay(record, gameVersions);
         }).collect(Collectors.toList());
         return ResponseUtil.successResponse(new DataSiteProjectFilesPage(new DataBaseProject(project), projectFiles));
+    }
+
+    @GET
+    @Path("/files/{fileId}")
+    public Response getProjectFile (@HeaderParam("Authorization") Token token, @PathParam("fileId") long fileId) throws ResponseException {
+
+        final ProjectFilesEntity projectFile = Confluencia.FILE.findOneById(fileId);
+
+        if (projectFile == null) {
+            return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
+        }
+        final ProjectsEntity project = projectFile.getProject();
+        boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_EDIT);
+
+        if (!projectFile.isReleased() && !authorized) {
+            return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
+        }
+
+        final List<GameVersionsEntity> gameVersionRecords = projectFile.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
+        final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
+
+        return ResponseUtil.successResponse(new DataSiteProjectFileDisplay(projectFile, gameVersions));
     }
 
     @POST
