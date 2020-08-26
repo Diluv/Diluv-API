@@ -211,9 +211,13 @@ public class SiteAPI {
             return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
         }
 
+        if (ip == null) {
+            return ErrorMessage.THROWABLE.respond();
+        }
+
         final String salt = AuthUtilities.getIP(ip);
         if (salt != null) {
-            if (!Confluencia.FILE.insertProjectFileDownloads(new ProjectFileDownloadsEntity(projectFile, ip))) {
+            if (!Confluencia.FILE.insertProjectFileDownloads(new ProjectFileDownloadsEntity(projectFile, salt))) {
                 //return ErrorMessage.FAILED_INSERT_PROJECT_FILE_DOWNLOADS.respond();
                 return ErrorMessage.THROWABLE.respond();
             }
