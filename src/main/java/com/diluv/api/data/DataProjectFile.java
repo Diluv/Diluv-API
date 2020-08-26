@@ -48,6 +48,10 @@ public class DataProjectFile {
     @Expose
     private final String sha512;
 
+    // TODO
+    @Expose
+    private final long downloads;
+
     /**
      * The release type of the file. E.g. release, beta, alpha
      */
@@ -119,6 +123,7 @@ public class DataProjectFile {
         this.size = rs.getSize();
         this.changelog = rs.getChangelog();
         this.sha512 = rs.getSha512();
+        this.downloads = rs.getDownloads();
         this.releaseType = rs.getReleaseType();
         this.classifier = rs.getClassifier();
         this.createdAt = rs.getCreatedAt().getTime();

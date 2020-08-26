@@ -42,6 +42,10 @@ public class DataSiteProjectFileDisplay {
     @Expose
     private final String sha512;
 
+    // TODO
+    @Expose
+    private final long downloads;
+
     /**
      * The release type of the file. E.g. release, beta, alpha
      */
@@ -113,6 +117,7 @@ public class DataSiteProjectFileDisplay {
         this.downloadURL = Constants.getFileURL(this.gameSlug, this.projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
         this.size = rs.getSize();
         this.sha512 = rs.getSha512();
+        this.downloads = rs.getDownloads();
         this.releaseType = rs.getReleaseType();
         this.classifier = rs.getClassifier();
         this.changelog = rs.getChangelog();

@@ -17,6 +17,9 @@
         "sha512": {
             "type": "string"
         },
+        "downloads": {
+            "type": "number"
+        },
         "size": {
             "type": "number"
         },
@@ -67,6 +70,7 @@
         "id",
         "name",
         "sha512",
+        "downloads",
         "size",
         "createdAt",
         "gameSlug",
