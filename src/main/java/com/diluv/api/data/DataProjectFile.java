@@ -119,7 +119,7 @@ public class DataProjectFile {
 
         this.id = rs.getId();
         this.name = rs.getName();
-        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
+        this.downloadURL = Constants.getFileURL(rs.getId());
         this.size = rs.getSize();
         this.changelog = rs.getChangelog();
         this.sha512 = rs.getSha512();

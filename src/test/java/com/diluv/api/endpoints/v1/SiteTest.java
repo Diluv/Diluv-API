@@ -24,17 +24,4 @@ public class SiteTest {
 
         Request.getOk(URL + "/files/1", "schema/project-files-schema.json");
     }
-
-    @Test
-    public void postProjectFileDownloads () {
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put("CF-Connecting-IP", "127.0.0.1");
-        Request.postRequest(URL + "/files/1/download", headers, new HashMap<>(), 204, null);
-        Request.postRequest(URL + "/files/1/download", headers, new HashMap<>(), 204, null);
-
-        headers.put("CF-Connecting-IP", "1.1.1.1");
-        Request.postRequest(URL + "/files/2/download", headers, new HashMap<>(), 204, null);
-        Request.postRequest(URL + "/files/3/download", headers, new HashMap<>(), 204, null);
-    }
 }

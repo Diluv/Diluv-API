@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -23,7 +22,6 @@ import com.diluv.api.data.site.DataSiteIndex;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;
 import com.diluv.api.data.site.DataSiteProjectFilesPage;
 import com.diluv.api.provider.ResponseException;
-import com.diluv.api.utils.AuthUtilities;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
@@ -200,29 +198,6 @@ public class SiteAPI {
         final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
 
         return ResponseUtil.successResponse(new DataSiteProjectFileDisplay(projectFile, gameVersions));
-    }
-
-    @POST
-    @Path("/files/{fileId}/download")
-    public Response postProjectFileDownloads (@HeaderParam("CF-Connecting-IP") String ip, @PathParam("fileId") long fileId) {
-
-        final ProjectFilesEntity projectFile = Confluencia.FILE.findOneById(fileId);
-        if (projectFile == null) {
-            return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
-        }
-
-        if (ip == null) {
-            return ErrorMessage.THROWABLE.respond();
-        }
-
-        final String salt = AuthUtilities.getIP(ip);
-        if (salt != null) {
-            if (!Confluencia.FILE.insertProjectFileDownloads(new ProjectFileDownloadsEntity(projectFile, salt))) {
-                //return ErrorMessage.FAILED_INSERT_PROJECT_FILE_DOWNLOADS.respond();
-                return ErrorMessage.THROWABLE.respond();
-            }
-        }
-        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @GET

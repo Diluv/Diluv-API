@@ -51,11 +51,11 @@ public class APIV1 extends Application {
 
         classes.add(FeaturedAPI.class);
         classes.add(GamesAPI.class);
-        classes.add(ProjectsAPI.class);
         classes.add(NewsAPI.class);
+        classes.add(ProjectsAPI.class);
+        classes.add(SiteAPI.class);
         classes.add(UsersAPI.class);
         classes.add(GenericAPI.class);
-        classes.add(SiteAPI.class);
 
         return classes;
     }

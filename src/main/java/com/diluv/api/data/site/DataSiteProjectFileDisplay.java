@@ -1,11 +1,11 @@
 package com.diluv.api.data.site;
 
-import java.util.List;
-
 import com.diluv.api.data.DataGameVersion;
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.google.gson.annotations.Expose;
+
+import java.util.List;
 
 /**
  * Represents a file uploaded to a project.
@@ -111,10 +111,7 @@ public class DataSiteProjectFileDisplay {
 
         this.id = rs.getId();
         this.name = rs.getName();
-        this.gameSlug = rs.getProject().getGame().getSlug();
-        this.projectTypeSlug = rs.getProject().getProjectType().getSlug();
-        this.projectSlug = rs.getProject().getSlug();
-        this.downloadURL = Constants.getFileURL(this.gameSlug, this.projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
+        this.downloadURL = Constants.getFileURL(rs.getId());
         this.size = rs.getSize();
         this.sha512 = rs.getSha512();
         this.downloads = rs.getDownloads();
@@ -126,5 +123,8 @@ public class DataSiteProjectFileDisplay {
         this.uploaderUsername = rs.getUser().getUsername();
         this.uploaderDisplayName = rs.getUser().getDisplayName();
         this.gameVersions = gameVersions;
+        this.gameSlug = rs.getProject().getGame().getSlug();
+        this.projectTypeSlug = rs.getProject().getProjectType().getSlug();
+        this.projectSlug = rs.getProject().getSlug();
     }
 }

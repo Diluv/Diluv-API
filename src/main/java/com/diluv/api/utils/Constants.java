@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.time.Instant;
@@ -48,6 +50,7 @@ public final class Constants {
     public static final ConfigurableJWTProcessor<SecurityContext> JWT_PROCESSOR = getJWTProcessor();
 
     public static final String WEBSITE_URL = getValueOrDefault("WEBSITE_URL", "https://diluv.com");
+    public static final String API_URL = getValueOrDefault("WEBSITE_URL", "https://api.diluv.com");
     public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.singleton(WEBSITE_URL));
 
     public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
@@ -267,9 +270,14 @@ public final class Constants {
         });
     }
 
-    public static String getFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) {
+    public static String getFileURL (long fileId) {
 
-        return String.format("%s/games/%s/%s/%d/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName);
+        return String.format("%s/v1/download/%d", Constants.API_URL, fileId);
+    }
+
+    public static URI getNodeCDNFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) throws URISyntaxException {
+
+        return new URI(String.format("%s/games/%s/%s/%d/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName));
     }
 
     public static Salt getSalt () {
