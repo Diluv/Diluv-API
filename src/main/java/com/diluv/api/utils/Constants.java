@@ -65,6 +65,7 @@ public final class Constants {
     public static final String CDN_URL = getValueOrDefault("CDN_URL", "https://download.nodecdn.net/containers/diluv");
     public static final String CDN_FOLDER = getValueOrDefault("CDN_FOLDER", "public");
     public static final String PROCESSING_FOLDER = getValueOrDefault("PROCESSING_FOLDER", "processing");
+    public static final String WEBHOOK_URL = getValueOrDefault("WEBHOOK_URL", null);
 
     /**
      * Reads a string from an environment variable. If the variable can not be found the

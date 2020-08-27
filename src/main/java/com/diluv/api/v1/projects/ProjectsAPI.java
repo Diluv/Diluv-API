@@ -2,6 +2,7 @@ package com.diluv.api.v1.projects;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataProjectFileInQueue;
 import com.diluv.api.provider.ResponseException;
+import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.MismatchException;
 import com.diluv.api.utils.auth.JWTUtil;
@@ -47,11 +49,15 @@ import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
+import com.diluv.schoomp.Webhook;
+import com.diluv.schoomp.message.Message;
 
 @GZIP
 @Path("/projects")
 @Produces(MediaType.APPLICATION_JSON)
 public class ProjectsAPI {
+
+    private Webhook webhook = new Webhook(Constants.WEBHOOK_URL, "Diluv - API");
 
     @GET
     @Path("/{id}")
@@ -236,11 +242,25 @@ public class ProjectsAPI {
             return ErrorMessage.THROWABLE.respond();
         }
 
-        if (!Confluencia.FILE.updateAllForRelease(entity.getCreatedAt())) {
+        int i = Confluencia.FILE.updateAllForRelease(entity.getCreatedAt());
+        if (i == -1) {
             System.out.println("FAILED_UPDATE_PROJECT_FILE");
             // return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();
             return ErrorMessage.THROWABLE.respond();
         }
+
+        if (i > 0 && Constants.WEBHOOK_URL != null) {
+            try {
+                Message discordMessage = new Message();
+                discordMessage.setContent(Instant.now().toString() + ": NodeCDN fetched " + i + " files.");
+                discordMessage.setUsername("Hilo");
+                this.webhook.sendMessage(discordMessage);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
