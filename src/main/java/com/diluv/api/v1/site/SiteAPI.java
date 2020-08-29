@@ -15,6 +15,7 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 
 import com.diluv.api.data.*;
+import com.diluv.api.data.site.DataCreateProject;
 import com.diluv.api.data.site.DataSiteAuthorProjects;
 import com.diluv.api.data.site.DataSiteGame;
 import com.diluv.api.data.site.DataSiteGameProjects;
@@ -36,11 +37,11 @@ import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.FeaturedGamesEntity;
 import com.diluv.confluencia.database.record.GameVersionsEntity;
 import com.diluv.confluencia.database.record.GamesEntity;
-import com.diluv.confluencia.database.record.ProjectFileDownloadsEntity;
 import com.diluv.confluencia.database.record.ProjectFileGameVersionsEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.TagsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
@@ -224,5 +225,13 @@ public class SiteAPI {
         List<DataProject> dataProjects = projects.stream().map(DataProject::new).collect(Collectors.toList());
         DataUser user = new DataUser(userRecord);
         return ResponseUtil.successResponse(new DataSiteAuthorProjects(user, dataProjects, GamesAPI.GAME_SORTS, projectCount));
+    }
+
+    @GET
+    @Path("/create/games/{gameSlug}/{projectTypeSlug}")
+    public Response createProject (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
+
+        List<TagsEntity> tags = Confluencia.PROJECT.findAllTagsByGameSlugAndProjectTypeSlug(new ProjectTypesEntity(new GamesEntity(gameSlug), projectTypeSlug));
+        return ResponseUtil.successResponse(new DataCreateProject(tags.stream().map(DataTag::new).collect(Collectors.toList())));
     }
 }
