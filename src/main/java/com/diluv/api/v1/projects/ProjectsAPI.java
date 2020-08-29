@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
@@ -57,6 +58,11 @@ import com.diluv.schoomp.message.Message;
 @Produces(MediaType.APPLICATION_JSON)
 public class ProjectsAPI {
 
+	/**
+	 * A RegEx pattern for matching valid semantic versions according to the https://semver.org guidelines.
+	 */
+    private static final Pattern SEM_VER = Pattern.compile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
+       
     private Webhook webhook = new Webhook(Constants.WEBHOOK_URL, "Diluv - API");
 
     @GET
@@ -116,7 +122,7 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_CLASSIFIER.respond();
         }
 
-        if (form.version == null || form.version.length() > 20) {
+        if (form.version == null || form.version.length() > 20 || !SEM_VER.matcher(form.version).matches()) {
 
             return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
         }
