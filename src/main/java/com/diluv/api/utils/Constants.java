@@ -271,9 +271,9 @@ public final class Constants {
         });
     }
 
-    public static String getFileURL (long fileId) {
+    public static String getDiluvCDN (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) {
 
-        return String.format("%s/%d", Constants.DILUV_CDN_URL, fileId);
+        return String.format("%s/games/%s/%s/%d/%d/%s", Constants.DILUV_CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName);
     }
 
     public static URI getNodeCDNFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) throws URISyntaxException {
