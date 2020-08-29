@@ -50,7 +50,7 @@ public final class Constants {
     public static final ConfigurableJWTProcessor<SecurityContext> JWT_PROCESSOR = getJWTProcessor();
 
     public static final String WEBSITE_URL = getValueOrDefault("WEBSITE_URL", "https://diluv.com");
-    public static final String API_URL = getValueOrDefault("API_URL", "https://api.diluv.com");
+    public static final String DILUV_CDN_URL = getValueOrDefault("DILUV_CDN_URL", "https://cdn.diluv.com");
     public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.singleton(WEBSITE_URL));
 
     public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
@@ -273,7 +273,7 @@ public final class Constants {
 
     public static String getFileURL (long fileId) {
 
-        return String.format("%s/v1/download/%d", Constants.API_URL, fileId);
+        return String.format("%s/%d", Constants.DILUV_CDN_URL, fileId);
     }
 
     public static URI getNodeCDNFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) throws URISyntaxException {
