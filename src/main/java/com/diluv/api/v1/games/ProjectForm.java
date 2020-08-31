@@ -1,31 +1,19 @@
 package com.diluv.api.v1.games;
 
+import org.jboss.resteasy.annotations.providers.multipart.PartType;
+
 import java.io.InputStream;
 
 import javax.ws.rs.FormParam;
+import javax.ws.rs.core.MediaType;
 
 public class ProjectForm {
 
-    @FormParam("name")
-    public String name;
-
-    @FormParam("summary")
-    public String summary;
-
-    @FormParam("description")
-    public String description;
-
-    @FormParam("tags")
-    private String tags;
+    @FormParam("data")
+    @PartType(value = MediaType.APPLICATION_JSON)
+    public ProjectCreate data;
 
     @FormParam("logo")
     public InputStream logo;
 
-    public String[] getTags () {
-
-        if (this.tags == null) {
-            return new String[0];
-        }
-        return this.tags.split(",");
-    }
 }

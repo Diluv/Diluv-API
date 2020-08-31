@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.diluv.api.v1.games.ProjectCreate;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -101,11 +103,14 @@ public class GameTest {
         final ClassLoader classLoader = this.getClass().getClassLoader();
         final File logo = new File(classLoader.getResource("logo.png").getFile());
 
+        ProjectCreate data =new ProjectCreate();
+        data.name ="Bookshelf";
+        data.summary ="Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        data.description ="Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+
         Map<String, Object> multiPart = new HashMap<>();
-        multiPart.put("name", "Bookshelf");
-        multiPart.put("summary", "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        multiPart.put("description", "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         multiPart.put("logo", logo);
+        multiPart.put("data", data);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_GAME);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, 400, ErrorMessage.PROJECT_TAKEN_SLUG);
@@ -115,12 +120,15 @@ public class GameTest {
 //        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, 400, ErrorMessage.PROJECT_INVALID_TAGS);
 
         // Ok
-        multiPart.put("name", "Bookshelf2");
-        multiPart.remove("tags");
+        data.name="Bookshelf2";
+        data.tags.clear();
+        multiPart.put("data", data);
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, "schema/project-schema.json");
 
-        multiPart.put("name", "Bookshelf3");
-        multiPart.put("tags", "tech,magic");
+        data.name="Bookshelf3";
+        data.tags.add("tech");
+        data.tags.add("magic");
+        multiPart.put("data", data);
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods", multiPart, "schema/project-schema.json");
     }
 
@@ -130,22 +138,26 @@ public class GameTest {
         final ClassLoader classLoader = this.getClass().getClassLoader();
         final File logo = new File(classLoader.getResource("logo.png").getFile());
 
+        ProjectCreate data =new ProjectCreate();
+        data.name = "Bookshelf";
+        data.summary = "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        data.description = "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+
         Map<String, Object> multiPart = new HashMap<>();
-        multiPart.put("name", "Bookshelf");
-        multiPart.put("summary", "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        multiPart.put("description", "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        multiPart.put("data", data);
         multiPart.put("logo", logo);
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/invalid/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_GAME);
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+        Request.patchMultipartErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/invalid/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_GAME);
+        Request.patchMultipartErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
 
 //        multiPart.put("name", "Dark Elevators New");
 //        multiPart.put("tags", "invalid,magic");
 //        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods/dark-elevators", multiPart, 400, ErrorMessage.PROJECT_INVALID_TAGS);
 
         // Ok
-        multiPart.put("name", "Dark Elevators New");
-        multiPart.remove("tags");
-        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods/dark-elevators", multiPart);
+        data.name= "Dark Elevators New";
+        data.tags.clear();
+        multiPart.put("data", data);
+        Request.patchOkMultipartWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/forge-mods/dark-elevators", multiPart);
 
 //        multiPart.put("name", "Dark Elevators New");
 //        multiPart.put("tags", "tech,magic");

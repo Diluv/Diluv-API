@@ -1,15 +1,15 @@
 package com.diluv.api.v1.users;
 
-import javax.ws.rs.FormParam;
+import com.google.gson.annotations.Expose;
 
 public class UserUpdateForm {
 
-    @FormParam("password")
+    @Expose
     public String password;
 
-    @FormParam("displayName")
+    @Expose
     public String displayName;
 
-    @FormParam("newPassword")
+    @Expose
     public String newPassword;
 }

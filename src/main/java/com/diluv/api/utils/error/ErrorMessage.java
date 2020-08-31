@@ -45,6 +45,8 @@ public enum ErrorMessage {
     NOT_FOUND_USER(BAD_REQUEST, "notfound.user", "The user was not found."),
     NOT_FOUND_NEWS(BAD_REQUEST, "notfound.news", "The news post was not found"),
 
+    INVALID_DATA(BAD_REQUEST, "invalid_data", "The data is invalid."),
+
     ENDPOINT_NOT_FOUND(NOT_FOUND, "generic.404", "The endpoint was not found."),
     THROWABLE(INTERNAL_SERVER_ERROR, "generic.throwable", "The request had an error, please try again later.");
 

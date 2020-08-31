@@ -1,8 +1,5 @@
 package com.diluv.api.endpoints.v1;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -10,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.v1.users.User2FAForm;
+import com.diluv.api.v1.users.UserUpdateForm;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.warrenstrange.googleauth.KeyRepresentation;
@@ -36,15 +35,15 @@ public class UserTest {
     @Test
     public void patchSelf () {
 
-        Map<String, Object> multiPart = new HashMap<>();
-        multiPart.put("password", "invalid");
-        multiPart.put("displayName", "ABC");
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", multiPart, 400, ErrorMessage.USER_INVALID_PASSWORD);
+        UserUpdateForm data = new UserUpdateForm();
+        data.password = "invalid";
+        data.displayName = "ABC";
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", data, 400, ErrorMessage.USER_INVALID_PASSWORD);
 
-        multiPart.put("password", "password");
-        multiPart.put("displayName", "Darkhax");
-        multiPart.put("newPassword", "password1");
-        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", multiPart);
+        data.password = "password";
+        data.displayName = "Darkhax";
+        data.newPassword = "password1";
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", 204, data);
     }
 
     @Test
@@ -60,16 +59,16 @@ public class UserTest {
             .build();
         final GoogleAuthenticator gAuth = new GoogleAuthenticator(config);
 
-        Map<String, Object> multiPart = new HashMap<>();
-        multiPart.put("password", "invalid");
-        multiPart.put("mfaStatus", "enable");
-        multiPart.put("mfa", gAuth.getTotpPassword(secret));
-        multiPart.put("mfaSecret", secret);
+        User2FAForm data = new User2FAForm();
+        data.password = "invalid";
+        data.mfaStatus = "enable";
+        data.mfa = gAuth.getTotpPassword(secret);
+        data.mfaSecret = secret;
 
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/mfa", multiPart, 400, ErrorMessage.USER_INVALID_PASSWORD);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/mfa", data, 400, ErrorMessage.USER_INVALID_PASSWORD);
 
-        multiPart.put("password", "password");
-        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/mfa", multiPart, null);
+        data.password = "password";
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/mfa", 200, data);
     }
 
     @Test

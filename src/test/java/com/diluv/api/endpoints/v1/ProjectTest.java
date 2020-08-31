@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.diluv.api.v1.games.FileDependency;
+import com.diluv.api.v1.games.ProjectFileUpload;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -49,46 +52,56 @@ public class ProjectTest {
         final File logo = new File(classLoader.getResource("logo.png").getFile());
 
         Map<String, Object> multiPart = new HashMap<>();
-        multiPart.put("version", "1.1.0");
-        multiPart.put("releaseType", "release");
-        multiPart.put("classifier", "binary");
-        multiPart.put("changelog", "Changelog");
+        ProjectFileUpload data = new ProjectFileUpload();
+        data.version = "1.1.0";
+        data.releaseType = "release";
+        data.classifier = "binary";
+        data.changelog = "logo.png";
+
+        multiPart.put("data", data);
         multiPart.put("filename", "logo.png");
         multiPart.put("file", logo);
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, "schema/project-files-schema.json");
 
         // Game Version
-        multiPart.put("version", "1.1.1");
-        multiPart.put("game_versions", "1.15,1.15.2");
+        data.version = "1.1.1";
+        data.gameVersions.add("1.15");
+        data.gameVersions.add("1.15.2");
+        multiPart.put("data", data);
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, "schema/project-files-schema.json");
 
-        multiPart.put("version", "1.1.2");
-        multiPart.put("game_versions", "1.15,1.15.2,invalid");
+        data.version = "1.1.2";
+        data.gameVersions.add("invalid");
+        multiPart.put("data", data);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION);
 
         // Dependencies
-        multiPart.remove("game_versions");
-        multiPart.put("version", "1.1.3");
-        multiPart.put("dependencies", "2,3");
+        data.version = "1.1.3";
+        data.gameVersions.clear();
+        data.dependencies.add(new FileDependency(2L, "optional"));
+        data.dependencies.add(new FileDependency(3L, "optional"));
+        multiPart.put("data", data);
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, "schema/project-files-schema.json");
 
-        multiPart.put("version", "1.1.4");
-        multiPart.put("dependencies", "1,2,3");
+        data.version = "1.1.4";
+        data.dependencies.add(new FileDependency(1L, "optional"));
+        multiPart.put("data", data);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF);
 
-        multiPart.put("version", "1.1.5");
-        multiPart.put("dependencies", "invalid");
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
-
-        multiPart.put("version", "1.1.6");
-        multiPart.put("dependencies", "1000000");
+        data.version = "1.1.4";
+        data.dependencies.clear();
+        data.dependencies.add(new FileDependency(500L, "optional"));
+        multiPart.put("data", data);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
 
         // Game Version + Dependencies
-        multiPart.put("version", "1.1.7");
-        multiPart.put("dependencies", "2,3");
-        multiPart.put("game_versions", "1.15,1.15.2");
-
+        data.version = "1.1.7";
+        data.dependencies.clear();
+        data.dependencies.add(new FileDependency(2L, "optional"));
+        data.dependencies.add(new FileDependency(3L, "optional"));
+        data.gameVersions.add("1.15");
+        data.gameVersions.add("1.15.2");
+        multiPart.put("data", data);
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, "schema/project-files-schema.json");
     }
 

@@ -1,16 +1,13 @@
 package com.diluv.api.v1.games;
 
-import java.io.InputStream;
+import org.jboss.resteasy.annotations.providers.multipart.PartType;
 
 import javax.ws.rs.FormParam;
+import javax.ws.rs.core.MediaType;
+
+import java.io.InputStream;
 
 public class ProjectFileUploadForm {
-
-    @FormParam("version")
-    public String version;
-
-    @FormParam("changelog")
-    public String changelog;
 
     @FormParam("file")
     public InputStream file;
@@ -18,15 +15,8 @@ public class ProjectFileUploadForm {
     @FormParam("filename")
     public String fileName;
 
-    @FormParam("releaseType")
-    public String releaseType;
+    @FormParam("data")
+    @PartType(value = MediaType.APPLICATION_JSON)
+    public ProjectFileUpload data;
 
-    @FormParam("classifier")
-    public String classifier;
-
-    @FormParam("game_versions")
-    public String gameVersions;
-
-    @FormParam("dependencies")
-    public String dependencies;
 }

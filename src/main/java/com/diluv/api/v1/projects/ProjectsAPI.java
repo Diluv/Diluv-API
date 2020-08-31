@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
@@ -58,11 +57,6 @@ import com.diluv.schoomp.message.Message;
 @Produces(MediaType.APPLICATION_JSON)
 public class ProjectsAPI {
 
-	/**
-	 * A RegEx pattern for matching valid semantic versions according to the https://semver.org guidelines.
-	 */
-    private static final Pattern SEM_VER = Pattern.compile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
-       
     private Webhook webhook = new Webhook(Constants.WEBHOOK_URL, "Diluv - API");
 
     @GET
@@ -86,6 +80,10 @@ public class ProjectsAPI {
             return ErrorMessage.USER_INVALID_TOKEN.respond();
         }
 
+        if (form.data == null) {
+            return ErrorMessage.INVALID_DATA.respond();
+        }
+
         final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(projectId);
 
         if (project == null) {
@@ -97,7 +95,7 @@ public class ProjectsAPI {
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
         }
 
-        if (!Validator.validateProjectFileChangelog(form.changelog)) {
+        if (!Validator.validateProjectFileChangelog(form.data.changelog)) {
 
             return ErrorMessage.PROJECT_FILE_INVALID_CHANGELOG.respond();
         }
@@ -112,37 +110,37 @@ public class ProjectsAPI {
             return ErrorMessage.PROJECT_FILE_INVALID_FILENAME.respond();
         }
 
-        if (!Validator.validateReleaseType(form.releaseType)) {
+        if (!Validator.validateReleaseType(form.data.releaseType)) {
 
             return ErrorMessage.PROJECT_FILE_INVALID_RELEASE_TYPE.respond();
         }
 
-        if (!Validator.validateClassifier(form.classifier)) {
+        if (!Validator.validateClassifier(form.data.classifier)) {
 
             return ErrorMessage.PROJECT_FILE_INVALID_CLASSIFIER.respond();
         }
 
-        if (form.version == null || form.version.length() > 20 || !SEM_VER.matcher(form.version).matches()) {
+        if (!Validator.validateVersion(form.data.version)) {
 
             return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
         }
 
-        if (Confluencia.FILE.existsByProjectIdAndVersion(projectId, form.version)) {
+        if (Confluencia.FILE.existsByProjectIdAndVersion(projectId, form.data.version)) {
 
             return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
         }
 
         List<GameVersionsEntity> gameVersionRecords;
         try {
-            gameVersionRecords = Validator.validateGameVersions(project.getGame(), form.gameVersions);
+            gameVersionRecords = Validator.validateGameVersions(project.getGame(), form.data.gameVersions);
         }
         catch (MismatchException e) {
             return e.getErrorMessage().respond(e.getMessage());
         }
 
-        List<ProjectsEntity> dependencyRecords;
+        List<ProjectFileDependenciesEntity> dependencyRecords;
         try {
-            dependencyRecords = Validator.validateDependencies(projectId, form.dependencies);
+            dependencyRecords = Validator.validateDependencies(projectId, form.data.dependencies);
         }
         catch (MismatchException e) {
             return e.getErrorMessage().respond(e.getMessage());
@@ -169,12 +167,12 @@ public class ProjectsAPI {
 
         ProjectFilesEntity projectFile = new ProjectFilesEntity();
         projectFile.setName(fileName);
-        projectFile.setVersion(form.version);
+        projectFile.setVersion(form.data.version);
         projectFile.setSize(tempFile.length());
-        projectFile.setChangelog(form.changelog);
+        projectFile.setChangelog(form.data.changelog);
         projectFile.setSha512(sha512);
-        projectFile.setReleaseType(form.releaseType);
-        projectFile.setClassifier(form.classifier);
+        projectFile.setReleaseType(form.data.releaseType);
+        projectFile.setClassifier(form.data.classifier);
         projectFile.setProject(project);
         projectFile.setUser(new UsersEntity(token.getUserId()));
 
@@ -190,14 +188,12 @@ public class ProjectsAPI {
         }
 
         if (!dependencyRecords.isEmpty()) {
-            List<ProjectFileDependenciesEntity> tagIds = new ArrayList<>();
-            for (ProjectsEntity dep : dependencyRecords) {
-                ProjectFileDependenciesEntity dependency = new ProjectFileDependenciesEntity();
+            List<ProjectFileDependenciesEntity> dependencies = new ArrayList<>();
+            for (ProjectFileDependenciesEntity dependency : dependencyRecords) {
                 dependency.setProjectFile(projectFile);
-                dependency.setDependencyProject(dep);
-                tagIds.add(dependency);
+                dependencies.add(dependency);
             }
-            projectFile.setDependencies(tagIds);
+            projectFile.setDependencies(dependencies);
         }
 
         if (!Confluencia.FILE.insertProjectFile(projectFile)) {
