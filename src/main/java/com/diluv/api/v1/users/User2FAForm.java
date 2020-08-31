@@ -1,18 +1,18 @@
 package com.diluv.api.v1.users;
 
-import javax.ws.rs.FormParam;
+import com.google.gson.annotations.Expose;
 
 public class User2FAForm {
 
-    @FormParam("password")
+    @Expose
     public String password;
 
-    @FormParam("mfaStatus")
+    @Expose
     public String mfaStatus;
 
-    @FormParam("mfaSecret")
+    @Expose
     public String mfaSecret;
 
-    @FormParam("mfa")
+    @Expose
     public Integer mfa;
 }

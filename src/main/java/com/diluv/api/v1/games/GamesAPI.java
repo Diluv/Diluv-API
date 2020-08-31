@@ -227,9 +227,12 @@ public class GamesAPI {
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
         }
 
+        if (form.data == null) {
+            return ErrorMessage.INVALID_DATA.respond();
+        }
 
-        if (!GenericValidator.isBlankOrNull(form.name)) {
-            String name = form.name.trim();
+        if (!GenericValidator.isBlankOrNull(form.data.name)) {
+            String name = form.data.name.trim();
             if (!name.equals(project.getName())) {
                 if (!Validator.validateProjectName(name)) {
                     return ErrorMessage.PROJECT_INVALID_NAME.respond();
@@ -239,8 +242,8 @@ public class GamesAPI {
             }
         }
 
-        if (!GenericValidator.isBlankOrNull(form.summary)) {
-            String summary = form.summary.trim();
+        if (!GenericValidator.isBlankOrNull(form.data.summary)) {
+            String summary = form.data.summary.trim();
             if (!summary.equals(project.getSummary())) {
                 if (!Validator.validateProjectSummary(summary)) {
                     return ErrorMessage.PROJECT_INVALID_SUMMARY.respond();
@@ -250,8 +253,8 @@ public class GamesAPI {
             }
         }
 
-        if (!GenericValidator.isBlankOrNull(form.description)) {
-            String description = form.description.trim();
+        if (!GenericValidator.isBlankOrNull(form.data.description)) {
+            String description = form.data.description.trim();
             if (!description.equals(project.getDescription())) {
                 if (!Validator.validateProjectDescription(description)) {
                     return ErrorMessage.PROJECT_INVALID_DESCRIPTION.respond();
@@ -261,10 +264,10 @@ public class GamesAPI {
             }
         }
 
-        String[] tags = form.getTags();
-        if (tags.length > 0) {
+        List<String> tags = form.data.tags;
+        if (!tags.isEmpty()) {
             List<TagsEntity> tagRecords = Validator.validateTags(project.getProjectType(), tags);
-            if (tagRecords.size() != tags.length) {
+            if (tagRecords.size() != tags.size()) {
                 return ErrorMessage.PROJECT_INVALID_TAGS.respond();
             }
 
@@ -387,21 +390,21 @@ public class GamesAPI {
             return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
         }
 
-        if (!Validator.validateProjectName(form.name)) {
+        if (!Validator.validateProjectName(form.data.name)) {
             return ErrorMessage.PROJECT_INVALID_NAME.respond();
         }
 
-        if (!Validator.validateProjectSummary(form.summary)) {
+        if (!Validator.validateProjectSummary(form.data.summary)) {
             return ErrorMessage.PROJECT_INVALID_SUMMARY.respond();
         }
 
-        if (!Validator.validateProjectDescription(form.description)) {
+        if (!Validator.validateProjectDescription(form.data.description)) {
             return ErrorMessage.PROJECT_INVALID_DESCRIPTION.respond();
         }
 
-        String[] tags = form.getTags();
+        List<String> tags = form.data.tags;
         List<TagsEntity> tagRecords = Validator.validateTags(projectType, tags);
-        if (tagRecords.size() != tags.length) {
+        if (tagRecords.size() != tags.size()) {
             return ErrorMessage.PROJECT_INVALID_TAGS.respond();
         }
 
@@ -415,9 +418,9 @@ public class GamesAPI {
             return ErrorMessage.PROJECT_INVALID_LOGO.respond();
         }
 
-        String name = form.name.trim();
-        String summary = form.summary.trim();
-        String description = form.description.trim();
+        String name = form.data.name.trim();
+        String summary = form.data.summary.trim();
+        String description = form.data.description.trim();
 
         final String projectSlug = this.slugify.slugify(name);
 
