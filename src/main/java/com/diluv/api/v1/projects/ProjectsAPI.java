@@ -143,6 +143,9 @@ public class ProjectsAPI {
             dependencyRecords = Validator.validateDependencies(projectId, form.data.dependencies);
         }
         catch (MismatchException e) {
+            if (e.getMessage() == null) {
+                return e.getErrorMessage().respond();
+            }
             return e.getErrorMessage().respond(e.getMessage());
         }
         catch (NumberFormatException e) {

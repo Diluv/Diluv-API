@@ -1,5 +1,10 @@
 package com.diluv.api.utils.auth;
 
+import java.text.ParseException;
+import java.util.Base64;
+
+import org.apache.commons.codec.digest.DigestUtils;
+
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.auth.tokens.InvalidToken;
@@ -14,11 +19,6 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
-
-import org.apache.commons.codec.digest.DigestUtils;
-
-import java.text.ParseException;
-import java.util.Base64;
 
 public class JWTUtil {
 

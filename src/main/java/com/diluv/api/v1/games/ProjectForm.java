@@ -1,11 +1,11 @@
 package com.diluv.api.v1.games;
 
-import org.jboss.resteasy.annotations.providers.multipart.PartType;
-
 import java.io.InputStream;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.MediaType;
+
+import org.jboss.resteasy.annotations.providers.multipart.PartType;
 
 public class ProjectForm {
 

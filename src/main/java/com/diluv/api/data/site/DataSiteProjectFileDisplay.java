@@ -1,11 +1,11 @@
 package com.diluv.api.data.site;
 
+import java.util.List;
+
 import com.diluv.api.data.DataGameVersion;
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.google.gson.annotations.Expose;
-
-import java.util.List;
 
 /**
  * Represents a file uploaded to a project.

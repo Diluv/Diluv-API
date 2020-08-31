@@ -1,8 +1,8 @@
 package com.diluv.api.utils.error;
 
-import com.diluv.api.utils.response.ErrorResponse;
-
 import javax.ws.rs.core.Response;
+
+import com.diluv.api.utils.response.ErrorResponse;
 
 import static com.diluv.api.utils.error.ErrorType.*;
 
@@ -29,6 +29,7 @@ public enum ErrorMessage {
 
     PROJECT_FILE_INVALID_DEPEND_SELF(BAD_REQUEST, "invalid_depend_self", "The file can't depend on itself."),
     PROJECT_FILE_INVALID_DEPENDENCY_ID(BAD_REQUEST, "invalid_dependency_id", null),
+    PROJECT_FILE_INVALID_DEPENDENCY_TYPE(BAD_REQUEST, "invalid_dependency_type", "Dependency type must be required, optional or incompatible"),
     PROJECT_FILE_INVALID_CHANGELOG(BAD_REQUEST, "invalid_changelog", "The changelog is not valid, must be null or below 2000 characters."),
     PROJECT_FILE_INVALID_FILENAME(BAD_REQUEST, "invalid_filename", "The file name is invalid, must be allowed by the project type"),
     PROJECT_FILE_INVALID_FILE(BAD_REQUEST, "invalid_file", "File is invalid, cannot be null"),

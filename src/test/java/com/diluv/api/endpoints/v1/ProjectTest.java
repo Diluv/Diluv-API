@@ -103,6 +103,11 @@ public class ProjectTest {
         data.gameVersions.add("1.15.2");
         multiPart.put("data", data);
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, "schema/project-files-schema.json");
+
+        data.dependencies.add(new FileDependency(3L, "invalid"));
+        data.version = "1.1.8";
+        multiPart.put("data", data);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_TYPE);
     }
 
     @AfterAll

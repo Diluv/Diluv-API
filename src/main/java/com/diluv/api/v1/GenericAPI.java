@@ -1,5 +1,18 @@
 package com.diluv.api.v1;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.annotations.GZIP;
+
 import com.diluv.api.utils.AuthUtilities;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -7,15 +20,6 @@ import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.ProjectFileDownloadsEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
-
-import org.jboss.resteasy.annotations.GZIP;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 @GZIP
 @Path("/")

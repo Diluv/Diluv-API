@@ -1,17 +1,27 @@
 package com.diluv.api.utils.auth;
 
-import com.diluv.api.utils.MismatchException;
-import com.diluv.api.utils.error.ErrorMessage;
-import com.diluv.api.v1.games.FileDependency;
-import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.record.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
 
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import com.diluv.api.utils.MismatchException;
+import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.v1.games.FileDependency;
+import com.diluv.confluencia.Confluencia;
+import com.diluv.confluencia.database.record.GameVersionsEntity;
+import com.diluv.confluencia.database.record.GamesEntity;
+import com.diluv.confluencia.database.record.ProjectFileDependenciesEntity;
+import com.diluv.confluencia.database.record.ProjectTypesEntity;
+import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.TagsEntity;
 
 public class Validator {
 
@@ -19,6 +29,7 @@ public class Validator {
      * A RegEx pattern for matching valid semantic versions according to the https://semver.org guidelines.
      */
     private static final Pattern SEM_VER = Pattern.compile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
+    private static final List<String> DEP_TYPES = Arrays.asList("required", "optional", "incompatible");
 
     public static boolean validateEmail (String email) {
 
@@ -74,7 +85,7 @@ public class Validator {
     public static List<GameVersionsEntity> validateGameVersions (GamesEntity game, List<String> gameVersions) throws MismatchException {
 
         final List<GameVersionsEntity> gameVersionRecords = new ArrayList<>();
-        if (gameVersions != null && gameVersions.size() > 0) {
+        if (gameVersions != null && !gameVersions.isEmpty()) {
             List<String> versionNotFound = new ArrayList<>(gameVersions);
             for (GameVersionsEntity record : game.getGameVersions()) {
                 for (String gameVersion : gameVersions) {
@@ -97,11 +108,13 @@ public class Validator {
             Set<Long> projectIds = new HashSet<>();
             for (FileDependency dependency : dependencies) {
                 if (dependency.projectId == null) {
-                    throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID, "");
+                    throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID, "Dependency projectId can't be null");
                 }
-
                 if (projectId == dependency.projectId) {
-                    throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF, "");
+                    throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF, null);
+                }
+                if (!DEP_TYPES.contains(dependency.type.toLowerCase())) {
+                    throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_TYPE, null);
                 }
                 projectIds.add(dependency.projectId);
             }
@@ -117,7 +130,7 @@ public class Validator {
             for (FileDependency dep : dependencies) {
                 ProjectFileDependenciesEntity pf = new ProjectFileDependenciesEntity();
                 pf.setDependencyProject(new ProjectsEntity(dep.projectId));
-                pf.setType(dep.type);
+                pf.setType(dep.type.toLowerCase());
                 projectFile.add(pf);
             }
             return projectFile;
