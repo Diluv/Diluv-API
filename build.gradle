@@ -18,7 +18,7 @@ repositories {
 dependencies {
     implementation project('Confluencia')
 
-    implementation group: 'com.diluv.schoomp', name: 'Schoomp', version: '1.0.9'
+    implementation group: 'com.diluv.schoomp', name: 'Schoomp', version: '1.1.0'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.13.3'
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.7'
