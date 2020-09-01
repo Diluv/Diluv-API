@@ -13,7 +13,8 @@ import org.bouncycastle.jcajce.provider.digest.SHA3;
 import org.bouncycastle.util.encoders.Hex;
 
 public class AuthUtilities {
-    private static final String symbols = "ABCDEFGHIJKLMNOPQSTUVWXYZ0123456789";
+    private static final String ALPHANUMERIC = "ABCDEFGHIJKLMNOPQSTUVWXYZ0123456789";
+    private static final String NUMERIC = "0123456789";
     private static final Random random = new SecureRandom();
 
     public static String getBcrypt (char[] password) {
@@ -27,7 +28,15 @@ public class AuthUtilities {
 
         final char[] buf = new char[length];
         for (int i = 0; i < buf.length; ++i)
-            buf[i] = symbols.charAt(random.nextInt(symbols.length()));
+            buf[i] = ALPHANUMERIC.charAt(random.nextInt(ALPHANUMERIC.length()));
+        return new String(buf);
+    }
+
+    public static String getSecureRandomNumeric (int length) {
+
+        final char[] buf = new char[length];
+        for (int i = 0; i < buf.length; ++i)
+            buf[i] = NUMERIC.charAt(random.nextInt(NUMERIC.length()));
         return new String(buf);
     }
 

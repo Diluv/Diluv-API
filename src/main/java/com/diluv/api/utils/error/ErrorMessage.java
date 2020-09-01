@@ -15,9 +15,11 @@ public enum ErrorMessage {
     USER_INVALID_DISPLAY_NAME(BAD_REQUEST, "invalid_display_name", "The display name for the user is not valid. Can only change the case of the username"),
     USER_INVALID_PASSWORD(BAD_REQUEST, "invalid_password", "The password is invalid, must match the current password."),
     USER_INVALID_NEW_PASSWORD(BAD_REQUEST, "invalid_new_password", "The password is invalid, password must be between 8 and 70 characters."),
+    USER_INVALID_EMAIL(BAD_REQUEST, "invalid_email", "The email is not valid."),
     USER_INVALID_MFA(BAD_REQUEST, "invalid_mfa", "MFA is required for the request."),
     USER_INVALID_MFA_SECRET(BAD_REQUEST, "invalid_mfa_secret", "The MFA secret is required, and must be base64."),
     USER_INVALID_MFA_AND_MFA_SECRET(BAD_REQUEST, "invalid_mfa_and_mfa_secret", "The MFA is invalid for."),
+    USER_TAKEN_EMAIL(BAD_REQUEST, "taken_email", "The email is already taken."),
 
     // Project Errors
     PROJECT_INVALID_NAME(BAD_REQUEST, "invalid_name", "The name is not valid"),

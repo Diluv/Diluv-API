@@ -34,6 +34,7 @@ import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.UserEmailEntity;
 import com.diluv.confluencia.database.record.UserMfaRecoveryEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.ProjectSort;
@@ -97,13 +98,17 @@ public class UsersAPI {
         }
 
         if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.password.toCharArray())) {
+
             return ErrorMessage.USER_INVALID_PASSWORD.respond();
         }
 
         if (!GenericValidator.isBlankOrNull(form.displayName)) {
+
             String displayName = form.displayName.trim();
             if (!displayName.equals(user.getDisplayName())) {
+
                 if (!Validator.validateUserDisplayName(user.getUsername(), displayName)) {
+
                     return ErrorMessage.USER_INVALID_DISPLAY_NAME.respond();
                 }
                 user.setDisplayName(displayName);
@@ -111,16 +116,52 @@ public class UsersAPI {
         }
 
         if (!GenericValidator.isBlankOrNull(form.newPassword)) {
+
             String password = form.newPassword.trim();
             if (!Validator.validatePassword(password)) {
+
                 return ErrorMessage.USER_INVALID_NEW_PASSWORD.respond();
             }
 
             user.setPassword(AuthUtilities.getBcrypt(password.toCharArray()));
         }
 
-        return Response.status(Response.Status.NO_CONTENT).build();
+        if (!GenericValidator.isBlankOrNull(form.email)) {
 
+            String email = form.email.trim();
+            if(!user.getEmail().equalsIgnoreCase(email)) {
+
+                if (!Validator.validateEmail(email)) {
+
+                    return ErrorMessage.USER_INVALID_EMAIL.respond();
+                }
+
+                if (Confluencia.USER.existsByEmail(email) || Confluencia.USER.existsTempUserByEmail(email)) {
+
+                    return ErrorMessage.USER_TAKEN_EMAIL.respond();
+                }
+
+                if (Confluencia.USER.existUserEmailByUser(user) ) {
+                    if (!Confluencia.USER.deleteUserEmail(user)) {
+                        // TODO ERROR Internally
+                        return ErrorMessage.THROWABLE.respond();
+                    }
+                }
+
+                UserEmailEntity userEmail = new UserEmailEntity();
+                userEmail.setUser(user);
+                userEmail.setEmail(email);
+                userEmail.setCode(AuthUtilities.getSecureRandomNumeric(8));
+
+                if (!Confluencia.USER.insertUserEmail(userEmail)) {
+                    // TODO ERROR Internally
+                    return ErrorMessage.THROWABLE.respond();
+                }
+                //TODO Send email
+            }
+        }
+
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @PATCH

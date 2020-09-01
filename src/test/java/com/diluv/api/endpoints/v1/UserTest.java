@@ -44,6 +44,14 @@ public class UserTest {
         data.displayName = "Darkhax";
         data.newPassword = "password1";
         Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", 204, data);
+
+        data.displayName = null;
+        data.newPassword = null;
+        data.email = "testing@diluv.com";
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", 204, data);
+
+        data.email = "lclc98@diluv.com";
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", data, 400, ErrorMessage.USER_TAKEN_EMAIL);
     }
 
     @Test

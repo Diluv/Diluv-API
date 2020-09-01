@@ -12,4 +12,7 @@ public class UserUpdateForm {
 
     @Expose
     public String newPassword;
+
+    @Expose
+    public String email;
 }

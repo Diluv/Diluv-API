@@ -36,14 +36,6 @@ public class Validator {
         return EmailValidator.getInstance().isValid(email);
     }
 
-    public static boolean validateUsername (String username) {
-
-        if (GenericValidator.isBlankOrNull(username) || username.length() > 30 || username.length() < 3) {
-            return false;
-        }
-        return GenericValidator.matchRegexp(username, "([A-Za-z0-9-_]+)");
-    }
-
     public static boolean validatePassword (String password) {
 
         return !GenericValidator.isBlankOrNull(password) && password.length() <= 70 && password.length() >= 8;
