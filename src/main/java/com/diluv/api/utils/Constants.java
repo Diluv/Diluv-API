@@ -47,6 +47,7 @@ public final class Constants {
     public static final String ENV = getValueOrDefault("ENVIRONMENT", "PRODUCTION");
 
     public static final String AUTH_BASE_URL = getValueOrDefault("AUTH_BASE_URL", "https://auth.diluv.com");
+    public static final String AUTH_ISSUER = getValueOrDefault("AUTH_ISSUER", "https://auth.diluv.com");
     public static final ConfigurableJWTProcessor<SecurityContext> JWT_PROCESSOR = getJWTProcessor();
 
     public static final String WEBSITE_URL = getValueOrDefault("WEBSITE_URL", "https://diluv.com");
@@ -157,7 +158,7 @@ public final class Constants {
 
             jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(new JOSEObjectType("at+jwt")));
             jwtProcessor.setJWTClaimsSetVerifier(new DefaultJWTClaimsVerifier<>(
-                new JWTClaimsSet.Builder().issuer(AUTH_BASE_URL).build(),
+                new JWTClaimsSet.Builder().issuer(AUTH_ISSUER).build(),
                 new HashSet<>(Arrays.asList("sub", /*"iat",*/ "exp"/*, "jti"*/))));
 
             JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(AUTH_BASE_URL + "/.well-known/openid-configuration/jwks"));
