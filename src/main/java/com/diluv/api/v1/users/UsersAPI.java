@@ -97,7 +97,7 @@ public class UsersAPI {
             return ErrorMessage.NOT_FOUND_USER.respond();
         }
 
-        if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.password.toCharArray())) {
+        if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.currentPassword.toCharArray())) {
 
             return ErrorMessage.USER_INVALID_PASSWORD.respond();
         }

@@ -36,11 +36,11 @@ public class UserTest {
     public void patchSelf () {
 
         UserUpdateForm data = new UserUpdateForm();
-        data.password = "invalid";
+        data.currentPassword = "invalid";
         data.displayName = "ABC";
         Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", data, 400, ErrorMessage.USER_INVALID_PASSWORD);
 
-        data.password = "password";
+        data.currentPassword = "password";
         data.displayName = "Darkhax";
         data.newPassword = "password1";
         Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", 204, data);

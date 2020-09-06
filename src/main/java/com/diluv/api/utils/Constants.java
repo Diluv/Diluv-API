@@ -245,6 +245,10 @@ public final class Constants {
 
     public static String getUserAvatar (String username) {
 
+        if (isDevelopment()) {
+            return "https://images.placeholders.dev/?width=400&height=400";
+        }
+
         return String.format("%s/users/%s/avatar.png", CDN_URL, username);
     }
 

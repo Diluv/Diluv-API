@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 public class UserUpdateForm {
 
     @Expose
-    public String password;
+    public String currentPassword;
 
     @Expose
     public String displayName;

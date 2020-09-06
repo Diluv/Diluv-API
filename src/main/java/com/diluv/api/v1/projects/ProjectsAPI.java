@@ -84,7 +84,6 @@ public class ProjectsAPI {
             return ErrorMessage.INVALID_DATA.respond();
         }
 
-        System.out.println(projectId);
         final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(projectId);
 
         if (project == null) {
