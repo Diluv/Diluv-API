@@ -11,6 +11,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.data.site.DataSiteProjectFilePage;
+
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 
@@ -199,6 +201,47 @@ public class SiteAPI {
         final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
 
         return ResponseUtil.successResponse(new DataSiteProjectFileDisplay(projectFile, gameVersions));
+    }
+
+    @GET
+    @Path("/games/{gameSlug}/{projectTypeSlug}/{projectSlug}/files/{fileId}")
+    public Response getProjectFile (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @PathParam("fileId") long fileId, @Query ProjectFileQuery query) throws ResponseException {
+
+        long page = query.getPage();
+        int limit = query.getLimit();
+        Sort sort = query.getSort(ProjectFileSort.NEW);
+        String gameVersion = query.getGameVersion();
+
+        final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        if (project == null) {
+
+            if (Confluencia.GAME.findOneBySlug(gameSlug) == null) {
+                return ErrorMessage.NOT_FOUND_GAME.respond();
+            }
+
+            if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+                return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
+            }
+
+            return ErrorMessage.NOT_FOUND_PROJECT.respond();
+        }
+
+        boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
+
+        final ProjectFilesEntity projectFile = Confluencia.FILE.findOneById(fileId);
+
+        if (projectFile == null) {
+            return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
+        }
+        if (!projectFile.isReleased() && !authorized) {
+            return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
+        }
+
+        final List<GameVersionsEntity> gameVersionRecords = projectFile.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
+        final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
+
+
+        return ResponseUtil.successResponse(new DataSiteProjectFilePage(new DataBaseProject(project),  new DataSiteProjectFileDisplay(projectFile, gameVersions)));
     }
 
     @GET
