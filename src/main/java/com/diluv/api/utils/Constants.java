@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -311,7 +312,7 @@ public final class Constants {
 
             File file = new File("salt.txt");
             if (file.exists()) {
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                try (BufferedReader reader = Files.newBufferedReader(file.toPath())) {
                     String line = reader.readLine();
                     if (line != null) {
                         String[] s = line.split(":");

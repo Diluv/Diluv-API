@@ -34,7 +34,7 @@ import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.ProjectsEntity;
-import com.diluv.confluencia.database.record.UserEmailEntity;
+import com.diluv.confluencia.database.record.UserChangeEmail;
 import com.diluv.confluencia.database.record.UserMfaRecoveryEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.ProjectSort;
@@ -141,19 +141,19 @@ public class UsersAPI {
                     return ErrorMessage.USER_TAKEN_EMAIL.respond();
                 }
 
-                if (Confluencia.USER.existUserEmailByUser(user) ) {
-                    if (!Confluencia.USER.deleteUserEmail(user)) {
+                if (Confluencia.USER.existUserChangeEmailByUser(user) ) {
+                    if (!Confluencia.USER.deleteUserChangeEmail(user)) {
                         // TODO ERROR Internally
                         return ErrorMessage.THROWABLE.respond();
                     }
                 }
 
-                UserEmailEntity userEmail = new UserEmailEntity();
-                userEmail.setUser(user);
-                userEmail.setEmail(email);
-                userEmail.setCode(AuthUtilities.getSecureRandomNumeric(8));
+                UserChangeEmail userChangeEmail = new UserChangeEmail();
+                userChangeEmail.setUser(user);
+                userChangeEmail.setEmail(email);
+                userChangeEmail.setCode(AuthUtilities.getSecureRandomNumeric(8));
 
-                if (!Confluencia.USER.insertUserEmail(userEmail)) {
+                if (!Confluencia.USER.insertUserChangeEmail(userChangeEmail)) {
                     // TODO ERROR Internally
                     return ErrorMessage.THROWABLE.respond();
                 }
