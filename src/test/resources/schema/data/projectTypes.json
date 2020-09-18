@@ -17,8 +17,8 @@
         "tags": {
             "$ref": "tags.json"
         },
-        "defaultType": {
-            "type": "boolean"
+        "loaders": {
+            "$ref": "loaders.json"
         }
     },
     "required": [

@@ -23,12 +23,16 @@ public class DataProjectType extends DataBaseProjectType {
     @Expose
     private final Long projectCount;
 
+    @Expose
+    private final List<DataLoader> loaders;
+
     public DataProjectType (ProjectTypesEntity rs) {
 
         super(rs);
         this.game = new DataBaseGame(rs.getGame());
         this.tags = rs.getTags().stream().map(DataTag::new).collect(Collectors.toList());
         this.projectCount = null;
+        this.loaders= rs.getProjectTypeLoaders().stream().map(DataLoader::new).collect(Collectors.toList());
     }
 
     public DataProjectType (ProjectTypesEntity rs, long projectCount) {
@@ -37,5 +41,6 @@ public class DataProjectType extends DataBaseProjectType {
         this.game = new DataBaseGame(rs.getGame());
         this.tags = rs.getTags().stream().map(DataTag::new).collect(Collectors.toList());
         this.projectCount = projectCount;
+        this.loaders = rs.getProjectTypeLoaders().stream().map(DataLoader::new).collect(Collectors.toList());
     }
 }
