@@ -133,8 +133,9 @@ public class GamesAPI {
         final String search = query.getSearch();
         final String versions = query.getVersions();
         final String[] tags = query.getTags();
+        final String[] loaders = query.getLoaders();
 
-        final List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByGameAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags);
+        final List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByGameAndProjectType(gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags, loaders);
 
         if (projects.isEmpty()) {
 

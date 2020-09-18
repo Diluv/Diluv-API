@@ -18,6 +18,9 @@ public class ProjectQuery extends PaginationQuery {
     @QueryParam("search")
     private String search;
 
+    @QueryParam("loaders")
+    private String[] loaders;
+
     @Override
     public Sort getSort (Sort defaultSort) {
 
@@ -41,6 +44,15 @@ public class ProjectQuery extends PaginationQuery {
             return new String[0];
         }
         return this.tags;
+    }
+
+    public String[] getLoaders () {
+
+        // Shouldn't happen but have it in case
+        if (this.loaders == null) {
+            return new String[0];
+        }
+        return this.loaders;
     }
 
     public String getSearch () {
