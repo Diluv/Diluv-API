@@ -39,6 +39,7 @@ public enum ErrorMessage {
     PROJECT_FILE_INVALID_CLASSIFIER(BAD_REQUEST, "invalid_classifier", "Must be binary"),
     PROJECT_FILE_INVALID_VERSION(BAD_REQUEST, "invalid_version", "Must specify a semver version at most 20 characters."),
     PROJECT_FILE_INVALID_GAME_VERSION(BAD_REQUEST, "invalid_game_version", null),
+    PROJECT_FILE_INVALID_LOADER(BAD_REQUEST, "invalid_loader", null),
     PROJECT_FILE_TAKEN_VERSION(BAD_REQUEST, "project_file.taken.version", "The file version is taken, must be unique"),
 
     NOT_FOUND_GAME(BAD_REQUEST, "notfound.game", "The game was the not found."),

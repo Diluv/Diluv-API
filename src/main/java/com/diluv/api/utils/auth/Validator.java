@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.diluv.confluencia.database.record.*;
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
 
@@ -16,12 +17,6 @@ import com.diluv.api.utils.MismatchException;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.v1.games.FileDependency;
 import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.record.GameVersionsEntity;
-import com.diluv.confluencia.database.record.GamesEntity;
-import com.diluv.confluencia.database.record.ProjectFileDependenciesEntity;
-import com.diluv.confluencia.database.record.ProjectTypesEntity;
-import com.diluv.confluencia.database.record.ProjectsEntity;
-import com.diluv.confluencia.database.record.TagsEntity;
 
 public class Validator {
 
@@ -162,5 +157,25 @@ public class Validator {
     public static boolean validateVersion (String version) {
 
         return version != null && version.length() <= 20 && SEM_VER.matcher(version).matches();
+    }
+
+    public static List<ProjectTypeLoadersEntity> validateProjectTypeLoaders (ProjectTypesEntity projectType, List<String> loaders) throws MismatchException {
+
+        final List<ProjectTypeLoadersEntity> loadersRecords = new ArrayList<>();
+        if (loaders != null && !loaders.isEmpty()) {
+            List<String> loadersNotFound = new ArrayList<>(loaders);
+            for (ProjectTypeLoadersEntity record : projectType.getProjectTypeLoaders()) {
+                for (String loader : loaders) {
+                    if (record.getSlug().equalsIgnoreCase(loader)) {
+                        loadersNotFound.remove(loader);
+                        loadersRecords.add(record);
+                    }
+                }
+            }
+            if (!loadersNotFound.isEmpty()) {
+                throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_LOADER, String.join(", ", loadersNotFound));
+            }
+        }
+        return loadersRecords;
     }
 }

@@ -23,5 +23,8 @@ public class ProjectFileUpload {
     public List<String> gameVersions = new ArrayList<>();
 
     @Expose
+    public List<String> loaders = new ArrayList<>();
+
+    @Expose
     public List<FileDependency> dependencies = new ArrayList<>();
 }

@@ -1,10 +1,10 @@
 package com.diluv.api.endpoints.v1;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.diluv.api.DiluvAPIServer;
+import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.Request;
+import com.diluv.api.utils.TestUtil;
+import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.v1.games.FileDependency;
 import com.diluv.api.v1.games.ProjectFileUpload;
 
@@ -13,11 +13,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.diluv.api.DiluvAPIServer;
-import com.diluv.api.utils.Constants;
-import com.diluv.api.utils.Request;
-import com.diluv.api.utils.TestUtil;
-import com.diluv.api.utils.error.ErrorMessage;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProjectTest {
 
@@ -108,6 +107,14 @@ public class ProjectTest {
         data.version = "1.1.8";
         multiPart.put("data", data);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_TYPE);
+
+        data.version = "1.1.9";
+        data.dependencies.clear();
+        data.dependencies.add(new FileDependency(2L, "optional"));
+        data.dependencies.add(new FileDependency(3L, "optional"));
+        data.loaders.add("forge");
+        multiPart.put("data", data);
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, "schema/project-files-schema.json");
     }
 
     @AfterAll

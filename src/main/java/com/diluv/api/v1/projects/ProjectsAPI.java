@@ -17,6 +17,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.confluencia.database.record.ProjectFileLoadersEntity;
+import com.diluv.confluencia.database.record.ProjectTypeLoadersEntity;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
@@ -138,6 +141,14 @@ public class ProjectsAPI {
             return e.getErrorMessage().respond(e.getMessage());
         }
 
+        List<ProjectTypeLoadersEntity> projectTypeLoaders;
+        try {
+            projectTypeLoaders = Validator.validateProjectTypeLoaders(project.getProjectType(), form.data.loaders);
+        }
+        catch (MismatchException e) {
+            return e.getErrorMessage().respond(e.getMessage());
+        }
+
         List<ProjectFileDependenciesEntity> dependencyRecords;
         try {
             dependencyRecords = Validator.validateDependencies(projectId, form.data.dependencies);
@@ -180,14 +191,25 @@ public class ProjectsAPI {
         projectFile.setUser(new UsersEntity(token.getUserId()));
 
         if (!gameVersionRecords.isEmpty()) {
-            List<ProjectFileGameVersionsEntity> tagIds = new ArrayList<>();
-            for (GameVersionsEntity gameVersions : gameVersionRecords) {
+            List<ProjectFileGameVersionsEntity> gameVersions = new ArrayList<>();
+            for (GameVersionsEntity version : gameVersionRecords) {
                 ProjectFileGameVersionsEntity gameVersionsEntity = new ProjectFileGameVersionsEntity();
                 gameVersionsEntity.setProjectFile(projectFile);
-                gameVersionsEntity.setGameVersion(gameVersions);
-                tagIds.add(gameVersionsEntity);
+                gameVersionsEntity.setGameVersion(version);
+                gameVersions.add(gameVersionsEntity);
             }
-            projectFile.setGameVersions(tagIds);
+            projectFile.setGameVersions(gameVersions);
+        }
+
+        if (!projectTypeLoaders.isEmpty()) {
+            List<ProjectFileLoadersEntity> loaders = new ArrayList<>();
+            for (ProjectTypeLoadersEntity loader : projectTypeLoaders) {
+                ProjectFileLoadersEntity fileLoadersEntity = new ProjectFileLoadersEntity();
+                fileLoadersEntity.setProjectFile(projectFile);
+                fileLoadersEntity.setLoader(loader);
+                loaders.add(fileLoadersEntity);
+            }
+            projectFile.setLoaders(loaders);
         }
 
         if (!dependencyRecords.isEmpty()) {
