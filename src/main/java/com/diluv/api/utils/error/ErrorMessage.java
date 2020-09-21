@@ -51,6 +51,8 @@ public enum ErrorMessage {
 
     INVALID_DATA(BAD_REQUEST, "invalid_data", "The data is invalid."),
 
+    FILE_NOT_FOUND(NOT_FOUND, "file.404", "The file was not found."),
+
     ENDPOINT_NOT_FOUND(NOT_FOUND, "generic.404", "The endpoint was not found."),
     THROWABLE(INTERNAL_SERVER_ERROR, "generic.throwable", "The request had an error, please try again later.");
 

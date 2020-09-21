@@ -44,6 +44,16 @@ public class GenericAPI {
                 return Response.temporaryRedirect(uri).build();
             }
 
+            ProjectFilesEntity file = Confluencia.FILE.findOneById(fileId);
+
+            if (file == null) {
+                return ErrorMessage.FILE_NOT_FOUND.respond();
+            }
+
+            if (!file.getName().equals(projectFileName)) {
+                return Response.temporaryRedirect(uri).build();
+            }
+
             final String saltedIp = AuthUtilities.getIP(ip);
             if (saltedIp != null) {
                 if (!Confluencia.FILE.insertProjectFileDownloads(new ProjectFileDownloadsEntity(new ProjectFilesEntity(fileId), saltedIp))) {
