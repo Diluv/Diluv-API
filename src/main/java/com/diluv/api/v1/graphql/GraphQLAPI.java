@@ -21,7 +21,9 @@ import com.diluv.api.utils.permissions.UserPermissions;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.Scalars;
 import graphql.kickstart.tools.SchemaParser;
+import graphql.kickstart.tools.SchemaParserOptions;
 import graphql.schema.GraphQLSchema;
 
 @GZIP
@@ -33,12 +35,18 @@ public class GraphQLAPI {
 
     public GraphQLAPI () {
 
+        SchemaParserOptions options = SchemaParserOptions
+            .newOptions()
+//            .fieldVisibility(DefaultGraphqlFieldVisibility.DEFAULT_FIELD_VISIBILITY)
+            .build();
+
         GraphQLSchema schema = SchemaParser.newParser()
             .file("diluv.graphqls")
             .resolvers(new Query(), new ProjectResolver())
+            .scalars(Scalars.GraphQLLong)
+            .options(options)
             .build()
             .makeExecutableSchema();
-
 
         graphQL = GraphQL.newGraphQL(schema)
             .build();
@@ -70,7 +78,6 @@ public class GraphQLAPI {
         Map<String, Object> result = new HashMap<>();
         if (!executionResult.getErrors().isEmpty()) {
             result.put("errors", executionResult.getErrors());
-//            logger.error("Errors: {}", executionResult.getErrors());
         }
         else {
             result.put("data", executionResult.getData());

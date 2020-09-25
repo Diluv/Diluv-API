@@ -1,15 +1,26 @@
+scalar Long
+
 type Query {
     games: [Game!]
-    projects(gameSlug: String!, projectSlug: String!): [Project!]
+    projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project]
+    projectReviews(page: Long, limit: Int) : [Project]
 }
 
 type Game {
-    slug: String!
+    slug: ID!
     name: String!
 }
 type Project {
-    id: Int!
-    name:String!
+    id: ID!
+    name: String!
+    slug: String!
+    summary: String!
+    description: String!
+    cachedDownloads: Long!
+    review: Boolean!
+    released: Boolean!
+    createdAt: Long!
+    updatedAt: Long!
     authors: [Author!]
 }
 type Author {
@@ -17,7 +28,8 @@ type Author {
     user: User!
 }
 type User {
-    id: Int!
+    id: ID!
     username: String!
     displayName: String!
+    createdAt: Long!
 }

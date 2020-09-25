@@ -17,28 +17,37 @@ public abstract class PaginationQuery {
 
     public long getPage () {
 
-        if (this.page == null || this.page < 1) {
+        return getPage(this.page);
+    }
+
+    public int getLimit(){
+        return getLimit(this.limit);
+    }
+
+    public static long getPage (Long page) {
+
+        if (page == null || page < 1) {
             return 1;
         }
 
-        return this.page;
+        return page;
     }
 
-    public int getLimit () {
+    public static int getLimit (Integer limit) {
 
-        if (this.limit == null) {
+        if (limit == null) {
             return 20;
         }
 
-        if (this.limit <= 20) {
-            return 20;
+        if (limit <= 10) {
+            return 10;
         }
 
-        if (this.limit >= 100) {
+        if (limit >= 100) {
             return 100;
         }
 
-        return this.limit;
+        return limit;
     }
 
     public abstract Sort getSort (Sort defaultSort);

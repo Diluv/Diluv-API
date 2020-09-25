@@ -2,8 +2,6 @@ package com.diluv.api.graphql;
 
 import com.diluv.confluencia.database.record.GamesEntity;
 
-import java.util.List;
-
 public class Game {
 
     private String slug;
