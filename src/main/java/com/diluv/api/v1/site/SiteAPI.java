@@ -208,11 +208,6 @@ public class SiteAPI {
     @Path("/games/{gameSlug}/{projectTypeSlug}/{projectSlug}/files/{fileId}")
     public Response getProjectFile (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @PathParam("fileId") long fileId, @Query ProjectFileQuery query) throws ResponseException {
 
-        long page = query.getPage();
-        int limit = query.getLimit();
-        Sort sort = query.getSort(ProjectFileSort.NEW);
-        String gameVersion = query.getGameVersion();
-
         final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
         if (project == null) {
 

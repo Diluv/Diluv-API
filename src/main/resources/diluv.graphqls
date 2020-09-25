@@ -1,0 +1,23 @@
+type Query {
+    games: [Game!]
+    projects(gameSlug: String!, projectSlug: String!): [Project!]
+}
+
+type Game {
+    slug: String!
+    name: String!
+}
+type Project {
+    id: Int!
+    name:String!
+    authors: [Author!]
+}
+type Author {
+    role: String!
+    user: User!
+}
+type User {
+    id: Int!
+    username: String!
+    displayName: String!
+}
