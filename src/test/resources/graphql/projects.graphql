@@ -1,0 +1,23 @@
+query {
+    projects(gameSlug: "minecraft-je", projectTypeSlug: "mods") {
+        id
+        name
+        slug
+        summary
+        description
+        cachedDownloads
+        review
+        released
+        createdAt
+        updatedAt
+        authors {
+            role
+            user {
+                id
+                username
+                displayName
+                createdAt
+            }
+        }
+    }
+}

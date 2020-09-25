@@ -17,6 +17,8 @@ import com.diluv.api.provider.ResponseExceptionMapper;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.v1.featured.FeaturedAPI;
 import com.diluv.api.v1.games.GamesAPI;
+import com.diluv.api.v1.graphql.GraphQLAPI;
+import com.diluv.api.v1.internal.InternalAPI;
 import com.diluv.api.v1.news.NewsAPI;
 import com.diluv.api.v1.projects.ProjectsAPI;
 import com.diluv.api.v1.site.SiteAPI;
@@ -51,6 +53,8 @@ public class APIV1 extends Application {
 
         classes.add(FeaturedAPI.class);
         classes.add(GamesAPI.class);
+        classes.add(GraphQLAPI.class);
+        classes.add(InternalAPI.class);
         classes.add(NewsAPI.class);
         classes.add(ProjectsAPI.class);
         classes.add(SiteAPI.class);

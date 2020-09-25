@@ -2,7 +2,6 @@ package com.diluv.api.v1.projects;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,9 +16,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.confluencia.database.record.ProjectFileLoadersEntity;
-import com.diluv.confluencia.database.record.ProjectTypeLoadersEntity;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
@@ -30,7 +26,6 @@ import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataProjectFileInQueue;
 import com.diluv.api.provider.ResponseException;
-import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.MismatchException;
 import com.diluv.api.utils.auth.JWTUtil;
@@ -44,23 +39,20 @@ import com.diluv.api.v1.games.ProjectFileUploadForm;
 import com.diluv.api.v1.utilities.ProjectService;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GameVersionsEntity;
-import com.diluv.confluencia.database.record.NodeCDNCommitsEntity;
 import com.diluv.confluencia.database.record.ProjectFileDependenciesEntity;
 import com.diluv.confluencia.database.record.ProjectFileGameVersionsEntity;
+import com.diluv.confluencia.database.record.ProjectFileLoadersEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
+import com.diluv.confluencia.database.record.ProjectTypeLoadersEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
-import com.diluv.schoomp.Webhook;
-import com.diluv.schoomp.message.Message;
 
 @GZIP
 @Path("/projects")
 @Produces(MediaType.APPLICATION_JSON)
 public class ProjectsAPI {
-
-    private Webhook webhook = new Webhook(Constants.WEBHOOK_URL, "Diluv - API");
 
     @GET
     @Path("/{id}")
@@ -251,44 +243,6 @@ public class ProjectsAPI {
         }
 
         return ResponseUtil.successResponse(new DataProjectFileInQueue(projectFile, gameSlug, projectTypeSlug, project.getSlug()));
-    }
-
-    @POST
-    @Path("/nodecdn/{hash}")
-    public Response postNodeCDNWebhook (@PathParam("hash") String hash) {
-
-        NodeCDNCommitsEntity entity = Confluencia.SECURITY.findOneNodeCDNCommitsByHash(hash);
-        if (entity == null) {
-            return ErrorMessage.ENDPOINT_NOT_FOUND.respond();
-        }
-
-        entity.setCompleted(true);
-        if (!Confluencia.SECURITY.updateNodeCDNCommits(entity)) {
-            System.out.println("FAILED_UPDATE_NODECDN_COMMIT");
-            // return ErrorMessage.FAILED_UPDATE_NODECDN_COMMIT.respond();
-            return ErrorMessage.THROWABLE.respond();
-        }
-
-        int i = Confluencia.FILE.updateAllForRelease(entity.getCreatedAt());
-        if (i == -1) {
-            System.out.println("FAILED_UPDATE_PROJECT_FILE");
-            // return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();
-            return ErrorMessage.THROWABLE.respond();
-        }
-
-        if (i > 0 && Constants.WEBHOOK_URL != null) {
-            try {
-                Message discordMessage = new Message();
-                discordMessage.setContent(Instant.now().toString() + ": NodeCDN fetched " + i + " files.");
-                discordMessage.setUsername("Hilo");
-                this.webhook.sendMessage(discordMessage);
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @GET
