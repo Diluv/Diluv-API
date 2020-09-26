@@ -57,7 +57,7 @@ public class JWTUtil {
                 JWTClaimsSet claimsSet = processor.process(jwt, null);
                 if (claimsSet != null) {
                     long userId = Long.parseLong(claimsSet.getSubject());
-                    return new Token(userId, ProjectPermissions.getAllPermissions());
+                    return new Token(userId, false, ProjectPermissions.getAllPermissions());
                 }
             }
             catch (JOSEException | BadJOSEException | NumberFormatException e) {
@@ -85,7 +85,7 @@ public class JWTUtil {
 
         //TODO Implement a table
         long userId = Long.parseLong(record.getSubjectId());
-        return new Token(userId, ProjectPermissions.getAllPermissions());
+        return new Token(userId, true, ProjectPermissions.getAllPermissions());
     }
 
     public static boolean isBearerToken (String token) {

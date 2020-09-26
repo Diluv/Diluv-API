@@ -237,7 +237,7 @@ public class SiteAPI {
         final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
 
 
-        return ResponseUtil.successResponse(new DataSiteProjectFilePage(new DataBaseProject(project),  new DataSiteProjectFileDisplay(projectFile, gameVersions)));
+        return ResponseUtil.successResponse(new DataSiteProjectFilePage(new DataBaseProject(project), new DataSiteProjectFileDisplay(projectFile, gameVersions)));
     }
 
     @GET

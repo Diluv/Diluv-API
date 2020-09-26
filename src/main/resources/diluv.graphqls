@@ -1,35 +1,52 @@
-scalar Long
+# This file was generated based on ".graphqlconfig". Do not edit manually.
 
-type Query {
-    games: [Game!]
-    projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project]
-    projectReviews(page: Long, limit: Int) : [Project]
+schema {
+    query: Query
+    mutation: Mutation
 }
 
-type Game {
-    slug: ID!
-    name: String!
-}
-type Project {
-    id: ID!
-    name: String!
-    slug: String!
-    summary: String!
-    description: String!
-    cachedDownloads: Long!
-    review: Boolean!
-    released: Boolean!
-    createdAt: Long!
-    updatedAt: Long!
-    authors: [Author!]
-}
 type Author {
     role: String!
     user: User!
 }
+
+type Game {
+    name: String!
+    slug: ID!
+}
+
+type Mutation {
+    addGame(slug: String!, name: String!, url: String!, logoPNG: Upload!, logoWebp: Upload!): Game
+}
+
+type Project {
+    authors: [Author!]
+    cachedDownloads: Long!
+    createdAt: Long!
+    description: String!
+    id: ID!
+    name: String!
+    released: Boolean!
+    review: Boolean!
+    slug: String!
+    summary: String!
+    updatedAt: Long!
+}
+
+type Query {
+    games: [Game!]
+    projectReviews(limit: Int, page: Long): [Project]
+    projects(gameSlug: String!, limit: Int, page: Long, projectTypeSlug: String!, sort: String): [Project]
+}
+
 type User {
+    createdAt: Long!
+    displayName: String!
     id: ID!
     username: String!
-    displayName: String!
-    createdAt: Long!
 }
+
+
+scalar Long
+
+scalar Upload

@@ -25,11 +25,7 @@ public class DataSiteGame extends DataBaseGame {
 
     public DataSiteGame (FeaturedGamesEntity rs) {
 
-        super(rs.getGame());
-
-        this.url = rs.getGame().getUrl();
-        this.logoURL = Constants.getGameLogoURL(rs.getGame().getSlug());
-        this.defaultProjectType = rs.getGame().getDefaultProjectTypeEntity().getSlug();
+        this(rs.getGame());
     }
 
     public DataSiteGame (GamesEntity rs) {

@@ -1,5 +1,8 @@
 package com.diluv.api;
 
+import java.io.File;
+
+import javax.servlet.MultipartConfigElement;
 import javax.ws.rs.core.Application;
 
 import org.apache.logging.log4j.LogManager;
@@ -63,6 +66,8 @@ public class DiluvAPIServer {
         info.setDeploymentName(name);
         info.setContextPath(path);
 
+        File uploadDirectory = new File(System.getProperty("java.io.tmpdir"));
+        info.setDefaultMultipartConfig(new MultipartConfigElement(uploadDirectory.getAbsolutePath()));
         info.addListener(Servlets.listener(org.jboss.weld.environment.servlet.Listener.class));
 
         this.server.deploy(info);

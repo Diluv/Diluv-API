@@ -5,6 +5,6 @@ import java.util.Collections;
 public class InvalidToken extends Token {
     public InvalidToken () {
 
-        super(-1, Collections.emptyList());
+        super(-1, false, Collections.emptyList());
     }
 }
