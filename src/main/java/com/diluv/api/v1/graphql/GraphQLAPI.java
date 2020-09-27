@@ -36,9 +36,9 @@ import graphql.schema.GraphQLSchema;
 @Produces(MediaType.APPLICATION_JSON)
 public class GraphQLAPI {
 
-    private final HttpServlet delegateServlet;
+    private static HttpServlet delegateServlet;
 
-    public GraphQLAPI () {
+    public static void init () {
 
         SchemaParserOptions options = SchemaParserOptions
             .newOptions()

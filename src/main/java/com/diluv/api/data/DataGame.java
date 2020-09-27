@@ -56,7 +56,7 @@ public class DataGame extends DataBaseGame {
 
         super(rs);
         this.url = rs.getUrl();
-        this.defaultProjectType = rs.getDefaultProjectTypeEntity().getSlug();
+        this.defaultProjectType = rs.getDefaultProjectTypeSlug();
         this.projectTypes = rs.getProjectTypes().stream().map(DataProjectType::new).collect(Collectors.toList());
         this.versions = rs.getGameVersions().stream().map(DataGameVersion::new).collect(Collectors.toList());
         this.logoURL = Constants.getGameLogoURL(rs.getSlug());

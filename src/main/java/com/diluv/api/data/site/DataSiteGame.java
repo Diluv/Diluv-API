@@ -34,6 +34,6 @@ public class DataSiteGame extends DataBaseGame {
 
         this.url = rs.getUrl();
         this.logoURL = Constants.getGameLogoURL(rs.getSlug());
-        this.defaultProjectType = rs.getDefaultProjectTypeEntity().getSlug();
+        this.defaultProjectType = rs.getDefaultProjectTypeSlug();
     }
 }

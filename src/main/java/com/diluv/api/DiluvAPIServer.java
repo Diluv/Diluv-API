@@ -5,6 +5,8 @@ import java.io.File;
 import javax.servlet.MultipartConfigElement;
 import javax.ws.rs.core.Application;
 
+import com.diluv.api.v1.graphql.GraphQLAPI;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jboss.resteasy.core.ResteasyDeploymentImpl;
@@ -35,6 +37,7 @@ public class DiluvAPIServer {
      */
     public void start (String host, int port) {
 
+        GraphQLAPI.init();
         this.deploy("API V1", "/v1", APIV1.class);
 
         this.server.start(Undertow.builder().addHttpListener(port, host));

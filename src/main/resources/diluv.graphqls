@@ -16,7 +16,7 @@ type Game {
 }
 
 type Mutation {
-    addGame(slug: String!, name: String!, url: String!, logoPNG: Upload!, logoWebp: Upload!): Game
+    addGame(slug: String!, name: String!, url: String!, logoPNG: Upload!, logoWebp: Upload!, projectTypeSlug: String!, projectTypeName: String!): Game
 }
 
 type Project {

@@ -95,7 +95,7 @@ public class SiteAPI {
             return ErrorMessage.NOT_FOUND_GAME.respond();
         }
 
-        return ResponseUtil.successResponse(gameRecord.getDefaultProjectTypeEntity().getSlug());
+        return ResponseUtil.successResponse(gameRecord.getDefaultProjectTypeSlug());
     }
 
 

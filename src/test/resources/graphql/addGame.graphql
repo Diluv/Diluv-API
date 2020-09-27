@@ -1,5 +1,5 @@
-mutation ($slug: String!, $name: String!, $url: String!, $logoPNG: Upload!, $logoWebp: Upload!) {
-    addGame(slug: $slug, name: $name, url: $url, logoPNG: $logoPNG, logoWebp: $logoWebp) {
+mutation ($slug: String!, $name: String!, $url: String!, $logoPNG: Upload!, $logoWebp: Upload!, $projectTypeSlug: String!, $projectTypeName: String!) {
+    addGame(slug: $slug, name: $name, url: $url, logoPNG: $logoPNG, logoWebp: $logoWebp, projectTypeSlug: $projectTypeSlug, projectTypeName: $projectTypeName) {
         name
         slug
     }
