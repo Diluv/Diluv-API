@@ -6,14 +6,14 @@ import java.io.IOException;
 
 import javax.servlet.http.Part;
 
-import com.diluv.confluencia.database.record.GameDefaultProjectTypeEntity;
-
 import org.apache.commons.io.IOUtils;
 
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.Confluencia;
+import com.diluv.confluencia.database.record.GameDefaultProjectTypeEntity;
 import com.diluv.confluencia.database.record.GamesEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
+import com.diluv.confluencia.database.record.ProjectsEntity;
 import graphql.GraphQLException;
 import graphql.kickstart.tools.GraphQLMutationResolver;
 
@@ -58,9 +58,45 @@ public class Mutation implements GraphQLMutationResolver {
         }
 
         if (!Confluencia.GAME.insertDefaultProjectType(new GameDefaultProjectTypeEntity(game, projectTypeSlug))) {
-            throw new GraphQLException("Failed to insert project type");
+            throw new GraphQLException("Failed to insert default project type");
         }
 
         return new Game(game);
+    }
+
+    public ProjectType addProjectType (String gameSlug, String projectTypeSlug, String projectTypeName, boolean isDefault) {
+
+        GamesEntity game = Confluencia.GAME.findOneBySlug(gameSlug);
+        if (game == null) {
+            throw new GraphQLException("Game doesn't exists");
+        }
+
+        ProjectTypesEntity projectType = new ProjectTypesEntity();
+        projectType.setGame(game);
+        projectType.setSlug(projectTypeSlug);
+        projectType.setName(projectTypeName);
+
+        if (!Confluencia.GAME.insertProjectType(projectType)) {
+            throw new GraphQLException("Failed to insert project type");
+        }
+
+        if (isDefault) {
+            if (!Confluencia.GAME.updateDefaultProjectType(new GameDefaultProjectTypeEntity(game, projectTypeSlug))) {
+                throw new GraphQLException("Failed to update default project type");
+            }
+        }
+        return new ProjectType(projectType);
+    }
+
+    public Project markReviewed (long projectId) {
+
+        ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(projectId);
+        project.setReleased(true);
+        project.setReview(true);
+        if (!Confluencia.PROJECT.updateProject(project)) {
+            throw new GraphQLException("Failed to update project");
+        }
+
+        return new Project(project);
     }
 }

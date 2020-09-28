@@ -1,14 +1,15 @@
 package com.diluv.api.graphql;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.diluv.api.utils.query.PaginationQuery;
 import com.diluv.confluencia.Confluencia;
+import com.diluv.confluencia.database.record.GamesEntity;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 import graphql.kickstart.tools.GraphQLQueryResolver;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class Query implements GraphQLQueryResolver {
 

@@ -1,0 +1,6 @@
+mutation ($gameSlug: String!, $projectTypeSlug: String!, $projectTypeName: String!, $isDefault: Boolean!) {
+    addProjectType(gameSlug: $gameSlug, projectTypeSlug: $projectTypeSlug, projectTypeName: $projectTypeName, isDefault: $isDefault) {
+        name
+        slug
+    }
+}

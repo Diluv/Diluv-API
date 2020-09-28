@@ -5,44 +5,70 @@ schema {
     mutation: Mutation
 }
 
+type Query {
+    games: [Game!]
+    projectReviews(page: Long, limit: Int): [Project]
+    projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project]
+}
+
+type Mutation {
+    addGame(slug: String!, name: String!, url: String!, logoPNG: Upload!, logoWebp: Upload!, projectTypeSlug: String!, projectTypeName: String!): Game
+    addProjectType(gameSlug: String!, projectTypeSlug: String!, projectTypeName: String!, isDefault: Boolean!): ProjectType
+    markReviewed (projectId: ID!): Project
+}
+
 type Author {
     role: String!
     user: User!
 }
 
 type Game {
-    name: String!
     slug: ID!
-}
-
-type Mutation {
-    addGame(slug: String!, name: String!, url: String!, logoPNG: Upload!, logoWebp: Upload!, projectTypeSlug: String!, projectTypeName: String!): Game
+    name: String!
+    projectTypes: [ProjectType]
 }
 
 type Project {
-    authors: [Author!]
-    cachedDownloads: Long!
-    createdAt: Long!
-    description: String!
     id: ID!
-    name: String!
-    released: Boolean!
-    review: Boolean!
     slug: String!
+    name: String!
     summary: String!
+    description: String!
+    cachedDownloads: Long!
+    review: Boolean!
+    released: Boolean!
     updatedAt: Long!
+    createdAt: Long!
+    authors: [Author!]
+    projectType: ProjectType!
 }
 
-type Query {
-    games: [Game!]
-    projectReviews(limit: Int, page: Long): [Project]
-    projects(gameSlug: String!, limit: Int, page: Long, projectTypeSlug: String!, sort: String): [Project]
+type ProjectType {
+    slug: String!
+    name: String!
+    maxFileSize: Long!
+    tags: [Tag]
+    loaders: [ProjectTypeLoader]
+}
+
+type Tag {
+    id: ID!
+    slug: String!
+    name: String!
+    projectType: ProjectType!
+}
+
+type ProjectTypeLoader {
+    id: ID!
+    slug: String!
+    name: String!
+    projectType: ProjectType!
 }
 
 type User {
+    id: ID!
     createdAt: Long!
     displayName: String!
-    id: ID!
     username: String!
 }
 

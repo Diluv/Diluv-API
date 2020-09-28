@@ -1,23 +1,24 @@
 package com.diluv.api.graphql;
 
-import com.diluv.confluencia.database.record.GamesEntity;
+import com.diluv.confluencia.database.record.TagsEntity;
 
-public class Game {
-
+public class Tag {
+    private long id;
     private String slug;
     private String name;
 
-    private GamesEntity entity;
+    private TagsEntity entity;
 
-    public Game (GamesEntity entity) {
+    public Tag (TagsEntity entity) {
 
+        this.id = entity.getId();
         this.slug = entity.getSlug();
         this.name = entity.getName();
 
         this.entity = entity;
     }
 
-    public GamesEntity getEntity () {
+    public TagsEntity getEntity () {
 
         return this.entity;
     }

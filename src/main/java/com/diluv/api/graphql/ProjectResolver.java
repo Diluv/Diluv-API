@@ -15,4 +15,9 @@ public class ProjectResolver implements GraphQLResolver<Project> {
         authors.addAll(project.getEntity().getAuthors().stream().map(a -> new Author(new User(a.getUser()), a.getRole())).collect(Collectors.toList()));
         return authors;
     }
+
+    public ProjectType projectType (Project project) {
+
+        return new ProjectType(project.getEntity().getProjectType());
+    }
 }

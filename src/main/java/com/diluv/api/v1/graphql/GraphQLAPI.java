@@ -17,10 +17,13 @@ import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.annotations.GZIP;
 
+import com.diluv.api.graphql.GameResolver;
+import com.diluv.api.graphql.LoaderResolver;
 import com.diluv.api.graphql.Mutation;
 import com.diluv.api.graphql.ProjectResolver;
+import com.diluv.api.graphql.ProjectTypeResolver;
 import com.diluv.api.graphql.Query;
-import com.diluv.api.utils.auth.JWTUtil;
+import com.diluv.api.graphql.TagResolver;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.UserPermissions;
@@ -47,7 +50,13 @@ public class GraphQLAPI {
 
         GraphQLSchema schema = SchemaParser.newParser()
             .file("diluv.graphqls")
-            .resolvers(new Query(), new ProjectResolver(), new Mutation())
+            .resolvers(new Query(),
+                new Mutation(),
+                new ProjectTypeResolver(),
+                new ProjectResolver(),
+                new TagResolver(),
+                new LoaderResolver(),
+                new GameResolver())
             .scalars(Scalars.GraphQLLong, ApolloScalars.Upload)
             .options(options)
             .build()
@@ -75,9 +84,9 @@ public class GraphQLAPI {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        if (token == JWTUtil.INVALID || token.isApiToken()) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond();
-        }
+//        if (token == JWTUtil.INVALID || token.isApiToken()) {
+//            return ErrorMessage.USER_INVALID_TOKEN.respond();
+//        }
 
         if (!UserPermissions.hasPermission(token, UserPermissions.VIEW_ADMIN)) {
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
