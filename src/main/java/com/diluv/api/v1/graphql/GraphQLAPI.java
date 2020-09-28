@@ -15,6 +15,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.utils.auth.JWTUtil;
+
 import org.jboss.resteasy.annotations.GZIP;
 
 import com.diluv.api.graphql.GameResolver;
@@ -84,9 +86,9 @@ public class GraphQLAPI {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-//        if (token == JWTUtil.INVALID || token.isApiToken()) {
-//            return ErrorMessage.USER_INVALID_TOKEN.respond();
-//        }
+        if (token == JWTUtil.INVALID || token.isApiToken()) {
+            return ErrorMessage.USER_INVALID_TOKEN.respond();
+        }
 
         if (!UserPermissions.hasPermission(token, UserPermissions.VIEW_ADMIN)) {
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
