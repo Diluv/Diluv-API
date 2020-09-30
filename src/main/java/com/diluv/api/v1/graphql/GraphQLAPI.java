@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import com.diluv.api.utils.auth.JWTUtil;
 
 import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.spi.CorsHeaders;
 
 import com.diluv.api.graphql.GameResolver;
 import com.diluv.api.graphql.LoaderResolver;
@@ -64,7 +65,6 @@ public class GraphQLAPI {
             .build()
             .makeExecutableSchema();
 
-
         delegateServlet = GraphQLHttpServlet.with(schema);
     }
 
@@ -94,6 +94,10 @@ public class GraphQLAPI {
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
         }
         try {
+
+            resp.addHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, req.getHeader(CorsHeaders.ORIGIN));
+            resp.addHeader(CorsHeaders.VARY, CorsHeaders.ORIGIN);
+            resp.addHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
             delegateServlet.service(req, resp);
         }
         catch (ServletException e) {
