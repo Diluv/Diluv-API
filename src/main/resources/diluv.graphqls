@@ -6,15 +6,15 @@ schema {
 }
 
 type Query {
-    games: [Game!]
-    projectReviews(page: Long, limit: Int): [Project]
-    projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project]
+    games: [Game!]!
+    projectReviews(page: Long, limit: Int): [Project!]
+    projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project!]
 }
 
 type Mutation {
     addGame(slug: String!, name: String!, url: String!, logoPNG: Upload!, logoWebp: Upload!, projectTypeSlug: String!, projectTypeName: String!): Game
     addProjectType(gameSlug: String!, projectTypeSlug: String!, projectTypeName: String!, isDefault: Boolean!): ProjectType
-    markReviewed (projectId: ID!): Project
+#    reviewed (projectId: ID!, requestChange: Boolean!, reason: String): Project
 }
 
 type Author {
@@ -25,7 +25,7 @@ type Author {
 type Game {
     slug: ID!
     name: String!
-    projectTypes: [ProjectType]
+    projectTypes: [ProjectType!]!
 }
 
 type Project {
@@ -39,7 +39,7 @@ type Project {
     released: Boolean!
     updatedAt: Long!
     createdAt: Long!
-    authors: [Author!]
+    authors: [Author!]!
     projectType: ProjectType!
 }
 
@@ -47,8 +47,8 @@ type ProjectType {
     slug: String!
     name: String!
     maxFileSize: Long!
-    tags: [Tag]
-    loaders: [ProjectTypeLoader]
+    tags: [Tag!]
+    loaders: [ProjectTypeLoader!]
 }
 
 type Tag {
