@@ -18,6 +18,11 @@ public class Query implements GraphQLQueryResolver {
         return Confluencia.GAME.findAll(1, 25, GameSort.NEW, "").stream().map(Game::new).collect(Collectors.toList());
     }
 
+    public Game game (String gameSlug) {
+
+        return new Game(Confluencia.GAME.findOneBySlug(gameSlug));
+    }
+
     public List<Project> projects (String gameSlug, String projectTypeSlug, Long page, Integer limit, String sort) {
 
         long p = PaginationQuery.getPage(page);

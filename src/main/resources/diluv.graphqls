@@ -7,6 +7,7 @@ schema {
 
 type Query {
     games: [Game!]!
+    game(gameSlug: String!): Game!
     projectReviews(page: Long, limit: Int): [Project!]
     projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project!]
 }
@@ -25,6 +26,7 @@ type Author {
 type Game {
     slug: ID!
     name: String!
+    defaultProjectType: String!
     projectTypes: [ProjectType!]!
 }
 
