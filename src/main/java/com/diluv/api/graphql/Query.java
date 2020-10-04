@@ -13,14 +13,24 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 public class Query implements GraphQLQueryResolver {
 
-    public List<Game> games () {
+    public List<Game> games (long page, int limit, String sort) {
 
-        return Confluencia.GAME.findAll(1, 25, GameSort.NEW, "").stream().map(Game::new).collect(Collectors.toList());
+        return Confluencia.GAME.findAll(page, limit, getSortOrDefault(sort, ProjectSort.LIST, ProjectSort.NEW), "").stream().map(Game::new).collect(Collectors.toList());
     }
 
     public Game game (String gameSlug) {
 
         return new Game(Confluencia.GAME.findOneBySlug(gameSlug));
+    }
+
+    public Project project (String gameSlug, String projectTypeSlug, String projectSlug) {
+
+        return new Project(Confluencia.PROJECT.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug));
+    }
+
+    public Project projectById (long projectId) {
+
+        return new Project(Confluencia.PROJECT.findOneProjectByProjectId(projectId));
     }
 
     public List<Project> projects (String gameSlug, String projectTypeSlug, Long page, Integer limit, String sort) {

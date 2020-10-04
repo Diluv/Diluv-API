@@ -11,4 +11,9 @@ public class GameResolver implements GraphQLResolver<Game> {
 
         return game.getEntity().getProjectTypes().stream().map(ProjectType::new).collect(Collectors.toList());
     }
+
+    public List<GameVersion> gameVersions (Game game) {
+
+        return game.getEntity().getGameVersions().stream().map(GameVersion::new).collect(Collectors.toList());
+    }
 }

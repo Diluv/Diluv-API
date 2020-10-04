@@ -7,6 +7,8 @@ public class Game {
     private String slug;
     private String name;
     private String defaultProjectType;
+    private String url;
+    private String createdAt;
     private GamesEntity entity;
 
     public Game (GamesEntity entity) {
@@ -14,7 +16,9 @@ public class Game {
         this.slug = entity.getSlug();
         this.name = entity.getName();
         this.defaultProjectType = entity.getDefaultProjectTypeSlug();
-        this.entity = entity;
+        this.url = entity.getUrl();
+        this.createdAt = entity.getCreatedAt().toLocalDateTime().toString();
+        this.entity = entity;   
     }
 
     public GamesEntity getEntity () {
