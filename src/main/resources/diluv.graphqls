@@ -6,10 +6,12 @@ schema {
 }
 
 type Query {
-    games: [Game!]!
-    projectTypes(gameSlug: String!): [ProjectType!]!
-    projectReviews(page: Long, limit: Int): [Project!]
+    games(page: Int = 1, limit: Int = 20, sort: String = "new"): [Game!]!
+    game(gameSlug: String!): Game!
+    projectReviews(page: Long = 1, limit: Int = 20): [Project!]
     projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project!]
+    project(gameSlug: String!, projectTypeSlug: String!, projectSlug: String!): Project!
+    projectById(id: Long!): Project!
 }
 
 type Mutation {
@@ -26,7 +28,11 @@ type Author {
 type Game {
     slug: ID!
     name: String!
+    defaultProjectType: String!
     projectTypes: [ProjectType!]!
+    gameVersions: [GameVersion!]!
+    createdAt: String!
+    url: String!
 }
 
 type Project {
@@ -50,6 +56,13 @@ type ProjectType {
     maxFileSize: Long!
     tags: [Tag!]
     loaders: [ProjectTypeLoader!]
+}
+
+type GameVersion {
+    id: Long!
+    version: String!
+    type: String!
+    releasedAt: String!
 }
 
 type Tag {
