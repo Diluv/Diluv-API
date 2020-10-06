@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import com.diluv.api.utils.query.PaginationQuery;
 import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.record.GamesEntity;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
@@ -16,6 +15,11 @@ public class Query implements GraphQLQueryResolver {
     public List<Game> games () {
 
         return Confluencia.GAME.findAll(1, 25, GameSort.NEW, "").stream().map(Game::new).collect(Collectors.toList());
+    }
+
+    public List<ProjectType> projectTypes (String gameSlug) {
+
+        return Confluencia.GAME.findAllProjectTypesByGameSlug(gameSlug).stream().map(ProjectType::new).collect(Collectors.toList());
     }
 
     public List<Project> projects (String gameSlug, String projectTypeSlug, Long page, Integer limit, String sort) {

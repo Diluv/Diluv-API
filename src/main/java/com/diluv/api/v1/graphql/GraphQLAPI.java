@@ -86,9 +86,9 @@ public class GraphQLAPI {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        if (token == JWTUtil.INVALID || token.isApiToken()) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond();
-        }
+//        if (token == JWTUtil.INVALID || token.isApiToken()) {
+//            return ErrorMessage.USER_INVALID_TOKEN.respond();
+//        }
 
         if (!UserPermissions.hasPermission(token, UserPermissions.VIEW_ADMIN)) {
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();

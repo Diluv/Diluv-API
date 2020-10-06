@@ -9,13 +9,20 @@ import javax.servlet.http.Part;
 import org.apache.commons.io.IOUtils;
 
 import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.auth.JWTUtil;
+import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GameDefaultProjectTypeEntity;
 import com.diluv.confluencia.database.record.GamesEntity;
+import com.diluv.confluencia.database.record.ProjectRequestChangeEntity;
+import com.diluv.confluencia.database.record.ProjectReviewEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.UsersEntity;
 import graphql.GraphQLException;
+import graphql.kickstart.servlet.context.DefaultGraphQLServletContext;
 import graphql.kickstart.tools.GraphQLMutationResolver;
+import graphql.schema.DataFetchingEnvironment;
 
 public class Mutation implements GraphQLMutationResolver {
 
@@ -72,27 +79,47 @@ public class Mutation implements GraphQLMutationResolver {
         }
 
         ProjectTypesEntity projectType = new ProjectTypesEntity();
-        projectType.setGame(game);
         projectType.setSlug(projectTypeSlug);
         projectType.setName(projectTypeName);
+        projectType.setMaxFileSize(25000000L);
 
-        if (!Confluencia.GAME.insertProjectType(projectType)) {
-            throw new GraphQLException("Failed to insert project type");
-        }
+        game.addProjectType(projectType);
 
         if (isDefault) {
-            if (!Confluencia.GAME.updateDefaultProjectType(new GameDefaultProjectTypeEntity(game, projectTypeSlug))) {
-                throw new GraphQLException("Failed to update default project type");
-            }
+           game.setDefaultProjectTypeEntity(projectTypeSlug);
         }
+
+        if (!Confluencia.GAME.updateGame(game)) {
+            throw new GraphQLException("Failed to update game");
+        }
+
         return new ProjectType(projectType);
     }
 
-    public Project markReviewed (long projectId) {
+    public Project reviewed (long projectId, boolean requestChange, String reason, DataFetchingEnvironment env) {
 
         ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(projectId);
-        project.setReleased(true);
-        project.setReview(true);
+        if (project == null) {
+            throw new GraphQLException("Project doesn't exists");
+        }
+
+        DefaultGraphQLServletContext context = env.getContext();
+        Token token = JWTUtil.getToken(context.getHttpServletRequest().getHeader("Authorization"));
+
+        ProjectReviewEntity review = new ProjectReviewEntity();
+        review.setReviewedBy(new UsersEntity(token.getUserId()));
+        if (requestChange) {
+            ProjectRequestChangeEntity requestChangeEntity = new ProjectRequestChangeEntity();
+            requestChangeEntity.setReason(reason);
+            review.setProjectRequestChange(requestChangeEntity);
+        }
+        else {
+            project.setReleased(true);
+            project.setReview(true);
+        }
+
+        project.addReview(review);
+
         if (!Confluencia.PROJECT.updateProject(project)) {
             throw new GraphQLException("Failed to update project");
         }

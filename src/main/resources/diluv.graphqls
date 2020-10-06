@@ -7,6 +7,7 @@ schema {
 
 type Query {
     games: [Game!]!
+    projectTypes(gameSlug: String!): [ProjectType!]!
     projectReviews(page: Long, limit: Int): [Project!]
     projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project!]
 }
@@ -14,7 +15,7 @@ type Query {
 type Mutation {
     addGame(slug: String!, name: String!, url: String!, logoPNG: Upload!, logoWebp: Upload!, projectTypeSlug: String!, projectTypeName: String!): Game
     addProjectType(gameSlug: String!, projectTypeSlug: String!, projectTypeName: String!, isDefault: Boolean!): ProjectType
-#    reviewed (projectId: ID!, requestChange: Boolean!, reason: String): Project
+    reviewed (projectId: ID!, requestChange: Boolean!, reason: String): Project
 }
 
 type Author {

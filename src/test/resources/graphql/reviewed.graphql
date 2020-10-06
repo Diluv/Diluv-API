@@ -1,0 +1,6 @@
+mutation ($projectId: ID!, $reason:String, $requestChange: Boolean!) {
+    reviewed(projectId:$projectId , reason:$reason, requestChange: $requestChange ) {
+        name
+        slug
+    }
+}
