@@ -24,6 +24,7 @@ public class JWTUtil {
 
     public static final InvalidToken INVALID = new InvalidToken();
     public static final String BEARER = "Bearer ";
+    private static final String TOKEN_TYPE = "reference_token";
 
     protected static JWT getJWT (String token) {
 
@@ -66,10 +67,9 @@ public class JWTUtil {
             }
         }
 
-        String type = "reference_token";
-        byte[] sha256 = DigestUtils.sha256(token + ":" + type);
+        byte[] sha256 = DigestUtils.sha256(token + ":" + TOKEN_TYPE);
         String key = Base64.getEncoder().encodeToString(sha256);
-        PersistedGrantsEntity record = Confluencia.SECURITY.findPersistedGrantByKeyAndType(key, type);
+        PersistedGrantsEntity record = Confluencia.SECURITY.findPersistedGrantByKeyAndType(key, TOKEN_TYPE);
         if (record == null) {
             return INVALID;
         }
