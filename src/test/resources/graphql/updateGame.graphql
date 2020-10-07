@@ -1,0 +1,6 @@
+mutation {
+    updateGame(slug: "subnautica", name: "Temp Subnautica") {
+        name
+        slug
+    }
+}

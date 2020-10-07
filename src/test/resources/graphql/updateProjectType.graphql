@@ -1,0 +1,6 @@
+mutation {
+    updateProjectType(gameSlug:"subnautica", projectTypeSlug: "mods", projectTypeName: "MODS", isDefault: true) {
+        name
+        slug
+    }
+}

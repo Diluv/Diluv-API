@@ -12,7 +12,6 @@ import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.record.GameDefaultProjectTypeEntity;
 import com.diluv.confluencia.database.record.GamesEntity;
 import com.diluv.confluencia.database.record.ProjectRequestChangeEntity;
 import com.diluv.confluencia.database.record.ProjectReviewEntity;
@@ -52,26 +51,63 @@ public class Mutation implements GraphQLMutationResolver {
         game.setUrl(url);
 
         ProjectTypesEntity projectType = new ProjectTypesEntity();
-        projectType.setGame(game);
         projectType.setSlug(projectTypeSlug);
         projectType.setName(projectTypeName);
 
+        game.addProjectType(projectType);
+        game.setDefaultProjectTypeEntity(projectTypeSlug);
         if (!Confluencia.GAME.insertGame(game)) {
             throw new GraphQLException("Failed to insert game");
-        }
-
-        if (!Confluencia.GAME.insertProjectType(projectType)) {
-            throw new GraphQLException("Failed to insert project type");
-        }
-
-        if (!Confluencia.GAME.insertDefaultProjectType(new GameDefaultProjectTypeEntity(game, projectTypeSlug))) {
-            throw new GraphQLException("Failed to insert default project type");
         }
 
         return new Game(game);
     }
 
-    public ProjectType addProjectType (String gameSlug, String projectTypeSlug, String projectTypeName, boolean isDefault) {
+    public Game updateGame (String slug, String name, String url, Part logoPNG, Part logoWebp) {
+
+        GamesEntity game = Confluencia.GAME.findOneBySlug(slug);
+
+        if (game == null) {
+            throw new GraphQLException("Game not found");
+        }
+
+        if (name != null) {
+            game.setName(name);
+        }
+
+        if (url != null) {
+            game.setUrl(url);
+        }
+
+        if (logoPNG != null || logoWebp != null) {
+            File logoPath = new File(Constants.CDN_FOLDER, "games/" + game.getSlug());
+            logoPath.mkdirs();
+            try {
+                if (logoPNG != null) {
+                    try (FileOutputStream fosPNG = new FileOutputStream(new File(logoPath, "logo.png"))) {
+                        IOUtils.copy(logoPNG.getInputStream(), fosPNG);
+                    }
+                }
+                if (logoWebp != null) {
+                    try (FileOutputStream fosWebp = new FileOutputStream(new File(logoPath, "logo.webp"))) {
+                        IOUtils.copy(logoWebp.getInputStream(), fosWebp);
+                    }
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+                throw new GraphQLException("Failed to create game logo's");
+            }
+        }
+
+        if (!Confluencia.update(game)) {
+            throw new GraphQLException("Failed to update game");
+        }
+
+        return new Game(game);
+    }
+
+    public ProjectType addProjectType (String gameSlug, String projectTypeSlug, String projectTypeName, boolean isDefault, Long maxFileSize) {
 
         GamesEntity game = Confluencia.GAME.findOneBySlug(gameSlug);
         if (game == null) {
@@ -81,16 +117,49 @@ public class Mutation implements GraphQLMutationResolver {
         ProjectTypesEntity projectType = new ProjectTypesEntity();
         projectType.setSlug(projectTypeSlug);
         projectType.setName(projectTypeName);
-        projectType.setMaxFileSize(25000000L);
-
+        if (maxFileSize == null) {
+            projectType.setMaxFileSize(25000000L);
+        }
+        else {
+            projectType.setMaxFileSize(maxFileSize);
+        }
         game.addProjectType(projectType);
 
         if (isDefault) {
-           game.setDefaultProjectTypeEntity(projectTypeSlug);
+            game.setDefaultProjectTypeEntity(projectTypeSlug);
         }
 
-        if (!Confluencia.GAME.updateGame(game)) {
+        if (!Confluencia.update(game)) {
             throw new GraphQLException("Failed to update game");
+        }
+
+        return new ProjectType(projectType);
+    }
+
+    public ProjectType updateProjectType (String gameSlug, String projectTypeSlug, String projectTypeName, Boolean isDefault, Long maxFileSize) {
+
+        ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        if (projectType == null) {
+            throw new GraphQLException("Project Type doesn't exists");
+        }
+
+        if (projectTypeName != null) {
+            projectType.setName(projectTypeName);
+        }
+
+        if (Boolean.TRUE.equals(isDefault)) {
+            projectType.getGame().setDefaultProjectTypeEntity(projectTypeSlug);
+            if (!Confluencia.update(projectType.getGame())) {
+                throw new GraphQLException("Failed to update default project type");
+            }
+        }
+
+        if (maxFileSize != null) {
+            projectType.setMaxFileSize(maxFileSize);
+        }
+
+        if (!Confluencia.update(projectType)) {
+            throw new GraphQLException("Failed to project type");
         }
 
         return new ProjectType(projectType);
@@ -120,7 +189,7 @@ public class Mutation implements GraphQLMutationResolver {
 
         project.addReview(review);
 
-        if (!Confluencia.PROJECT.updateProject(project)) {
+        if (!Confluencia.update(project)) {
             throw new GraphQLException("Failed to update project");
         }
 

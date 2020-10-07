@@ -282,7 +282,7 @@ public class GamesAPI {
             }
 
         }
-        if (!Confluencia.PROJECT.updateProject(project)) {
+        if (!Confluencia.update(project)) {
             // FAILED_UPDATE_PROJECT
             return ErrorMessage.THROWABLE.respond();
         }

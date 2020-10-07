@@ -219,7 +219,7 @@ public class UsersAPI {
                 return ErrorMessage.THROWABLE.respond();
             }
 
-            if (!Confluencia.USER.updateUser(user)) {
+            if (!Confluencia.update(user)) {
                 //return ErrorMessage.FAILED_UPDATE_USER.respond();
                 return ErrorMessage.THROWABLE.respond();
             }
@@ -233,7 +233,7 @@ public class UsersAPI {
                 return ErrorMessage.THROWABLE.respond();
             }
 
-            if (!Confluencia.USER.updateUser(user)) {
+            if (!Confluencia.update(user)) {
                 //return ErrorMessage.FAILED_UPDATE_USER.respond();
                 return ErrorMessage.THROWABLE.respond();
             }

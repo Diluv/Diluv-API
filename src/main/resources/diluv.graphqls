@@ -15,9 +15,11 @@ type Query {
 }
 
 type Mutation {
-    addGame(slug: String!, name: String!, url: String!, logoPNG: Upload!, logoWebp: Upload!, projectTypeSlug: String!, projectTypeName: String!): Game
-    addProjectType(gameSlug: String!, projectTypeSlug: String!, projectTypeName: String!, isDefault: Boolean!): ProjectType
-    reviewed (projectId: ID!, requestChange: Boolean!, reason: String): Project
+    addGame(slug: String!, name: String!, url: String!, logoPNG: Upload!, logoWebp: Upload!, projectTypeSlug: String!, projectTypeName: String!): Game!
+    updateGame(slug: String!, name: String, url: String, logoPNG: Upload, logoWebp: Upload): Game!
+    addProjectType(gameSlug: String!, projectTypeSlug: String!, projectTypeName: String!, isDefault: Boolean!, maxFileSize: Long): ProjectType!
+    updateProjectType(gameSlug: String!, projectTypeSlug: String!, projectTypeName: String, isDefault: Boolean, maxFileSize: Long): ProjectType!
+    reviewed (projectId: ID!, requestChange: Boolean!, reason: String): Project!
 }
 
 type Author {

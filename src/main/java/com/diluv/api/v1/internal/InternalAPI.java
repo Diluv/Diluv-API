@@ -37,7 +37,7 @@ public class InternalAPI {
         }
 
         entity.setCompleted(true);
-        if (!Confluencia.SECURITY.updateNodeCDNCommits(entity)) {
+        if (!Confluencia.update(entity)) {
             System.out.println("FAILED_UPDATE_NODECDN_COMMIT");
             // return ErrorMessage.FAILED_UPDATE_NODECDN_COMMIT.respond();
             return ErrorMessage.THROWABLE.respond();
