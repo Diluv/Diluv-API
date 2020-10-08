@@ -3,6 +3,7 @@ package com.diluv.api.graphql;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.diluv.api.data.DataImage;
 import graphql.kickstart.tools.GraphQLResolver;
 
 public class GameResolver implements GraphQLResolver<Game> {

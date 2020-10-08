@@ -1,5 +1,6 @@
 package com.diluv.api.graphql;
 
+import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.GamesEntity;
 
 public class Game {
@@ -9,6 +10,7 @@ public class Game {
     private String defaultProjectType;
     private String url;
     private String createdAt;
+    private Image logo;
     private GamesEntity entity;
 
     public Game (GamesEntity entity) {
@@ -18,7 +20,8 @@ public class Game {
         this.defaultProjectType = entity.getDefaultProjectTypeSlug();
         this.url = entity.getUrl();
         this.createdAt = entity.getCreatedAt().toLocalDateTime().toString();
-        this.entity = entity;   
+        this.logo = new Image(Constants.getGameLogoURL(entity.getSlug()));
+        this.entity = entity;
     }
 
     public GamesEntity getEntity () {

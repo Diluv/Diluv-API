@@ -15,4 +15,14 @@ public class DataImage {
         this.fallback = fallback;
         this.sources = sources;
     }
+
+    public DataImageSource getFallback () {
+
+        return fallback;
+    }
+
+    public DataImageSource[] getSources () {
+
+        return sources;
+    }
 }

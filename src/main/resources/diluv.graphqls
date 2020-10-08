@@ -35,6 +35,7 @@ type Game {
     gameVersions: [GameVersion!]!
     createdAt: String!
     url: String!
+    logo: Image!
 }
 
 type Project {
@@ -87,6 +88,17 @@ type User {
     displayName: String!
     username: String!
 }
+
+type ImageSource {
+    src: String!
+    type: String!
+}
+
+type Image {
+    fallback: ImageSource!
+    sources: [ImageSource!]!
+}
+
 
 
 scalar Long

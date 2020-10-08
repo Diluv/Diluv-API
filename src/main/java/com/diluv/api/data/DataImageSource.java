@@ -15,4 +15,14 @@ public class DataImageSource {
         this.src = src;
         this.type = type;
     }
+
+    public String getSrc () {
+
+        return src;
+    }
+
+    public String getType () {
+
+        return type;
+    }
 }
