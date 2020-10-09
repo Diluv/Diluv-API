@@ -8,6 +8,7 @@ schema {
 type Query {
     games(page: Int = 1, limit: Int = 20, sort: String = "new"): [Game!]!
     game(gameSlug: String!): Game!
+    projectType(gameSlug: String!, projectTypeSlug: String!): ProjectType
     projectReviews(page: Long = 1, limit: Int = 20): [Project!]
     projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project!]
     project(gameSlug: String!, projectTypeSlug: String!, projectSlug: String!): Project!
@@ -58,6 +59,7 @@ type ProjectType {
     name: String!
     maxFileSize: Long!
     tags: [Tag!]
+    game: Game!
     loaders: [ProjectTypeLoader!]
 }
 

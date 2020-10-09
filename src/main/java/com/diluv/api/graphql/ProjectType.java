@@ -7,6 +7,7 @@ public class ProjectType {
     private String slug;
     private String name;
     private long maxFileSize;
+    private Game game;
 
     private ProjectTypesEntity entity;
 
@@ -15,6 +16,7 @@ public class ProjectType {
         this.slug = entity.getSlug();
         this.name = entity.getName();
         this.maxFileSize = entity.getMaxFileSize();
+        this.game = new Game(entity.getGame());
 
         this.entity = entity;
     }

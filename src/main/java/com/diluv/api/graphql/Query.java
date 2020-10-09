@@ -22,6 +22,11 @@ public class Query implements GraphQLQueryResolver {
         return new Game(Confluencia.GAME.findOneBySlug(gameSlug));
     }
 
+    public ProjectType projectType (String gameSlug, String projectTypeSlug) {
+
+        return new ProjectType(Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug));
+    }
+
     public Project project (String gameSlug, String projectTypeSlug, String projectSlug) {
 
         return new Project(Confluencia.PROJECT.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug));
