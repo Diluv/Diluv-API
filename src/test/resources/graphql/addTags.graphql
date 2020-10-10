@@ -1,0 +1,6 @@
+mutation  {
+    addTag(gameSlug: "minecraft-je", projectTypeSlug: "mods", tagSlug: "food", tagName: "Food") {
+        name
+        slug
+    }
+}

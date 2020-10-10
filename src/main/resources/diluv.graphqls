@@ -21,6 +21,8 @@ type Mutation {
     addProjectType(gameSlug: String!, projectTypeSlug: String!, projectTypeName: String!, isDefault: Boolean!, maxFileSize: Long): ProjectType!
     updateProjectType(gameSlug: String!, projectTypeSlug: String!, projectTypeName: String, isDefault: Boolean, maxFileSize: Long): ProjectType!
     reviewed (projectId: ID!, requestChange: Boolean!, reason: String): Project!
+    addTag(gameSlug: String!, projectTypeSlug: String!, tagSlug: String!, tagName: String!): ProjectType
+    addLoader(gameSlug: String!, projectTypeSlug: String!, loaderSlug: String!, loaderName: String!): ProjectType
 }
 
 type Author {

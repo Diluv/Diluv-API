@@ -1,0 +1,6 @@
+mutation  {
+    addLoader(gameSlug: "minecraft-je", projectTypeSlug: "mods", loaderSlug: "example", loaderName: "Example") {
+        name
+        slug
+    }
+}

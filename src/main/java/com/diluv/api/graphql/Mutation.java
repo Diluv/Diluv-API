@@ -6,6 +6,10 @@ import java.io.IOException;
 
 import javax.servlet.http.Part;
 
+import com.diluv.confluencia.database.record.ProjectFileLoadersEntity;
+
+import com.diluv.confluencia.database.record.ProjectTypeLoadersEntity;
+
 import org.apache.commons.io.IOUtils;
 
 import com.diluv.api.utils.Constants;
@@ -17,6 +21,7 @@ import com.diluv.confluencia.database.record.ProjectRequestChangeEntity;
 import com.diluv.confluencia.database.record.ProjectReviewEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.TagsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
 import graphql.GraphQLException;
 import graphql.kickstart.servlet.context.DefaultGraphQLServletContext;
@@ -194,5 +199,37 @@ public class Mutation implements GraphQLMutationResolver {
         }
 
         return new Project(project);
+    }
+
+    public ProjectType addTag (String gameSlug, String projectTypeSlug, String tagSlug, String tagName) {
+
+        ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        if (projectType == null) {
+            throw new GraphQLException("Project Type doesn't exists");
+        }
+
+        TagsEntity tag = new TagsEntity(tagSlug, tagName);
+        tag.setProjectType(projectType);
+        if (!Confluencia.insert(tag)) {
+            throw new GraphQLException("Failed to project type");
+        }
+
+        return new ProjectType(projectType);
+    }
+
+    public ProjectType addLoader (String gameSlug, String projectTypeSlug, String loaderSlug, String loaderName) {
+
+        ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
+        if (projectType == null) {
+            throw new GraphQLException("Project Type doesn't exists");
+        }
+
+        ProjectTypeLoadersEntity tag = new ProjectTypeLoadersEntity(loaderSlug, loaderName);
+        tag.setProjectType(projectType);
+        if (!Confluencia.insert(tag)) {
+            throw new GraphQLException("Failed to project type");
+        }
+
+        return new ProjectType(projectType);
     }
 }
