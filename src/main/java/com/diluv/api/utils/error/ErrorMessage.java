@@ -23,7 +23,7 @@ public enum ErrorMessage {
 
     // Project Errors
     PROJECT_INVALID_NAME(BAD_REQUEST, "invalid_name", "The name is not valid"),
-    PROJECT_INVALID_LOGO(BAD_REQUEST, "invalid_logo", "The logo is not valid, please verify you are sending an image."),
+    INVALID_IMAGE(BAD_REQUEST, "invalid_image", "The image is not valid, please verify you are sending an image."),
     PROJECT_INVALID_TAGS(BAD_REQUEST, "invalid_tags", null),
     PROJECT_INVALID_SUMMARY(BAD_REQUEST, "invalid_summary", "The summary must be less then 250 characters"),
     PROJECT_INVALID_DESCRIPTION(BAD_REQUEST, "invalid_description", "The description must be greater then 50 characters but less then 10000."),
@@ -48,6 +48,8 @@ public enum ErrorMessage {
     NOT_FOUND_PROJECT_TYPE(BAD_REQUEST, "notfound.project_type", "The project type was not found."),
     NOT_FOUND_USER(BAD_REQUEST, "notfound.user", "The user was not found."),
     NOT_FOUND_NEWS(BAD_REQUEST, "notfound.news", "The news post was not found"),
+
+    REQUIRES_IMAGE(BAD_REQUEST, "requires_image", "The image is required"),
 
     INVALID_DATA(BAD_REQUEST, "invalid_data", "The data is invalid."),
 

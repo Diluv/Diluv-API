@@ -291,7 +291,7 @@ public class GamesAPI {
             final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
 
             if (image == null) {
-                return ErrorMessage.PROJECT_INVALID_LOGO.respond();
+                return ErrorMessage.INVALID_IMAGE.respond();
             }
 
             final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, project.getId()));
@@ -410,13 +410,13 @@ public class GamesAPI {
         }
 
         if (form.logo == null) {
-            return ErrorMessage.PROJECT_INVALID_LOGO.respond();
+            return ErrorMessage.INVALID_IMAGE.respond();
         }
 
         final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
 
         if (image == null) {
-            return ErrorMessage.PROJECT_INVALID_LOGO.respond();
+            return ErrorMessage.REQUIRES_IMAGE.respond();
         }
 
         String name = form.data.name.trim();

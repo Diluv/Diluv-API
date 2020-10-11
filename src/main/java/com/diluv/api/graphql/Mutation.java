@@ -1,24 +1,12 @@
 package com.diluv.api.graphql;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import javax.servlet.http.Part;
-
-import com.diluv.confluencia.database.record.ProjectFileLoadersEntity;
-
-import com.diluv.confluencia.database.record.ProjectTypeLoadersEntity;
-
-import org.apache.commons.io.IOUtils;
-
-import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GamesEntity;
 import com.diluv.confluencia.database.record.ProjectRequestChangeEntity;
 import com.diluv.confluencia.database.record.ProjectReviewEntity;
+import com.diluv.confluencia.database.record.ProjectTypeLoadersEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.diluv.confluencia.database.record.TagsEntity;
@@ -29,88 +17,6 @@ import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.schema.DataFetchingEnvironment;
 
 public class Mutation implements GraphQLMutationResolver {
-
-    public Game addGame (String slug, String name, String url, Part logoPNG, Part logoWebp, String projectTypeSlug, String projectTypeName) {
-
-        if (Confluencia.GAME.findOneBySlug(slug) != null) {
-            throw new GraphQLException("Game already exists");
-        }
-        File logoPath = new File(Constants.CDN_FOLDER, "games/" + slug);
-        logoPath.mkdirs();
-        try {
-            try (FileOutputStream fosPNG = new FileOutputStream(new File(logoPath, "logo.png"))) {
-                IOUtils.copy(logoPNG.getInputStream(), fosPNG);
-            }
-            try (FileOutputStream fosWebp = new FileOutputStream(new File(logoPath, "logo.webp"))) {
-                IOUtils.copy(logoWebp.getInputStream(), fosWebp);
-            }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            throw new GraphQLException("Failed to create game logo's");
-        }
-
-        GamesEntity game = new GamesEntity();
-        game.setSlug(slug);
-        game.setName(name);
-        game.setUrl(url);
-
-        ProjectTypesEntity projectType = new ProjectTypesEntity();
-        projectType.setSlug(projectTypeSlug);
-        projectType.setName(projectTypeName);
-
-        game.addProjectType(projectType);
-        game.setDefaultProjectTypeEntity(projectTypeSlug);
-        if (!Confluencia.GAME.insertGame(game)) {
-            throw new GraphQLException("Failed to insert game");
-        }
-
-        return new Game(game);
-    }
-
-    public Game updateGame (String slug, String name, String url, Part logoPNG, Part logoWebp) {
-
-        GamesEntity game = Confluencia.GAME.findOneBySlug(slug);
-
-        if (game == null) {
-            throw new GraphQLException("Game not found");
-        }
-
-        if (name != null) {
-            game.setName(name);
-        }
-
-        if (url != null) {
-            game.setUrl(url);
-        }
-
-        if (logoPNG != null || logoWebp != null) {
-            File logoPath = new File(Constants.CDN_FOLDER, "games/" + game.getSlug());
-            logoPath.mkdirs();
-            try {
-                if (logoPNG != null) {
-                    try (FileOutputStream fosPNG = new FileOutputStream(new File(logoPath, "logo.png"))) {
-                        IOUtils.copy(logoPNG.getInputStream(), fosPNG);
-                    }
-                }
-                if (logoWebp != null) {
-                    try (FileOutputStream fosWebp = new FileOutputStream(new File(logoPath, "logo.webp"))) {
-                        IOUtils.copy(logoWebp.getInputStream(), fosWebp);
-                    }
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-                throw new GraphQLException("Failed to create game logo's");
-            }
-        }
-
-        if (!Confluencia.update(game)) {
-            throw new GraphQLException("Failed to update game");
-        }
-
-        return new Game(game);
-    }
 
     public ProjectType addProjectType (String gameSlug, String projectTypeSlug, String projectTypeName, boolean isDefault, Long maxFileSize) {
 

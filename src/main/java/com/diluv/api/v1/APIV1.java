@@ -1,28 +1,23 @@
 package com.diluv.api.v1;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.ws.rs.core.Application;
-
-import org.jboss.resteasy.plugins.interceptors.CorsFilter;
-import org.jboss.resteasy.plugins.interceptors.GZIPEncodingInterceptor;
-
-import com.diluv.api.provider.CustomAtomFeedProvider;
-import com.diluv.api.provider.GenericExceptionMapper;
-import com.diluv.api.provider.GsonProvider;
-import com.diluv.api.provider.NotFoundExceptionMapper;
-import com.diluv.api.provider.ParameterProviderV1;
-import com.diluv.api.provider.ResponseExceptionMapper;
+import com.diluv.api.provider.*;
 import com.diluv.api.utils.Constants;
+import com.diluv.api.v1.admin.AdminAPI;
 import com.diluv.api.v1.featured.FeaturedAPI;
 import com.diluv.api.v1.games.GamesAPI;
-import com.diluv.api.v1.graphql.GraphQLAPI;
 import com.diluv.api.v1.internal.InternalAPI;
 import com.diluv.api.v1.news.NewsAPI;
 import com.diluv.api.v1.projects.ProjectsAPI;
 import com.diluv.api.v1.site.SiteAPI;
 import com.diluv.api.v1.users.UsersAPI;
+
+import org.jboss.resteasy.plugins.interceptors.CorsFilter;
+import org.jboss.resteasy.plugins.interceptors.GZIPEncodingInterceptor;
+
+import javax.ws.rs.core.Application;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class APIV1 extends Application {
 
@@ -51,9 +46,9 @@ public class APIV1 extends Application {
 
         classes.add(ResponseExceptionMapper.class);
 
+        classes.add(AdminAPI.class);
         classes.add(FeaturedAPI.class);
         classes.add(GamesAPI.class);
-        classes.add(GraphQLAPI.class);
         classes.add(InternalAPI.class);
         classes.add(NewsAPI.class);
         classes.add(ProjectsAPI.class);
