@@ -295,7 +295,7 @@ public class GamesAPI {
             }
 
             final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, project.getId()));
-            if (!ImageUtil.saveImage(image, file)) {
+            if (!ImageUtil.savePNG(image, file)) {
                 // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
                 return ErrorMessage.THROWABLE.respond();
             }
@@ -458,7 +458,7 @@ public class GamesAPI {
         }
 
         final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, project.getId()));
-        if (!ImageUtil.saveImage(image, file)) {
+        if (!ImageUtil.savePNG(image, file)) {
             // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
             return ErrorMessage.THROWABLE.respond();
         }

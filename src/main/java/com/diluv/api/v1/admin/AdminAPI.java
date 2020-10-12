@@ -19,8 +19,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.utils.auth.JWTUtil;
-
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -135,12 +133,12 @@ public class AdminAPI {
         File logoPath = new File(Constants.CDN_FOLDER, "games/" + data.slug);
         logoPath.mkdirs();
 
-        if (!ImageUtil.saveImage(imagePNG, new File(logoPath, "logo.png"))) {
+        if (!ImageUtil.savePNG(imagePNG, new File(logoPath, "logo.png"))) {
             // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
             return ErrorMessage.THROWABLE.respond();
         }
 
-        if (!ImageUtil.saveImage(imageWebp, new File(logoPath, "logo.webp"))) {
+        if (!ImageUtil.saveWebp(imageWebp, new File(logoPath, "logo.webp"))) {
             // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
             return ErrorMessage.THROWABLE.respond();
         }
@@ -210,7 +208,7 @@ public class AdminAPI {
             if (imagePNG == null) {
                 return ErrorMessage.INVALID_IMAGE.respond();
             }
-            if (!ImageUtil.saveImage(imagePNG, new File(logoPath, "logo.png"))) {
+            if (!ImageUtil.savePNG(imagePNG, new File(logoPath, "logo.png"))) {
                 // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
                 return ErrorMessage.THROWABLE.respond();
             }
@@ -223,7 +221,7 @@ public class AdminAPI {
                 return ErrorMessage.INVALID_IMAGE.respond();
             }
 
-            if (!ImageUtil.saveImage(imageWebp, new File(logoPath, "logo.webp"))) {
+            if (!ImageUtil.savePNG(imageWebp, new File(logoPath, "logo.webp"))) {
                 // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
                 return ErrorMessage.THROWABLE.respond();
             }
