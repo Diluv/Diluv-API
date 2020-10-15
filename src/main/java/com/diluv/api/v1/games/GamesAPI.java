@@ -425,7 +425,6 @@ public class GamesAPI {
 
         if (Confluencia.PROJECT.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug) != null) {
             return ErrorMessage.PROJECT_TAKEN_SLUG.respond();
-
         }
 
         ProjectsEntity project = new ProjectsEntity();
