@@ -7,8 +7,9 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
-import com.diluv.api.utils.auth.tokens.InvalidToken;
+import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
+import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.PersistedGrantsEntity;
@@ -22,7 +23,6 @@ import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 
 public class JWTUtil {
 
-    public static final InvalidToken INVALID = new InvalidToken();
     public static final String BEARER = "Bearer ";
     private static final String TOKEN_TYPE = "reference_token";
 
@@ -43,7 +43,7 @@ public class JWTUtil {
         }
 
         if (!JWTUtil.isBearerToken(rawToken)) {
-            return INVALID;
+            return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond());
         }
 
         String token = rawToken.substring(JWTUtil.BEARER.length());
@@ -52,8 +52,9 @@ public class JWTUtil {
         if (jwt != null) {
             try {
                 ConfigurableJWTProcessor<SecurityContext> processor = Constants.JWT_PROCESSOR;
-                if (processor == null)
-                    return INVALID;
+                if (processor == null) {
+                    return new ErrorToken(ErrorMessage.THROWABLE.respond());
+                }
 
                 JWTClaimsSet claimsSet = processor.process(jwt, null);
                 if (claimsSet != null) {
@@ -63,7 +64,7 @@ public class JWTUtil {
             }
             catch (JOSEException | BadJOSEException | NumberFormatException e) {
                 DiluvAPIServer.LOGGER.catching(e);
-                return INVALID;
+                return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Invalid token format"));
             }
         }
 
@@ -71,16 +72,16 @@ public class JWTUtil {
         String key = Base64.getEncoder().encodeToString(sha256);
         PersistedGrantsEntity record = Confluencia.SECURITY.findPersistedGrantByKeyAndType(key, TOKEN_TYPE);
         if (record == null) {
-            return INVALID;
+            return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
         }
 
         long currentTime = System.currentTimeMillis();
 
         if (currentTime < record.getCreationTime().getTime()) {
-            return INVALID;
+            return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Token is not valid yet"));
         }
         if (currentTime > record.getExpiration().getTime()) {
-            return INVALID;
+            return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Token has expired"));
         }
 
         //TODO Implement a table

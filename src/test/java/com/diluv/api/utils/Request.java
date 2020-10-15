@@ -61,7 +61,7 @@ public class Request {
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
         getRequest(url, status, "schema/error-schema.json", headers)
-            .body("message", equalTo(error.getMessage()));
+            .body("error", equalTo(error.getUniqueId()));
     }
 
     public static ValidatableResponse postRequest (String url, Map<String, String> headers, Map<String, Object> multiPart, int status, String schema) {

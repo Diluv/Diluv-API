@@ -19,6 +19,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.utils.auth.tokens.ErrorToken;
+
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
@@ -206,8 +208,8 @@ public class GamesAPI {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        if (token == JWTUtil.INVALID) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond();
+        if (token instanceof ErrorToken) {
+            return ((ErrorToken) token).getResponse();
         }
 
         if (Confluencia.GAME.findOneBySlug(gameSlug) == null) {
@@ -374,12 +376,8 @@ public class GamesAPI {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response postProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @MultipartForm ProjectForm form) {
 
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token == JWTUtil.INVALID) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond();
+        if (token instanceof ErrorToken ) {
+            return ((ErrorToken)token).getResponse();
         }
 
         ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);

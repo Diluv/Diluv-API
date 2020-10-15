@@ -26,8 +26,8 @@ import com.diluv.api.data.DataAuthorizedUser;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.AuthUtilities;
-import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
+import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.query.ProjectQuery;
@@ -64,8 +64,8 @@ public class UsersAPI {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        if (token == JWTUtil.INVALID) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond();
+        if (token instanceof ErrorToken) {
+            return ((ErrorToken) token).getResponse();
         }
 
         final UsersEntity userRecord = Confluencia.USER.findOneByUserId(token.getUserId());
@@ -86,8 +86,8 @@ public class UsersAPI {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        if (token == JWTUtil.INVALID) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond();
+        if (token instanceof ErrorToken) {
+            return ((ErrorToken) token).getResponse();
         }
 
         final UsersEntity user = Confluencia.USER.findOneByUserId(token.getUserId());
@@ -129,7 +129,7 @@ public class UsersAPI {
         if (!GenericValidator.isBlankOrNull(form.email)) {
 
             String email = form.email.trim();
-            if(!user.getEmail().equalsIgnoreCase(email)) {
+            if (!user.getEmail().equalsIgnoreCase(email)) {
 
                 if (!Validator.validateEmail(email)) {
 
@@ -141,7 +141,7 @@ public class UsersAPI {
                     return ErrorMessage.USER_TAKEN_EMAIL.respond();
                 }
 
-                if (Confluencia.USER.existUserChangeEmailByUser(user) ) {
+                if (Confluencia.USER.existUserChangeEmailByUser(user)) {
                     if (!Confluencia.USER.deleteUserChangeEmail(user)) {
                         // TODO ERROR Internally
                         return ErrorMessage.THROWABLE.respond();
@@ -172,8 +172,8 @@ public class UsersAPI {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        if (token == JWTUtil.INVALID) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond();
+        if (token instanceof ErrorToken) {
+            return ((ErrorToken) token).getResponse();
         }
 
         final UsersEntity user = Confluencia.USER.findOneByUserId(token.getUserId());

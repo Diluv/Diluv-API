@@ -16,6 +16,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.utils.auth.tokens.ErrorToken;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
@@ -71,8 +73,8 @@ public class ProjectsAPI {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
         }
 
-        if (token == JWTUtil.INVALID) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond();
+        if (token instanceof ErrorToken) {
+            return ((ErrorToken) token).getResponse();
         }
 
         if (form.data == null) {

@@ -21,6 +21,8 @@ import javax.ws.rs.core.Response;
 
 import com.diluv.api.utils.auth.JWTUtil;
 
+import com.diluv.api.utils.auth.tokens.ErrorToken;
+
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -252,12 +254,12 @@ public class AdminAPI {
 
     public Response hasPermission (Token token) {
 
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        if (token instanceof ErrorToken ) {
+            return ((ErrorToken)token).getResponse();
         }
 
-        if (token == JWTUtil.INVALID || token.isApiToken()) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond();
+        if(token.isApiToken()){
+            return ErrorMessage.USER_INVALID_TOKEN.respond("Can't use an API token for this request");
         }
 
         if (!UserPermissions.hasPermission(token, UserPermissions.VIEW_ADMIN)) {
