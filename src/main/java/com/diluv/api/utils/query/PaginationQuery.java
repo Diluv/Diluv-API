@@ -20,7 +20,8 @@ public abstract class PaginationQuery {
         return getPage(this.page);
     }
 
-    public int getLimit(){
+    public int getLimit () {
+
         return getLimit(this.limit);
     }
 

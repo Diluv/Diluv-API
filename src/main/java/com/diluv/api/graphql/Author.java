@@ -6,6 +6,7 @@ public class Author {
     private String role;
 
     public Author (User user, String role) {
+
         this.user = user;
         this.role = role;
     }

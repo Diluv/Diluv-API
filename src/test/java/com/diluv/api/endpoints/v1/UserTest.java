@@ -47,6 +47,7 @@ public class UserTest {
 
         data.displayName = null;
         data.newPassword = null;
+        data.currentPassword = "password1";
         data.email = "testing@diluv.com";
         Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", 204, data);
 

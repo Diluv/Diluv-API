@@ -7,6 +7,7 @@ public class ImageSource {
     private String type;
 
     public ImageSource (DataImageSource dis) {
+
         this.src = dis.getSrc();
         this.type = dis.getType();
     }

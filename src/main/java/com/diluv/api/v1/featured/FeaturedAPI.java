@@ -26,19 +26,21 @@ public class FeaturedAPI {
     @Path("/")
     public Response getFeatured () {
 
-        final List<DataGame> games = Confluencia.GAME.findFeaturedGames()
-            .stream()
-            .map(DataGame::new)
-            .collect(Collectors.toList());
+        return Confluencia.getTransaction(session -> {
+            final List<DataGame> games = Confluencia.GAME.findFeaturedGames(session)
+                .stream()
+                .map(DataGame::new)
+                .collect(Collectors.toList());
 
-        final List<DataBaseProject> projects = Confluencia.PROJECT.findFeaturedProjects()
-            .stream()
-            .map(DataBaseProject::new)
-            .collect(Collectors.toList());
+            final List<DataBaseProject> projects = Confluencia.PROJECT.findFeaturedProjects(session)
+                .stream()
+                .map(DataBaseProject::new)
+                .collect(Collectors.toList());
 
-        final long projectCount = Confluencia.PROJECT.countAllByGameSlug("");
-        final long userCount = Confluencia.USER.countAll();
+            final long projectCount = Confluencia.PROJECT.countAllByGameSlug(session, "");
+            final long userCount = Confluencia.USER.countAll(session);
 
-        return ResponseUtil.successResponse(new DataFeatured(games, projects, projectCount, userCount));
+            return ResponseUtil.successResponse(new DataFeatured(games, projects, projectCount, userCount));
+        });
     }
 }
