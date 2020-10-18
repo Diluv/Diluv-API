@@ -47,6 +47,13 @@ public class InternalAPI {
                 return ErrorMessage.THROWABLE.respond();
             }
 
+            i = Confluencia.MISC.updateAllImagesForRelease(session, entity.getCreatedAt());
+            if (i == -1) {
+                System.out.println("FAILED_UPDATE_PROJECT_FILE");
+                // return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();
+                return ErrorMessage.THROWABLE.respond();
+            }
+
             if (i > 0 && Constants.WEBHOOK_URL != null) {
                 try {
                     Message discordMessage = new Message();
