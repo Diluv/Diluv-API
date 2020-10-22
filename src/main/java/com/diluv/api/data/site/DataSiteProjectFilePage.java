@@ -12,7 +12,7 @@ public class DataSiteProjectFilePage {
     private final DataSiteProjectFileDisplay file;
 
 
-    public DataSiteProjectFilePage (DataBaseProject project,  DataSiteProjectFileDisplay file) {
+    public DataSiteProjectFilePage (DataBaseProject project, DataSiteProjectFileDisplay file) {
 
         this.project = project;
         this.file = file;

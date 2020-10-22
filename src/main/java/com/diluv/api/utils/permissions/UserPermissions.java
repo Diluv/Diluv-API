@@ -33,7 +33,9 @@ public enum UserPermissions {
             return false;
         }
 
-        UsersEntity user = Confluencia.USER.findOneByUserId(token.getUserId());
+        UsersEntity user = Confluencia.getTransaction(session -> {
+            return Confluencia.USER.findOneByUserId(session, token.getUserId());
+        });
         if (user == null) {
             return false;
         }

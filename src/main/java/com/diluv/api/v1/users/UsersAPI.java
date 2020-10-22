@@ -1,6 +1,5 @@
 package com.diluv.api.v1.users;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,14 +67,16 @@ public class UsersAPI {
             return ((ErrorToken) token).getResponse();
         }
 
-        final UsersEntity userRecord = Confluencia.USER.findOneByUserId(token.getUserId());
+        return Confluencia.getTransaction(session -> {
+            final UsersEntity userRecord = Confluencia.USER.findOneByUserId(session, token.getUserId());
 
-        if (userRecord == null) {
+            if (userRecord == null) {
 
-            return ErrorMessage.NOT_FOUND_USER.respond();
-        }
+                return ErrorMessage.NOT_FOUND_USER.respond();
+            }
 
-        return ResponseUtil.successResponse(new DataAuthorizedUser(userRecord));
+            return ResponseUtil.successResponse(new DataAuthorizedUser(userRecord));
+        });
     }
 
     @PATCH
@@ -90,78 +91,77 @@ public class UsersAPI {
             return ((ErrorToken) token).getResponse();
         }
 
-        final UsersEntity user = Confluencia.USER.findOneByUserId(token.getUserId());
+        return Confluencia.getTransaction(session -> {
+            final UsersEntity user = Confluencia.USER.findOneByUserId(session, token.getUserId());
 
-        if (user == null) {
+            if (user == null) {
 
-            return ErrorMessage.NOT_FOUND_USER.respond();
-        }
-
-        if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.currentPassword.toCharArray())) {
-
-            return ErrorMessage.USER_INVALID_PASSWORD.respond();
-        }
-
-        if (!GenericValidator.isBlankOrNull(form.displayName)) {
-
-            String displayName = form.displayName.trim();
-            if (!displayName.equals(user.getDisplayName())) {
-
-                if (!Validator.validateUserDisplayName(user.getUsername(), displayName)) {
-
-                    return ErrorMessage.USER_INVALID_DISPLAY_NAME.respond();
-                }
-                user.setDisplayName(displayName);
-            }
-        }
-
-        if (!GenericValidator.isBlankOrNull(form.newPassword)) {
-
-            String password = form.newPassword.trim();
-            if (!Validator.validatePassword(password)) {
-
-                return ErrorMessage.USER_INVALID_NEW_PASSWORD.respond();
+                return ErrorMessage.NOT_FOUND_USER.respond();
             }
 
-            user.setPassword(AuthUtilities.getBcrypt(password.toCharArray()));
-        }
+            if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.currentPassword.toCharArray())) {
 
-        if (!GenericValidator.isBlankOrNull(form.email)) {
+                return ErrorMessage.USER_INVALID_PASSWORD.respond();
+            }
 
-            String email = form.email.trim();
-            if (!user.getEmail().equalsIgnoreCase(email)) {
+            if (!GenericValidator.isBlankOrNull(form.displayName)) {
 
-                if (!Validator.validateEmail(email)) {
+                String displayName = form.displayName.trim();
+                if (!displayName.equals(user.getDisplayName())) {
 
-                    return ErrorMessage.USER_INVALID_EMAIL.respond();
-                }
+                    if (!Validator.validateUserDisplayName(user.getUsername(), displayName)) {
 
-                if (Confluencia.USER.existsByEmail(email) || Confluencia.USER.existsTempUserByEmail(email)) {
-
-                    return ErrorMessage.USER_TAKEN_EMAIL.respond();
-                }
-
-                if (Confluencia.USER.existUserChangeEmailByUser(user)) {
-                    if (!Confluencia.USER.deleteUserChangeEmail(user)) {
-                        // TODO ERROR Internally
-                        return ErrorMessage.THROWABLE.respond();
+                        return ErrorMessage.USER_INVALID_DISPLAY_NAME.respond();
                     }
+                    user.setDisplayName(displayName);
                 }
-
-                UserChangeEmail userChangeEmail = new UserChangeEmail();
-                userChangeEmail.setUser(user);
-                userChangeEmail.setEmail(email);
-                userChangeEmail.setCode(AuthUtilities.getSecureRandomNumeric(8));
-
-                if (!Confluencia.USER.insertUserChangeEmail(userChangeEmail)) {
-                    // TODO ERROR Internally
-                    return ErrorMessage.THROWABLE.respond();
-                }
-                //TODO Send email
             }
-        }
 
-        return Response.status(Response.Status.NO_CONTENT).build();
+            if (!GenericValidator.isBlankOrNull(form.newPassword)) {
+
+                String password = form.newPassword.trim();
+                if (!Validator.validatePassword(password)) {
+
+                    return ErrorMessage.USER_INVALID_NEW_PASSWORD.respond();
+                }
+
+                user.setPassword(AuthUtilities.getBcrypt(password.toCharArray()));
+            }
+
+            if (!GenericValidator.isBlankOrNull(form.email)) {
+
+                String email = form.email.trim();
+                if (!user.getEmail().equalsIgnoreCase(email)) {
+
+                    if (!Validator.validateEmail(email)) {
+
+                        return ErrorMessage.USER_INVALID_EMAIL.respond();
+                    }
+
+                    if (Confluencia.USER.existsByEmail(session, email) || Confluencia.USER.existsTempUserByEmail(session, email)) {
+
+                        return ErrorMessage.USER_TAKEN_EMAIL.respond();
+                    }
+
+                    if (Confluencia.USER.existUserChangeEmailByUser(session, user)) {
+                        if (!Confluencia.USER.deleteUserChangeEmail(session, user)) {
+                            // TODO ERROR Internally
+                            return ErrorMessage.THROWABLE.respond();
+                        }
+                    }
+
+                    UserChangeEmail userChangeEmail = new UserChangeEmail();
+                    userChangeEmail.setUser(user);
+                    userChangeEmail.setEmail(email);
+                    userChangeEmail.setCode(AuthUtilities.getSecureRandomNumeric(8));
+
+                    session.save(userChangeEmail);
+                    //TODO Send email
+                }
+            }
+
+            return Response.status(Response.Status.NO_CONTENT).build();
+        });
     }
 
     @PATCH
@@ -176,88 +176,80 @@ public class UsersAPI {
             return ((ErrorToken) token).getResponse();
         }
 
-        final UsersEntity user = Confluencia.USER.findOneByUserId(token.getUserId());
+        return Confluencia.getTransaction(session -> {
+            final UsersEntity user = Confluencia.USER.findOneByUserId(session, token.getUserId());
 
-        if (user == null) {
+            if (user == null) {
 
-            return ErrorMessage.NOT_FOUND_USER.respond();
-        }
-
-        if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.password.toCharArray())) {
-            return ErrorMessage.USER_INVALID_PASSWORD.respond();
-        }
-
-        if ("enable".equalsIgnoreCase(form.mfaStatus)) {
-            if (!Validator.validateMFA(form.mfa)) {
-                return ErrorMessage.USER_INVALID_MFA.respond();
+                return ErrorMessage.NOT_FOUND_USER.respond();
             }
 
-            if (GenericValidator.isBlankOrNull(form.mfaSecret) || !Base64.isBase64(form.mfaSecret)) {
-                return ErrorMessage.USER_INVALID_MFA_SECRET.respond();
+            if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.password.toCharArray())) {
+                return ErrorMessage.USER_INVALID_PASSWORD.respond();
             }
 
-            if (!gAuth.authorize(form.mfaSecret, form.mfa)) {
-                return ErrorMessage.USER_INVALID_MFA_AND_MFA_SECRET.respond();
+            if ("enable".equalsIgnoreCase(form.mfaStatus)) {
+                if (!Validator.validateMFA(form.mfa)) {
+                    return ErrorMessage.USER_INVALID_MFA.respond();
+                }
+
+                if (GenericValidator.isBlankOrNull(form.mfaSecret) || !Base64.isBase64(form.mfaSecret)) {
+                    return ErrorMessage.USER_INVALID_MFA_SECRET.respond();
+                }
+
+                if (!gAuth.authorize(form.mfaSecret, form.mfa)) {
+                    return ErrorMessage.USER_INVALID_MFA_AND_MFA_SECRET.respond();
+                }
+
+                Set<String> mfaScratch = new HashSet<>();
+                for (int i = 0; i < 8; i++) {
+                    String code;
+                    do {
+                        code = AuthUtilities.getSecureRandomAlphanumeric(8);
+                    } while (mfaScratch.contains(code));
+                    mfaScratch.add(code);
+                    session.save(new UserMfaRecoveryEntity(user, code));
+                }
+
+                user.setMfaSecret(form.mfaSecret);
+                user.setMfa(true);
+
+                session.update(user);
+            }
+            else if ("disable".equalsIgnoreCase(form.mfaStatus)) {
+                user.setMfa(false);
+                user.setMfaSecret(null);
+
+                if (!Confluencia.USER.deleteUserMFARecovery(session, user)) {
+                    //return ErrorMessage.FAILED_DELETE_MFA_RECOVERY.respond();
+                    return ErrorMessage.THROWABLE.respond();
+                }
+
+                session.update(user);
             }
 
-            Set<String> mfaScratch = new HashSet<>();
-            List<UserMfaRecoveryEntity> entities = new ArrayList<>();
-            for (int i = 0; i < 8; i++) {
-                String code;
-                do {
-                    code = AuthUtilities.getSecureRandomAlphanumeric(8);
-                } while (mfaScratch.contains(code));
-                mfaScratch.add(code);
-                entities.add(new UserMfaRecoveryEntity(user, code));
-            }
-
-            user.setMfaSecret(form.mfaSecret);
-            user.setMfa(true);
-
-            if (!Confluencia.USER.insertUserMFARecovery(entities)) {
-                //return ErrorMessage.FAILED_INSERT_MFA_RECOVERY.respond();
-                return ErrorMessage.THROWABLE.respond();
-            }
-
-            if (!Confluencia.update(user)) {
-                //return ErrorMessage.FAILED_UPDATE_USER.respond();
-                return ErrorMessage.THROWABLE.respond();
-            }
-        }
-        else if ("disable".equalsIgnoreCase(form.mfaStatus)) {
-            user.setMfa(false);
-            user.setMfaSecret(null);
-
-            if (!Confluencia.USER.deleteUserMFARecovery(user)) {
-                //return ErrorMessage.FAILED_DELETE_MFA_RECOVERY.respond();
-                return ErrorMessage.THROWABLE.respond();
-            }
-
-            if (!Confluencia.update(user)) {
-                //return ErrorMessage.FAILED_UPDATE_USER.respond();
-                return ErrorMessage.THROWABLE.respond();
-            }
-        }
-
-        return ResponseUtil.successResponse(new DataAuthorizedUser(user));
+            return ResponseUtil.successResponse(new DataAuthorizedUser(user));
+        });
     }
 
     @GET
     @Path("/{username}")
     public Response getUser (@HeaderParam("Authorization") Token token, @PathParam("username") String username) {
 
-        final UsersEntity userRecord = Confluencia.USER.findOneByUsername(username);
+        return Confluencia.getTransaction(session -> {
+            final UsersEntity userRecord = Confluencia.USER.findOneByUsername(session, username);
 
-        if (userRecord == null) {
+            if (userRecord == null) {
 
-            return ErrorMessage.NOT_FOUND_USER.respond();
-        }
+                return ErrorMessage.NOT_FOUND_USER.respond();
+            }
 
-        if (token != null && token.getUserId() == userRecord.getId()) {
-            return ResponseUtil.successResponse(new DataAuthorizedUser(userRecord));
-        }
+            if (token != null && token.getUserId() == userRecord.getId()) {
+                return ResponseUtil.successResponse(new DataAuthorizedUser(userRecord));
+            }
 
-        return ResponseUtil.successResponse(new DataUser(userRecord));
+            return ResponseUtil.successResponse(new DataUser(userRecord));
+        });
     }
 
     @GET
@@ -268,18 +260,20 @@ public class UsersAPI {
         int limit = query.getLimit();
         Sort sort = query.getSort(ProjectSort.POPULAR);
 
-        UsersEntity userRecord = Confluencia.USER.findOneByUsername(username);
-        if (userRecord == null) {
-            return ErrorMessage.NOT_FOUND_USER.respond();
-        }
+        return Confluencia.getTransaction(session -> {
+            UsersEntity userRecord = Confluencia.USER.findOneByUsername(session, username);
+            if (userRecord == null) {
+                return ErrorMessage.NOT_FOUND_USER.respond();
+            }
 
-        boolean authorized = false;
+            boolean authorized = false;
 
-        if (token != null) {
-            authorized = userRecord.getUsername().equalsIgnoreCase(username);
-        }
+            if (token != null) {
+                authorized = userRecord.getUsername().equalsIgnoreCase(username);
+            }
 
-        List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByUsername(username, authorized, page, limit, sort);
-        return ResponseUtil.successResponse(projects.stream().map(DataProject::new).collect(Collectors.toList()));
+            List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByUsername(session, username, authorized, page, limit, sort);
+            return ResponseUtil.successResponse(projects.stream().map(DataProject::new).collect(Collectors.toList()));
+        });
     }
 }

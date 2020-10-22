@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.hibernate.Session;
 
 import com.diluv.api.utils.MismatchException;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -95,7 +96,7 @@ public class Validator {
         return gameVersionRecords;
     }
 
-    public static List<ProjectFileDependenciesEntity> validateDependencies (long projectId, List<FileDependency> dependencies) throws NumberFormatException, MismatchException {
+    public static List<ProjectFileDependenciesEntity> validateDependencies (Session session, long projectId, List<FileDependency> dependencies) throws NumberFormatException, MismatchException {
 
         if (dependencies != null && !dependencies.isEmpty()) {
             Set<Long> projectIds = new HashSet<>();
@@ -112,7 +113,7 @@ public class Validator {
                 projectIds.add(dependency.projectId);
             }
 
-            List<Long> projects = Confluencia.PROJECT.findAllProjectsByProjectIds(projectIds);
+            List<Long> projects = Confluencia.PROJECT.findAllProjectsByProjectIds(session, projectIds);
             if (projects.size() != dependencies.size()) {
                 projectIds.removeAll(projects);
                 String missing = projectIds.stream().map(Object::toString).collect(Collectors.joining(", "));

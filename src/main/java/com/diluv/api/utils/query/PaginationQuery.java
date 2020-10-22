@@ -21,6 +21,7 @@ public abstract class PaginationQuery {
     }
 
     public int getLimit () {
+
         return getLimit(this.limit);
     }
 

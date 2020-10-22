@@ -37,36 +37,35 @@ public class GenericAPI {
     @Path("/download/{gameSlug}/{projectTypeSlug}/{projectId}/{fileId}/{projectFileName}")
     public Response getProjectFileDownloads (@HeaderParam("CF-Connecting-IP") String ip, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectId") long projectId, @PathParam("fileId") long fileId, @PathParam("projectFileName") String projectFileName) {
 
-        try {
-            final URI uri = Constants.getNodeCDNFileURL(gameSlug, projectTypeSlug, projectId, fileId, projectFileName);
+        return Confluencia.getTransaction(session -> {
+            try {
+                final URI uri = Constants.getNodeCDNFileURL(gameSlug, projectTypeSlug, projectId, fileId, projectFileName);
 
-            if (ip == null) {
-                return Response.temporaryRedirect(uri).build();
-            }
-
-            ProjectFilesEntity file = Confluencia.FILE.findOneById(fileId);
-
-            if (file == null) {
-                return ErrorMessage.FILE_NOT_FOUND.respond();
-            }
-
-            if (!file.getName().equals(projectFileName)) {
-                return Response.temporaryRedirect(uri).build();
-            }
-
-            final String saltedIp = AuthUtilities.getIP(ip);
-            if (saltedIp != null) {
-                if (!Confluencia.FILE.insertProjectFileDownloads(new ProjectFileDownloadsEntity(new ProjectFilesEntity(fileId), saltedIp))) {
-                    //return ErrorMessage.FAILED_INSERT_PROJECT_FILE_DOWNLOADS.respond();
+                if (ip == null) {
                     return Response.temporaryRedirect(uri).build();
                 }
-            }
 
-            return Response.temporaryRedirect(uri).build();
-        }
-        catch (URISyntaxException e) {
-            e.printStackTrace();
-            return ErrorMessage.THROWABLE.respond();
-        }
+                ProjectFilesEntity file = Confluencia.FILE.findOneById(session, fileId);
+
+                if (file == null) {
+                    return ErrorMessage.FILE_NOT_FOUND.respond();
+                }
+
+                if (!file.getName().equals(projectFileName)) {
+                    return Response.temporaryRedirect(uri).build();
+                }
+
+                final String saltedIp = AuthUtilities.getIP(ip);
+                if (saltedIp != null) {
+                    session.save(new ProjectFileDownloadsEntity(new ProjectFilesEntity(fileId), saltedIp));
+                }
+
+                return Response.temporaryRedirect(uri).build();
+            }
+            catch (URISyntaxException e) {
+                e.printStackTrace();
+                return ErrorMessage.THROWABLE.respond();
+            }
+        });
     }
 }

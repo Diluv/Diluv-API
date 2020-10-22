@@ -56,10 +56,18 @@ public class ProjectsAPI {
 
     @GET
     @Path("/{id}")
-    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("id") Long id) throws ResponseException {
+    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("id") Long id) {
 
-        final DataProject project = ProjectService.getDataProject(id, token);
-        return ResponseUtil.successResponse(project);
+        return Confluencia.getTransaction(session -> {
+            try {
+                final DataProject project = ProjectService.getDataProject(session, id, token);
+                return ResponseUtil.successResponse(project);
+            }
+            catch (ResponseException e) {
+                e.printStackTrace();
+                return e.getResponse();
+            }
+        });
     }
 
     @POST
@@ -79,171 +87,165 @@ public class ProjectsAPI {
             return ErrorMessage.INVALID_DATA.respond();
         }
 
-        final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(projectId);
+        return Confluencia.getTransaction(session -> {
+            final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(session, projectId);
 
-        if (project == null) {
-            return ErrorMessage.NOT_FOUND_PROJECT.respond();
-        }
-
-        if (!ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD)) {
-
-            return ErrorMessage.USER_NOT_AUTHORIZED.respond();
-        }
-
-        if (!Validator.validateProjectFileChangelog(form.data.changelog)) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_CHANGELOG.respond();
-        }
-
-        if (form.file == null) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_FILE.respond();
-        }
-
-        if (form.fileName == null) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_FILENAME.respond();
-        }
-
-        if (!Validator.validateReleaseType(form.data.releaseType)) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_RELEASE_TYPE.respond();
-        }
-
-        if (!Validator.validateClassifier(form.data.classifier)) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_CLASSIFIER.respond();
-        }
-
-        if (!Validator.validateVersion(form.data.version)) {
-
-            return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
-        }
-
-        if (Confluencia.FILE.existsByProjectIdAndVersion(projectId, form.data.version)) {
-
-            return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
-        }
-
-        List<GameVersionsEntity> gameVersionRecords;
-        try {
-            gameVersionRecords = Validator.validateGameVersions(project.getGame(), form.data.gameVersions);
-        }
-        catch (MismatchException e) {
-            return e.getErrorMessage().respond(e.getMessage());
-        }
-
-        List<ProjectTypeLoadersEntity> projectTypeLoaders;
-        try {
-            projectTypeLoaders = Validator.validateProjectTypeLoaders(project.getProjectType(), form.data.loaders);
-        }
-        catch (MismatchException e) {
-            return e.getErrorMessage().respond(e.getMessage());
-        }
-
-        List<ProjectFileDependenciesEntity> dependencyRecords;
-        try {
-            dependencyRecords = Validator.validateDependencies(projectId, form.data.dependencies);
-        }
-        catch (MismatchException e) {
-            if (e.getMessage() == null) {
-                return e.getErrorMessage().respond();
+            if (project == null) {
+                return ErrorMessage.NOT_FOUND_PROJECT.respond();
             }
-            return e.getErrorMessage().respond(e.getMessage());
-        }
-        catch (NumberFormatException e) {
-            return ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID.respond();
-        }
 
-        final String fileName = FilenameUtils.getName(form.fileName);
-        final File tempFile = FileUtil.getTempFile(project.getId(), fileName);
-        final String sha512 = FileUtil.writeFile(form.file, project.getProjectType().getMaxFileSize(), tempFile);
+            if (!ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD)) {
 
-        if (tempFile == null) {
-            System.out.println("FAILED_TEMP_FILE");
-            // return ErrorMessage.FAILED_TEMP_FILE.respond();
-            return ErrorMessage.THROWABLE.respond();
-        }
-
-        if (sha512 == null) {
-            System.out.println("FAILED_SHA512");
-            //return ErrorMessage.FAILED_SHA512.respond();
-            return ErrorMessage.THROWABLE.respond();
-        }
-
-        ProjectFilesEntity projectFile = new ProjectFilesEntity();
-        projectFile.setName(fileName);
-        projectFile.setVersion(form.data.version);
-        projectFile.setSize(tempFile.length());
-        projectFile.setChangelog(form.data.changelog);
-        projectFile.setSha512(sha512);
-        projectFile.setReleaseType(form.data.releaseType);
-        projectFile.setClassifier(form.data.classifier);
-        projectFile.setProject(project);
-        projectFile.setUser(new UsersEntity(token.getUserId()));
-
-        if (!gameVersionRecords.isEmpty()) {
-            List<ProjectFileGameVersionsEntity> gameVersions = new ArrayList<>();
-            for (GameVersionsEntity version : gameVersionRecords) {
-                ProjectFileGameVersionsEntity gameVersionsEntity = new ProjectFileGameVersionsEntity();
-                gameVersionsEntity.setProjectFile(projectFile);
-                gameVersionsEntity.setGameVersion(version);
-                gameVersions.add(gameVersionsEntity);
+                return ErrorMessage.USER_NOT_AUTHORIZED.respond();
             }
-            projectFile.setGameVersions(gameVersions);
-        }
 
-        if (!projectTypeLoaders.isEmpty()) {
-            List<ProjectFileLoadersEntity> loaders = new ArrayList<>();
-            for (ProjectTypeLoadersEntity loader : projectTypeLoaders) {
-                ProjectFileLoadersEntity fileLoadersEntity = new ProjectFileLoadersEntity();
-                fileLoadersEntity.setProjectFile(projectFile);
-                fileLoadersEntity.setLoader(loader);
-                loaders.add(fileLoadersEntity);
+            if (!Validator.validateProjectFileChangelog(form.data.changelog)) {
+
+                return ErrorMessage.PROJECT_FILE_INVALID_CHANGELOG.respond();
             }
-            projectFile.setLoaders(loaders);
-        }
 
-        if (!dependencyRecords.isEmpty()) {
-            List<ProjectFileDependenciesEntity> dependencies = new ArrayList<>();
-            for (ProjectFileDependenciesEntity dependency : dependencyRecords) {
-                dependency.setProjectFile(projectFile);
-                dependencies.add(dependency);
+            if (form.file == null) {
+
+                return ErrorMessage.PROJECT_FILE_INVALID_FILE.respond();
             }
-            projectFile.setDependencies(dependencies);
-        }
 
-        if (!Confluencia.FILE.insertProjectFile(projectFile)) {
-            System.out.println("FAILED_CREATE_PROJECT_FILE");
-            //return ErrorMessage.FAILED_CREATE_PROJECT_FILE.respond();
-            return ErrorMessage.THROWABLE.respond();
-        }
+            if (form.fileName == null) {
 
+                return ErrorMessage.PROJECT_FILE_INVALID_FILENAME.respond();
+            }
 
-        projectFile = Confluencia.FILE.findOneById(projectFile.getId());
-        if (projectFile == null) {
-            return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
-        }
+            if (!Validator.validateReleaseType(form.data.releaseType)) {
 
-        final String gameSlug = project.getGame().getSlug();
-        final String projectTypeSlug = project.getProjectType().getSlug();
+                return ErrorMessage.PROJECT_FILE_INVALID_RELEASE_TYPE.respond();
+            }
 
-        File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, project.getId(), projectFile.getId(), fileName);
-        destination.getParentFile().mkdirs();
-        try {
-            FileUtils.copyFile(tempFile, destination);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("ERROR_WRITING");
-            return ErrorMessage.THROWABLE.respond();
-        }
-        finally {
-            tempFile.delete();
-            tempFile.getParentFile().delete();
-        }
+            if (!Validator.validateClassifier(form.data.classifier)) {
 
-        return ResponseUtil.successResponse(new DataProjectFileInQueue(projectFile, gameSlug, projectTypeSlug, project.getSlug()));
+                return ErrorMessage.PROJECT_FILE_INVALID_CLASSIFIER.respond();
+            }
+
+            if (!Validator.validateVersion(form.data.version)) {
+
+                return ErrorMessage.PROJECT_FILE_INVALID_VERSION.respond();
+            }
+
+            if (Confluencia.FILE.existsByProjectIdAndVersion(session, projectId, form.data.version)) {
+
+                return ErrorMessage.PROJECT_FILE_TAKEN_VERSION.respond();
+            }
+
+            List<GameVersionsEntity> gameVersionRecords;
+            try {
+                gameVersionRecords = Validator.validateGameVersions(project.getGame(), form.data.gameVersions);
+            }
+            catch (MismatchException e) {
+                return e.getErrorMessage().respond(e.getMessage());
+            }
+
+            List<ProjectTypeLoadersEntity> projectTypeLoaders;
+            try {
+                projectTypeLoaders = Validator.validateProjectTypeLoaders(project.getProjectType(), form.data.loaders);
+            }
+            catch (MismatchException e) {
+                return e.getErrorMessage().respond(e.getMessage());
+            }
+
+            List<ProjectFileDependenciesEntity> dependencyRecords;
+            try {
+                dependencyRecords = Validator.validateDependencies(session, projectId, form.data.dependencies);
+            }
+            catch (MismatchException e) {
+                if (e.getMessage() == null) {
+                    return e.getErrorMessage().respond();
+                }
+                return e.getErrorMessage().respond(e.getMessage());
+            }
+            catch (NumberFormatException e) {
+                return ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID.respond();
+            }
+
+            final String fileName = FilenameUtils.getName(form.fileName);
+            final File tempFile = FileUtil.getTempFile(project.getId(), fileName);
+            final String sha512 = FileUtil.writeFile(form.file, project.getProjectType().getMaxFileSize(), tempFile);
+
+            if (tempFile == null) {
+                System.out.println("FAILED_TEMP_FILE");
+                // return ErrorMessage.FAILED_TEMP_FILE.respond();
+                return ErrorMessage.THROWABLE.respond();
+            }
+
+            if (sha512 == null) {
+                System.out.println("FAILED_SHA512");
+                //return ErrorMessage.FAILED_SHA512.respond();
+                return ErrorMessage.THROWABLE.respond();
+            }
+
+            ProjectFilesEntity projectFile = new ProjectFilesEntity();
+            projectFile.setName(fileName);
+            projectFile.setVersion(form.data.version);
+            projectFile.setSize(tempFile.length());
+            projectFile.setChangelog(form.data.changelog);
+            projectFile.setSha512(sha512);
+            projectFile.setReleaseType(form.data.releaseType);
+            projectFile.setClassifier(form.data.classifier);
+            projectFile.setProject(project);
+            projectFile.setUser(new UsersEntity(token.getUserId()));
+
+            if (!gameVersionRecords.isEmpty()) {
+                List<ProjectFileGameVersionsEntity> gameVersions = new ArrayList<>();
+                for (GameVersionsEntity version : gameVersionRecords) {
+                    ProjectFileGameVersionsEntity gameVersionsEntity = new ProjectFileGameVersionsEntity();
+                    gameVersionsEntity.setProjectFile(projectFile);
+                    gameVersionsEntity.setGameVersion(version);
+                    gameVersions.add(gameVersionsEntity);
+                }
+                projectFile.setGameVersions(gameVersions);
+            }
+
+            if (!projectTypeLoaders.isEmpty()) {
+                List<ProjectFileLoadersEntity> loaders = new ArrayList<>();
+                for (ProjectTypeLoadersEntity loader : projectTypeLoaders) {
+                    ProjectFileLoadersEntity fileLoadersEntity = new ProjectFileLoadersEntity();
+                    fileLoadersEntity.setProjectFile(projectFile);
+                    fileLoadersEntity.setLoader(loader);
+                    loaders.add(fileLoadersEntity);
+                }
+                projectFile.setLoaders(loaders);
+            }
+
+            if (!dependencyRecords.isEmpty()) {
+                List<ProjectFileDependenciesEntity> dependencies = new ArrayList<>();
+                for (ProjectFileDependenciesEntity dependency : dependencyRecords) {
+                    dependency.setProjectFile(projectFile);
+                    dependencies.add(dependency);
+                }
+                projectFile.setDependencies(dependencies);
+            }
+
+            session.save(projectFile);
+            session.flush();
+            session.refresh(projectFile);
+
+            final String gameSlug = project.getGame().getSlug();
+            final String projectTypeSlug = project.getProjectType().getSlug();
+
+            File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, project.getId(), projectFile.getId(), fileName);
+            destination.getParentFile().mkdirs();
+            try {
+                FileUtils.copyFile(tempFile, destination);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("ERROR_WRITING");
+                return ErrorMessage.THROWABLE.respond();
+            }
+            finally {
+                tempFile.delete();
+                tempFile.getParentFile().delete();
+            }
+
+            return ResponseUtil.successResponse(new DataProjectFileInQueue(projectFile, gameSlug, projectTypeSlug, project.getSlug()));
+        });
     }
 
     @GET
@@ -253,9 +255,12 @@ public class ProjectsAPI {
         final long page = query.getPage();
         final int limit = query.getLimit();
         final Sort sort = query.getSort(ProjectSort.POPULAR);
-        final List<ProjectsEntity> projects = Confluencia.PROJECT.findProjectsByProjectFileHash(projectFileHash, page, limit, sort);
 
-        final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
-        return ResponseUtil.successResponse(dataProjects);
+        return Confluencia.getTransaction(session -> {
+            final List<ProjectsEntity> projects = Confluencia.PROJECT.findProjectsByProjectFileHash(session, projectFileHash, page, limit, sort);
+
+            final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
+            return ResponseUtil.successResponse(dataProjects);
+        });
     }
 }

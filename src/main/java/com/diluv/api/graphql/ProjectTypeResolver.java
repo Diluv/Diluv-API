@@ -16,4 +16,9 @@ public class ProjectTypeResolver implements GraphQLResolver<ProjectType> {
 
         return projectType.getEntity().getProjectTypeLoaders().stream().map(Loader::new).collect(Collectors.toList());
     }
+
+    public Game game (ProjectType projectType) {
+
+        return new Game(projectType.getEntity().getGame());
+    }
 }

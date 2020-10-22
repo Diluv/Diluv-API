@@ -4,7 +4,7 @@
     "extensions": {
         "endpoints": {
             "Default GraphQL Endpoint": {
-                "url": "http://localhost:4567/v1/graphql",
+                "url": "http://localhost:4567/v1/admin/graphql",
                 "headers": {
                     "user-agent": "JS GraphQL",
                     "authorization": "Bearer r_lN-_POwYxBjf5J2O9Jn889jcpG1QumCs4K3BJ6rFs"

@@ -31,37 +31,42 @@ public class InternalAPI {
     @Path("/nodecdn/{hash}")
     public Response postNodeCDNWebhook (@PathParam("hash") String hash) {
 
-        NodeCDNCommitsEntity entity = Confluencia.SECURITY.findOneNodeCDNCommitsByHash(hash);
-        if (entity == null) {
-            return ErrorMessage.ENDPOINT_NOT_FOUND.respond();
-        }
-
-        entity.setCompleted(true);
-        if (!Confluencia.update(entity)) {
-            System.out.println("FAILED_UPDATE_NODECDN_COMMIT");
-            // return ErrorMessage.FAILED_UPDATE_NODECDN_COMMIT.respond();
-            return ErrorMessage.THROWABLE.respond();
-        }
-
-        int i = Confluencia.FILE.updateAllForRelease(entity.getCreatedAt());
-        if (i == -1) {
-            System.out.println("FAILED_UPDATE_PROJECT_FILE");
-            // return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();
-            return ErrorMessage.THROWABLE.respond();
-        }
-
-        if (i > 0 && Constants.WEBHOOK_URL != null) {
-            try {
-                Message discordMessage = new Message();
-                discordMessage.setContent(Instant.now().toString() + ": NodeCDN fetched " + i + " files.");
-                discordMessage.setUsername("Hilo");
-                WEBHOOK.sendMessage(discordMessage);
+        return Confluencia.getTransaction(session -> {
+            NodeCDNCommitsEntity entity = Confluencia.SECURITY.findOneNodeCDNCommitsByHash(session, hash);
+            if (entity == null) {
+                return ErrorMessage.ENDPOINT_NOT_FOUND.respond();
             }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
 
-        return Response.status(Response.Status.NO_CONTENT).build();
+            entity.setCompleted(true);
+            session.update(entity);
+
+            int i = Confluencia.FILE.updateAllForRelease(session, entity.getCreatedAt());
+            if (i == -1) {
+                System.out.println("FAILED_UPDATE_PROJECT_FILE");
+                // return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();
+                return ErrorMessage.THROWABLE.respond();
+            }
+
+            i = Confluencia.MISC.updateAllImagesForRelease(session, entity.getCreatedAt());
+            if (i == -1) {
+                System.out.println("FAILED_UPDATE_PROJECT_FILE");
+                // return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();
+                return ErrorMessage.THROWABLE.respond();
+            }
+
+            if (i > 0 && Constants.WEBHOOK_URL != null) {
+                try {
+                    Message discordMessage = new Message();
+                    discordMessage.setContent(Instant.now().toString() + ": NodeCDN fetched " + i + " files.");
+                    discordMessage.setUsername("Hilo");
+                    WEBHOOK.sendMessage(discordMessage);
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return Response.status(Response.Status.NO_CONTENT).build();
+        });
     }
 }
