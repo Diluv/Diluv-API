@@ -45,8 +45,8 @@ import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.utilities.ProjectService;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GamesEntity;
-import com.diluv.confluencia.database.record.ProjectReviewEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
+import com.diluv.confluencia.database.record.ProjectReviewEntity;
 import com.diluv.confluencia.database.record.ProjectTagsEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
@@ -63,8 +63,10 @@ import com.github.slugify.Slugify;
 @Produces(MediaType.APPLICATION_JSON)
 public class GamesAPI {
 
-    public static final List<DataSort> GAME_SORTS = GameSort.LIST.stream().map(DataSort::new).collect(Collectors.toList());
-    public static final List<DataSort> PROJECT_SORTS = ProjectSort.LIST.stream().map(DataSort::new).collect(Collectors.toList());
+    public static final List<DataSort> GAME_SORTS =
+        GameSort.LIST.stream().map(DataSort::new).collect(Collectors.toList());
+    public static final List<DataSort> PROJECT_SORTS =
+        ProjectSort.LIST.stream().map(DataSort::new).collect(Collectors.toList());
 
     private final Slugify slugify = new Slugify();
 
@@ -109,10 +111,12 @@ public class GamesAPI {
 
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}")
-    public Response getProjectType (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
+    public Response getProjectType (@PathParam("gameSlug") String gameSlug,
+                                    @PathParam("projectTypeSlug") String projectTypeSlug) {
 
         return Confluencia.getTransaction(session -> {
-            final ProjectTypesEntity projectTypesRecords = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
+            final ProjectTypesEntity projectTypesRecords =
+                Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
 
             if (projectTypesRecords == null) {
 
@@ -124,14 +128,16 @@ public class GamesAPI {
                 return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
             }
 
-            final long projectCount = Confluencia.PROJECT.countAllByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
+            final long projectCount =
+                Confluencia.PROJECT.countAllByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
             return ResponseUtil.successResponse(new DataProjectType(projectTypesRecords, projectCount));
         });
     }
 
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/projects")
-    public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectQuery query) {
+    public Response getProjects (@PathParam("gameSlug") String gameSlug,
+                                 @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectQuery query) {
 
         final long page = query.getPage();
         final int limit = query.getLimit();
@@ -143,7 +149,8 @@ public class GamesAPI {
 
         return Confluencia.getTransaction(session -> {
 
-            final List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByGameAndProjectType(session, gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags, loaders);
+            final List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByGameAndProjectType(
+                    session, gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags, loaders);
 
             if (projects.isEmpty()) {
 
@@ -152,13 +159,15 @@ public class GamesAPI {
                     return ErrorMessage.NOT_FOUND_GAME.respond();
                 }
 
-                if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
+                if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(
+                    session, gameSlug, projectTypeSlug) == null) {
 
                     return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
                 }
             }
 
-            final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
+            final List<DataBaseProject> dataProjects =
+                projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
 
             return ResponseUtil.successResponse(dataProjects);
         });
@@ -167,11 +176,12 @@ public class GamesAPI {
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/feed.atom")
     @Produces(MediaType.APPLICATION_ATOM_XML)
-    public Response getProjectFeed (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
+    public Response getProjectFeed (@PathParam("gameSlug") String gameSlug,
+                                    @PathParam("projectTypeSlug") String projectTypeSlug) {
 
-        final List<ProjectsEntity> projects = Confluencia.getTransaction(session -> {
-            return Confluencia.PROJECT.findAllByGameAndProjectType(session, gameSlug, projectTypeSlug, "", 1, 25, ProjectSort.NEW);
-        });
+        final List<ProjectsEntity> projects = Confluencia.getTransaction(session ->
+            Confluencia.PROJECT.findAllByGameAndProjectType(
+                session, gameSlug, projectTypeSlug, "", 1, 25, ProjectSort.NEW));
 
         if (projects.isEmpty()) {
             return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
@@ -202,11 +212,14 @@ public class GamesAPI {
 
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
-    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
+    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug,
+                                @PathParam("projectTypeSlug") String projectTypeSlug,
+                                @PathParam("projectSlug") String projectSlug) {
 
         return Confluencia.getTransaction(session -> {
             try {
-                final DataProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
+                final DataProject project =
+                    ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
                 return ResponseUtil.successResponse(project);
             }
             catch (ResponseException e) {
@@ -218,7 +231,9 @@ public class GamesAPI {
 
     @PATCH
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
-    public Response patchProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectForm form) {
+    public Response patchProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug,
+                                  @PathParam("projectTypeSlug") String projectTypeSlug,
+                                  @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectForm form) {
 
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
@@ -234,11 +249,13 @@ public class GamesAPI {
                 return ErrorMessage.NOT_FOUND_GAME.respond();
             }
 
-            if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
+            if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug)
+                == null) {
                 return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
             }
 
-            ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
+            ProjectsEntity project =
+                Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
             if (project == null) {
                 return ErrorMessage.NOT_FOUND_PROJECT.respond();
             }
@@ -319,7 +336,9 @@ public class GamesAPI {
                     return ErrorMessage.INVALID_IMAGE.respond();
                 }
 
-                final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, project.getId()));
+                final File file = new File(Constants.CDN_FOLDER,
+                    String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, project.getId()));
+
                 if (!ImageUtil.savePNG(image, file)) {
                     // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
                     return ErrorMessage.THROWABLE.respond();
@@ -333,17 +352,23 @@ public class GamesAPI {
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/feed.atom")
     @Produces(MediaType.APPLICATION_ATOM_XML)
-    public Response getProjectFileFeed (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
+    public Response getProjectFileFeed (@PathParam("gameSlug") String gameSlug,
+                                        @PathParam("projectTypeSlug") String projectTypeSlug,
+                                        @PathParam("projectSlug") String projectSlug) {
 
         return Confluencia.getTransaction(session -> {
-            final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
+            final ProjectsEntity project = Confluencia.PROJECT.findOneProject(
+                session, gameSlug, projectTypeSlug, projectSlug);
+
             if (project == null) {
                 return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
             }
 
-            final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(session, project, false, 1, 25, ProjectFileSort.NEW, null);
+            final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(
+                session, project, false, 1, 25, ProjectFileSort.NEW, null);
 
-            final String baseUrl = String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
+            final String baseUrl =
+                String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
             Feed feed = new Feed();
             feed.setId(URI.create(baseUrl + "/feed.atom"));
             feed.getLinks().add(new Link("self", baseUrl + "/"));
@@ -367,7 +392,9 @@ public class GamesAPI {
 
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
-    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @Query ProjectFileQuery query) {
+    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug,
+                                     @PathParam("projectTypeSlug") String projectTypeSlug,
+                                     @PathParam("projectSlug") String projectSlug, @Query ProjectFileQuery query) {
 
         long page = query.getPage();
         int limit = query.getLimit();
@@ -375,26 +402,30 @@ public class GamesAPI {
         String gameVersion = query.getGameVersion();
 
         return Confluencia.getTransaction(session -> {
-            final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
+            final ProjectsEntity project =
+                Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
             if (project == null) {
 
                 if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
                     return ErrorMessage.NOT_FOUND_GAME.respond();
                 }
 
-                if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
+                if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(
+                    session, gameSlug, projectTypeSlug) == null) {
                     return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
                 }
 
                 return ErrorMessage.NOT_FOUND_PROJECT.respond();
             }
 
-            boolean authorized = token != null && ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
-            final List<ProjectFilesEntity> projectFileRecords = Confluencia.FILE.findAllByProject(session, project, authorized, page, limit, sort, gameVersion);
+            boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
+            final List<ProjectFilesEntity> projectFileRecords =
+                Confluencia.FILE.findAllByProject(session, project, authorized, page, limit, sort, gameVersion);
 
             final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> record.isReleased() ?
                 new DataProjectFileAvailable(record, gameSlug, projectTypeSlug, projectSlug) :
-                new DataProjectFileInQueue(record, gameSlug, projectTypeSlug, projectSlug)).collect(Collectors.toList());
+                new DataProjectFileInQueue(record, gameSlug, projectTypeSlug, projectSlug))
+                .collect(Collectors.toList());
             return ResponseUtil.successResponse(projectFiles);
         });
     }
@@ -402,7 +433,9 @@ public class GamesAPI {
     @POST
     @Path("/{gameSlug}/{projectTypeSlug}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @MultipartForm ProjectForm form) {
+    public Response postProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug,
+                                 @PathParam("projectTypeSlug") String projectTypeSlug,
+                                 @MultipartForm ProjectForm form) {
 
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
@@ -414,7 +447,8 @@ public class GamesAPI {
 
         return Confluencia.getTransaction(session -> {
 
-            ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
+            ProjectTypesEntity projectType =
+                Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
 
             if (projectType == null) {
                 if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
@@ -481,7 +515,8 @@ public class GamesAPI {
             session.flush();
             session.refresh(project);
 
-            final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, project.getId()));
+            final File file = new File(Constants.CDN_FOLDER,
+                    String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, project.getId()));
             if (!ImageUtil.savePNG(image, file)) {
                 // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
                 return ErrorMessage.THROWABLE.respond();

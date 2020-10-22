@@ -18,7 +18,8 @@ public class DataFeatured {
     @Expose
     private final long contributorCount;
 
-    public DataFeatured (List<DataGame> games, List<DataBaseProject> projects, long projectCount, long contributorCount) {
+    public DataFeatured (List<DataGame> games, List<DataBaseProject> projects, long projectCount,
+                         long contributorCount) {
 
         this.games = games;
         this.projects = projects;

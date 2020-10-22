@@ -73,7 +73,8 @@ public class ProjectsAPI {
     @POST
     @Path("/{id}/files")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postProjectFile (@HeaderParam("Authorization") Token token, @PathParam("id") Long projectId, @MultipartForm ProjectFileUploadForm form) {
+    public Response postProjectFile (@HeaderParam("Authorization") Token token, @PathParam("id") Long projectId,
+                                     @MultipartForm ProjectFileUploadForm form) {
 
         if (token == null) {
             return ErrorMessage.USER_REQUIRED_TOKEN.respond();
@@ -229,7 +230,8 @@ public class ProjectsAPI {
             final String gameSlug = project.getGame().getSlug();
             final String projectTypeSlug = project.getProjectType().getSlug();
 
-            File destination = FileUtil.getOutputLocation(gameSlug, projectTypeSlug, project.getId(), projectFile.getId(), fileName);
+            File destination =
+                FileUtil.getOutputLocation(gameSlug, projectTypeSlug, project.getId(), projectFile.getId(), fileName);
             destination.getParentFile().mkdirs();
             try {
                 FileUtils.copyFile(tempFile, destination);
@@ -244,7 +246,8 @@ public class ProjectsAPI {
                 tempFile.getParentFile().delete();
             }
 
-            return ResponseUtil.successResponse(new DataProjectFileInQueue(projectFile, gameSlug, projectTypeSlug, project.getSlug()));
+            return ResponseUtil.successResponse(
+                new DataProjectFileInQueue(projectFile, gameSlug, projectTypeSlug, project.getSlug()));
         });
     }
 
@@ -257,9 +260,11 @@ public class ProjectsAPI {
         final Sort sort = query.getSort(ProjectSort.POPULAR);
 
         return Confluencia.getTransaction(session -> {
-            final List<ProjectsEntity> projects = Confluencia.PROJECT.findProjectsByProjectFileHash(session, projectFileHash, page, limit, sort);
+            final List<ProjectsEntity> projects =
+                Confluencia.PROJECT.findProjectsByProjectFileHash(session, projectFileHash, page, limit, sort);
 
-            final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
+            final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new)
+                .collect(Collectors.toList());
             return ResponseUtil.successResponse(dataProjects);
         });
     }

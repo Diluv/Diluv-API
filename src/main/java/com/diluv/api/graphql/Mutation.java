@@ -18,7 +18,8 @@ import graphql.schema.DataFetchingEnvironment;
 
 public class Mutation implements GraphQLMutationResolver {
 
-    public ProjectType addProjectType (String gameSlug, String projectTypeSlug, String projectTypeName, boolean isDefault, Long maxFileSize) {
+    public ProjectType addProjectType (String gameSlug, String projectTypeSlug, String projectTypeName,
+                                       boolean isDefault, Long maxFileSize) {
 
         return Confluencia.getTransaction(session -> {
             GamesEntity game = Confluencia.GAME.findOneBySlug(session, gameSlug);
@@ -47,10 +48,12 @@ public class Mutation implements GraphQLMutationResolver {
         });
     }
 
-    public ProjectType updateProjectType (String gameSlug, String projectTypeSlug, String projectTypeName, Boolean isDefault, Long maxFileSize) {
+    public ProjectType updateProjectType (String gameSlug, String projectTypeSlug, String projectTypeName,
+                                          Boolean isDefault, Long maxFileSize) {
 
         return Confluencia.getTransaction(session -> {
-            ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
+            ProjectTypesEntity projectType =
+                Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
             if (projectType == null) {
                 throw new GraphQLException("Project Type doesn't exists");
             }
@@ -109,7 +112,8 @@ public class Mutation implements GraphQLMutationResolver {
     public ProjectType addTag (String gameSlug, String projectTypeSlug, String tagSlug, String tagName) {
 
         return Confluencia.getTransaction(session -> {
-            ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
+            ProjectTypesEntity projectType =
+                Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
             if (projectType == null) {
                 throw new GraphQLException("Project Type doesn't exists");
             }
@@ -126,7 +130,8 @@ public class Mutation implements GraphQLMutationResolver {
 
         return Confluencia.getTransaction(session -> {
 
-            ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
+            ProjectTypesEntity projectType =
+                Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
             if (projectType == null) {
                 throw new GraphQLException("Project Type doesn't exists");
             }

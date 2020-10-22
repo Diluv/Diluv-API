@@ -138,7 +138,8 @@ public class UsersAPI {
                         return ErrorMessage.USER_INVALID_EMAIL.respond();
                     }
 
-                    if (Confluencia.USER.existsByEmail(session, email) || Confluencia.USER.existsTempUserByEmail(session, email)) {
+                    if (Confluencia.USER.existsByEmail(session, email)
+                        || Confluencia.USER.existsTempUserByEmail(session, email)) {
 
                         return ErrorMessage.USER_TAKEN_EMAIL.respond();
                     }
@@ -254,7 +255,8 @@ public class UsersAPI {
 
     @GET
     @Path("/{username}/projects")
-    public Response getProjectsByUsername (@HeaderParam("Authorization") Token token, @PathParam("username") String username, @Query ProjectQuery query) {
+    public Response getProjectsByUsername (@HeaderParam("Authorization") Token token,
+                                           @PathParam("username") String username, @Query ProjectQuery query) {
 
         long page = query.getPage();
         int limit = query.getLimit();
@@ -272,7 +274,8 @@ public class UsersAPI {
                 authorized = userRecord.getUsername().equalsIgnoreCase(username);
             }
 
-            List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByUsername(session, username, authorized, page, limit, sort);
+            List<ProjectsEntity> projects =
+                Confluencia.PROJECT.findAllByUsername(session, username, authorized, page, limit, sort);
             return ResponseUtil.successResponse(projects.stream().map(DataProject::new).collect(Collectors.toList()));
         });
     }

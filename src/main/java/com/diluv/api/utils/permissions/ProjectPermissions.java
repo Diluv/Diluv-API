@@ -31,7 +31,8 @@ public enum ProjectPermissions {
         return this.name;
     }
 
-    public static boolean hasPermission (ProjectsEntity project, @Nullable Token token, ProjectPermissions permissions) {
+    public static boolean hasPermission (ProjectsEntity project, @Nullable Token token,
+                                         ProjectPermissions permissions) {
 
         if (token == null) {
             return false;
@@ -50,11 +51,14 @@ public enum ProjectPermissions {
             return getSubsetPermissions(getAllPermissions(), token);
         }
 
-        final Optional<ProjectAuthorsEntity> record = project.getAuthors().stream().filter(r -> r.getUser().getId() == token.getUserId()).findAny();
+        final Optional<ProjectAuthorsEntity> record =
+            project.getAuthors().stream().filter(r -> r.getUser().getId() == token.getUserId()).findAny();
 
         if (record.isPresent()) {
             ProjectAuthorsEntity r = record.get();
-            final List<String> permissions = r.getPermissions().stream().map(ProjectAuthorPermissionsEntity::getPermission).collect(Collectors.toList());
+            final List<String> permissions =
+                r.getPermissions().stream().map(ProjectAuthorPermissionsEntity::getPermission)
+                    .collect(Collectors.toList());
             return getSubsetPermissions(permissions, token);
         }
 

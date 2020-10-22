@@ -71,7 +71,8 @@ public class JWTUtil {
         return Confluencia.getTransaction(session -> {
             byte[] sha256 = DigestUtils.sha256(token + ":" + TOKEN_TYPE);
             String key = Base64.getEncoder().encodeToString(sha256);
-            PersistedGrantsEntity record = Confluencia.SECURITY.findPersistedGrantByKeyAndType(session, key, TOKEN_TYPE);
+            PersistedGrantsEntity record =
+                Confluencia.SECURITY.findPersistedGrantByKeyAndType(session, key, TOKEN_TYPE);
             if (record == null) {
                 return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
             }

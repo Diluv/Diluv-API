@@ -21,7 +21,8 @@ public class DataSiteIndex {
     @Expose
     private final long projectTypeCount;
 
-    public DataSiteIndex (List<DataSiteGame> featuredGames, long projectCount, long contributorCount, long gameCount, long projectTypeCount) {
+    public DataSiteIndex (List<DataSiteGame> featuredGames, long projectCount, long contributorCount, long gameCount,
+                          long projectTypeCount) {
 
         this.featuredGames = featuredGames;
         this.projectCount = projectCount;

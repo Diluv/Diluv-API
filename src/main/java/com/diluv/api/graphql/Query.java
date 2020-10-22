@@ -13,23 +13,21 @@ public class Query implements GraphQLQueryResolver {
 
     public List<Game> games (long page, int limit, String sort) {
 
-        return Confluencia.getTransaction(session -> {
-            return Confluencia.GAME.findAll(session, page, limit, getSortOrDefault(sort, ProjectSort.LIST, ProjectSort.NEW), "").stream().map(Game::new).collect(Collectors.toList());
-        });
+        return Confluencia.getTransaction(session ->
+            Confluencia.GAME.findAll(session, page, limit, getSortOrDefault(sort, ProjectSort.LIST, ProjectSort.NEW),
+                "").stream().map(Game::new).collect(Collectors.toList()));
     }
 
     public Game game (String gameSlug) {
 
-        return Confluencia.getTransaction(session -> {
-            return new Game(Confluencia.GAME.findOneBySlug(session, gameSlug));
-        });
+        return Confluencia.getTransaction(session -> new Game(Confluencia.GAME.findOneBySlug(session, gameSlug)));
     }
 
     public ProjectType projectType (String gameSlug, String projectTypeSlug) {
 
-        return Confluencia.getTransaction(session -> {
-            return new ProjectType(Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug));
-        });
+        return Confluencia.getTransaction(session ->
+            new ProjectType(Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(
+                session, gameSlug, projectTypeSlug)));
     }
 
     public Project project (String gameSlug, String projectTypeSlug, String projectSlug) {
@@ -48,9 +46,9 @@ public class Query implements GraphQLQueryResolver {
 
     public List<ProjectType> projectTypes (String gameSlug) {
 
-        return Confluencia.getTransaction(session -> {
-            return Confluencia.GAME.findAllProjectTypesByGameSlug(session, gameSlug).stream().map(ProjectType::new).collect(Collectors.toList());
-        });
+        return Confluencia.getTransaction(session ->
+            Confluencia.GAME.findAllProjectTypesByGameSlug(session, gameSlug).stream().map(ProjectType::new)
+                .collect(Collectors.toList()));
     }
 
     public List<Project> projects (String gameSlug, String projectTypeSlug, Long page, Integer limit, String sort) {
@@ -58,18 +56,17 @@ public class Query implements GraphQLQueryResolver {
         long p = PaginationQuery.getPage(page);
         int l = PaginationQuery.getLimit(limit);
         Sort s = getSortOrDefault(sort, ProjectSort.LIST, ProjectSort.NEW);
-        return Confluencia.getTransaction(session -> {
-            return Confluencia.PROJECT.findAllByGameAndProjectType(session, gameSlug, projectTypeSlug, "", p, l, s).stream().map(Project::new).collect(Collectors.toList());
-        });
+        return Confluencia.getTransaction(session ->
+            Confluencia.PROJECT.findAllByGameAndProjectType(session, gameSlug, projectTypeSlug, "", p, l, s).stream()
+                .map(Project::new).collect(Collectors.toList()));
     }
 
     public List<Project> projectReviews (Long page, Integer limit) {
 
         long p = PaginationQuery.getPage(page);
         int l = PaginationQuery.getLimit(limit);
-        return Confluencia.getTransaction(session -> {
-            return Confluencia.PROJECT.findAllByReview(session, p, l).stream().map(Project::new).collect(Collectors.toList());
-        });
+        return Confluencia.getTransaction(session ->
+            Confluencia.PROJECT.findAllByReview(session, p, l).stream().map(Project::new).collect(Collectors.toList()));
     }
 
     public Sort getSortOrDefault (String sort, List<Sort> sortList, Sort defaultSort) {

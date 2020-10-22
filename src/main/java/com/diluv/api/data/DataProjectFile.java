@@ -119,7 +119,8 @@ public class DataProjectFile {
 
         this.id = rs.getId();
         this.name = rs.getName();
-        this.downloadURL = Constants.getDiluvCDN(gameSlug, projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
+        this.downloadURL =
+            Constants.getDiluvCDN(gameSlug, projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
         this.size = rs.getSize();
         this.changelog = rs.getChangelog();
         this.sha512 = rs.getSha512();
@@ -130,8 +131,11 @@ public class DataProjectFile {
         this.uploaderUserId = rs.getUser().getId();
         this.uploaderUsername = rs.getUser().getUsername();
         this.uploaderDisplayName = rs.getUser().getDisplayName();
-        this.dependencies = rs.getDependencies().stream().map(a -> a.getDependencyProject().getId()).collect(Collectors.toList());
-        this.gameVersions = rs.getGameVersions().stream().map(a -> new DataGameVersion(a.getGameVersion())).collect(Collectors.toList());
+        this.dependencies =
+            rs.getDependencies().stream().map(a -> a.getDependencyProject().getId()).collect(Collectors.toList());
+        this.gameVersions =
+            rs.getGameVersions().stream().map(a -> new DataGameVersion(a.getGameVersion()))
+                .collect(Collectors.toList());
         this.gameSlug = gameSlug;
         this.projectTypeSlug = projectTypeSlug;
         this.projectSlug = projectSlug;

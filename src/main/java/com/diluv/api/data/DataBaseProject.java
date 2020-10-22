@@ -103,7 +103,8 @@ public class DataBaseProject {
         this.projectType = new DataBaseProjectType(rs.getProjectType());
         this.contributors.add(new DataProjectContributor(rs.getOwner(), "owner"));
         if (!rs.getAuthors().isEmpty()) {
-            this.contributors.addAll(rs.getAuthors().stream().map(DataProjectContributor::new).collect(Collectors.toList()));
+            this.contributors.addAll(rs.getAuthors().stream().map(DataProjectContributor::new)
+                .collect(Collectors.toList()));
         }
     }
 }

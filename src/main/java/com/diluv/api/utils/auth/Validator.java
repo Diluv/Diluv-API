@@ -30,7 +30,9 @@ public class Validator {
     /**
      * A RegEx pattern for matching valid semantic versions according to the https://semver.org guidelines.
      */
+    //CHECKSTYLE:OFF
     private static final Pattern SEM_VER = Pattern.compile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
+    //CHECKSTYLE:ON
     private static final List<String> DEP_TYPES = Arrays.asList("required", "optional", "incompatible");
 
     public static boolean validateEmail (String email) {
@@ -55,7 +57,8 @@ public class Validator {
 
     public static boolean validateProjectDescription (String description) {
 
-        return !GenericValidator.isBlankOrNull(description) && description.length() <= 10000 && description.length() >= 50;
+        return !GenericValidator.isBlankOrNull(description) && description.length() <= 10000
+            && description.length() >= 50;
     }
 
     public static boolean validateProjectFileChangelog (String changelog) {
@@ -63,8 +66,10 @@ public class Validator {
         return changelog == null || changelog.length() <= 2000;
     }
 
-    private static final Set<String> VALID_RELEASE_TYPES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("release", "beta", "alpha")));
-    private static final Set<String> VALID_CLASSIFIERS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("binary")));
+    private static final Set<String> VALID_RELEASE_TYPES =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList("release", "beta", "alpha")));
+    private static final Set<String> VALID_CLASSIFIERS =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList("binary")));
 
     public static boolean validateReleaseType (String releaseType) {
 
@@ -76,7 +81,8 @@ public class Validator {
         return classifier != null && VALID_CLASSIFIERS.contains(classifier.toLowerCase());
     }
 
-    public static List<GameVersionsEntity> validateGameVersions (GamesEntity game, List<String> gameVersions) throws MismatchException {
+    public static List<GameVersionsEntity> validateGameVersions (GamesEntity game, List<String> gameVersions)
+        throws MismatchException {
 
         final List<GameVersionsEntity> gameVersionRecords = new ArrayList<>();
         if (gameVersions != null && !gameVersions.isEmpty()) {
@@ -90,19 +96,23 @@ public class Validator {
                 }
             }
             if (!versionNotFound.isEmpty()) {
-                throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION, String.join(", ", versionNotFound));
+                throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION,
+                    String.join(", ", versionNotFound));
             }
         }
         return gameVersionRecords;
     }
 
-    public static List<ProjectFileDependenciesEntity> validateDependencies (Session session, long projectId, List<FileDependency> dependencies) throws NumberFormatException, MismatchException {
+    public static List<ProjectFileDependenciesEntity> validateDependencies (Session session, long projectId,
+                                                                            List<FileDependency> dependencies)
+        throws NumberFormatException, MismatchException {
 
         if (dependencies != null && !dependencies.isEmpty()) {
             Set<Long> projectIds = new HashSet<>();
             for (FileDependency dependency : dependencies) {
                 if (dependency.projectId == null) {
-                    throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID, "Dependency projectId can't be null");
+                    throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID,
+                        "Dependency projectId can't be null");
                 }
                 if (projectId == dependency.projectId) {
                     throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF, null);
@@ -117,7 +127,8 @@ public class Validator {
             if (projects.size() != dependencies.size()) {
                 projectIds.removeAll(projects);
                 String missing = projectIds.stream().map(Object::toString).collect(Collectors.joining(", "));
-                throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID, "Project ID not found: " + missing);
+                throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID,
+                    "Project ID not found: " + missing);
             }
 
             List<ProjectFileDependenciesEntity> projectFile = new ArrayList<>();
@@ -166,7 +177,9 @@ public class Validator {
         return version != null && version.length() <= 20 && SEM_VER.matcher(version).matches();
     }
 
-    public static List<ProjectTypeLoadersEntity> validateProjectTypeLoaders (ProjectTypesEntity projectType, List<String> loaders) throws MismatchException {
+    public static List<ProjectTypeLoadersEntity> validateProjectTypeLoaders (ProjectTypesEntity projectType,
+                                                                             List<String> loaders)
+        throws MismatchException {
 
         final List<ProjectTypeLoadersEntity> loadersRecords = new ArrayList<>();
         if (loaders != null && !loaders.isEmpty()) {
@@ -180,7 +193,8 @@ public class Validator {
                 }
             }
             if (!loadersNotFound.isEmpty()) {
-                throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_LOADER, String.join(", ", loadersNotFound));
+                throw new MismatchException(ErrorMessage.PROJECT_FILE_INVALID_LOADER,
+                    String.join(", ", loadersNotFound));
             }
         }
         return loadersRecords;

@@ -22,7 +22,8 @@ public class DataSiteGameProjects {
     @Expose
     private final List<DataSort> sorts;
 
-    public DataSiteGameProjects (List<DataBaseProject> projects, List<DataBaseProjectType> types, DataProjectType currentType, List<DataSort> sorts) {
+    public DataSiteGameProjects (List<DataBaseProject> projects, List<DataBaseProjectType> types,
+                                 DataProjectType currentType, List<DataSort> sorts) {
 
         this.projects = projects;
         this.types = types;

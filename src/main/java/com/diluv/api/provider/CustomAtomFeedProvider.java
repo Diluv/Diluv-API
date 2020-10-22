@@ -44,7 +44,9 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 public class CustomAtomFeedProvider extends AtomFeedProvider {
 
     @Override
-    public void writeTo (Feed feed, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+    public void writeTo (Feed feed, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+                         MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
+        throws IOException, WebApplicationException {
 
         LogMessages.LOGGER.debugf("Provider : %s,  Method : writeTo", getClass().getName());
         JAXBContextFinder finder = getFinder(mediaType);

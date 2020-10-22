@@ -238,14 +238,16 @@ public class AdminAPI {
 
     @GET
     @Path("/graphql")
-    public Response getGraphQL (@HeaderParam("Authorization") Token token, @Context HttpServletRequest req, @Context HttpServletResponse resp) {
+    public Response getGraphQL (@HeaderParam("Authorization") Token token, @Context HttpServletRequest req,
+                                @Context HttpServletResponse resp) {
 
         return request(token, req, resp);
     }
 
     @POST
     @Path("/graphql")
-    public Response postGraphQL (@HeaderParam("Authorization") Token token, @Context HttpServletRequest req, @Context HttpServletResponse resp) {
+    public Response postGraphQL (@HeaderParam("Authorization") Token token, @Context HttpServletRequest req,
+                                 @Context HttpServletResponse resp) {
 
         return request(token, req, resp);
     }

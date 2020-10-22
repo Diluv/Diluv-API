@@ -21,6 +21,7 @@ public class DataAuthorizedProjectContributor extends DataProjectContributor {
     public DataAuthorizedProjectContributor (ProjectAuthorsEntity projectAuthor) {
 
         super(projectAuthor);
-        this.permissions = projectAuthor.getPermissions().stream().map(ProjectAuthorPermissionsEntity::getPermission).collect(Collectors.toList());
+        this.permissions = projectAuthor.getPermissions().stream().map(ProjectAuthorPermissionsEntity::getPermission)
+            .collect(Collectors.toList());
     }
 }

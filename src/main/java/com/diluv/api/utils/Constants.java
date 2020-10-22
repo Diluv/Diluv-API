@@ -52,7 +52,8 @@ public final class Constants {
 
     public static final String WEBSITE_URL = getValueOrDefault("WEBSITE_URL", "https://diluv.com");
     public static final String DILUV_CDN_URL = getValueOrDefault("DILUV_CDN_URL", "https://cdn.diluv.com");
-    public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.singleton(WEBSITE_URL));
+    public static final Set<String> ALLOWED_ORIGINS =
+        getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.singleton(WEBSITE_URL));
 
     public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
     public static final Salt SALT = getFileSalt();
@@ -161,9 +162,11 @@ public final class Constants {
                 new JWTClaimsSet.Builder().issuer(AUTH_ISSUER).build(),
                 new HashSet<>(Arrays.asList("sub", /*"iat",*/ "exp"/*, "jti"*/))));
 
-            JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(AUTH_BASE_URL + "/.well-known/openid-configuration/jwks"));
+            JWKSource<SecurityContext> keySource =
+                new RemoteJWKSet<>(new URL(AUTH_BASE_URL + "/.well-known/openid-configuration/jwks"));
 
-            JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, keySource);
+            JWSKeySelector<SecurityContext> keySelector =
+                new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, keySource);
 
             jwtProcessor.setJWSKeySelector(keySelector);
 
@@ -266,7 +269,10 @@ public final class Constants {
 
         if (isDevelopment()) {
             final String url = "https://images.placeholders.dev/?width=250&height=130";
-            return new DataImage(new DataImageSource(url + "&text=fallback", "image/png"), new DataImageSource[]{new DataImageSource(url + "&text=" + gameSlug, "image/svg+xml")});
+            return new DataImage(
+                new DataImageSource(url + "&text=fallback", "image/png"),
+                new DataImageSource[]{new DataImageSource(url + "&text=" + gameSlug, "image/svg+xml")}
+                );
         }
 
         final String baseURL = String.format("%s/games/%s/logo", CDN_URL, gameSlug);
@@ -276,14 +282,18 @@ public final class Constants {
         });
     }
 
-    public static String getDiluvCDN (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) {
+    public static String getDiluvCDN (String gameSlug, String projectTypeSlug, long projectId, long fileId,
+                                      String fileName) {
 
-        return String.format("%s/games/%s/%s/%d/%d/%s", Constants.DILUV_CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName);
+        return String.format(
+            "%s/games/%s/%s/%d/%d/%s", Constants.DILUV_CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName);
     }
 
-    public static URI getNodeCDNFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) throws URISyntaxException {
+    public static URI getNodeCDNFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId,
+                                         String fileName) throws URISyntaxException {
 
-        return new URI(String.format("%s/games/%s/%s/%d/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName));
+        return new URI(String.format(
+            "%s/games/%s/%s/%d/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName));
     }
 
     public static Salt getSalt () {

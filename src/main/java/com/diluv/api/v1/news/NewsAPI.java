@@ -37,7 +37,8 @@ public class NewsAPI {
 
         return Confluencia.getTransaction(session -> {
             final List<NewsEntity> newsRecords = Confluencia.NEWS.findAll(session, page, limit, sort);
-            final List<DataNewsPost> newsPosts = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
+            final List<DataNewsPost> newsPosts =
+                newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
 
             return ResponseUtil.successResponse(newsPosts);
         });

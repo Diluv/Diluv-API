@@ -20,7 +20,8 @@ public class DataProjectFileInQueue extends DataProjectFile {
     @Expose
     private final long lastStatusChanged;
 
-    public DataProjectFileInQueue (ProjectFilesEntity record, String gameSlug, String projectTypeSlug, String projectSlug) {
+    public DataProjectFileInQueue (ProjectFilesEntity record, String gameSlug, String projectTypeSlug,
+                                   String projectSlug) {
 
         super(record, gameSlug, projectTypeSlug, projectSlug);
         this.status = record.getProcessingStatus().toString();

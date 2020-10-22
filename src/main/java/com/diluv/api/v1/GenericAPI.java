@@ -35,11 +35,16 @@ public class GenericAPI {
 
     @GET
     @Path("/download/{gameSlug}/{projectTypeSlug}/{projectId}/{fileId}/{projectFileName}")
-    public Response getProjectFileDownloads (@HeaderParam("CF-Connecting-IP") String ip, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectId") long projectId, @PathParam("fileId") long fileId, @PathParam("projectFileName") String projectFileName) {
+    public Response getProjectFileDownloads (@HeaderParam("CF-Connecting-IP") String ip,
+                                             @PathParam("gameSlug") String gameSlug,
+                                             @PathParam("projectTypeSlug") String projectTypeSlug,
+                                             @PathParam("projectId") long projectId, @PathParam("fileId") long fileId,
+                                             @PathParam("projectFileName") String projectFileName) {
 
         return Confluencia.getTransaction(session -> {
             try {
-                final URI uri = Constants.getNodeCDNFileURL(gameSlug, projectTypeSlug, projectId, fileId, projectFileName);
+                final URI uri =
+                    Constants.getNodeCDNFileURL(gameSlug, projectTypeSlug, projectId, fileId, projectFileName);
 
                 if (ip == null) {
                     return Response.temporaryRedirect(uri).build();

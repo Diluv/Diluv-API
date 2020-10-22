@@ -19,7 +19,8 @@ public class FileUtil {
 
     public static String writeFile (InputStream input, long limit, File destination) {
 
-        try (DigestInputStream hashStream = new DigestInputStream(input, new SHA3.Digest512()); LimitedInputStream in = new LimitedInputStream(hashStream, limit)) {
+        try (DigestInputStream hashStream = new DigestInputStream(input, new SHA3.Digest512());
+             LimitedInputStream in = new LimitedInputStream(hashStream, limit)) {
 
             FileUtils.copyInputStreamToFile(in, destination);
             return Hex.toHexString(hashStream.getMessageDigest().digest());
@@ -49,6 +50,7 @@ public class FileUtil {
 
     public static File getOutputLocation (String game, String type, long project, long id, String inputFileName) {
 
-        return new File(Constants.PROCESSING_FOLDER, game + "/" + type + "/" + project + "/" + id + "/" + inputFileName);
+        return new File(
+            Constants.PROCESSING_FOLDER, game + "/" + type + "/" + project + "/" + id + "/" + inputFileName);
     }
 }

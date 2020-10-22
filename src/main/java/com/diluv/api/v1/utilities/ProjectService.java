@@ -15,15 +15,18 @@ import com.diluv.confluencia.database.record.ProjectsEntity;
 
 public class ProjectService {
 
-    public static DataProject getDataProject (Session session, String gameSlug, String projectTypeSlug, String projectSlug, Token token) throws ResponseException {
+    public static DataProject getDataProject (Session session, String gameSlug, String projectTypeSlug,
+                                              String projectSlug, Token token) throws ResponseException {
 
-        final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
+        final ProjectsEntity project =
+            Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
         if (project == null) {
             if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
                 throw new ResponseException(ErrorMessage.NOT_FOUND_GAME.respond());
             }
 
-            if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
+            if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug,
+                projectTypeSlug) == null) {
                 throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond());
             }
 
