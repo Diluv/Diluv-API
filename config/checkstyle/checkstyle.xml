@@ -30,6 +30,7 @@
                   default="checkstyle-suppressions.xml" />
         <property name="optional" value="true"/>
     </module>
+    <module name="SuppressionCommentFilter"/>
 
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.org/config_whitespace.html -->
