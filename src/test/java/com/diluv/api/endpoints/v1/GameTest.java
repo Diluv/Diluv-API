@@ -103,10 +103,10 @@ public class GameTest {
         final ClassLoader classLoader = this.getClass().getClassLoader();
         final File logo = new File(classLoader.getResource("logo.png").getFile());
 
-        ProjectCreate data =new ProjectCreate();
-        data.name ="Bookshelf";
-        data.summary ="Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-        data.description ="Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        ProjectCreate data = new ProjectCreate();
+        data.name = "Bookshelf";
+        data.summary = "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        data.description = "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
         Map<String, Object> multiPart = new HashMap<>();
         multiPart.put("logo", logo);
@@ -120,12 +120,12 @@ public class GameTest {
 //        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, 400, ErrorMessage.PROJECT_INVALID_TAGS);
 
         // Ok
-        data.name="Bookshelf2";
+        data.name = "Bookshelf2";
         data.tags.clear();
         multiPart.put("data", data);
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, "schema/project-schema.json");
 
-        data.name="Bookshelf3";
+        data.name = "Bookshelf3";
         data.tags.add("tech");
         data.tags.add("magic");
         multiPart.put("data", data);
@@ -138,7 +138,7 @@ public class GameTest {
         final ClassLoader classLoader = this.getClass().getClassLoader();
         final File logo = new File(classLoader.getResource("logo.png").getFile());
 
-        ProjectCreate data =new ProjectCreate();
+        ProjectCreate data = new ProjectCreate();
         data.name = "Bookshelf";
         data.summary = "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
         data.description = "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -154,10 +154,14 @@ public class GameTest {
 //        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/dark-elevators", multiPart, 400, ErrorMessage.PROJECT_INVALID_TAGS);
 
         // Ok
-        data.name= "Dark Elevators New";
+        data.name = "Dark Elevators New";
         data.tags.clear();
         multiPart.put("data", data);
         Request.patchOkMultipartWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/dark-elevators", multiPart);
+
+        multiPart.clear();
+        multiPart.put("data", new ProjectCreate());
+        Request.patchOkMultipartWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/get-ya-tanks-here", multiPart);
 
 //        multiPart.put("name", "Dark Elevators New");
 //        multiPart.put("tags", "tech,magic");

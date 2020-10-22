@@ -88,18 +88,19 @@ public class Mutation implements GraphQLMutationResolver {
             ProjectReviewEntity review = new ProjectReviewEntity();
             review.setReviewedBy(new UsersEntity(token.getUserId()));
             if (requestChange) {
-                ProjectRequestChangeEntity requestChangeEntity = new ProjectRequestChangeEntity();
-                requestChangeEntity.setReason(reason);
-                review.setProjectRequestChange(requestChangeEntity);
+                review.setProjectRequestChange(new ProjectRequestChangeEntity(reason));
             }
             else {
                 project.setReleased(true);
-                project.setReview(true);
+                review.setCompleted(true);
             }
 
+            project.setReview(false);
             project.addReview(review);
 
             session.update(project);
+
+            //TODO EMAIL
 
             return new Project(project);
         });

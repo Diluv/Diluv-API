@@ -45,6 +45,7 @@ import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.utilities.ProjectService;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GamesEntity;
+import com.diluv.confluencia.database.record.ProjectReviewEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.diluv.confluencia.database.record.ProjectTagsEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
@@ -300,6 +301,13 @@ public class GamesAPI {
                     project.getTags().add(tagsEntity);
                 }
 
+            }
+
+            for (ProjectReviewEntity review : project.getReviews()) {
+                if (!review.isCompleted()) {
+                    project.setReview(true);
+                    review.setCompleted(true);
+                }
             }
 
             session.update(project);
