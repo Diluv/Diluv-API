@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'jacoco'
     id 'com.google.cloud.tools.jib' version '2.5.0'
-    //    id "checkstyle"
+    id 'checkstyle'
 }
 
 version = "${project_version}" + (isSnapshot() ? '.' + getBuildNumber() : '')
@@ -86,10 +86,9 @@ jib {
     }
 }
 
-//checkstyle {
-//    configFile = file("checkstyle.xml")
-//    toolVersion = '8.10'
-//}
+checkstyle {
+    toolVersion "8.36.2"
+}
 
 static String getBuildNumber() {
     return System.getenv("GITHUB_RUN_NUMBER") ?: "0"
