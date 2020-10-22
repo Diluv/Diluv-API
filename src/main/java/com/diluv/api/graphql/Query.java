@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import com.diluv.api.utils.query.PaginationQuery;
 import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 import graphql.kickstart.tools.GraphQLQueryResolver;

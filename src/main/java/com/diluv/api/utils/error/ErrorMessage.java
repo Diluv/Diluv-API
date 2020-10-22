@@ -1,10 +1,11 @@
 package com.diluv.api.utils.error;
 
+import static com.diluv.api.utils.error.ErrorType.*;
+
 import javax.ws.rs.core.Response;
 
 import com.diluv.api.utils.response.ErrorResponse;
 
-import static com.diluv.api.utils.error.ErrorType.*;
 
 public enum ErrorMessage {
 

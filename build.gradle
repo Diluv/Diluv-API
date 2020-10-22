@@ -95,7 +95,7 @@ static String getBuildNumber() {
 }
 
 static boolean isSnapshot() {
-    String ref = System.getenv("GITHUB_REF");
+    String ref = System.getenv("GITHUB_REF")
     if (ref != null && ref.startsWith("refs/tags/v")) {
         return false
     }

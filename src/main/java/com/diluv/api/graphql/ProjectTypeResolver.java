@@ -1,9 +1,9 @@
 package com.diluv.api.graphql;
 
-import graphql.kickstart.tools.GraphQLResolver;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import graphql.kickstart.tools.GraphQLResolver;
 
 public class ProjectTypeResolver implements GraphQLResolver<ProjectType> {
 

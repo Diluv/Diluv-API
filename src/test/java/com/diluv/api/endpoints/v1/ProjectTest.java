@@ -1,5 +1,15 @@
 package com.diluv.api.endpoints.v1;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.Request;
@@ -7,16 +17,6 @@ import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.v1.games.FileDependency;
 import com.diluv.api.v1.games.ProjectFileUpload;
-
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ProjectTest {
 

@@ -11,8 +11,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.data.site.DataSiteProjectFilePage;
-
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 
@@ -23,6 +21,7 @@ import com.diluv.api.data.site.DataSiteGame;
 import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;
+import com.diluv.api.data.site.DataSiteProjectFilePage;
 import com.diluv.api.data.site.DataSiteProjectFilesPage;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.auth.tokens.Token;

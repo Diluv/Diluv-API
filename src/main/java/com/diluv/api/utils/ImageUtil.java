@@ -1,14 +1,14 @@
 package com.diluv.api.utils;
 
-import org.apache.james.mime4j.io.LimitedInputStream;
-
-import javax.imageio.ImageIO;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import javax.imageio.ImageIO;
+
+import org.apache.james.mime4j.io.LimitedInputStream;
 
 public class ImageUtil {
 

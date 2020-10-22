@@ -33,8 +33,9 @@ public enum ProjectPermissions {
 
     public static boolean hasPermission (ProjectsEntity project, @Nullable Token token, ProjectPermissions permissions) {
 
-        if (token == null)
+        if (token == null) {
             return false;
+        }
 
         List<String> userPermissions = getAuthorizedUserPermissions(project, token);
 

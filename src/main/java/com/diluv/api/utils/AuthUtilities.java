@@ -27,16 +27,18 @@ public class AuthUtilities {
     public static String getSecureRandomAlphanumeric (int length) {
 
         final char[] buf = new char[length];
-        for (int i = 0; i < buf.length; ++i)
+        for (int i = 0; i < buf.length; ++i) {
             buf[i] = ALPHANUMERIC.charAt(random.nextInt(ALPHANUMERIC.length()));
+        }
         return new String(buf);
     }
 
     public static String getSecureRandomNumeric (int length) {
 
         final char[] buf = new char[length];
-        for (int i = 0; i < buf.length; ++i)
+        for (int i = 0; i < buf.length; ++i) {
             buf[i] = NUMERIC.charAt(random.nextInt(NUMERIC.length()));
+        }
         return new String(buf);
     }
 

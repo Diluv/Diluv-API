@@ -19,10 +19,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.utils.auth.JWTUtil;
-
-import com.diluv.api.utils.auth.tokens.ErrorToken;
-
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -38,6 +34,7 @@ import com.diluv.api.graphql.Query;
 import com.diluv.api.graphql.TagResolver;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
+import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.UserPermissions;
@@ -63,7 +60,7 @@ public class AdminAPI {
 
         SchemaParserOptions options = SchemaParserOptions
             .newOptions()
-//            .fieldVisibility(DefaultGraphqlFieldVisibility.DEFAULT_FIELD_VISIBILITY)
+            //.fieldVisibility(DefaultGraphqlFieldVisibility.DEFAULT_FIELD_VISIBILITY)
             .build();
 
         GraphQLSchema schema = SchemaParser.newParser()
@@ -254,11 +251,11 @@ public class AdminAPI {
 
     public Response hasPermission (Token token) {
 
-        if (token instanceof ErrorToken ) {
-            return ((ErrorToken)token).getResponse();
+        if (token instanceof ErrorToken) {
+            return ((ErrorToken) token).getResponse();
         }
 
-        if(token.isApiToken()){
+        if (token.isApiToken()) {
             return ErrorMessage.USER_INVALID_TOKEN.respond("Can't use an API token for this request");
         }
 

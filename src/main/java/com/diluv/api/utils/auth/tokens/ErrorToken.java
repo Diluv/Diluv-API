@@ -1,8 +1,8 @@
 package com.diluv.api.utils.auth.tokens;
 
-import javax.ws.rs.core.Response;
-
 import java.util.Collections;
+
+import javax.ws.rs.core.Response;
 
 public class ErrorToken extends Token {
     private final Response response;

@@ -19,8 +19,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.utils.auth.tokens.ErrorToken;
-
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
@@ -35,8 +33,8 @@ import com.diluv.api.data.*;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
-import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
+import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.error.ErrorType;
@@ -376,8 +374,8 @@ public class GamesAPI {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response postProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @MultipartForm ProjectForm form) {
 
-        if (token instanceof ErrorToken ) {
-            return ((ErrorToken)token).getResponse();
+        if (token instanceof ErrorToken) {
+            return ((ErrorToken) token).getResponse();
         }
 
         ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
@@ -417,9 +415,9 @@ public class GamesAPI {
             return ErrorMessage.REQUIRES_IMAGE.respond();
         }
 
-        String name = form.data.name.trim();
-        String summary = form.data.summary.trim();
-        String description = form.data.description.trim();
+        final String name = form.data.name.trim();
+        final String summary = form.data.summary.trim();
+        final String description = form.data.description.trim();
 
         final String projectSlug = this.slugify.slugify(name);
 

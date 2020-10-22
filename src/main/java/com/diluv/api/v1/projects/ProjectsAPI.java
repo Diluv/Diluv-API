@@ -16,8 +16,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.utils.auth.tokens.ErrorToken;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.annotations.GZIP;
@@ -30,8 +28,8 @@ import com.diluv.api.data.DataProjectFileInQueue;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.MismatchException;
-import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
+import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
@@ -239,7 +237,8 @@ public class ProjectsAPI {
             e.printStackTrace();
             System.out.println("ERROR_WRITING");
             return ErrorMessage.THROWABLE.respond();
-        } finally {
+        }
+        finally {
             tempFile.delete();
             tempFile.getParentFile().delete();
         }

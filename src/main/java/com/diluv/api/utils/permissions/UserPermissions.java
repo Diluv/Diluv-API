@@ -29,8 +29,9 @@ public enum UserPermissions {
 
     public static boolean hasPermission (@Nullable Token token, UserPermissions permissions) {
 
-        if (token == null)
+        if (token == null) {
             return false;
+        }
 
         UsersEntity user = Confluencia.USER.findOneByUserId(token.getUserId());
         if (user == null) {
@@ -41,9 +42,7 @@ public enum UserPermissions {
             return false;
         }
         if ("admin".equals(userRole.getRole().getName())) {
-            if (ADMIN.contains(permissions)) {
-                return true;
-            }
+            return ADMIN.contains(permissions);
         }
 
         return false;

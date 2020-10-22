@@ -25,15 +25,21 @@ import org.jboss.resteasy.resteasy_jaxrs.i18n.LogMessages;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 /**
- * This class was created by <Bill Burke>. It's distributed as
+ * <p>
+ * This class was created by Bill Burke. It's distributed as
  * part of Resteasy. Get the Source Code in github:
  * https://github.com/resteasy/Resteasy/
+ * </p>
  *
+ * <p>
  * Resteasy is Apache License 2.0 and distributed under the
  * Resteasy License: https://github.com/resteasy/Resteasy/blob/master/License.html
+ * </p>
  *
+ * <p>
  * Changes
  * - Removed if check from getPreferredPrefix to not include a prefix
+ * </p>
  */
 public class CustomAtomFeedProvider extends AtomFeedProvider {
 

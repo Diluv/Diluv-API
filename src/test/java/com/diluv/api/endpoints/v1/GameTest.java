@@ -4,14 +4,13 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.diluv.api.v1.games.ProjectCreate;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.v1.games.ProjectCreate;
 
 public class GameTest {
 

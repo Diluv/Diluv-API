@@ -45,8 +45,9 @@ public class ProjectService {
 
         if (!project.isReleased()) {
 
-            if (token == null)
+            if (token == null) {
                 throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
+            }
 
             List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
 

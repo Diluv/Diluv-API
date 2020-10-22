@@ -1,14 +1,8 @@
 package com.diluv.api.v1.internal;
 
 
-import com.diluv.api.utils.Constants;
-import com.diluv.api.utils.error.ErrorMessage;
-import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.record.NodeCDNCommitsEntity;
-import com.diluv.schoomp.Webhook;
-import com.diluv.schoomp.message.Message;
-
-import org.jboss.resteasy.annotations.GZIP;
+import java.io.IOException;
+import java.time.Instant;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,8 +11,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.io.IOException;
-import java.time.Instant;
+import org.jboss.resteasy.annotations.GZIP;
+
+import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.confluencia.Confluencia;
+import com.diluv.confluencia.database.record.NodeCDNCommitsEntity;
+import com.diluv.schoomp.Webhook;
+import com.diluv.schoomp.message.Message;
 
 @GZIP
 @Path("/internal")

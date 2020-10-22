@@ -105,6 +105,21 @@ public final class Constants {
     }
 
     /**
+     * Reads an integer from a system environment variable. If the variable can not be found or
+     * is not mapped to a valid integer a default value will be returned.
+     *
+     * @param name The name of the environment variable.
+     * @param defaultValue The default value to use when the variable is missing or can not be
+     *     used.
+     * @return The integer variable, or the default value if it is not usable.
+     */
+    private static int getValueOrDefault (String name, int defaultValue) {
+
+        final String value = System.getenv(name);
+        return value == null || !GenericValidator.isInt(value) ? defaultValue : Integer.parseInt(value);
+    }
+
+    /**
      * Reads an immutable set of strings from an environment variable. If the variable can not
      * be found or is not mapped to a valid value the default values will be returned.
      *
@@ -133,21 +148,6 @@ public final class Constants {
 
         final String value = System.getenv(name);
         return value == null ? defaultValues : Arrays.stream(value.split(",")).collect(Collectors.toSet());
-    }
-
-    /**
-     * Reads an integer from a system environment variable. If the variable can not be found or
-     * is not mapped to a valid integer a default value will be returned.
-     *
-     * @param name The name of the environment variable.
-     * @param defaultValue The default value to use when the variable is missing or can not be
-     *     used.
-     * @return The integer variable, or the default value if it is not usable.
-     */
-    private static int getValueOrDefault (String name, int defaultValue) {
-
-        final String value = System.getenv(name);
-        return value == null || !GenericValidator.isInt(value) ? defaultValue : Integer.parseInt(value);
     }
 
     @Nullable

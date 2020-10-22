@@ -2,8 +2,6 @@ package com.diluv.api.v1.admin;
 
 import com.google.gson.annotations.Expose;
 
-import javax.validation.constraints.NotNull;
-
 public class AdminGameData {
 
     @Expose
