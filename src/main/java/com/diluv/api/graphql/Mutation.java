@@ -20,122 +20,121 @@ public class Mutation implements GraphQLMutationResolver {
 
     public ProjectType addProjectType (String gameSlug, String projectTypeSlug, String projectTypeName, boolean isDefault, Long maxFileSize) {
 
-        GamesEntity game = Confluencia.GAME.findOneBySlug(gameSlug);
-        if (game == null) {
-            throw new GraphQLException("Game doesn't exists");
-        }
+        return Confluencia.getTransaction(session -> {
+            GamesEntity game = Confluencia.GAME.findOneBySlug(session, gameSlug);
+            if (game == null) {
+                throw new GraphQLException("Game doesn't exists");
+            }
 
-        ProjectTypesEntity projectType = new ProjectTypesEntity();
-        projectType.setSlug(projectTypeSlug);
-        projectType.setName(projectTypeName);
-        if (maxFileSize == null) {
-            projectType.setMaxFileSize(25000000L);
-        }
-        else {
-            projectType.setMaxFileSize(maxFileSize);
-        }
-        game.addProjectType(projectType);
+            ProjectTypesEntity projectType = new ProjectTypesEntity();
+            projectType.setSlug(projectTypeSlug);
+            projectType.setName(projectTypeName);
+            if (maxFileSize == null) {
+                projectType.setMaxFileSize(25000000L);
+            }
+            else {
+                projectType.setMaxFileSize(maxFileSize);
+            }
+            game.addProjectType(projectType);
 
-        if (isDefault) {
-            game.setDefaultProjectTypeEntity(projectTypeSlug);
-        }
+            if (isDefault) {
+                game.setDefaultProjectTypeEntity(projectTypeSlug);
+            }
 
-        if (!Confluencia.update(game)) {
-            throw new GraphQLException("Failed to update game");
-        }
+            session.update(game);
 
-        return new ProjectType(projectType);
+            return new ProjectType(projectType);
+        });
     }
 
     public ProjectType updateProjectType (String gameSlug, String projectTypeSlug, String projectTypeName, Boolean isDefault, Long maxFileSize) {
 
-        ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
-        if (projectType == null) {
-            throw new GraphQLException("Project Type doesn't exists");
-        }
-
-        if (projectTypeName != null) {
-            projectType.setName(projectTypeName);
-        }
-
-        if (Boolean.TRUE.equals(isDefault)) {
-            projectType.getGame().setDefaultProjectTypeEntity(projectTypeSlug);
-            if (!Confluencia.update(projectType.getGame())) {
-                throw new GraphQLException("Failed to update default project type");
+        return Confluencia.getTransaction(session -> {
+            ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
+            if (projectType == null) {
+                throw new GraphQLException("Project Type doesn't exists");
             }
-        }
 
-        if (maxFileSize != null) {
-            projectType.setMaxFileSize(maxFileSize);
-        }
+            if (projectTypeName != null) {
+                projectType.setName(projectTypeName);
+            }
 
-        if (!Confluencia.update(projectType)) {
-            throw new GraphQLException("Failed to project type");
-        }
+            if (Boolean.TRUE.equals(isDefault)) {
+                projectType.getGame().setDefaultProjectTypeEntity(projectTypeSlug);
+                session.update(projectType.getGame());
+            }
 
-        return new ProjectType(projectType);
+            if (maxFileSize != null) {
+                projectType.setMaxFileSize(maxFileSize);
+            }
+
+            session.update(projectType);
+
+            return new ProjectType(projectType);
+        });
     }
 
     public Project reviewed (long projectId, boolean requestChange, String reason, DataFetchingEnvironment env) {
 
-        ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(projectId);
-        if (project == null) {
-            throw new GraphQLException("Project doesn't exists");
-        }
+        return Confluencia.getTransaction(session -> {
+            ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(session, projectId);
+            if (project == null) {
+                throw new GraphQLException("Project doesn't exists");
+            }
 
-        DefaultGraphQLServletContext context = env.getContext();
-        Token token = JWTUtil.getToken(context.getHttpServletRequest().getHeader("Authorization"));
+            DefaultGraphQLServletContext context = env.getContext();
+            Token token = JWTUtil.getToken(context.getHttpServletRequest().getHeader("Authorization"));
 
-        ProjectReviewEntity review = new ProjectReviewEntity();
-        review.setReviewedBy(new UsersEntity(token.getUserId()));
-        if (requestChange) {
-            ProjectRequestChangeEntity requestChangeEntity = new ProjectRequestChangeEntity();
-            requestChangeEntity.setReason(reason);
-            review.setProjectRequestChange(requestChangeEntity);
-        }
-        else {
-            project.setReleased(true);
-            project.setReview(true);
-        }
+            ProjectReviewEntity review = new ProjectReviewEntity();
+            review.setReviewedBy(new UsersEntity(token.getUserId()));
+            if (requestChange) {
+                ProjectRequestChangeEntity requestChangeEntity = new ProjectRequestChangeEntity();
+                requestChangeEntity.setReason(reason);
+                review.setProjectRequestChange(requestChangeEntity);
+            }
+            else {
+                project.setReleased(true);
+                project.setReview(true);
+            }
 
-        project.addReview(review);
+            project.addReview(review);
 
-        if (!Confluencia.update(project)) {
-            throw new GraphQLException("Failed to update project");
-        }
+            session.update(project);
 
-        return new Project(project);
+            return new Project(project);
+        });
     }
 
     public ProjectType addTag (String gameSlug, String projectTypeSlug, String tagSlug, String tagName) {
 
-        ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
-        if (projectType == null) {
-            throw new GraphQLException("Project Type doesn't exists");
-        }
+        return Confluencia.getTransaction(session -> {
+            ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
+            if (projectType == null) {
+                throw new GraphQLException("Project Type doesn't exists");
+            }
 
-        TagsEntity tag = new TagsEntity(tagSlug, tagName);
-        tag.setProjectType(projectType);
-        if (!Confluencia.insert(tag)) {
-            throw new GraphQLException("Failed to project type");
-        }
+            TagsEntity tag = new TagsEntity(tagSlug, tagName);
+            tag.setProjectType(projectType);
+            session.save(tag);
 
-        return new ProjectType(projectType);
+            return new ProjectType(projectType);
+        });
     }
 
     public ProjectType addLoader (String gameSlug, String projectTypeSlug, String loaderSlug, String loaderName) {
 
-        ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug);
-        if (projectType == null) {
-            throw new GraphQLException("Project Type doesn't exists");
-        }
+        return Confluencia.getTransaction(session -> {
 
-        ProjectTypeLoadersEntity tag = new ProjectTypeLoadersEntity(loaderSlug, loaderName);
-        tag.setProjectType(projectType);
-        if (!Confluencia.insert(tag)) {
-            throw new GraphQLException("Failed to project type");
-        }
+            ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
+            if (projectType == null) {
+                throw new GraphQLException("Project Type doesn't exists");
+            }
 
-        return new ProjectType(projectType);
+            ProjectTypeLoadersEntity tag = new ProjectTypeLoadersEntity(loaderSlug, loaderName);
+            tag.setProjectType(projectType);
+            session.save(tag);
+
+            return new ProjectType(projectType);
+        });
     }
 }

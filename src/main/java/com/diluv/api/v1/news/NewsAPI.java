@@ -35,23 +35,27 @@ public class NewsAPI {
         int limit = query.getLimit();
         Sort sort = query.getSort(NewsSort.NEW);
 
-        final List<NewsEntity> newsRecords = Confluencia.NEWS.findAll(page, limit, sort);
-        final List<DataNewsPost> newsPosts = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
+        return Confluencia.getTransaction(session -> {
+            final List<NewsEntity> newsRecords = Confluencia.NEWS.findAll(session, page, limit, sort);
+            final List<DataNewsPost> newsPosts = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
 
-        return ResponseUtil.successResponse(newsPosts);
+            return ResponseUtil.successResponse(newsPosts);
+        });
     }
 
     @GET
     @Path("/{slug}")
     public Response getNewsBySlug (@PathParam("slug") String slug) {
 
-        final NewsEntity newsRecord = Confluencia.NEWS.findOneByNewsSlug(slug);
+        return Confluencia.getTransaction(session -> {
+            final NewsEntity newsRecord = Confluencia.NEWS.findOneByNewsSlug(session, slug);
 
-        if (newsRecord == null) {
+            if (newsRecord == null) {
 
-            return ErrorMessage.NOT_FOUND_NEWS.respond();
-        }
+                return ErrorMessage.NOT_FOUND_NEWS.respond();
+            }
 
-        return ResponseUtil.successResponse(new DataNewsPost(newsRecord));
+            return ResponseUtil.successResponse(new DataNewsPost(newsRecord));
+        });
     }
 }

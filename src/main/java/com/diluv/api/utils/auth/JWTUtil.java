@@ -68,25 +68,27 @@ public class JWTUtil {
             }
         }
 
-        byte[] sha256 = DigestUtils.sha256(token + ":" + TOKEN_TYPE);
-        String key = Base64.getEncoder().encodeToString(sha256);
-        PersistedGrantsEntity record = Confluencia.SECURITY.findPersistedGrantByKeyAndType(key, TOKEN_TYPE);
-        if (record == null) {
-            return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
-        }
+        return Confluencia.getTransaction(session -> {
+            byte[] sha256 = DigestUtils.sha256(token + ":" + TOKEN_TYPE);
+            String key = Base64.getEncoder().encodeToString(sha256);
+            PersistedGrantsEntity record = Confluencia.SECURITY.findPersistedGrantByKeyAndType(session, key, TOKEN_TYPE);
+            if (record == null) {
+                return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
+            }
 
-        long currentTime = System.currentTimeMillis();
+            long currentTime = System.currentTimeMillis();
 
-        if (currentTime < record.getCreationTime().getTime()) {
-            return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Token is not valid yet"));
-        }
-        if (currentTime > record.getExpiration().getTime()) {
-            return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Token has expired"));
-        }
+            if (currentTime < record.getCreationTime().getTime()) {
+                return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Token is not valid yet"));
+            }
+            if (currentTime > record.getExpiration().getTime()) {
+                return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Token has expired"));
+            }
 
-        //TODO Implement a table
-        long userId = Long.parseLong(record.getSubjectId());
-        return new Token(userId, true, ProjectPermissions.getAllPermissions());
+            //TODO Implement a table
+            long userId = Long.parseLong(record.getSubjectId());
+            return new Token(userId, true, ProjectPermissions.getAllPermissions());
+        });
     }
 
     public static boolean isBearerToken (String token) {

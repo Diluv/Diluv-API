@@ -19,10 +19,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.utils.auth.JWTUtil;
-
-import com.diluv.api.utils.auth.tokens.ErrorToken;
-
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -38,6 +34,7 @@ import com.diluv.api.graphql.Query;
 import com.diluv.api.graphql.TagResolver;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
+import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.UserPermissions;
@@ -88,86 +85,87 @@ public class AdminAPI {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response postGames (@HeaderParam("Authorization") Token token, @MultipartForm AdminGameForm form) {
 
-        Response permission = hasPermission(token);
-        if (permission != null) {
-            return permission;
-        }
+        return Confluencia.getTransaction(session -> {
+            Response permission = hasPermission(token);
+            if (permission != null) {
+                return permission;
+            }
 
-        if (form.data == null) {
-            return ErrorMessage.INVALID_DATA.respond();
-        }
+            if (form.data == null) {
+                return ErrorMessage.INVALID_DATA.respond();
+            }
 
-        AdminGameData data = form.data;
+            AdminGameData data = form.data;
 
-        if (GenericValidator.isBlankOrNull(data.slug)) {
-            return ErrorMessage.INVALID_DATA.respond("The game slug is required.");
-        }
-        if (GenericValidator.isBlankOrNull(data.name)) {
-            return ErrorMessage.INVALID_DATA.respond("The game name is required.");
-        }
-        if (GenericValidator.isBlankOrNull(data.url)) {
-            return ErrorMessage.INVALID_DATA.respond("The game store/website url is required");
-        }
-        if (GenericValidator.isBlankOrNull(data.projectTypeSlug)) {
-            return ErrorMessage.INVALID_DATA.respond("The default project type slug is required");
-        }
-        if (GenericValidator.isBlankOrNull(data.projectTypeName)) {
-            return ErrorMessage.INVALID_DATA.respond("The default project type name is required");
-        }
+            if (GenericValidator.isBlankOrNull(data.slug)) {
+                return ErrorMessage.INVALID_DATA.respond("The game slug is required.");
+            }
+            if (GenericValidator.isBlankOrNull(data.name)) {
+                return ErrorMessage.INVALID_DATA.respond("The game name is required.");
+            }
+            if (GenericValidator.isBlankOrNull(data.url)) {
+                return ErrorMessage.INVALID_DATA.respond("The game store/website url is required");
+            }
+            if (GenericValidator.isBlankOrNull(data.projectTypeSlug)) {
+                return ErrorMessage.INVALID_DATA.respond("The default project type slug is required");
+            }
+            if (GenericValidator.isBlankOrNull(data.projectTypeName)) {
+                return ErrorMessage.INVALID_DATA.respond("The default project type name is required");
+            }
 
-        if (Confluencia.GAME.findOneBySlug(data.slug) != null) {
-            return ErrorMessage.INVALID_DATA.respond();
-        }
+            if (Confluencia.GAME.findOneBySlug(session, data.slug) != null) {
+                return ErrorMessage.INVALID_DATA.respond();
+            }
 
-        if (form.logoPNG == null || form.logoWebp == null) {
-            return ErrorMessage.REQUIRES_IMAGE.respond();
-        }
+            if (form.logoPNG == null || form.logoWebp == null) {
+                return ErrorMessage.REQUIRES_IMAGE.respond();
+            }
 
-        final BufferedImage imagePNG = ImageUtil.isValidImage(form.logoPNG, 1000000L);
+            final BufferedImage imagePNG = ImageUtil.isValidImage(form.logoPNG, 1000000L);
 
-        if (imagePNG == null) {
-            return ErrorMessage.INVALID_IMAGE.respond();
-        }
+            if (imagePNG == null) {
+                return ErrorMessage.INVALID_IMAGE.respond();
+            }
 
-        final BufferedImage imageWebp = ImageUtil.isValidImage(form.logoWebp, 1000000L);
+            final BufferedImage imageWebp = ImageUtil.isValidImage(form.logoWebp, 1000000L);
 
-        if (imageWebp == null) {
-            return ErrorMessage.INVALID_IMAGE.respond();
-        }
-        File logoPath = new File(Constants.CDN_FOLDER, "games/" + data.slug);
-        logoPath.mkdirs();
+            if (imageWebp == null) {
+                return ErrorMessage.INVALID_IMAGE.respond();
+            }
+            File logoPath = new File(Constants.CDN_FOLDER, "games/" + data.slug);
+            logoPath.mkdirs();
 
-        if (!ImageUtil.savePNG(imagePNG, new File(logoPath, "logo.png"))) {
-            // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
-            return ErrorMessage.THROWABLE.respond();
-        }
+            if (!ImageUtil.savePNG(imagePNG, new File(logoPath, "logo.png"))) {
+                // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
+                return ErrorMessage.THROWABLE.respond();
+            }
 
-        if (!ImageUtil.saveWebp(imageWebp, new File(logoPath, "logo.webp"))) {
-            // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
-            return ErrorMessage.THROWABLE.respond();
-        }
+            if (!ImageUtil.saveWebp(imageWebp, new File(logoPath, "logo.webp"))) {
+                // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
+                return ErrorMessage.THROWABLE.respond();
+            }
 
-        GamesEntity game = new GamesEntity();
-        game.setSlug(data.slug);
-        game.setName(data.name);
-        game.setUrl(data.url);
+            GamesEntity game = new GamesEntity();
+            game.setSlug(data.slug);
+            game.setName(data.name);
+            game.setUrl(data.url);
 
-        ProjectTypesEntity projectType = new ProjectTypesEntity();
-        projectType.setSlug(data.projectTypeSlug);
-        projectType.setName(data.projectTypeName);
+            ProjectTypesEntity projectType = new ProjectTypesEntity();
+            projectType.setSlug(data.projectTypeSlug);
+            projectType.setName(data.projectTypeName);
 
-        game.addProjectType(projectType);
-        game.setDefaultProjectTypeEntity(data.projectTypeSlug);
-        if (!Confluencia.GAME.insertGame(game)) {
-            return ErrorMessage.THROWABLE.respond();
-        }
+            game.addProjectType(projectType);
+            game.setDefaultProjectTypeEntity(data.projectTypeSlug);
 
-        game = Confluencia.GAME.findOneBySlug(data.slug);
+            session.save(game);
 
-        if (game == null) {
-            return ErrorMessage.NOT_FOUND_GAME.respond();
-        }
-        return ResponseUtil.successResponse(new DataGame(game, GamesAPI.PROJECT_SORTS, 0L));
+            game = Confluencia.GAME.findOneBySlug(session, data.slug);
+
+            if (game == null) {
+                return ErrorMessage.NOT_FOUND_GAME.respond();
+            }
+            return ResponseUtil.successResponse(new DataGame(game, GamesAPI.PROJECT_SORTS, 0L));
+        });
     }
 
     @PATCH
@@ -175,67 +173,67 @@ public class AdminAPI {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response patchGames (@HeaderParam("Authorization") Token token, @MultipartForm AdminGameForm form) {
 
-        Response permission = hasPermission(token);
-        if (permission != null) {
-            return permission;
-        }
-
-        if (form.data == null) {
-            return ErrorMessage.INVALID_DATA.respond();
-        }
-
-        AdminGameData data = form.data;
-
-        if (GenericValidator.isBlankOrNull(data.slug)) {
-            return ErrorMessage.INVALID_DATA.respond("The game slug is required.");
-        }
-
-        GamesEntity game = Confluencia.GAME.findOneBySlug(data.slug);
-
-        if (game == null) {
-            return ErrorMessage.NOT_FOUND_GAME.respond();
-        }
-
-        if (!GenericValidator.isBlankOrNull(data.name)) {
-            game.setName(data.name);
-        }
-        if (!GenericValidator.isBlankOrNull(data.url)) {
-            game.setUrl(data.url);
-        }
-
-        File logoPath = new File(Constants.CDN_FOLDER, "games/" + data.slug);
-        logoPath.mkdirs();
-
-        if (form.logoPNG != null) {
-            final BufferedImage imagePNG = ImageUtil.isValidImage(form.logoPNG, 1000000L);
-
-            if (imagePNG == null) {
-                return ErrorMessage.INVALID_IMAGE.respond();
-            }
-            if (!ImageUtil.savePNG(imagePNG, new File(logoPath, "logo.png"))) {
-                // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
-                return ErrorMessage.THROWABLE.respond();
-            }
-        }
-
-        if (form.logoWebp != null) {
-            final BufferedImage imageWebp = ImageUtil.isValidImage(form.logoWebp, 1000000L);
-
-            if (imageWebp == null) {
-                return ErrorMessage.INVALID_IMAGE.respond();
+        return Confluencia.getTransaction(session -> {
+            Response permission = hasPermission(token);
+            if (permission != null) {
+                return permission;
             }
 
-            if (!ImageUtil.savePNG(imageWebp, new File(logoPath, "logo.webp"))) {
-                // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
-                return ErrorMessage.THROWABLE.respond();
+            if (form.data == null) {
+                return ErrorMessage.INVALID_DATA.respond();
             }
-        }
 
-        if (!Confluencia.update(game)) {
-            return ErrorMessage.THROWABLE.respond();
-        }
+            AdminGameData data = form.data;
 
-        return Response.status(Response.Status.NO_CONTENT).build();
+            if (GenericValidator.isBlankOrNull(data.slug)) {
+                return ErrorMessage.INVALID_DATA.respond("The game slug is required.");
+            }
+
+            GamesEntity game = Confluencia.GAME.findOneBySlug(session, data.slug);
+
+            if (game == null) {
+                return ErrorMessage.NOT_FOUND_GAME.respond();
+            }
+
+            if (!GenericValidator.isBlankOrNull(data.name)) {
+                game.setName(data.name);
+            }
+            if (!GenericValidator.isBlankOrNull(data.url)) {
+                game.setUrl(data.url);
+            }
+
+            File logoPath = new File(Constants.CDN_FOLDER, "games/" + data.slug);
+            logoPath.mkdirs();
+
+            if (form.logoPNG != null) {
+                final BufferedImage imagePNG = ImageUtil.isValidImage(form.logoPNG, 1000000L);
+
+                if (imagePNG == null) {
+                    return ErrorMessage.INVALID_IMAGE.respond();
+                }
+                if (!ImageUtil.savePNG(imagePNG, new File(logoPath, "logo.png"))) {
+                    // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
+                    return ErrorMessage.THROWABLE.respond();
+                }
+            }
+
+            if (form.logoWebp != null) {
+                final BufferedImage imageWebp = ImageUtil.isValidImage(form.logoWebp, 1000000L);
+
+                if (imageWebp == null) {
+                    return ErrorMessage.INVALID_IMAGE.respond();
+                }
+
+                if (!ImageUtil.savePNG(imageWebp, new File(logoPath, "logo.webp"))) {
+                    // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
+                    return ErrorMessage.THROWABLE.respond();
+                }
+            }
+
+            session.update(game);
+
+            return Response.status(Response.Status.NO_CONTENT).build();
+        });
     }
 
     @GET
@@ -254,11 +252,11 @@ public class AdminAPI {
 
     public Response hasPermission (Token token) {
 
-        if (token instanceof ErrorToken ) {
-            return ((ErrorToken)token).getResponse();
+        if (token instanceof ErrorToken) {
+            return ((ErrorToken) token).getResponse();
         }
 
-        if(token.isApiToken()){
+        if (token.isApiToken()) {
             return ErrorMessage.USER_INVALID_TOKEN.respond("Can't use an API token for this request");
         }
 

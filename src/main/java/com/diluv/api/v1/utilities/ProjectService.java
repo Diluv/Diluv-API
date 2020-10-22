@@ -2,6 +2,8 @@ package com.diluv.api.v1.utilities;
 
 import java.util.List;
 
+import org.hibernate.Session;
+
 import com.diluv.api.data.DataAuthorizedProject;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.provider.ResponseException;
@@ -13,15 +15,15 @@ import com.diluv.confluencia.database.record.ProjectsEntity;
 
 public class ProjectService {
 
-    public static DataProject getDataProject (String gameSlug, String projectTypeSlug, String projectSlug, Token token) throws ResponseException {
+    public static DataProject getDataProject (Session session, String gameSlug, String projectTypeSlug, String projectSlug, Token token) throws ResponseException {
 
-        final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByGameSlugAndProjectTypeSlugAndProjectSlug(gameSlug, projectTypeSlug, projectSlug);
+        final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
         if (project == null) {
-            if (Confluencia.GAME.findOneBySlug(gameSlug) == null) {
+            if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
                 throw new ResponseException(ErrorMessage.NOT_FOUND_GAME.respond());
             }
 
-            if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(gameSlug, projectTypeSlug) == null) {
+            if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
                 throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond());
             }
 
@@ -31,9 +33,9 @@ public class ProjectService {
         return getDataProject(project, token);
     }
 
-    public static DataProject getDataProject (long projectId, Token token) throws ResponseException {
+    public static DataProject getDataProject (Session session, long projectId, Token token) throws ResponseException {
 
-        final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(projectId);
+        final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(session, projectId);
 
         if (project == null) {
             throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
