@@ -39,28 +39,4 @@ public class AuthUtilities {
             buf[i] = NUMERIC.charAt(random.nextInt(NUMERIC.length()));
         return new String(buf);
     }
-
-    public static String writeSalt (int week) throws IOException {
-
-        String salt = getSecureRandomAlphanumeric(32);
-
-        try (FileWriter fileWriter = new FileWriter(new File("salt.txt"))) {
-            fileWriter.write(salt + ":" + week);
-            fileWriter.flush();
-        }
-        return salt;
-    }
-
-    public static String getIP (String ipAddr) {
-
-        Salt salt = Constants.getSalt();
-        if (salt == null) {
-            // Failed to securely store salt, don't record, don't increment
-            return null;
-        }
-        MessageDigest digest = new SHA3.Digest512();
-        digest.update(StringUtils.getBytesUtf8(salt.getData()));
-        digest.update(StringUtils.getBytesUtf8(ipAddr));
-        return Hex.toHexString(digest.digest());
-    }
 }

@@ -1,18 +1,9 @@
 package com.diluv.api.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.IsoFields;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -22,7 +13,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.validator.GenericTypeValidator;
 import org.apache.commons.validator.GenericValidator;
 
 import com.diluv.api.DiluvAPIServer;
@@ -51,11 +41,9 @@ public final class Constants {
     public static final ConfigurableJWTProcessor<SecurityContext> JWT_PROCESSOR = getJWTProcessor();
 
     public static final String WEBSITE_URL = getValueOrDefault("WEBSITE_URL", "https://diluv.com");
-    public static final String DILUV_CDN_URL = getValueOrDefault("DILUV_CDN_URL", "https://cdn.diluv.com");
     public static final Set<String> ALLOWED_ORIGINS = getValuesOrDefaultImmutable("ALLOWED_ORIGINS", Collections.singleton(WEBSITE_URL));
 
     public static final int BCRYPT_COST = getValueOrDefault("BCRYPT_COST", 14);
-    public static final Salt SALT = getFileSalt();
 
     // Database
     public static final String DB_HOSTNAME = getValueOrDefault("DB_HOSTNAME", "jdbc:mariadb://localhost:3306/diluv");
@@ -63,7 +51,7 @@ public final class Constants {
     public static final String DB_PASSWORD = getValueOrDefault("DB_PASSWORD", "");
 
     // CDN
-    public static final String CDN_URL = getValueOrDefault("CDN_URL", "https://download.nodecdn.net/containers/diluv");
+    public static final String CDN_URL = getValueOrDefault("CDN_URL", "https://cdn.diluv.com");
     public static final String CDN_FOLDER = getValueOrDefault("CDN_FOLDER", "public");
     public static final String PROCESSING_FOLDER = getValueOrDefault("PROCESSING_FOLDER", "processing");
     public static final String WEBHOOK_URL = getValueOrDefault("WEBHOOK_URL", null);
@@ -249,7 +237,7 @@ public final class Constants {
             return "https://images.placeholders.dev/?width=400&height=400";
         }
 
-        return String.format("%s/users/%s/avatar.png", CDN_URL, username);
+        return String.format("%s/users/%s/avatar.png", Constants.CDN_URL, username);
     }
 
     public static String getProjectLogo (ProjectsEntity project) {
@@ -259,7 +247,7 @@ public final class Constants {
         }
         final String gameSlug = project.getGame().getSlug();
         final String projectTypeSlug = project.getProjectType().getSlug();
-        return String.format("%s/games/%s/%s/%d/logo.png", CDN_URL, gameSlug, projectTypeSlug, project.getId());
+        return String.format("%s/games/%s/%s/%d/logo.png", Constants.CDN_URL, gameSlug, projectTypeSlug, project.getId());
     }
 
     public static DataImage getGameLogoURL (String gameSlug) {
@@ -269,71 +257,15 @@ public final class Constants {
             return new DataImage(new DataImageSource(url + "&text=fallback", "image/png"), new DataImageSource[]{new DataImageSource(url + "&text=" + gameSlug, "image/svg+xml")});
         }
 
-        final String baseURL = String.format("%s/games/%s/logo", CDN_URL, gameSlug);
+        final String baseURL = String.format("%s/games/%s/logo", Constants.CDN_URL, gameSlug);
         final String pngURL = baseURL + ".png";
         return new DataImage(new DataImageSource(pngURL, "image/png"), new DataImageSource[]{
             new DataImageSource(baseURL + ".webp", "image/webp")
         });
     }
 
-    public static String getDiluvCDN (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) {
+    public static String getFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) {
 
-        return String.format("%s/games/%s/%s/%d/%d/%s", Constants.DILUV_CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName);
-    }
-
-    public static URI getNodeCDNFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) throws URISyntaxException {
-
-        return new URI(String.format("%s/games/%s/%s/%d/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName));
-    }
-
-    public static Salt getSalt () {
-
-        try {
-            int week = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("UTC")).get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
-
-            if (SALT.getWeek() != week) {
-                SALT.setData(AuthUtilities.writeSalt(week));
-                SALT.setWeek(week);
-            }
-
-            return SALT;
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private static Salt getFileSalt () {
-
-        try {
-            int week = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("UTC")).get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
-
-            File file = new File("salt.txt");
-            if (file.exists()) {
-                try (BufferedReader reader = Files.newBufferedReader(file.toPath())) {
-                    String line = reader.readLine();
-                    if (line != null) {
-                        String[] s = line.split(":");
-                        if (s.length == 2) {
-                            String salt = s[0];
-                            Integer fileWeek = GenericTypeValidator.formatInt(s[1]);
-                            if (!GenericValidator.isBlankOrNull(salt) && week == fileWeek) {
-                                return new Salt(salt, week);
-                            }
-                        }
-                    }
-                }
-            }
-            else {
-                file.createNewFile();
-            }
-            return new Salt(AuthUtilities.writeSalt(week), week);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return String.format("%s/games/%s/%s/%d/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName);
     }
 }

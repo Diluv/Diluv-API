@@ -114,7 +114,7 @@ public class DataSiteProjectFileDisplay {
         this.gameSlug = rs.getProject().getGame().getSlug();
         this.projectTypeSlug = rs.getProject().getProjectType().getSlug();
         this.projectSlug = rs.getProject().getSlug();
-        this.downloadURL = Constants.getDiluvCDN(this.gameSlug, this.projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
+        this.downloadURL = Constants.getFileURL(this.gameSlug, this.projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
         this.size = rs.getSize();
         this.sha512 = rs.getSha512();
         this.downloads = rs.getDownloads();
