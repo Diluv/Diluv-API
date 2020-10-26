@@ -117,7 +117,7 @@ public class AdminAPI {
                 return ErrorMessage.INVALID_DATA.respond();
             }
 
-            if (form.logoPNG == null || form.logoWebp == null) {
+            if (form.logoPNG == null) {
                 return ErrorMessage.REQUIRES_IMAGE.respond();
             }
 
@@ -127,20 +127,10 @@ public class AdminAPI {
                 return ErrorMessage.INVALID_IMAGE.respond();
             }
 
-            final BufferedImage imageWebp = ImageUtil.isValidImage(form.logoWebp, 1000000L);
-
-            if (imageWebp == null) {
-                return ErrorMessage.INVALID_IMAGE.respond();
-            }
             File logoPath = new File(Constants.CDN_FOLDER, "games/" + data.slug);
             logoPath.mkdirs();
 
             if (!ImageUtil.savePNG(imagePNG, new File(logoPath, "logo.png"))) {
-                // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
-                return ErrorMessage.THROWABLE.respond();
-            }
-
-            if (!ImageUtil.saveWebp(imageWebp, new File(logoPath, "logo.webp"))) {
                 // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
                 return ErrorMessage.THROWABLE.respond();
             }
@@ -212,19 +202,6 @@ public class AdminAPI {
                     return ErrorMessage.INVALID_IMAGE.respond();
                 }
                 if (!ImageUtil.savePNG(imagePNG, new File(logoPath, "logo.png"))) {
-                    // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
-                    return ErrorMessage.THROWABLE.respond();
-                }
-            }
-
-            if (form.logoWebp != null) {
-                final BufferedImage imageWebp = ImageUtil.isValidImage(form.logoWebp, 1000000L);
-
-                if (imageWebp == null) {
-                    return ErrorMessage.INVALID_IMAGE.respond();
-                }
-
-                if (!ImageUtil.savePNG(imageWebp, new File(logoPath, "logo.webp"))) {
                     // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
                     return ErrorMessage.THROWABLE.respond();
                 }

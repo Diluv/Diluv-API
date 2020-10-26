@@ -15,7 +15,4 @@ public class AdminGameForm {
 
     @FormParam("logoPNG")
     public InputStream logoPNG;
-
-    @FormParam("logoWebp")
-    public InputStream logoWebp;
 }
