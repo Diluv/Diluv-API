@@ -229,6 +229,10 @@ public class AdminAPI {
 
     public Response hasPermission (Token token) {
 
+        if (token == null) {
+            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        }
+
         if (token instanceof ErrorToken) {
             return ((ErrorToken) token).getResponse();
         }
