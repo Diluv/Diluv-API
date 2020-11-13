@@ -11,7 +11,6 @@ public class DataSiteProjectFilePage {
     @Expose
     private final DataSiteProjectFileDisplay file;
 
-
     public DataSiteProjectFilePage (DataBaseProject project, DataSiteProjectFileDisplay file) {
 
         this.project = project;

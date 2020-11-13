@@ -1,6 +1,8 @@
 package com.diluv.api.data.site;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.diluv.api.data.DataGameVersion;
 import com.diluv.api.utils.Constants;
@@ -107,6 +109,9 @@ public class DataSiteProjectFileDisplay {
     @Expose
     private final String uploaderDisplayName;
 
+    @Expose
+    private final List<DataSiteProjectFileDependency> dependencies;
+
     public DataSiteProjectFileDisplay (ProjectFilesEntity rs, List<DataGameVersion> gameVersions) {
 
         this.id = rs.getId();
@@ -126,5 +131,6 @@ public class DataSiteProjectFileDisplay {
         this.uploaderUsername = rs.getUser().getUsername();
         this.uploaderDisplayName = rs.getUser().getDisplayName();
         this.gameVersions = gameVersions;
+        this.dependencies = rs.getDependencies().stream().map(DataSiteProjectFileDependency::new).collect(Collectors.toList());
     }
 }

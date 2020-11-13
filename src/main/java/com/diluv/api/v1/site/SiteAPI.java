@@ -103,7 +103,6 @@ public class SiteAPI {
         });
     }
 
-
     @GET
     @Path("/games/{gameSlug}/{projectTypeSlug}/projects")
     public Response getProjects (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Query ProjectQuery query) {
