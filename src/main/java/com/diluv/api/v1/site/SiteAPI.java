@@ -11,6 +11,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.data.site.DataSiteProjectSettings;
+
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 
@@ -151,6 +153,22 @@ public class SiteAPI {
             try {
                 final DataProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
                 return ResponseUtil.successResponse(project);
+            }
+            catch (ResponseException e) {
+                e.printStackTrace();
+                return e.getResponse();
+            }
+        });
+    }
+
+    @GET
+    @Path("/projects/{gameSlug}/{projectTypeSlug}/{projectSlug}/settings")
+    public Response getProjectSettings (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) throws ResponseException {
+
+        return Confluencia.getTransaction(session -> {
+            try {
+                final DataProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
+                return ResponseUtil.successResponse(new DataSiteProjectSettings(project, Confluencia.PROJECT.findAllTagsByGameSlugAndProjectTypeSlug(session, new ProjectTypesEntity(new GamesEntity(gameSlug), projectTypeSlug)).stream().map(DataTag::new).collect(Collectors.toList())));
             }
             catch (ResponseException e) {
                 e.printStackTrace();
