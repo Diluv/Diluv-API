@@ -22,7 +22,9 @@ import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import com.diluv.api.data.DataAuthorizedUser;
+import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataProject;
+import com.diluv.api.data.DataProjectList;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.AuthUtilities;
 import com.diluv.api.utils.auth.Validator;
@@ -273,7 +275,8 @@ public class UsersAPI {
             }
 
             List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByUsername(session, username, authorized, page, limit, sort);
-            return ResponseUtil.successResponse(projects.stream().map(DataProject::new).collect(Collectors.toList()));
+            List<DataBaseProject> dataProjects = projects.stream().map(DataProject::new).collect(Collectors.toList());
+            return ResponseUtil.successResponse(new DataProjectList(dataProjects));
         });
     }
 }

@@ -9,38 +9,38 @@ import com.google.gson.annotations.Expose;
 /**
  * Represents a supported project type for a supported game.
  */
-public class DataProjectType extends DataBaseProjectType {
+public class DataProjectType extends DataSlugName {
 
     /**
      * The slug of the game the project type belongs to.
      */
     @Expose
-    private final DataBaseGame game;
+    private final DataSlugName game;
 
     @Expose
-    private final List<DataTag> tags;
+    private final List<DataSlugName> tags;
 
     @Expose
     private final Long projectCount;
 
     @Expose
-    private final List<DataLoader> loaders;
+    private final List<DataSlugName> loaders;
 
     public DataProjectType (ProjectTypesEntity rs) {
 
-        super(rs);
-        this.game = new DataBaseGame(rs.getGame());
-        this.tags = rs.getTags().stream().map(DataTag::new).collect(Collectors.toList());
+        super(rs.getSlug(), rs.getName());
+        this.game = new DataSlugName(rs.getGame().getSlug(), rs.getGame().getName());
+        this.tags = rs.getTags().stream().map(a -> new DataSlugName(a.getSlug(), a.getName())).collect(Collectors.toList());
         this.projectCount = null;
-        this.loaders = rs.getProjectTypeLoaders().stream().map(DataLoader::new).collect(Collectors.toList());
+        this.loaders = rs.getProjectTypeLoaders().stream().map(a -> new DataSlugName(a.getSlug(), a.getName())).collect(Collectors.toList());
     }
 
     public DataProjectType (ProjectTypesEntity rs, long projectCount) {
 
-        super(rs);
-        this.game = new DataBaseGame(rs.getGame());
-        this.tags = rs.getTags().stream().map(DataTag::new).collect(Collectors.toList());
+        super(rs.getSlug(), rs.getName());
+        this.game = new DataSlugName(rs.getGame().getSlug(), rs.getGame().getName());
+        this.tags = rs.getTags().stream().map(a -> new DataSlugName(a.getSlug(), a.getName())).collect(Collectors.toList());
         this.projectCount = projectCount;
-        this.loaders = rs.getProjectTypeLoaders().stream().map(DataLoader::new).collect(Collectors.toList());
+        this.loaders = rs.getProjectTypeLoaders().stream().map(a -> new DataSlugName(a.getSlug(), a.getName())).collect(Collectors.toList());
     }
 }

@@ -1,10 +1,18 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "array",
-    "items": [
-        {
-            "$ref": "data/projectFiles.json"
+    "type": "object",
+    "properties": {
+        "project": {
+            "$ref": "project-schema.json"
+        },
+        "files": {
+            "type": "array",
+            "items": [
+                {
+                    "$ref": "data/projectFiles.json"
+                }
+            ]
         }
-    ],
+    },
     "additionalProperties": false
 }

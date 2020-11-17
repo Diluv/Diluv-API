@@ -6,19 +6,7 @@ import com.google.gson.annotations.Expose;
 /**
  * Represents a news post on the site.
  */
-public class DataNewsPost {
-
-    /**
-     * The slug for the news post.
-     */
-    @Expose
-    private final String slug;
-
-    /**
-     * The title of the post.
-     */
-    @Expose
-    private final String title;
+public class DataNewsPost extends DataSlugName {
 
     /**
      * A short summary of the post.
@@ -50,8 +38,7 @@ public class DataNewsPost {
 
     public DataNewsPost (NewsEntity news) {
 
-        this.slug = news.getSlug();
-        this.title = news.getTitle();
+        super(news.getSlug(), news.getTitle());
         this.summary = news.getSummary();
         this.description = news.getDescription();
         this.username = news.getUser().getUsername();

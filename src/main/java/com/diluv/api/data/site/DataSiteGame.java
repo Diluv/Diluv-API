@@ -1,13 +1,13 @@
 package com.diluv.api.data.site;
 
-import com.diluv.api.data.DataBaseGame;
 import com.diluv.api.data.DataImage;
+import com.diluv.api.data.DataSlugName;
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.FeaturedGamesEntity;
 import com.diluv.confluencia.database.record.GamesEntity;
 import com.google.gson.annotations.Expose;
 
-public class DataSiteGame extends DataBaseGame {
+public class DataSiteGame extends DataSlugName {
     /**
      * A URL that links to the official home page of the game.
      */
@@ -30,7 +30,7 @@ public class DataSiteGame extends DataBaseGame {
 
     public DataSiteGame (GamesEntity rs) {
 
-        super(rs);
+        super(rs.getSlug(), rs.getName());
 
         this.url = rs.getUrl();
         this.logoURL = Constants.getGameLogoURL(rs.getSlug());

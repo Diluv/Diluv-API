@@ -101,19 +101,10 @@ public class DataProjectFile {
     private final String projectSlug;
 
     /**
-     * The user id who uploaded the file
+     * The user who uploaded the file
      */
     @Expose
-    private final long uploaderUserId;
-
-    /**
-     * The username who uploaded the file
-     */
-    @Expose
-    private final String uploaderUsername;
-
-    @Expose
-    private final String uploaderDisplayName;
+    private final DataUser user;
 
     public DataProjectFile (ProjectFilesEntity rs, String gameSlug, String projectTypeSlug, String projectSlug) {
 
@@ -127,9 +118,7 @@ public class DataProjectFile {
         this.releaseType = rs.getReleaseType();
         this.classifier = rs.getClassifier();
         this.createdAt = rs.getCreatedAt().getTime();
-        this.uploaderUserId = rs.getUser().getId();
-        this.uploaderUsername = rs.getUser().getUsername();
-        this.uploaderDisplayName = rs.getUser().getDisplayName();
+        this.user = new DataUser(rs.getUser());
         this.dependencies = rs.getDependencies().stream().map(a -> a.getDependencyProject().getId()).collect(Collectors.toList());
         this.gameVersions = rs.getGameVersions().stream().map(a -> new DataGameVersion(a.getGameVersion())).collect(Collectors.toList());
         this.gameSlug = gameSlug;

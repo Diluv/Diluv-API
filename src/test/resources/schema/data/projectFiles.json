@@ -41,14 +41,8 @@
         "projectSlug": {
             "type": "string"
         },
-        "uploaderUserId": {
-            "type": "number"
-        },
-        "uploaderUsername": {
-            "type": "string"
-        },
-        "uploaderDisplayName": {
-            "type": "string"
+        "user": {
+            "$ref": "user.json"
         },
         "updatedAt": {
             "type": "number"
@@ -76,8 +70,7 @@
         "gameSlug",
         "projectTypeSlug",
         "projectSlug",
-        "uploaderUserId",
-        "uploaderUsername"
+        "user"
     ],
     "additionalProperties": false
 }

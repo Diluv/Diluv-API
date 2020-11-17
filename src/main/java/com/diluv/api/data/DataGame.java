@@ -11,7 +11,7 @@ import com.google.gson.annotations.Expose;
 /**
  * Represents the data for a game that we support.
  */
-public class DataGame extends DataBaseGame {
+public class DataGame extends DataSlugName {
 
     /**
      * A URL that links to the official home page of the game.
@@ -32,7 +32,7 @@ public class DataGame extends DataBaseGame {
     private final List<DataGameVersion> versions;
 
     @Expose
-    private final List<DataSort> sort;
+    private final List<DataSlugName> sort;
 
     @Expose
     private final Long projectCount;
@@ -51,10 +51,10 @@ public class DataGame extends DataBaseGame {
     }
 
     public DataGame (GamesEntity rs,
-                     List<DataSort> sort,
+                     List<DataSlugName> sort,
                      Long projectCount) {
 
-        super(rs);
+        super(rs.getSlug(), rs.getName());
         this.url = rs.getUrl();
         this.defaultProjectType = rs.getDefaultProjectTypeSlug();
         this.projectTypes = rs.getProjectTypes().stream().map(DataProjectType::new).collect(Collectors.toList());

@@ -2,9 +2,9 @@ package com.diluv.api.data.site;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.diluv.api.data.DataGameVersion;
+import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.google.gson.annotations.Expose;
@@ -95,19 +95,10 @@ public class DataSiteProjectFileDisplay {
     private final String projectSlug;
 
     /**
-     * The user id who uploaded the file
+     * The user who uploaded the file
      */
     @Expose
-    private final long uploaderUserId;
-
-    /**
-     * The username who uploaded the file
-     */
-    @Expose
-    private final String uploaderUsername;
-
-    @Expose
-    private final String uploaderDisplayName;
+    private final DataUser user;
 
     @Expose
     private final List<DataSiteProjectFileDependency> dependencies;
@@ -127,9 +118,7 @@ public class DataSiteProjectFileDisplay {
         this.classifier = rs.getClassifier();
         this.changelog = rs.getChangelog();
         this.createdAt = rs.getCreatedAt().getTime();
-        this.uploaderUserId = rs.getUser().getId();
-        this.uploaderUsername = rs.getUser().getUsername();
-        this.uploaderDisplayName = rs.getUser().getDisplayName();
+        this.user = new DataUser(rs.getUser());
         this.gameVersions = gameVersions;
         this.dependencies = rs.getDependencies().stream().map(DataSiteProjectFileDependency::new).collect(Collectors.toList());
     }

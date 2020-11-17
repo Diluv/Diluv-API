@@ -6,7 +6,7 @@
             "type": "array",
             "items": [
                 {
-                    "$ref": "data/projects.json"
+                    "$ref": "project-files-list-schema.json"
                 }
             ]
         }

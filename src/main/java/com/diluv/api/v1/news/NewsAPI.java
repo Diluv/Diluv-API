@@ -14,6 +14,7 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 
 import com.diluv.api.data.DataNewsPost;
+import com.diluv.api.data.DataNewsPosts;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.query.NewsQuery;
 import com.diluv.api.utils.response.ResponseUtil;
@@ -39,7 +40,7 @@ public class NewsAPI {
             final List<NewsEntity> newsRecords = Confluencia.NEWS.findAll(session, page, limit, sort);
             final List<DataNewsPost> newsPosts = newsRecords.stream().map(DataNewsPost::new).collect(Collectors.toList());
 
-            return ResponseUtil.successResponse(newsPosts);
+            return ResponseUtil.successResponse(new DataNewsPosts(newsPosts));
         });
     }
 

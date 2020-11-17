@@ -28,7 +28,16 @@ import org.jboss.resteasy.plugins.providers.atom.Feed;
 import org.jboss.resteasy.plugins.providers.atom.Link;
 import org.jboss.resteasy.plugins.providers.atom.Person;
 
-import com.diluv.api.data.*;
+import com.diluv.api.data.DataBaseProject;
+import com.diluv.api.data.DataGame;
+import com.diluv.api.data.DataGameList;
+import com.diluv.api.data.DataGameVersion;
+import com.diluv.api.data.DataProject;
+import com.diluv.api.data.DataProjectList;
+import com.diluv.api.data.DataProjectType;
+import com.diluv.api.data.DataSlugName;
+import com.diluv.api.data.site.DataSiteProjectFileDisplay;
+import com.diluv.api.data.site.DataSiteProjectFilesPage;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
@@ -44,14 +53,7 @@ import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.utilities.ProjectService;
 import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.record.GamesEntity;
-import com.diluv.confluencia.database.record.ProjectReviewEntity;
-import com.diluv.confluencia.database.record.ProjectFilesEntity;
-import com.diluv.confluencia.database.record.ProjectTagsEntity;
-import com.diluv.confluencia.database.record.ProjectTypesEntity;
-import com.diluv.confluencia.database.record.ProjectsEntity;
-import com.diluv.confluencia.database.record.TagsEntity;
-import com.diluv.confluencia.database.record.UsersEntity;
+import com.diluv.confluencia.database.record.*;
 import com.diluv.confluencia.database.sort.GameSort;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
@@ -63,8 +65,8 @@ import com.github.slugify.Slugify;
 @Produces(MediaType.APPLICATION_JSON)
 public class GamesAPI {
 
-    public static final List<DataSort> GAME_SORTS = GameSort.LIST.stream().map(DataSort::new).collect(Collectors.toList());
-    public static final List<DataSort> PROJECT_SORTS = ProjectSort.LIST.stream().map(DataSort::new).collect(Collectors.toList());
+    public static final List<DataSlugName> GAME_SORTS = GameSort.LIST.stream().map(a -> new DataSlugName(a.getSlug(), a.getDisplayName())).collect(Collectors.toList());
+    public static final List<DataSlugName> PROJECT_SORTS = ProjectSort.LIST.stream().map(a -> new DataSlugName(a.getSlug(), a.getDisplayName())).collect(Collectors.toList());
 
     private final Slugify slugify = new Slugify();
 
@@ -78,7 +80,7 @@ public class GamesAPI {
         final String search = query.getSearch();
 
         return Confluencia.getTransaction(session -> {
-            final List<DataBaseGame> games = Confluencia.GAME.findAll(session, page, limit, sort, search)
+            final List<DataSlugName> games = Confluencia.GAME.findAll(session, page, limit, sort, search)
                 .stream()
                 .map(DataGame::new)
                 .collect(Collectors.toList());
@@ -160,7 +162,7 @@ public class GamesAPI {
 
             final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
 
-            return ResponseUtil.successResponse(dataProjects);
+            return ResponseUtil.successResponse(new DataProjectList(dataProjects));
         });
     }
 
@@ -389,13 +391,17 @@ public class GamesAPI {
                 return ErrorMessage.NOT_FOUND_PROJECT.respond();
             }
 
-            boolean authorized = token != null && ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
+            boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
             final List<ProjectFilesEntity> projectFileRecords = Confluencia.FILE.findAllByProject(session, project, authorized, page, limit, sort, gameVersion);
 
-            final List<DataProjectFile> projectFiles = projectFileRecords.stream().map(record -> record.isReleased() ?
-                new DataProjectFileAvailable(record, gameSlug, projectTypeSlug, projectSlug) :
-                new DataProjectFileInQueue(record, gameSlug, projectTypeSlug, projectSlug)).collect(Collectors.toList());
-            return ResponseUtil.successResponse(projectFiles);
+            final List<DataSiteProjectFileDisplay> projectFiles = projectFileRecords.stream().map(record -> {
+                final List<GameVersionsEntity> gameVersionRecords = record.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
+                List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
+                return record.isReleased() ?
+                    new DataSiteProjectFileDisplay(record, gameVersions) :
+                    new DataSiteProjectFileDisplay(record, gameVersions);
+            }).collect(Collectors.toList());
+            return ResponseUtil.successResponse(new DataSiteProjectFilesPage(new DataBaseProject(project), projectFiles));
         });
     }
 

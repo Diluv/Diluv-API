@@ -11,12 +11,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.data.site.DataSiteProjectSettings;
-
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 
-import com.diluv.api.data.*;
+import com.diluv.api.data.DataAuthorizedProject;
+import com.diluv.api.data.DataAuthorizedUser;
+import com.diluv.api.data.DataBaseProject;
+import com.diluv.api.data.DataGameList;
+import com.diluv.api.data.DataGameVersion;
+import com.diluv.api.data.DataProject;
+import com.diluv.api.data.DataProjectType;
+import com.diluv.api.data.DataSlugName;
+import com.diluv.api.data.DataUser;
 import com.diluv.api.data.site.DataCreateProject;
 import com.diluv.api.data.site.DataSiteAuthorProjects;
 import com.diluv.api.data.site.DataSiteGame;
@@ -24,7 +30,7 @@ import com.diluv.api.data.site.DataSiteGameProjects;
 import com.diluv.api.data.site.DataSiteIndex;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;
 import com.diluv.api.data.site.DataSiteProjectFilePage;
-import com.diluv.api.data.site.DataSiteProjectFilesPage;
+import com.diluv.api.data.site.DataSiteProjectSettings;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -85,7 +91,7 @@ public class SiteAPI {
             final List<GamesEntity> gameRecords = Confluencia.GAME.findAll(session, page, limit, sort, search);
 
             final long gameCount = Confluencia.GAME.countAllBySearch(session, search);
-            final List<DataBaseGame> games = gameRecords.stream().map(DataSiteGame::new).collect(Collectors.toList());
+            final List<DataSlugName> games = gameRecords.stream().map(DataSiteGame::new).collect(Collectors.toList());
             return ResponseUtil.successResponse(new DataGameList(games, GamesAPI.GAME_SORTS, gameCount));
         });
     }
@@ -135,7 +141,7 @@ public class SiteAPI {
             }
             final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
 
-            final List<DataBaseProjectType> types = game.getProjectTypes().stream().map(DataBaseProjectType::new).collect(Collectors.toList());
+            final List<DataSlugName> types = game.getProjectTypes().stream().map(a -> new DataSlugName(a.getSlug(), a.getName())).collect(Collectors.toList());
             final ProjectTypesEntity currentType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
 
             final long projectCount = Confluencia.PROJECT.countAllByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
@@ -168,50 +174,12 @@ public class SiteAPI {
         return Confluencia.getTransaction(session -> {
             try {
                 final DataProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
-                return ResponseUtil.successResponse(new DataSiteProjectSettings(project, Confluencia.PROJECT.findAllTagsByGameSlugAndProjectTypeSlug(session, new ProjectTypesEntity(new GamesEntity(gameSlug), projectTypeSlug)).stream().map(DataTag::new).collect(Collectors.toList())));
+                return ResponseUtil.successResponse(new DataSiteProjectSettings(project, Confluencia.PROJECT.findAllTagsByGameSlugAndProjectTypeSlug(session, new ProjectTypesEntity(new GamesEntity(gameSlug), projectTypeSlug)).stream().map(a -> new DataSlugName(a.getSlug(), a.getName())).collect(Collectors.toList())));
             }
             catch (ResponseException e) {
                 e.printStackTrace();
                 return e.getResponse();
             }
-        });
-    }
-
-    @GET
-    @Path("/games/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
-    public Response getProjectFiles (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @Query ProjectFileQuery query) throws ResponseException {
-
-        long page = query.getPage();
-        int limit = query.getLimit();
-        Sort sort = query.getSort(ProjectFileSort.NEW);
-        String gameVersion = query.getGameVersion();
-
-        return Confluencia.getTransaction(session -> {
-            final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
-            if (project == null) {
-
-                if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
-                    return ErrorMessage.NOT_FOUND_GAME.respond();
-                }
-
-                if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
-                    return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
-                }
-
-                return ErrorMessage.NOT_FOUND_PROJECT.respond();
-            }
-
-            boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
-            final List<ProjectFilesEntity> projectFileRecords = Confluencia.FILE.findAllByProject(session, project, authorized, page, limit, sort, gameVersion);
-
-            final List<DataSiteProjectFileDisplay> projectFiles = projectFileRecords.stream().map(record -> {
-                final List<GameVersionsEntity> gameVersionRecords = record.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
-                List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
-                return record.isReleased() ?
-                    new DataSiteProjectFileDisplay(record, gameVersions) :
-                    new DataSiteProjectFileDisplay(record, gameVersions);
-            }).collect(Collectors.toList());
-            return ResponseUtil.successResponse(new DataSiteProjectFilesPage(new DataBaseProject(project), projectFiles));
         });
     }
 
@@ -272,7 +240,6 @@ public class SiteAPI {
             final List<GameVersionsEntity> gameVersionRecords = projectFile.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
             final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
 
-
             return ResponseUtil.successResponse(new DataSiteProjectFilePage(new DataBaseProject(project), new DataSiteProjectFileDisplay(projectFile, gameVersions)));
         });
     }
@@ -311,7 +278,7 @@ public class SiteAPI {
 
         return Confluencia.getTransaction(session -> {
             List<TagsEntity> tags = Confluencia.PROJECT.findAllTagsByGameSlugAndProjectTypeSlug(session, new ProjectTypesEntity(new GamesEntity(gameSlug), projectTypeSlug));
-            return ResponseUtil.successResponse(new DataCreateProject(tags.stream().map(DataTag::new).collect(Collectors.toList())));
+            return ResponseUtil.successResponse(new DataCreateProject(tags.stream().map(a -> new DataSlugName(a.getSlug(), a.getName())).collect(Collectors.toList())));
         });
     }
 }

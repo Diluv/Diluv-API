@@ -12,22 +12,10 @@ import com.google.gson.annotations.Expose;
 /**
  * Represents a subset of project info.
  */
-public class DataBaseProject {
+public class DataBaseProject extends DataSlugName {
 
     @Expose
     private final long id;
-
-    /**
-     * The display name of the project.
-     */
-    @Expose
-    private final String name;
-
-    /**
-     * A unique slug used to identify the project in URLs and API requests.
-     */
-    @Expose
-    private final String slug;
 
     /**
      * A short summary of the project.
@@ -63,19 +51,19 @@ public class DataBaseProject {
      * The tags of the project to be found under.
      */
     @Expose
-    private final List<DataTag> tags;
+    private final List<DataSlugName> tags;
 
     /**
      * The game data related to the project
      */
     @Expose
-    private final DataBaseGame game;
+    private final DataSlugName game;
 
     /**
      * The project type data related to the project
      */
     @Expose
-    private final DataBaseProjectType projectType;
+    private final DataSlugName projectType;
 
     /**
      * The users who contributed to the project.
@@ -90,20 +78,24 @@ public class DataBaseProject {
 
     public DataBaseProject (ProjectsEntity rs) {
 
+        super(rs.getSlug(), rs.getName());
         this.id = rs.getId();
-        this.name = rs.getName();
-        this.slug = rs.getSlug();
         this.summary = rs.getSummary();
         this.logo = Constants.getProjectLogo(rs);
         this.downloads = rs.getCachedDownloads();
         this.createdAt = rs.getCreatedAt().getTime();
         this.updatedAt = rs.getUpdatedAt().getTime();
-        this.tags = rs.getTags().stream().map(DataTag::new).collect(Collectors.toList());
-        this.game = new DataBaseGame(rs.getGame());
-        this.projectType = new DataBaseProjectType(rs.getProjectType());
+        this.tags = rs.getTags().stream().map(a -> new DataSlugName(a.getTag().getSlug(), a.getTag().getName())).collect(Collectors.toList());
+        this.game = new DataSlugName(rs.getGame().getSlug(), rs.getGame().getName());
+        this.projectType = new DataSlugName(rs.getProjectType().getSlug(), rs.getProjectType().getName());
         this.contributors.add(new DataProjectContributor(rs.getOwner(), "owner"));
         if (!rs.getAuthors().isEmpty()) {
             this.contributors.addAll(rs.getAuthors().stream().map(DataProjectContributor::new).collect(Collectors.toList()));
         }
+    }
+
+    public long getId () {
+
+        return this.id;
     }
 }

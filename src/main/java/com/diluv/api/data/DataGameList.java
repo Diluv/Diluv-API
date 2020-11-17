@@ -5,16 +5,17 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 
 public class DataGameList {
-    @Expose
-    private final List<DataBaseGame> games;
 
     @Expose
-    private final List<DataSort> sort;
+    private final List<DataSlugName> games;
+
+    @Expose
+    private final List<DataSlugName> sort;
 
     @Expose
     private final long gameCount;
 
-    public DataGameList (List<DataBaseGame> games, List<DataSort> sort, long gameCount) {
+    public DataGameList (List<DataSlugName> games, List<DataSlugName> sort, long gameCount) {
 
         this.games = games;
         this.sort = sort;

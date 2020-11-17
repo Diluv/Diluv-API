@@ -1,16 +1,9 @@
 package com.diluv.api.utils;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import org.apache.commons.codec.binary.StringUtils;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
-import org.bouncycastle.jcajce.provider.digest.SHA3;
-import org.bouncycastle.util.encoders.Hex;
 
 public class AuthUtilities {
     private static final String ALPHANUMERIC = "ABCDEFGHIJKLMNOPQSTUVWXYZ0123456789";

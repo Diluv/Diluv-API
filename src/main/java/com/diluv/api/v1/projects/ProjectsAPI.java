@@ -3,7 +3,9 @@ package com.diluv.api.v1.projects;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
@@ -23,8 +25,12 @@ import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import com.diluv.api.data.DataBaseProject;
+import com.diluv.api.data.DataGameVersion;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataProjectFileInQueue;
+import com.diluv.api.data.DataProjectFileList;
+import com.diluv.api.data.site.DataSiteProjectFileDisplay;
+import com.diluv.api.data.site.DataSiteProjectFilesPage;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.MismatchException;
@@ -33,7 +39,7 @@ import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
-import com.diluv.api.utils.query.ProjectQuery;
+import com.diluv.api.utils.query.ProjectFileQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.ProjectFileUploadForm;
 import com.diluv.api.v1.utilities.ProjectService;
@@ -46,7 +52,7 @@ import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.diluv.confluencia.database.record.ProjectTypeLoadersEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
-import com.diluv.confluencia.database.sort.ProjectSort;
+import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.Sort;
 
 @GZIP
@@ -249,17 +255,39 @@ public class ProjectsAPI {
 
     @GET
     @Path("/hash/{hash}")
-    public Response getProjectByHash (@PathParam("hash") String projectFileHash, @Query ProjectQuery query) {
+    public Response getProjectByHash (@PathParam("hash") String projectFileHash, @Query ProjectFileQuery query) {
 
         final long page = query.getPage();
         final int limit = query.getLimit();
-        final Sort sort = query.getSort(ProjectSort.POPULAR);
+        final Sort sort = query.getSort(ProjectFileSort.NEW);
 
         return Confluencia.getTransaction(session -> {
-            final List<ProjectsEntity> projects = Confluencia.PROJECT.findProjectsByProjectFileHash(session, projectFileHash, page, limit, sort);
+            final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findProjectFilesByHash(session, projectFileHash, page, limit, sort);
 
-            final List<DataBaseProject> dataProjects = projects.stream().map(DataBaseProject::new).collect(Collectors.toList());
-            return ResponseUtil.successResponse(dataProjects);
+            DataBaseProject lastProject = null;
+            Map<DataBaseProject, List<DataSiteProjectFileDisplay>> projectFileMap = new HashMap<>();
+            for (ProjectFilesEntity rs : projectFiles) {
+
+                long projectId = rs.getProject().getId();
+
+                if (lastProject == null || lastProject.getId() != projectId) {
+                    lastProject = projectFileMap.keySet().stream().filter(a -> a.getId() == projectId).findAny().orElse(null);
+                }
+
+                final List<GameVersionsEntity> gameVersionRecords = rs.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
+                final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
+
+                DataSiteProjectFileDisplay file = new DataSiteProjectFileDisplay(rs, gameVersions);
+                List<DataSiteProjectFileDisplay> fileDisplayList = projectFileMap.getOrDefault(lastProject, new ArrayList<>());
+                fileDisplayList.add(file);
+                if (lastProject == null) {
+                    projectFileMap.put(new DataBaseProject(rs.getProject()), fileDisplayList);
+                }
+            }
+
+            List<DataSiteProjectFilesPage> projectFilesPages = new ArrayList<>();
+            projectFileMap.forEach((key, value) -> projectFilesPages.add(new DataSiteProjectFilesPage(key, value)));
+            return ResponseUtil.successResponse(new DataProjectFileList(projectFilesPages));
         });
     }
 }

@@ -1,5 +1,15 @@
 package com.diluv.api.endpoints.v1;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.Request;
@@ -7,16 +17,6 @@ import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.v1.games.FileDependency;
 import com.diluv.api.v1.games.ProjectFileUpload;
-
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ProjectTest {
 
@@ -40,8 +40,8 @@ public class ProjectTest {
     @Test
     public void getProjectByHash () {
 
-        Request.getOk(URL + "/hash/fake", "schema/project-list-schema.json");
-        Request.getOk(URL + "/hash/5E96A9A98839D073C298BBD0AC73A510E1F13A64151E2C4895440ECDBCD6D483EDA994D2CD5E69C5C00A96783280F7BC1E933667B4A25C53CE3918007D5C77E3", "schema/project-list-schema.json");
+        Request.getOk(URL + "/hash/fake", "schema/project-hash-list-schema.json");
+        Request.getOk(URL + "/hash/5E96A9A98839D073C298BBD0AC73A510E1F13A64151E2C4895440ECDBCD6D483EDA994D2CD5E69C5C00A96783280F7BC1E933667B4A25C53CE3918007D5C77E3", "schema/project-hash-list-schema.json");
     }
 
     @Test
