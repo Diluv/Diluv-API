@@ -1,9 +1,9 @@
 package com.diluv.api.utils.auth;
 
 import java.text.ParseException;
-import java.util.Base64;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.bouncycastle.util.encoders.Hex;
 
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
@@ -20,8 +20,6 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
-
-import org.bouncycastle.util.encoders.Hex;
 
 public class JWTUtil {
 
@@ -59,11 +57,10 @@ public class JWTUtil {
 
                 JWTClaimsSet claimsSet = processor.process(jwt, null);
                 if (claimsSet != null) {
-                    long userId = Long.parseLong(claimsSet.getSubject());
-                    return new Token(userId, false, ProjectPermissions.getAllPermissions());
+                    return new Token(claimsSet.getLongClaim("userId"), false, ProjectPermissions.getAllPermissions());
                 }
             }
-            catch (JOSEException | BadJOSEException | NumberFormatException e) {
+            catch (JOSEException | BadJOSEException | NumberFormatException | ParseException e) {
                 DiluvAPIServer.LOGGER.catching(e);
                 return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Invalid token format"));
             }

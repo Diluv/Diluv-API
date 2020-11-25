@@ -144,12 +144,12 @@ public final class Constants {
         try {
             ConfigurableJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
 
-            jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(new JOSEObjectType("at+jwt")));
+            jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(new JOSEObjectType("jwt")));
             jwtProcessor.setJWTClaimsSetVerifier(new DefaultJWTClaimsVerifier<>(
                 new JWTClaimsSet.Builder().issuer(AUTH_ISSUER).build(),
-                new HashSet<>(Arrays.asList("sub", /*"iat",*/ "exp"/*, "jti"*/))));
+                new HashSet<>(Arrays.asList("sub", "iat", "exp", "jti"))));
 
-            JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(AUTH_BASE_URL + "/.well-known/openid-configuration/jwks"));
+            JWKSource<SecurityContext> keySource = new RemoteJWKSet<>(new URL(AUTH_BASE_URL + "/protocol/openid-connect/certs"));
 
             JWSKeySelector<SecurityContext> keySelector = new JWSVerificationKeySelector<>(JWSAlgorithm.RS256, keySource);
 
