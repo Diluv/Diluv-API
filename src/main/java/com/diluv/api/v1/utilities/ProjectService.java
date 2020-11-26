@@ -1,9 +1,5 @@
 package com.diluv.api.v1.utilities;
 
-import java.util.List;
-
-import org.hibernate.Session;
-
 import com.diluv.api.data.DataAuthorizedProject;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.provider.ResponseException;
@@ -12,6 +8,10 @@ import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.ProjectsEntity;
+
+import org.hibernate.Session;
+
+import java.util.List;
 
 public class ProjectService {
 
@@ -45,17 +45,21 @@ public class ProjectService {
 
     public static DataProject getDataProject (ProjectsEntity project, Token token) throws ResponseException {
 
-        if (!project.isReleased()) {
-
-            if (token == null)
+        if (token == null) {
+            if (!project.isReleased()) {
                 throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
-
-            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
-
-            if (permissions != null) {
-                return new DataAuthorizedProject(project, permissions);
             }
 
+            return new DataProject(project);
+        }
+
+        List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
+
+        if (permissions != null) {
+            return new DataAuthorizedProject(project, permissions);
+        }
+
+        if (!project.isReleased()) {
             throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
         }
 
