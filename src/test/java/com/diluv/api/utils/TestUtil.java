@@ -22,8 +22,8 @@ public class TestUtil {
     public static final int PORT = 4545;
     public static boolean running = false;
 
-    public static String TOKEN_DARKHAX = "C_RxaYIzXLYxKXD8itdhMUB6J6rKLcvPWpinbpH0ezc";
-    public static String TOKEN_JARED = "r_lN-_POwYxBjf5J2O9Jn889jcpG1QumCs4K3BJ6rFs";
+    public static String TOKEN_DARKHAX = "8dfa96ba-44b0-4eb0-930a-fca183e73ec8";
+    public static String TOKEN_JARED = "f0f9c173-2092-48b8-b9de-79242bd684a9";
     public static String TOKEN_INVALID = "invalid";
 
     public static void start () {

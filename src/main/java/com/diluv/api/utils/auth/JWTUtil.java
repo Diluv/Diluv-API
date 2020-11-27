@@ -1,9 +1,9 @@
 package com.diluv.api.utils.auth;
 
 import java.text.ParseException;
-import java.util.Base64;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.bouncycastle.util.encoders.Hex;
 
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
@@ -12,7 +12,7 @@ import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.record.PersistedGrantsEntity;
+import com.diluv.confluencia.database.record.APITokensEntity;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.proc.BadJOSEException;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -24,7 +24,6 @@ import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 public class JWTUtil {
 
     public static final String BEARER = "Bearer ";
-    private static final String TOKEN_TYPE = "reference_token";
 
     protected static JWT getJWT (String token) {
 
@@ -58,35 +57,24 @@ public class JWTUtil {
 
                 JWTClaimsSet claimsSet = processor.process(jwt, null);
                 if (claimsSet != null) {
-                    long userId = Long.parseLong(claimsSet.getSubject());
-                    return new Token(userId, false, ProjectPermissions.getAllPermissions());
+                    return new Token(claimsSet.getLongClaim("userId"), false, ProjectPermissions.getAllPermissions());
                 }
             }
-            catch (JOSEException | BadJOSEException | NumberFormatException e) {
+            catch (JOSEException | BadJOSEException | NumberFormatException | ParseException e) {
                 DiluvAPIServer.LOGGER.catching(e);
                 return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Invalid token format"));
             }
         }
+        byte[] sha512 = DigestUtils.sha512(token);
+        String apiToken = Hex.toHexString(sha512);
 
         return Confluencia.getTransaction(session -> {
-            byte[] sha256 = DigestUtils.sha256(token + ":" + TOKEN_TYPE);
-            String key = Base64.getEncoder().encodeToString(sha256);
-            PersistedGrantsEntity record = Confluencia.SECURITY.findPersistedGrantByKeyAndType(session, key, TOKEN_TYPE);
+            APITokensEntity record = Confluencia.SECURITY.findAPITokensByToken(session, apiToken);
             if (record == null) {
                 return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
             }
 
-            long currentTime = System.currentTimeMillis();
-
-            if (currentTime < record.getCreationTime().getTime()) {
-                return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Token is not valid yet"));
-            }
-            if (currentTime > record.getExpiration().getTime()) {
-                return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Token has expired"));
-            }
-
-            //TODO Implement a table
-            long userId = Long.parseLong(record.getSubjectId());
+            long userId = record.getUser().getId();
             return new Token(userId, true, ProjectPermissions.getAllPermissions());
         });
     }
