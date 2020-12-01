@@ -43,7 +43,7 @@ dependencies {
     implementation group: 'org.jboss.resteasy', name: 'resteasy-cdi', version: '4.5.8.Final'
     implementation group: 'org.jboss.weld.servlet', name: 'weld-servlet', version: '2.4.8.Final'
     implementation group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
-    compileOnly group: 'org.hibernate', name: 'hibernate-core', version: '5.4.22.Final'
+    compileOnly group: 'org.hibernate', name: 'hibernate-core', version: '5.4.24.Final'
 
     testImplementation project(path: ':Confluencia', configuration: 'testOutput')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.7.0'
