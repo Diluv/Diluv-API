@@ -1,6 +1,7 @@
 package com.diluv.api.utils.auth;
 
 import java.text.ParseException;
+import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.util.encoders.Hex;
@@ -25,6 +26,16 @@ public class JWTUtil {
 
     public static final String BEARER = "Bearer ";
 
+    protected static UUID getUUID (String token) {
+
+        try {
+            return UUID.fromString(token);
+        }
+        catch (IllegalArgumentException ignored) {
+        }
+        return null;
+    }
+
     protected static JWT getJWT (String token) {
 
         try {
@@ -46,15 +57,31 @@ public class JWTUtil {
         }
 
         String token = rawToken.substring(JWTUtil.BEARER.length());
+
+        UUID uuid = getUUID(token);
+        if (uuid != null) {
+            byte[] sha512 = DigestUtils.sha512(token);
+            String apiToken = Hex.toHexString(sha512);
+
+            return Confluencia.getTransaction(session -> {
+                APITokensEntity record = Confluencia.SECURITY.findAPITokensByToken(session, apiToken);
+                if (record == null) {
+                    return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
+                }
+                long userId = record.getUser().getId();
+                return new Token(userId, true, ProjectPermissions.getAllPermissions());
+            });
+        }
+
         JWT jwt = getJWT(token);
 
         if (jwt != null) {
+            ConfigurableJWTProcessor<SecurityContext> processor = Constants.JWT_PROCESSOR;
+            if (processor == null) {
+                DiluvAPIServer.LOGGER.error("Processor is null.");
+                return new ErrorToken(ErrorMessage.THROWABLE.respond());
+            }
             try {
-                ConfigurableJWTProcessor<SecurityContext> processor = Constants.JWT_PROCESSOR;
-                if (processor == null) {
-                    return new ErrorToken(ErrorMessage.THROWABLE.respond());
-                }
-
                 JWTClaimsSet claimsSet = processor.process(jwt, null);
                 if (claimsSet != null) {
                     return new Token(claimsSet.getLongClaim("userId"), false, ProjectPermissions.getAllPermissions());
@@ -65,18 +92,8 @@ public class JWTUtil {
                 return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Invalid token format"));
             }
         }
-        byte[] sha512 = DigestUtils.sha512(token);
-        String apiToken = Hex.toHexString(sha512);
 
-        return Confluencia.getTransaction(session -> {
-            APITokensEntity record = Confluencia.SECURITY.findAPITokensByToken(session, apiToken);
-            if (record == null) {
-                return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
-            }
-
-            long userId = record.getUser().getId();
-            return new Token(userId, true, ProjectPermissions.getAllPermissions());
-        });
+        return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond());
     }
 
     public static boolean isBearerToken (String token) {
