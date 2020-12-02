@@ -294,13 +294,14 @@ public class GamesAPI {
                     return ErrorMessage.PROJECT_INVALID_TAGS.respond();
                 }
 
-                project.getTags().clear();
+                project.getTags().removeIf(p -> !tagRecords.contains(p.getTag()));
 
                 for (TagsEntity tag : tagRecords) {
-                    ProjectTagsEntity tagsEntity = new ProjectTagsEntity();
-                    tagsEntity.setProject(project);
-                    tagsEntity.setTag(tag);
-                    project.getTags().add(tagsEntity);
+                    if (project.getTags().stream().noneMatch(t -> t.getTag() == tag)) {
+                        ProjectTagsEntity tagsEntity = new ProjectTagsEntity();
+                        tagsEntity.setTag(tag);
+                        project.addTag(tagsEntity);
+                    }
                 }
 
             }
