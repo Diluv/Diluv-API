@@ -5,20 +5,16 @@
         {
             "type": "object",
             "properties": {
-                "version": {
-                    "type": "string"
+                "project": {
+                    "$ref": "projects.json"
                 },
                 "type": {
                     "type": "string"
-                },
-                "releasedAt": {
-                    "type": "number"
                 }
             },
             "required": [
-                "version",
-                "type",
-                "releasedAt"
+                "project",
+                "type"
             ],
             "additionalProperties": false
         }

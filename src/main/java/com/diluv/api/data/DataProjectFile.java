@@ -71,10 +71,10 @@ public class DataProjectFile {
     private final long createdAt;
 
     /**
-     * The list of the project ids the file depends on.
+     * The list of the project ids the file depends on./
      */
     @Expose
-    private final List<Long> dependencies;
+    private final List<DataProjectFileDependency> dependencies;
 
     /**
      * The list of game versions the file works with
@@ -119,7 +119,7 @@ public class DataProjectFile {
         this.classifier = rs.getClassifier();
         this.createdAt = rs.getCreatedAt().getTime();
         this.user = new DataUser(rs.getUser());
-        this.dependencies = rs.getDependencies().stream().map(a -> a.getDependencyProject().getId()).collect(Collectors.toList());
+        this.dependencies = rs.getDependencies().stream().map(DataProjectFileDependency::new).collect(Collectors.toList());
         this.gameVersions = rs.getGameVersions().stream().map(a -> new DataGameVersion(a.getGameVersion())).collect(Collectors.toList());
         this.gameSlug = gameSlug;
         this.projectTypeSlug = projectTypeSlug;

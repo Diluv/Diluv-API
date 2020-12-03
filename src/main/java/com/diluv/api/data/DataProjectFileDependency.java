@@ -1,13 +1,12 @@
-package com.diluv.api.data.site;
+package com.diluv.api.data;
 
-import com.diluv.api.data.DataProject;
 import com.diluv.confluencia.database.record.ProjectFileDependenciesEntity;
 import com.google.gson.annotations.Expose;
 
 /**
  * Represents a file uploaded to a project.
  */
-public class DataSiteProjectFileDependency {
+public class DataProjectFileDependency {
 
     @Expose
     private final DataProject project;
@@ -15,7 +14,7 @@ public class DataSiteProjectFileDependency {
     @Expose
     private final String type;
 
-    public DataSiteProjectFileDependency (ProjectFileDependenciesEntity rs) {
+    public DataProjectFileDependency (ProjectFileDependenciesEntity rs) {
 
         this.project = new DataProject(rs.getDependencyProject());
         this.type = rs.getType();

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.diluv.api.data.DataGameVersion;
+import com.diluv.api.data.DataProjectFileDependency;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
@@ -101,7 +102,7 @@ public class DataSiteProjectFileDisplay {
     private final DataUser user;
 
     @Expose
-    private final List<DataSiteProjectFileDependency> dependencies;
+    private final List<DataProjectFileDependency> dependencies;
 
     public DataSiteProjectFileDisplay (ProjectFilesEntity rs, List<DataGameVersion> gameVersions) {
 
@@ -120,6 +121,6 @@ public class DataSiteProjectFileDisplay {
         this.createdAt = rs.getCreatedAt().getTime();
         this.user = new DataUser(rs.getUser());
         this.gameVersions = gameVersions;
-        this.dependencies = rs.getDependencies().stream().map(DataSiteProjectFileDependency::new).collect(Collectors.toList());
+        this.dependencies = rs.getDependencies().stream().map(DataProjectFileDependency::new).collect(Collectors.toList());
     }
 }

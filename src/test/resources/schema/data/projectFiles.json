@@ -27,7 +27,7 @@
             "type": "number"
         },
         "dependencies": {
-            "type": "array"
+            "$ref": "dependency.json"
         },
         "gameVersions": {
             "$ref": "game_versions.json"
