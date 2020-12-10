@@ -16,7 +16,6 @@ public class DataSiteProjectFilesPage {
     public DataSiteProjectFilesPage (DataBaseProject project, List<DataSiteProjectFileDisplay> files) {
 
         this.project = project;
-
         this.files = files;
     }
 }

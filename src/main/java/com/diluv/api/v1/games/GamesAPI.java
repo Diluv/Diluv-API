@@ -2,8 +2,6 @@ package com.diluv.api.v1.games;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.net.URI;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,11 +20,6 @@ import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.plugins.providers.atom.Content;
-import org.jboss.resteasy.plugins.providers.atom.Entry;
-import org.jboss.resteasy.plugins.providers.atom.Feed;
-import org.jboss.resteasy.plugins.providers.atom.Link;
-import org.jboss.resteasy.plugins.providers.atom.Person;
 
 import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataGame;
@@ -36,6 +29,8 @@ import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataProjectList;
 import com.diluv.api.data.DataProjectType;
 import com.diluv.api.data.DataSlugName;
+import com.diluv.api.data.feed.FeedProjectFiles;
+import com.diluv.api.data.feed.FeedProjects;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;
 import com.diluv.api.data.site.DataSiteProjectFilesPage;
 import com.diluv.api.provider.ResponseException;
@@ -180,24 +175,9 @@ public class GamesAPI {
         }
 
         final String baseUrl = String.format("%s/games/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug);
-        Feed feed = new Feed();
-        feed.setId(URI.create(baseUrl + "/feed.atom"));
-        feed.getLinks().add(new Link("self", baseUrl));
-        feed.setUpdated(new Date());
-        feed.setTitle("Project Feed");
-        for (ProjectsEntity project : projects) {
-            Content content = new Content();
-            content.setText(project.getSummary());
-            Entry entry = new Entry();
-            entry.setId(URI.create(baseUrl + "/" + project.getSlug()));
-            entry.setTitle(project.getName());
-            entry.setUpdated(project.getUpdatedAt());
-            entry.setContent(content);
+        FeedProjects feed = new FeedProjects(baseUrl);
 
-            //TODO Maybe show all authors?
-            entry.getAuthors().add(new Person(project.getOwner().getDisplayName()));
-            feed.getEntries().add(entry);
-        }
+        projects.forEach(feed::addProject);
 
         return Response.ok(feed).build();
     }
@@ -347,22 +327,8 @@ public class GamesAPI {
             final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(session, project, false, 1, 25, ProjectFileSort.NEW, null);
 
             final String baseUrl = String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
-            Feed feed = new Feed();
-            feed.setId(URI.create(baseUrl + "/feed.atom"));
-            feed.getLinks().add(new Link("self", baseUrl + "/"));
-            feed.setUpdated(new Date());
-            feed.setTitle(project.getName() + " File Feed");
-            for (ProjectFilesEntity file : projectFiles) {
-                Content content = new Content();
-                content.setText(file.getChangelog());
-                Entry entry = new Entry();
-                entry.setId(URI.create(baseUrl + "/files/" + file.getId()));
-                entry.setTitle(file.getName());
-                entry.setUpdated(file.getUpdatedAt());
-                entry.setContent(content);
-                entry.getAuthors().add(new Person(file.getUser().getDisplayName()));
-                feed.getEntries().add(entry);
-            }
+            FeedProjectFiles feed = new FeedProjectFiles(baseUrl, project.getName());
+            projectFiles.forEach(feed::addFile);
 
             return Response.ok(feed).build();
         });
