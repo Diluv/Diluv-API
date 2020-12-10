@@ -9,14 +9,14 @@ import com.google.gson.annotations.Expose;
 public class DataProjectFileDependency {
 
     @Expose
-    private final DataProject project;
+    private final DataBaseProject project;
 
     @Expose
     private final String type;
 
     public DataProjectFileDependency (ProjectFileDependenciesEntity rs) {
 
-        this.project = new DataProject(rs.getDependencyProject());
+        this.project = new DataBaseProject(rs.getDependencyProject());
         this.type = rs.getType();
     }
 }

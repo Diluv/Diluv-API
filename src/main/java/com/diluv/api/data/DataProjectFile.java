@@ -71,7 +71,7 @@ public class DataProjectFile {
     private final long createdAt;
 
     /**
-     * The list of the project ids the file depends on./
+     * The list of the project ids the file depends on.
      */
     @Expose
     private final List<DataProjectFileDependency> dependencies;
