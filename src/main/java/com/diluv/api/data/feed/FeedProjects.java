@@ -14,7 +14,7 @@ import com.diluv.confluencia.database.record.ProjectsEntity;
 public class FeedProjects extends Feed {
     private final String baseUrl;
 
-    public FeedProjects (String baseUrl ) {
+    public FeedProjects (String baseUrl) {
 
         this.baseUrl = baseUrl;
         this.setId(URI.create(baseUrl + "/feed.atom"));

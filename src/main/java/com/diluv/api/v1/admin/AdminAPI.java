@@ -209,7 +209,7 @@ public class AdminAPI {
 
             session.update(game);
 
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return ResponseUtil.noContent();
         });
     }
 

@@ -53,6 +53,9 @@ public enum ErrorMessage {
 
     INVALID_DATA(BAD_REQUEST, "invalid_data", "The data is invalid."),
 
+    TOKEN_INVALID_NAME(BAD_REQUEST,"token_invalid_name", "The token has an invalid name."),
+    TOKEN_INVALID_ID(BAD_REQUEST,"token_invalid_id", "The id is invalid."),
+
     FILE_NOT_FOUND(NOT_FOUND, "file.404", "The file was not found."),
 
     ENDPOINT_NOT_FOUND(NOT_FOUND, "generic.404", "The endpoint was not found."),

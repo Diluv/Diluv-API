@@ -31,7 +31,7 @@ public class ProjectTest {
     @Test
     public void getProjectById () {
 
-        Request.getError(URL + "/100000000", 400, ErrorMessage.NOT_FOUND_PROJECT);
+        Request.getError(URL + "/100000000", ErrorMessage.NOT_FOUND_PROJECT);
 
         Request.getOk(URL + "/1", "schema/project-schema.json");
         Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1", "schema/project-schema.json");
@@ -72,7 +72,7 @@ public class ProjectTest {
         data.version = "1.1.2";
         data.gameVersions.add("invalid");
         multiPart.put("data", data);
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, ErrorMessage.PROJECT_FILE_INVALID_GAME_VERSION);
 
         // Dependencies
         data.version = "1.1.3";
@@ -85,13 +85,13 @@ public class ProjectTest {
         data.version = "1.1.4";
         data.dependencies.add(new FileDependency(1L, "optional"));
         multiPart.put("data", data);
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, ErrorMessage.PROJECT_FILE_INVALID_DEPEND_SELF);
 
         data.version = "1.1.4";
         data.dependencies.clear();
         data.dependencies.add(new FileDependency(500L, "optional"));
         multiPart.put("data", data);
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_ID);
 
         // Game Version + Dependencies
         data.version = "1.1.7";
@@ -106,7 +106,7 @@ public class ProjectTest {
         data.dependencies.add(new FileDependency(3L, "invalid"));
         data.version = "1.1.8";
         multiPart.put("data", data);
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, 400, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_TYPE);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, ErrorMessage.PROJECT_FILE_INVALID_DEPENDENCY_TYPE);
 
         data.version = "1.1.9";
         data.dependencies.clear();

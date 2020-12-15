@@ -8,4 +8,9 @@ public final class ResponseUtil {
 
         return Response.ok(data).build();
     }
+
+    public static Response noContent () {
+
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 }

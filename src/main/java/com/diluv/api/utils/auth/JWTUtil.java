@@ -60,11 +60,8 @@ public class JWTUtil {
 
         UUID uuid = getUUID(token);
         if (uuid != null) {
-            byte[] sha512 = DigestUtils.sha512(token);
-            String apiToken = Hex.toHexString(sha512);
-
             return Confluencia.getTransaction(session -> {
-                APITokensEntity record = Confluencia.SECURITY.findAPITokensByToken(session, apiToken);
+                APITokensEntity record = Confluencia.SECURITY.findAPITokensByToken(session, getSha512UUID(uuid));
                 if (record == null) {
                     return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
                 }
@@ -99,5 +96,11 @@ public class JWTUtil {
     public static boolean isBearerToken (String token) {
 
         return BEARER.regionMatches(true, 0, token, 0, BEARER.length());
+    }
+
+    public static String getSha512UUID (UUID uuid) {
+
+        byte[] sha512 = DigestUtils.sha512(uuid.toString());
+        return Hex.toHexString(sha512);
     }
 }

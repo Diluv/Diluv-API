@@ -1,16 +1,21 @@
 package com.diluv.api.v1.users;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -21,12 +26,15 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
+import com.diluv.api.data.DataAPIToken;
 import com.diluv.api.data.DataAuthorizedUser;
 import com.diluv.api.data.DataBaseProject;
+import com.diluv.api.data.DataCreateAPIToken;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataProjectList;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.AuthUtilities;
+import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
@@ -34,6 +42,7 @@ import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.Confluencia;
+import com.diluv.confluencia.database.record.APITokensEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.diluv.confluencia.database.record.UserChangeEmail;
 import com.diluv.confluencia.database.record.UserMfaRecoveryEntity;
@@ -162,7 +171,7 @@ public class UsersAPI {
                 }
             }
 
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return ResponseUtil.noContent();
         });
     }
 
@@ -277,6 +286,94 @@ public class UsersAPI {
             List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByUsername(session, username, authorized, page, limit, sort);
             List<DataBaseProject> dataProjects = projects.stream().map(DataProject::new).collect(Collectors.toList());
             return ResponseUtil.successResponse(new DataProjectList(dataProjects));
+        });
+    }
+
+    @GET
+    @Path("/self/token")
+    public Response getTokens (@HeaderParam("Authorization") Token token) {
+
+        if (token == null) {
+            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        }
+
+        if (token instanceof ErrorToken) {
+            return ((ErrorToken) token).getResponse();
+        }
+
+        if (token.isApiToken()) {
+            return ErrorMessage.USER_INVALID_TOKEN.respond("API Token can't be used for this request.");
+        }
+
+        final List<APITokensEntity> tokens = Confluencia.getTransaction(session -> {
+            return Confluencia.SECURITY.findAPITokensByUserId(session, new UsersEntity(token.getUserId()));
+        });
+
+        final List<DataAPIToken> dataTokens = tokens.stream().map(DataAPIToken::new).collect(Collectors.toList());
+
+        return ResponseUtil.successResponse(Collections.singletonMap("tokens", dataTokens));
+    }
+
+    @POST
+    @Path("/self/token")
+    public Response postToken (@HeaderParam("Authorization") Token token, @QueryParam("name") String queryName) {
+
+        if (token == null) {
+            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        }
+
+        if (token instanceof ErrorToken) {
+            return ((ErrorToken) token).getResponse();
+        }
+
+        if (token.isApiToken()) {
+            return ErrorMessage.USER_INVALID_TOKEN.respond("API Token can't be used for this request.");
+        }
+
+        final String name = queryName == null ? null : queryName.trim();
+        if (name == null || name.length() > 50) {
+            return ErrorMessage.TOKEN_INVALID_NAME.respond();
+        }
+
+        final UUID uuid = UUID.randomUUID();
+
+        Confluencia.getTransaction(session -> {
+            APITokensEntity entity = new APITokensEntity();
+            entity.setName(name);
+            entity.setToken(JWTUtil.getSha512UUID(uuid));
+            entity.setUser(new UsersEntity(token.getUserId()));
+            session.save(entity);
+        });
+
+        return ResponseUtil.successResponse(new DataCreateAPIToken(name, uuid));
+    }
+
+    @DELETE
+    @Path("/self/token/{id}")
+    public Response deleteToken (@HeaderParam("Authorization") Token token, @PathParam("id") Long id) {
+
+        if (token == null) {
+            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
+        }
+
+        if (token instanceof ErrorToken) {
+            return ((ErrorToken) token).getResponse();
+        }
+
+        if (token.isApiToken()) {
+            return ErrorMessage.USER_INVALID_TOKEN.respond("API Token can't be used for this request.");
+        }
+
+        return Confluencia.getTransaction(session -> {
+            APITokensEntity entity = Confluencia.SECURITY.findAPITokensById(session, id);
+
+            if (entity == null || entity.getUser().getId() != token.getUserId()) {
+                return ErrorMessage.TOKEN_INVALID_ID.respond();
+            }
+
+            entity.setDeleted(true);
+            session.update(entity);
+            return ResponseUtil.noContent();
         });
     }
 }

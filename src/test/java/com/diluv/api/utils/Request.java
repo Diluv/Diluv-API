@@ -50,17 +50,17 @@ public class Request {
         getRequest(url, 200, schema, headers);
     }
 
-    public static void getError (String url, int status, ErrorMessage error) {
+    public static void getError (String url, ErrorMessage error) {
 
-        getRequest(url, status, "schema/error-schema.json", new HashMap<>())
+        getRequest(url, error.getType().getCode(), "schema/error-schema.json", new HashMap<>())
             .body("message", equalTo(error.getMessage()));
     }
 
-    public static void getErrorWithAuth (String token, String url, int status, ErrorMessage error) {
+    public static void getErrorWithAuth (String token, String url, ErrorMessage error) {
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
-        getRequest(url, status, "schema/error-schema.json", headers)
+        getRequest(url, error.getType().getCode(), "schema/error-schema.json", headers)
             .body("error", equalTo(error.getUniqueId()));
     }
 
@@ -98,11 +98,11 @@ public class Request {
         postRequest(url, headers, multiPart, 200, schema);
     }
 
-    public static void postErrorWithAuth (String token, String url, Map<String, Object> multiPart, int status, ErrorMessage error) {
+    public static void postErrorWithAuth (String token, String url, Map<String, Object> multiPart, ErrorMessage error) {
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
-        postRequest(url, headers, multiPart, status, "schema/error-schema.json")
+        postRequest(url, headers, multiPart, error.getType().getCode(), "schema/error-schema.json")
             .body("error", equalTo(error.getUniqueId()));
     }
 
@@ -150,11 +150,11 @@ public class Request {
         return response.body(matchesJsonSchemaInClasspath(schema));
     }
 
-    public static void patchErrorWithAuth (String token, String url, Object body, int status, ErrorMessage error) {
+    public static void patchErrorWithAuth (String token, String url, Object body, ErrorMessage error) {
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
-        patchRequest(url, headers, body, status, "schema/error-schema.json")
+        patchRequest(url, headers, body, error.getType().getCode(), "schema/error-schema.json")
             .body("message", equalTo(error.getMessage()));
     }
 
@@ -178,5 +178,47 @@ public class Request {
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
         patchRequest(url, headers, body, statusCode, null);
+    }
+
+    public static ValidatableResponse deleteRequest (String url, Map<String, String> headers, Map<String, Object> multiPart, int status, String schema) {
+
+        RequestSpecification request = given().headers(headers);
+        for (String key : multiPart.keySet()) {
+            Object o = multiPart.get(key);
+            if (o instanceof File) {
+                request = request.multiPart(key, (File) o);
+            }
+            else if (o instanceof String) {
+                request = request.multiPart(key, (String) o);
+            }
+            else {
+                request = request.multiPart(key, GSON.toJson(o), "application/json");
+            }
+        }
+        ValidatableResponse response = request
+            .delete(url)
+            .then()
+            .assertThat()
+            .statusCode(status);
+
+        if (schema == null) {
+            return response;
+        }
+        return response.body(matchesJsonSchemaInClasspath(schema));
+    }
+
+    public static void deleteOkWithAuth (String token, String url, Map<String, Object> multiPart, String schema) {
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + token);
+        deleteRequest(url, headers, multiPart, 200, schema);
+    }
+
+    public static void deleteErrorWithAuth (String token, String url, Map<String, Object> multiPart, ErrorMessage error) {
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + token);
+        deleteRequest(url, headers, multiPart, error.getType().getCode(), "schema/error-schema.json")
+            .body("error", equalTo(error.getUniqueId()));
     }
 }

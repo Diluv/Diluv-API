@@ -31,7 +31,7 @@ public class GameTest {
     @Test
     public void getGameBySlug () {
 
-        Request.getError(URL + "/invalid", 400, ErrorMessage.NOT_FOUND_GAME);
+        Request.getError(URL + "/invalid", ErrorMessage.NOT_FOUND_GAME);
 
         Request.getOk(URL + "/minecraft-je", "schema/game-schema.json");
     }
@@ -39,8 +39,8 @@ public class GameTest {
     @Test
     public void getProjectTypesByGameSlugAndProjectType () {
 
-        Request.getError(URL + "/invalid/invalid", 400, ErrorMessage.NOT_FOUND_GAME);
-        Request.getError(URL + "/minecraft-je/invalid", 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+        Request.getError(URL + "/invalid/invalid", ErrorMessage.NOT_FOUND_GAME);
+        Request.getError(URL + "/minecraft-je/invalid", ErrorMessage.NOT_FOUND_PROJECT_TYPE);
 
         Request.getOk(URL + "/minecraft-je/mods", "schema/project-types-schema.json");
     }
@@ -48,8 +48,8 @@ public class GameTest {
     @Test
     public void getProjectsByGameSlugAndProjectType () {
 
-        Request.getError(URL + "/invalid/invalid/projects", 400, ErrorMessage.NOT_FOUND_GAME);
-        Request.getError(URL + "/minecraft-je/invalid/projects", 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+        Request.getError(URL + "/invalid/invalid/projects", ErrorMessage.NOT_FOUND_GAME);
+        Request.getError(URL + "/minecraft-je/invalid/projects", ErrorMessage.NOT_FOUND_PROJECT_TYPE);
 
         Request.getOk(URL + "/minecraft-je/mods/projects", "schema/project-list-schema.json");
         Request.getOk(URL + "/minecraft-je/mods/projects?sort=name", "schema/project-list-schema.json");
@@ -60,17 +60,17 @@ public class GameTest {
     @Test
     public void getProjectFeed () {
 
-        Request.getFeed(URL + "/invalid/invalid/feed.atom", 400);
-        Request.getFeed(URL + "/minecraft-je/invalid/feed.atom", 400);
+        Request.getFeed(URL + "/invalid/invalid/feed.atom", 404);
+        Request.getFeed(URL + "/minecraft-je/invalid/feed.atom", 404);
         Request.getFeed(URL + "/minecraft-je/mods/feed.atom", 200);
     }
 
     @Test
     public void getProjectByGameSlugAndProjectTypeAndProjectSlug () {
 
-        Request.getError(URL + "/invalid/invalid/test", 400, ErrorMessage.NOT_FOUND_GAME);
-        Request.getError(URL + "/minecraft-je/invalid/test", 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
-        Request.getError(URL + "/minecraft-je/mods/test", 400, ErrorMessage.NOT_FOUND_PROJECT);
+        Request.getError(URL + "/invalid/invalid/test", ErrorMessage.NOT_FOUND_GAME);
+        Request.getError(URL + "/minecraft-je/invalid/test", ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+        Request.getError(URL + "/minecraft-je/mods/test", ErrorMessage.NOT_FOUND_PROJECT);
 
         Request.getOk(URL + "/minecraft-je/mods/bookshelf", "schema/project-schema.json");
         Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/bookshelf", "schema/project-schema.json");
@@ -79,18 +79,18 @@ public class GameTest {
     @Test
     public void getProjectFilesFeed () {
 
-        Request.getFeed(URL + "/invalid/invalid/invalid/feed.atom", 400);
-        Request.getFeed(URL + "/minecraft-je/invalid/invalid/feed.atom", 400);
-        Request.getFeed(URL + "/minecraft-je/mods/invalid/feed.atom", 400);
+        Request.getFeed(URL + "/invalid/invalid/invalid/feed.atom", 404);
+        Request.getFeed(URL + "/minecraft-je/invalid/invalid/feed.atom", 404);
+        Request.getFeed(URL + "/minecraft-je/mods/invalid/feed.atom", 404);
         Request.getFeed(URL + "/minecraft-je/mods/bookshelf/feed.atom", 200);
     }
 
     @Test
     public void getProjectFilesByGameSlugAndProjectTypeAndProjectSlug () {
 
-        Request.getError(URL + "/invalid/invalid/test/files", 400, ErrorMessage.NOT_FOUND_GAME);
-        Request.getError(URL + "/minecraft-je/invalid/invalidproject/files", 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
-        Request.getError(URL + "/minecraft-je/mods/invalidproject/files", 400, ErrorMessage.NOT_FOUND_PROJECT);
+        Request.getError(URL + "/invalid/invalid/test/files", ErrorMessage.NOT_FOUND_GAME);
+        Request.getError(URL + "/minecraft-je/invalid/invalidproject/files", ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+        Request.getError(URL + "/minecraft-je/mods/invalidproject/files", ErrorMessage.NOT_FOUND_PROJECT);
 
         Request.getOk(URL + "/minecraft-je/mods/crafttweaker/files", "schema/project-files-list-schema.json");
         Request.getOk(URL + "/minecraft-je/mods/bookshelf/files", "schema/project-files-list-schema.json");
@@ -110,9 +110,9 @@ public class GameTest {
         Map<String, Object> multiPart = new HashMap<>();
         multiPart.put("logo", logo);
         multiPart.put("data", data);
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_GAME);
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, 400, ErrorMessage.PROJECT_TAKEN_SLUG);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/invalid/invalid", multiPart, ErrorMessage.NOT_FOUND_GAME);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid", multiPart, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, ErrorMessage.PROJECT_TAKEN_SLUG);
 
 //        multiPart.put("name", "Bookshelf3");
 //        multiPart.put("tags", "invalid,magic");

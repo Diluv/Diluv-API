@@ -1,5 +1,9 @@
 package com.diluv.api.v1.utilities;
 
+import java.util.List;
+
+import org.hibernate.Session;
+
 import com.diluv.api.data.DataAuthorizedProject;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.provider.ResponseException;
@@ -8,10 +12,6 @@ import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.ProjectsEntity;
-
-import org.hibernate.Session;
-
-import java.util.List;
 
 public class ProjectService {
 

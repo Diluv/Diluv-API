@@ -26,7 +26,7 @@ public class NewsTest {
     @Test
     public void getNewsBySlug () {
 
-        Request.getError(URL + "/invalid", 400, ErrorMessage.NOT_FOUND_NEWS);
+        Request.getError(URL + "/invalid", ErrorMessage.NOT_FOUND_NEWS);
 
         Request.getOk(URL + "/example", "schema/news-schema.json");
     }

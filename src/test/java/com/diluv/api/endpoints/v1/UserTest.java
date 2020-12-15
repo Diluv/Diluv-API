@@ -1,5 +1,8 @@
 package com.diluv.api.endpoints.v1;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -25,8 +28,8 @@ public class UserTest {
     @Test
     public void getSelf () {
 
-        Request.getError(URL + "/self", 401, ErrorMessage.USER_REQUIRED_TOKEN);
-        Request.getErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self", 401, ErrorMessage.USER_INVALID_TOKEN);
+        Request.getError(URL + "/self", ErrorMessage.USER_REQUIRED_TOKEN);
+        Request.getErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self", ErrorMessage.USER_INVALID_TOKEN);
 
         Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", "schema/user-schema.json");
         Request.getOkWithAuth(TestUtil.TOKEN_JARED, URL + "/self", "schema/user-schema.json");
@@ -38,7 +41,7 @@ public class UserTest {
         UserUpdateForm data = new UserUpdateForm();
         data.currentPassword = "invalid";
         data.displayName = "ABC";
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", data, 400, ErrorMessage.USER_INVALID_PASSWORD);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", data, ErrorMessage.USER_INVALID_PASSWORD);
 
         data.currentPassword = "password";
         data.displayName = "Darkhax";
@@ -52,7 +55,7 @@ public class UserTest {
         Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", 204, data);
 
         data.email = "lclc98@diluv.com";
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", data, 400, ErrorMessage.USER_TAKEN_EMAIL);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", data, ErrorMessage.USER_TAKEN_EMAIL);
     }
 
     @Test
@@ -74,7 +77,7 @@ public class UserTest {
         data.mfa = gAuth.getTotpPassword(secret);
         data.mfaSecret = secret;
 
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/mfa", data, 400, ErrorMessage.USER_INVALID_PASSWORD);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/mfa", data, ErrorMessage.USER_INVALID_PASSWORD);
 
         data.password = "password";
         Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/mfa", 200, data);
@@ -84,8 +87,8 @@ public class UserTest {
     public void getUser () {
 
         // Check for a non-existing user
-        Request.getError(URL + "/abc", 400, ErrorMessage.NOT_FOUND_USER);
-        Request.getErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/abc", 400, ErrorMessage.NOT_FOUND_USER);
+        Request.getError(URL + "/abc", ErrorMessage.NOT_FOUND_USER);
+        Request.getErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/abc", ErrorMessage.NOT_FOUND_USER);
 
         // Check for existing user with and without a token, and an invalid token
         Request.getOk(URL + "/darkhax", "schema/user-schema.json");
@@ -100,13 +103,48 @@ public class UserTest {
     public void getProjectsByUsername () {
 
         // Check for a non-existing user
-        Request.getError(URL + "/abc/projects", 400, ErrorMessage.NOT_FOUND_USER);
-        Request.getErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/abc/projects", 400, ErrorMessage.NOT_FOUND_USER);
+        Request.getError(URL + "/abc/projects", ErrorMessage.NOT_FOUND_USER);
+        Request.getErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/abc/projects", ErrorMessage.NOT_FOUND_USER);
 
         // Check for existing user with and without a token, and an invalid token
         Request.getOk(URL + "/darkhax/projects", "schema/project-list-schema.json");
         Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/darkhax/projects", "schema/project-list-schema.json");
         Request.getOkWithAuth(TestUtil.TOKEN_JARED, URL + "/darkhax/projects", "schema/project-list-schema.json");
 //        Request.getErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/darkhax/projects", 401, ErrorMessage.USER_INVALID_TOKEN);
+    }
+
+    @Test
+    public void getToken () {
+
+        Request.getError(URL + "/self/token", ErrorMessage.USER_REQUIRED_TOKEN);
+
+        Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token", "schema/token-list-schema.json");
+        Request.getOkWithAuth(TestUtil.TOKEN_JARED, URL + "/self/token", "schema/token-list-schema.json");
+    }
+
+    @Test
+    public void postToken () {
+
+        Map<String, Object> multiPart = new HashMap<>();
+        Request.postErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self/token", multiPart, ErrorMessage.USER_INVALID_TOKEN);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token", multiPart, ErrorMessage.TOKEN_INVALID_NAME);
+
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token?name=Jenkins", multiPart, "schema/create-token-schema.json");
+    }
+
+    @Test
+    public void deleteToken () {
+
+        Map<String, Object> multiPart = new HashMap<>();
+
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self/token/3", multiPart, ErrorMessage.USER_INVALID_TOKEN);
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token/2", multiPart, ErrorMessage.TOKEN_INVALID_ID);
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + TestUtil.TOKEN_DARKHAX);
+        Request.deleteRequest(URL + "/self/token/3", headers, multiPart, 204, null);
+
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token/3", multiPart, ErrorMessage.TOKEN_INVALID_ID);
+
     }
 }

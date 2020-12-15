@@ -171,7 +171,7 @@ public class GamesAPI {
         });
 
         if (projects.isEmpty()) {
-            return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
+            return Response.status(ErrorType.NOT_FOUND.getCode()).build();
         }
 
         final String baseUrl = String.format("%s/games/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug);
@@ -309,7 +309,7 @@ public class GamesAPI {
                 }
             }
 
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return ResponseUtil.noContent();
         });
     }
 
@@ -321,7 +321,7 @@ public class GamesAPI {
         return Confluencia.getTransaction(session -> {
             final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
             if (project == null) {
-                return Response.status(ErrorType.BAD_REQUEST.getCode()).build();
+                return Response.status(ErrorType.NOT_FOUND.getCode()).build();
             }
 
             final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(session, project, false, 1, 25, ProjectFileSort.NEW, null);

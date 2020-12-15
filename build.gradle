@@ -34,8 +34,8 @@ dependencies {
     implementation group: 'com.wildbit.java', name: 'postmark', version: '1.5.3'
 
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
-    implementation group: 'com.graphql-java-kickstart', name:'graphql-java-servlet', version: '10.0.0'
-    implementation group: 'com.graphql-java-kickstart', name:'graphql-java-tools', version: '6.2.0'
+    implementation group: 'com.graphql-java-kickstart', name: 'graphql-java-servlet', version: '10.0.0'
+    implementation group: 'com.graphql-java-kickstart', name: 'graphql-java-tools', version: '6.2.0'
 
     implementation group: 'org.jboss.resteasy', name: 'resteasy-undertow', version: '4.5.8.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-multipart-provider', version: '4.5.8.Final'
@@ -56,6 +56,7 @@ dependencies {
 }
 
 test {
+    environment "ENVIRONMENT", 'DEVELOPMENT'
     useJUnitPlatform()
 }
 

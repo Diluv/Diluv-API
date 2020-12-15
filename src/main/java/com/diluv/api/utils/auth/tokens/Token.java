@@ -2,6 +2,8 @@ package com.diluv.api.utils.auth.tokens;
 
 import java.util.List;
 
+import com.diluv.api.utils.Constants;
+
 public class Token {
     private final long userId;
     private final boolean apiToken;
@@ -21,6 +23,9 @@ public class Token {
 
     public boolean isApiToken () {
 
+        if (Constants.isDevelopment()) {
+            return false;
+        }
         return this.apiToken;
     }
 

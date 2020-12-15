@@ -15,6 +15,7 @@ import org.jboss.resteasy.annotations.GZIP;
 
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.NodeCDNCommitsEntity;
 import com.diluv.schoomp.Webhook;
@@ -66,7 +67,7 @@ public class InternalAPI {
                 }
             }
 
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return ResponseUtil.noContent();
         });
     }
 }
