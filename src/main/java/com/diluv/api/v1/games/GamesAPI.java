@@ -21,6 +21,7 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
+import com.diluv.api.data.DataAuthorizedProject;
 import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataGame;
 import com.diluv.api.data.DataGameList;
@@ -368,7 +369,17 @@ public class GamesAPI {
                     new DataSiteProjectFileDisplay(record, gameVersions) :
                     new DataSiteProjectFileDisplay(record, gameVersions);
             }).collect(Collectors.toList());
-            return ResponseUtil.successResponse(new DataSiteProjectFilesPage(new DataBaseProject(project), projectFiles));
+
+            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
+
+            DataBaseProject dataProject;
+            if (permissions == null) {
+                dataProject = new DataBaseProject(project);
+            }
+            else {
+                dataProject = new DataAuthorizedProject(project, permissions);
+            }
+            return ResponseUtil.successResponse(new DataSiteProjectFilesPage(dataProject, projectFiles));
         });
     }
 
