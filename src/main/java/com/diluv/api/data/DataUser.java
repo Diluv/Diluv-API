@@ -12,6 +12,7 @@ public class DataUser {
     /**
      * The id of the user
      */
+    @Expose
     private final long userId;
 
     /**

@@ -345,41 +345,37 @@ public class GamesAPI {
         String gameVersion = query.getGameVersion();
 
         return Confluencia.getTransaction(session -> {
-            final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
-            if (project == null) {
+            try {
+                final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
+                if (project == null) {
+                    if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
+                        throw new ResponseException(ErrorMessage.NOT_FOUND_GAME.respond());
+                    }
 
-                if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
-                    return ErrorMessage.NOT_FOUND_GAME.respond();
+                    if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
+                        throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond());
+                    }
+
+                    throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
                 }
+                DataProject dataProject = ProjectService.getDataProject( project, token);
 
-                if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
-                    return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
-                }
+                boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
+                final List<ProjectFilesEntity> projectFileRecords = Confluencia.FILE.findAllByProject(session, project, authorized, page, limit, sort, gameVersion);
 
-                return ErrorMessage.NOT_FOUND_PROJECT.respond();
+                final List<DataSiteProjectFileDisplay> projectFiles = projectFileRecords.stream().map(record -> {
+                    final List<GameVersionsEntity> gameVersionRecords = record.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
+                    List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
+                    return record.isReleased() ?
+                        new DataSiteProjectFileDisplay(record, gameVersions) :
+                        new DataSiteProjectFileDisplay(record, gameVersions);
+                }).collect(Collectors.toList());
+
+                return ResponseUtil.successResponse(new DataSiteProjectFilesPage(dataProject, projectFiles));
             }
-
-            boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
-            final List<ProjectFilesEntity> projectFileRecords = Confluencia.FILE.findAllByProject(session, project, authorized, page, limit, sort, gameVersion);
-
-            final List<DataSiteProjectFileDisplay> projectFiles = projectFileRecords.stream().map(record -> {
-                final List<GameVersionsEntity> gameVersionRecords = record.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
-                List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
-                return record.isReleased() ?
-                    new DataSiteProjectFileDisplay(record, gameVersions) :
-                    new DataSiteProjectFileDisplay(record, gameVersions);
-            }).collect(Collectors.toList());
-
-            List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
-
-            DataBaseProject dataProject;
-            if (permissions == null) {
-                dataProject = new DataBaseProject(project);
+            catch (ResponseException e) {
+               return e.getResponse();
             }
-            else {
-                dataProject = new DataAuthorizedProject(project, permissions);
-            }
-            return ResponseUtil.successResponse(new DataSiteProjectFilesPage(dataProject, projectFiles));
         });
     }
 

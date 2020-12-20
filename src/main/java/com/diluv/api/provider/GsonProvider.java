@@ -68,7 +68,7 @@ public class GsonProvider implements MessageBodyWriter<Object>, MessageBodyReade
 
         if (this.gson == null) {
 
-            this.gson = new GsonBuilder().create();
+            this.gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         }
 
         return this.gson;
