@@ -234,7 +234,7 @@ public final class Constants {
     public static String getUserAvatar (String username) {
 
         if (isDevelopment()) {
-            return "https://images.placeholders.dev/?width=400&height=400";
+            return "https://images.placeholders.dev/?width=512&height=512";
         }
 
         return String.format("%s/users/%s/avatar.png", Constants.CDN_URL, username);
@@ -253,7 +253,7 @@ public final class Constants {
     public static DataImage getGameLogoURL (String gameSlug) {
 
         if (isDevelopment()) {
-            final String url = "https://images.placeholders.dev/?width=250&height=130";
+            final String url = "https://images.placeholders.dev/?width=360&height=180";
             return new DataImage(new DataImageSource(url + "&text=fallback", "image/png"), new DataImageSource[]{new DataImageSource(url + "&text=" + gameSlug, "image/svg+xml")});
         }
 
