@@ -50,7 +50,7 @@ dependencies {
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.2'
     testImplementation group: 'io.rest-assured', name: 'json-schema-validator', version: '4.3.1'
 
-    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.14.3'
+    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.15.1'
     testImplementation group: 'org.testcontainers', name: 'mariadb', version: '1.14.3'
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.15.0'
 }
