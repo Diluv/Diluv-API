@@ -2,6 +2,8 @@ package com.diluv.api.v1.utilities;
 
 import java.util.List;
 
+import com.diluv.api.data.DataBaseProject;
+
 import org.hibernate.Session;
 
 import com.diluv.api.data.DataAuthorizedProject;
@@ -15,7 +17,7 @@ import com.diluv.confluencia.database.record.ProjectsEntity;
 
 public class ProjectService {
 
-    public static DataProject getDataProject (Session session, String gameSlug, String projectTypeSlug, String projectSlug, Token token) throws ResponseException {
+    public static DataBaseProject getDataProject (Session session, String gameSlug, String projectTypeSlug, String projectSlug, Token token) throws ResponseException {
 
         final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
         if (project == null) {
@@ -33,7 +35,7 @@ public class ProjectService {
         return getDataProject(project, token);
     }
 
-    public static DataProject getDataProject (Session session, long projectId, Token token) throws ResponseException {
+    public static DataBaseProject getDataProject (Session session, long projectId, Token token) throws ResponseException {
 
         final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(session, projectId);
 
@@ -43,7 +45,7 @@ public class ProjectService {
         return getDataProject(project, token);
     }
 
-    public static DataProject getDataProject (ProjectsEntity project, Token token) throws ResponseException {
+    public static DataBaseProject getDataProject (ProjectsEntity project, Token token) throws ResponseException {
 
         if (token == null) {
             if (!project.isReleased()) {
@@ -64,5 +66,28 @@ public class ProjectService {
         }
 
         return new DataProject(project);
+    }
+
+    public static DataBaseProject getBaseDataProject (ProjectsEntity project, Token token) throws ResponseException {
+
+        if (token == null) {
+            if (!project.isReleased()) {
+                throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
+            }
+
+            return new DataBaseProject(project);
+        }
+
+        List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
+
+        if (permissions != null) {
+            return new DataAuthorizedProject(project, permissions);
+        }
+
+        if (!project.isReleased()) {
+            throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
+        }
+
+        return new DataBaseProject(project);
     }
 }

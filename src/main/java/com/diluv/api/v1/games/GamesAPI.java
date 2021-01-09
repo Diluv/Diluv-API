@@ -189,7 +189,7 @@ public class GamesAPI {
 
         return Confluencia.getTransaction(session -> {
             try {
-                final DataProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
+                final DataBaseProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
                 return ResponseUtil.successResponse(project);
             }
             catch (ResponseException e) {
@@ -358,7 +358,7 @@ public class GamesAPI {
 
                     throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
                 }
-                DataProject dataProject = ProjectService.getDataProject( project, token);
+                DataBaseProject dataProject = ProjectService.getBaseDataProject(project, token);
 
                 boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
                 final List<ProjectFilesEntity> projectFileRecords = Confluencia.FILE.findAllByProject(session, project, authorized, page, limit, sort, gameVersion);
@@ -371,10 +371,12 @@ public class GamesAPI {
                         new DataSiteProjectFileDisplay(record, gameVersions);
                 }).collect(Collectors.toList());
 
-                return ResponseUtil.successResponse(new DataSiteProjectFilesPage(dataProject, projectFiles));
+                final long fileCount = Confluencia.FILE.countFilesByProject(session, project, authorized);
+
+                return ResponseUtil.successResponse(new DataSiteProjectFilesPage(dataProject, projectFiles, fileCount));
             }
             catch (ResponseException e) {
-               return e.getResponse();
+                return e.getResponse();
             }
         });
     }

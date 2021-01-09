@@ -66,7 +66,7 @@ public class ProjectsAPI {
 
         return Confluencia.getTransaction(session -> {
             try {
-                final DataProject project = ProjectService.getDataProject(session, id, token);
+                final DataBaseProject project = ProjectService.getDataProject(session, id, token);
                 return ResponseUtil.successResponse(project);
             }
             catch (ResponseException e) {
@@ -286,7 +286,7 @@ public class ProjectsAPI {
             }
 
             List<DataSiteProjectFilesPage> projectFilesPages = new ArrayList<>();
-            projectFileMap.forEach((key, value) -> projectFilesPages.add(new DataSiteProjectFilesPage(key, value)));
+            projectFileMap.forEach((key, value) -> projectFilesPages.add(new DataSiteProjectFilesPage(key, value, value.size())));
             return ResponseUtil.successResponse(new DataProjectFileList(projectFilesPages));
         });
     }

@@ -157,7 +157,7 @@ public class SiteAPI {
 
         return Confluencia.getTransaction(session -> {
             try {
-                final DataProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
+                final DataBaseProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
                 return ResponseUtil.successResponse(project);
             }
             catch (ResponseException e) {
@@ -173,7 +173,7 @@ public class SiteAPI {
 
         return Confluencia.getTransaction(session -> {
             try {
-                final DataProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
+                final DataBaseProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
                 return ResponseUtil.successResponse(new DataSiteProjectSettings(project, Confluencia.PROJECT.findAllTagsByGameSlugAndProjectTypeSlug(session, new ProjectTypesEntity(new GamesEntity(gameSlug), projectTypeSlug)).stream().map(a -> new DataSlugName(a.getSlug(), a.getName())).collect(Collectors.toList())));
             }
             catch (ResponseException e) {
