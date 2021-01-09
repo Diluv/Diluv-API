@@ -21,7 +21,6 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
-import com.diluv.api.data.DataAuthorizedProject;
 import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataGame;
 import com.diluv.api.data.DataGameList;
@@ -325,7 +324,7 @@ public class GamesAPI {
                 return Response.status(ErrorType.NOT_FOUND.getCode()).build();
             }
 
-            final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(session, project, false, 1, 25, ProjectFileSort.NEW, null);
+            final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(session, project, false, 1, 25, ProjectFileSort.NEW, null, "");
 
             final String baseUrl = String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
             FeedProjectFiles feed = new FeedProjectFiles(baseUrl, project.getName());
@@ -341,6 +340,7 @@ public class GamesAPI {
 
         long page = query.getPage();
         int limit = query.getLimit();
+        String search = query.getSearch();
         Sort sort = query.getSort(ProjectFileSort.NEW);
         String gameVersion = query.getGameVersion();
 
@@ -361,7 +361,7 @@ public class GamesAPI {
                 DataBaseProject dataProject = ProjectService.getBaseDataProject(project, token);
 
                 boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
-                final List<ProjectFilesEntity> projectFileRecords = Confluencia.FILE.findAllByProject(session, project, authorized, page, limit, sort, gameVersion);
+                final List<ProjectFilesEntity> projectFileRecords = Confluencia.FILE.findAllByProject(session, project, authorized, page, limit, sort, gameVersion, search);
 
                 final List<DataSiteProjectFileDisplay> projectFiles = projectFileRecords.stream().map(record -> {
                     final List<GameVersionsEntity> gameVersionRecords = record.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
@@ -371,7 +371,7 @@ public class GamesAPI {
                         new DataSiteProjectFileDisplay(record, gameVersions);
                 }).collect(Collectors.toList());
 
-                final long fileCount = Confluencia.FILE.countFilesByProject(session, project, authorized);
+                final long fileCount = Confluencia.FILE.countByProjectParams(session, project, authorized, gameVersion, search);
 
                 return ResponseUtil.successResponse(new DataSiteProjectFilesPage(dataProject, projectFiles, fileCount));
             }
