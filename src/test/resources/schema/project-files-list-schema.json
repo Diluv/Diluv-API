@@ -15,6 +15,9 @@
         },
         "fileCount": {
             "type": "number"
+        },
+        "sorts": {
+            "type": "array"
         }
     },
     "additionalProperties": false

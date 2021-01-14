@@ -18,6 +18,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.v1.games.GamesAPI;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.validator.GenericValidator;
@@ -292,7 +294,7 @@ public class ProjectsAPI {
             }
 
             List<DataSiteProjectFilesPage> projectFilesPages = new ArrayList<>();
-            projectFileMap.forEach((key, value) -> projectFilesPages.add(new DataSiteProjectFilesPage(key, value, value.size())));
+            projectFileMap.forEach((key, value) -> projectFilesPages.add(new DataSiteProjectFilesPage(key, value, value.size(), GamesAPI.PROJECT_FILE_SORTS)));
             return ResponseUtil.successResponse(new DataProjectFileList(projectFilesPages));
         });
     }

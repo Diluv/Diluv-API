@@ -62,6 +62,7 @@ public class GamesAPI {
 
     public static final List<DataSlugName> GAME_SORTS = GameSort.LIST.stream().map(a -> new DataSlugName(a.getSlug(), a.getDisplayName())).collect(Collectors.toList());
     public static final List<DataSlugName> PROJECT_SORTS = ProjectSort.LIST.stream().map(a -> new DataSlugName(a.getSlug(), a.getDisplayName())).collect(Collectors.toList());
+    public static final List<DataSlugName> PROJECT_FILE_SORTS = ProjectFileSort.LIST.stream().map(a -> new DataSlugName(a.getSlug(), a.getDisplayName())).collect(Collectors.toList());
 
     private final Slugify slugify = new Slugify();
 
@@ -373,7 +374,7 @@ public class GamesAPI {
 
                 final long fileCount = Confluencia.FILE.countByProjectParams(session, project, authorized, gameVersion, search);
 
-                return ResponseUtil.successResponse(new DataSiteProjectFilesPage(dataProject, projectFiles, fileCount));
+                return ResponseUtil.successResponse(new DataSiteProjectFilesPage(dataProject, projectFiles, fileCount, PROJECT_FILE_SORTS));
             }
             catch (ResponseException e) {
                 return e.getResponse();
