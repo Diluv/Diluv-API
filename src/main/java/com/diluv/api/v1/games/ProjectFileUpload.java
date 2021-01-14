@@ -1,7 +1,9 @@
 package com.diluv.api.v1.games;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gson.annotations.Expose;
 
@@ -20,10 +22,10 @@ public class ProjectFileUpload {
     public String classifier;
 
     @Expose
-    public List<String> gameVersions = new ArrayList<>();
+    public Set<String> gameVersions = new HashSet<>();
 
     @Expose
-    public List<String> loaders = new ArrayList<>();
+    public Set<String> loaders = new HashSet<>();
 
     @Expose
     public List<FileDependency> dependencies = new ArrayList<>();
