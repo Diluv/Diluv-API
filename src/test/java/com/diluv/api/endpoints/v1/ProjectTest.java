@@ -24,7 +24,12 @@ public class ProjectTest {
 
     @BeforeAll
     public static void setup () {
-
+        try {
+            FileUtils.deleteDirectory(new File(Constants.PROCESSING_FOLDER));
+        }
+        catch (IOException e) {
+            DiluvAPIServer.LOGGER.catching(e);
+        }
         TestUtil.start();
     }
 
@@ -124,14 +129,9 @@ public class ProjectTest {
 
     }
 
-    @AfterAll
-    public static void cleanup () {
+    @Test
+    public void getProjectFile () {
 
-        try {
-            FileUtils.deleteDirectory(new File(Constants.PROCESSING_FOLDER));
-        }
-        catch (IOException e) {
-            DiluvAPIServer.LOGGER.catching(e);
-        }
+        Request.getOk(URL + "/files/1", "schema/project-files-schema.json");
     }
 }

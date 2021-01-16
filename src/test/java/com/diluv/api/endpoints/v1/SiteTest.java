@@ -15,10 +15,4 @@ public class SiteTest {
 
         TestUtil.start();
     }
-
-    @Test
-    public void getProjectFile () {
-
-        Request.getOk(URL + "/files/1", "schema/project-files-schema.json");
-    }
 }
