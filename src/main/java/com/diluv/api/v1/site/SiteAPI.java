@@ -184,30 +184,6 @@ public class SiteAPI {
     }
 
     @GET
-    @Path("/files/{fileId}")
-    public Response getProjectFile (@HeaderParam("Authorization") Token token, @PathParam("fileId") long fileId) {
-
-        return Confluencia.getTransaction(session -> {
-            final ProjectFilesEntity projectFile = Confluencia.FILE.findOneById(session, fileId);
-
-            if (projectFile == null) {
-                return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
-            }
-            final ProjectsEntity project = projectFile.getProject();
-            boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_EDIT);
-
-            if (!projectFile.isReleased() && !authorized) {
-                return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
-            }
-
-            final List<GameVersionsEntity> gameVersionRecords = projectFile.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
-            final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
-
-            return ResponseUtil.successResponse(new DataSiteProjectFileDisplay(projectFile, gameVersions));
-        });
-    }
-
-    @GET
     @Path("/games/{gameSlug}/{projectTypeSlug}/{projectSlug}/files/{fileId}")
     public Response getProjectFile (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @PathParam("fileId") long fileId, @Query ProjectFileQuery query) throws ResponseException {
 
