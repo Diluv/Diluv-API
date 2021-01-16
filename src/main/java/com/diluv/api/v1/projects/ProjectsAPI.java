@@ -22,6 +22,7 @@ import com.diluv.api.v1.games.GamesAPI;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -56,6 +57,8 @@ import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.Sort;
+
+import org.jboss.resteasy.spi.validation.GeneralValidator;
 
 @GZIP
 @Path("/projects")
@@ -173,6 +176,9 @@ public class ProjectsAPI {
             }
 
             final String fileName = FilenameUtils.getName(form.fileName);
+            if (GenericValidator.isBlankOrNull(fileName) || !(form.fileName.equals(fileName))) {
+                return ErrorMessage.PROJECT_FILE_INVALID_FILENAME.respond();
+            }
             final File tempFile = FileUtil.getTempFile(project.getId(), fileName);
             final String sha512 = FileUtil.writeFile(form.file, project.getProjectType().getMaxFileSize(), tempFile);
 

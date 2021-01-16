@@ -115,6 +115,13 @@ public class ProjectTest {
         data.loaders.add("forge");
         multiPart.put("data", data);
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, "schema/project-files-schema.json");
+
+        data.version = "1.1.10";
+        data.loaders.add("forge");
+        multiPart.put("data", data);
+        multiPart.put("filename", "../../../logo.png");
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1/files", multiPart, ErrorMessage.PROJECT_FILE_INVALID_FILENAME);
+
     }
 
     @AfterAll

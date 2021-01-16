@@ -76,7 +76,7 @@ public class Validator {
         return classifier != null && VALID_CLASSIFIERS.contains(classifier.toLowerCase());
     }
 
-    public static List<GameVersionsEntity> validateGameVersions (GamesEntity game, List<String> gameVersions) throws MismatchException {
+    public static List<GameVersionsEntity> validateGameVersions (GamesEntity game, Set<String> gameVersions) throws MismatchException {
 
         final List<GameVersionsEntity> gameVersionRecords = new ArrayList<>();
         if (gameVersions != null && !gameVersions.isEmpty()) {
@@ -166,7 +166,7 @@ public class Validator {
         return version != null && version.length() <= 20 && SEM_VER.matcher(version).matches();
     }
 
-    public static List<ProjectTypeLoadersEntity> validateProjectTypeLoaders (ProjectTypesEntity projectType, List<String> loaders) throws MismatchException {
+    public static List<ProjectTypeLoadersEntity> validateProjectTypeLoaders (ProjectTypesEntity projectType, Set<String> loaders) throws MismatchException {
 
         final List<ProjectTypeLoadersEntity> loadersRecords = new ArrayList<>();
         if (loaders != null && !loaders.isEmpty()) {
