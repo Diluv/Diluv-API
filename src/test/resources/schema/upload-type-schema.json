@@ -1,0 +1,44 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "loaders": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "slug": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
+        },
+        "releaseTypes": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "string"
+                }
+            ]
+        },
+        "classifiers": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "string"
+                }
+            ]
+        }
+    },
+    "required": [
+        "loaders",
+        "releaseTypes",
+        "classifiers"
+    ],
+    "additionalProperties": false
+}

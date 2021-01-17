@@ -86,6 +86,16 @@ public class GameTest {
     }
 
     @Test
+    public void getUploadTypeData () {
+
+        Request.getError(URL + "/invalid/invalid/upload", ErrorMessage.NOT_FOUND_GAME);
+        Request.getError(URL + "/minecraft-je/invalid/upload", ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+
+        Request.getOk(URL + "/minecraft-je/mods/upload", "schema/upload-type-schema.json");
+        Request.getOk(URL + "/minecraft-je/mods/upload", "schema/upload-type-schema.json");
+    }
+
+    @Test
     public void getProjectFilesByGameSlugAndProjectTypeAndProjectSlug () {
 
         Request.getError(URL + "/invalid/invalid/test/files", ErrorMessage.NOT_FOUND_GAME);

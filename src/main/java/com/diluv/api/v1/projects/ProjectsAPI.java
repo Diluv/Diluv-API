@@ -58,8 +58,6 @@ import com.diluv.confluencia.database.record.UsersEntity;
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.Sort;
 
-import org.jboss.resteasy.spi.validation.GeneralValidator;
-
 @GZIP
 @Path("/projects")
 @Produces(MediaType.APPLICATION_JSON)

@@ -16,6 +16,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.data.DataUploadType;
+
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
@@ -332,6 +334,28 @@ public class GamesAPI {
             projectFiles.forEach(feed::addFile);
 
             return Response.ok(feed).build();
+        });
+    }
+
+    @GET
+    @Path("/{gameSlug}/{projectTypeSlug}/upload")
+    public Response getUploadTypeData (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
+
+        return Confluencia.getTransaction(session -> {
+            try {
+                final ProjectTypesEntity projectType = Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
+                if (projectType == null) {
+                    if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
+                        throw new ResponseException(ErrorMessage.NOT_FOUND_GAME.respond());
+                    }
+                    throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond());
+                }
+                final List<DataSlugName> loaders = projectType.getProjectTypeLoaders().stream().map(p -> new DataSlugName(p.getSlug(), p.getName())).collect(Collectors.toList());
+                return ResponseUtil.successResponse(new DataUploadType(loaders, Validator.VALID_RELEASE_TYPES, Validator.VALID_CLASSIFIERS));
+            }
+            catch (ResponseException e) {
+                return e.getResponse();
+            }
         });
     }
 
