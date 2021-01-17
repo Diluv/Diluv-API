@@ -90,4 +90,33 @@ public class ProjectService {
 
         return new DataBaseProject(project);
     }
+
+    public static ProjectsEntity getProject (Session session, long projectId, Token token) throws ResponseException {
+
+        final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(session, projectId);
+
+        if (project == null) {
+            throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
+        }
+
+        if (token == null) {
+            if (!project.isReleased()) {
+                throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
+            }
+
+            return project;
+        }
+
+        List<String> permissions = ProjectPermissions.getAuthorizedUserPermissions(project, token);
+
+        if (permissions != null) {
+            return project;
+        }
+
+        if (!project.isReleased()) {
+            throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
+        }
+
+        return project;
+    }
 }

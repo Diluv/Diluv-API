@@ -1,5 +1,7 @@
 package com.diluv.api.graphql;
 
+import com.diluv.api.graphql.data.Project;
+import com.diluv.api.graphql.data.ProjectType;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.confluencia.Confluencia;

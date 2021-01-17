@@ -3,6 +3,9 @@ package com.diluv.api.graphql;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.diluv.api.graphql.data.Game;
+import com.diluv.api.graphql.data.GameVersion;
+import com.diluv.api.graphql.data.ProjectType;
 import graphql.kickstart.tools.GraphQLResolver;
 
 public class GameResolver implements GraphQLResolver<Game> {

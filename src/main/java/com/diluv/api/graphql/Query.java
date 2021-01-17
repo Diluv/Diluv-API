@@ -3,6 +3,10 @@ package com.diluv.api.graphql;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.diluv.api.graphql.data.Game;
+import com.diluv.api.graphql.data.Project;
+import com.diluv.api.graphql.data.ProjectFile;
+import com.diluv.api.graphql.data.ProjectType;
 import com.diluv.api.utils.query.PaginationQuery;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.sort.ProjectSort;
@@ -43,6 +47,13 @@ public class Query implements GraphQLQueryResolver {
 
         return Confluencia.getTransaction(session -> {
             return new Project(Confluencia.PROJECT.findOneProjectByProjectId(session, projectId));
+        });
+    }
+
+    public ProjectFile projectFile (long fileId) {
+
+        return Confluencia.getTransaction(session -> {
+            return new ProjectFile(Confluencia.FILE.findOneById(session, fileId));
         });
     }
 

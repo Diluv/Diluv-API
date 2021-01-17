@@ -5,12 +5,13 @@ schema {
 
 type Query {
     games(page: Int = 1, limit: Int = 20, sort: String = "new"): [Game!]!
-    game(gameSlug: String!): Game!
+    game(gameSlug: String!): Game
     projectType(gameSlug: String!, projectTypeSlug: String!): ProjectType
-    projectReviews(page: Long = 1, limit: Int = 20): [Project!]
-    projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project!]
-    project(gameSlug: String!, projectTypeSlug: String!, projectSlug: String!): Project!
-    projectById(id: Long!): Project!
+    projectReviews(page: Long = 1, limit: Int = 20): [Project!]!
+    projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project!]!
+    project(gameSlug: String!, projectTypeSlug: String!, projectSlug: String!): Project
+    projectById(id: Long!): Project
+    projectFile(id: Long!): ProjectFile
 }
 
 type Mutation {
@@ -37,28 +38,36 @@ type Game {
     logo: Image!
 }
 
+type SlugName{
+    slug: String!
+    name: String!
+}
 type Project {
     id: ID!
     slug: String!
     name: String!
     summary: String!
     description: String!
-    cachedDownloads: Long!
+    downloads: Long!
     review: Boolean!
     released: Boolean!
     updatedAt: Long!
     createdAt: Long!
     authors: [Author!]!
     projectType: ProjectType!
+    game: Game!
+    tags: [SlugName!]!
+    logo: String!
+    files: [ProjectFile!]!
 }
 
 type ProjectType {
     slug: String!
     name: String!
     maxFileSize: Long!
-    tags: [Tag!]
+    tags: [SlugName!]!
     game: Game!
-    loaders: [ProjectTypeLoader!]
+    loaders: [ProjectTypeLoader!]!
 }
 
 type GameVersion {
@@ -66,13 +75,6 @@ type GameVersion {
     version: String!
     type: String!
     releasedAt: String!
-}
-
-type Tag {
-    id: ID!
-    slug: String!
-    name: String!
-    projectType: ProjectType!
 }
 
 type ProjectTypeLoader {
@@ -89,6 +91,20 @@ type User {
     username: String!
 }
 
+type ProjectFile {
+    id: ID!
+    name: String!
+    size: Long!
+    changelog: String!
+    downloads: Long!
+    releaseType: String!
+    classifier:String!
+    createdAt: Long!
+#    downloadURL: String!
+    gameVersions: [GameVersion!]!
+}
+
+
 type ImageSource {
     src: String!
     type: String!
@@ -98,7 +114,5 @@ type Image {
     fallback: ImageSource!
     sources: [ImageSource!]!
 }
-
-
 
 scalar Long

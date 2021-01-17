@@ -1,4 +1,4 @@
-package com.diluv.api.graphql;
+package com.diluv.api.graphql.data;
 
 import com.diluv.confluencia.database.record.UsersEntity;
 
