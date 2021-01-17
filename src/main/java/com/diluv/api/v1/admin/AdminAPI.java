@@ -19,6 +19,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.diluv.api.graphql.ProjectFileResolver;
+
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -31,7 +33,6 @@ import com.diluv.api.graphql.Mutation;
 import com.diluv.api.graphql.ProjectResolver;
 import com.diluv.api.graphql.ProjectTypeResolver;
 import com.diluv.api.graphql.Query;
-import com.diluv.api.graphql.TagResolver;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.auth.tokens.ErrorToken;
@@ -69,7 +70,7 @@ public class AdminAPI {
                 new Mutation(),
                 new ProjectTypeResolver(),
                 new ProjectResolver(),
-                new TagResolver(),
+                new ProjectFileResolver(),
                 new LoaderResolver(),
                 new GameResolver())
             .scalars(Scalars.GraphQLLong)
