@@ -17,8 +17,8 @@ public class DataSiteProjectFilesPage {
     @Expose
     private final long fileCount;
 
-   @Expose
-   private final List<DataSlugName> sorts;
+    @Expose
+    private final List<DataSlugName> sorts;
 
     public DataSiteProjectFilesPage (DataBaseProject project, List<DataSiteProjectFileDisplay> files, long fileCount, List<DataSlugName> sorts) {
 

@@ -2,10 +2,10 @@ package com.diluv.api.utils.query;
 
 import javax.ws.rs.QueryParam;
 
+import org.apache.commons.validator.GenericValidator;
+
 import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.Sort;
-
-import org.apache.commons.validator.GenericValidator;
 
 public class ProjectFileQuery extends PaginationQuery {
 

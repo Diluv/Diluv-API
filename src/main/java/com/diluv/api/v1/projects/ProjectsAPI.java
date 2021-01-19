@@ -18,8 +18,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.v1.games.GamesAPI;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.validator.GenericValidator;
@@ -29,7 +27,6 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataGameVersion;
-import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataProjectFileInQueue;
 import com.diluv.api.data.DataProjectFileList;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;

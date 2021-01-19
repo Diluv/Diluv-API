@@ -97,13 +97,13 @@ type ProjectFile {
     size: Long!
     changelog: String!
     downloads: Long!
+    released: Boolean!
     releaseType: String!
     classifier:String!
     createdAt: Long!
-#    downloadURL: String!
+    downloadURL: String
     gameVersions: [GameVersion!]!
 }
-
 
 type ImageSource {
     src: String!

@@ -16,8 +16,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.diluv.api.data.DataUploadType;
-
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
@@ -31,6 +29,7 @@ import com.diluv.api.data.DataProject;
 import com.diluv.api.data.DataProjectList;
 import com.diluv.api.data.DataProjectType;
 import com.diluv.api.data.DataSlugName;
+import com.diluv.api.data.DataUploadType;
 import com.diluv.api.data.feed.FeedProjectFiles;
 import com.diluv.api.data.feed.FeedProjects;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;

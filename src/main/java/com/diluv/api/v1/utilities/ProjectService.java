@@ -2,11 +2,10 @@ package com.diluv.api.v1.utilities;
 
 import java.util.List;
 
-import com.diluv.api.data.DataBaseProject;
-
 import org.hibernate.Session;
 
 import com.diluv.api.data.DataAuthorizedProject;
+import com.diluv.api.data.DataBaseProject;
 import com.diluv.api.data.DataProject;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.auth.tokens.Token;

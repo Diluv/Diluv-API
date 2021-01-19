@@ -1,9 +1,9 @@
 package com.diluv.api.data;
 
-import com.google.gson.annotations.Expose;
-
 import java.util.List;
 import java.util.Set;
+
+import com.google.gson.annotations.Expose;
 
 public class DataUploadType {
 

@@ -13,6 +13,7 @@ public class ProjectFile {
     private final String releaseType;
     private final String classifier;
     private final long createdAt;
+    private final boolean released;
 
     private final ProjectFilesEntity entity;
 
@@ -27,6 +28,7 @@ public class ProjectFile {
         this.releaseType = rs.getReleaseType();
         this.classifier = rs.getClassifier();
         this.createdAt = rs.getCreatedAt().getTime();
+        this.released = rs.isReleased();
 
         this.entity = rs;
     }

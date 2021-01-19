@@ -14,13 +14,14 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
-import com.diluv.api.graphql.ProjectFileResolver;
-
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -30,10 +31,12 @@ import com.diluv.api.data.DataGame;
 import com.diluv.api.graphql.GameResolver;
 import com.diluv.api.graphql.LoaderResolver;
 import com.diluv.api.graphql.Mutation;
+import com.diluv.api.graphql.ProjectFileResolver;
 import com.diluv.api.graphql.ProjectResolver;
 import com.diluv.api.graphql.ProjectTypeResolver;
 import com.diluv.api.graphql.Query;
 import com.diluv.api.utils.Constants;
+import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.ImageUtil;
 import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
@@ -43,7 +46,9 @@ import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GamesEntity;
+import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
+import com.diluv.confluencia.database.record.ProjectsEntity;
 import graphql.Scalars;
 import graphql.kickstart.servlet.GraphQLHttpServlet;
 import graphql.kickstart.tools.SchemaParser;
@@ -212,6 +217,34 @@ public class AdminAPI {
 
             return ResponseUtil.noContent();
         });
+    }
+
+    @GET
+    @Path("/files/{fileId}")
+    public Response getProjectFile (@HeaderParam("Authorization") Token token, @PathParam("fileId") long fileId) {
+
+        Response permission = hasPermission(token);
+        if (permission != null) {
+            return permission;
+        }
+        ProjectFilesEntity rs = Confluencia.getTransaction(session -> {
+            return Confluencia.FILE.findOneById(session, fileId);
+        });
+
+        if (rs.isReleased()) {
+            //TODO ERROR
+            return ResponseUtil.noContent();
+        }
+
+        final ProjectsEntity p = rs.getProject();
+
+        File destination = FileUtil.getOutputLocation(p.getGame().getSlug(), p.getProjectType().getSlug(), p.getId(), rs.getId(), rs.getName());
+        if (!destination.exists()) {
+            return ResponseUtil.noContent();
+        }
+
+        StreamingOutput stream = os -> FileUtils.copyFile(destination, os);
+        return Response.ok(stream).header("content-disposition", "attachment; filename=\"" + rs.getName() + "\"").build();
     }
 
     @GET
