@@ -20,10 +20,7 @@ public class ProjectFileResolver implements GraphQLResolver<ProjectFile> {
     public String downloadURL (ProjectFile file) {
 
         final ProjectFilesEntity projectFilesEntity = file.getEntity();
-        if (projectFilesEntity.isReleased()) {
-            final ProjectsEntity projectsEntity = projectFilesEntity.getProject();
-            return Constants.getFileURL(projectsEntity.getGame().getSlug(), projectsEntity.getProjectType().getSlug(), projectsEntity.getId(), projectFilesEntity.getId(), projectFilesEntity.getName());
-        }
-        return null;
+        final ProjectsEntity projectsEntity = projectFilesEntity.getProject();
+        return Constants.getFileURL(projectsEntity.getGame().getSlug(), projectsEntity.getProjectType().getSlug(), projectsEntity.getId(), projectFilesEntity.getId(), projectFilesEntity.getName());
     }
 }

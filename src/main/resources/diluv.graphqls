@@ -101,7 +101,7 @@ type ProjectFile {
     releaseType: String!
     classifier:String!
     createdAt: Long!
-    downloadURL: String
+    downloadURL: String!
     gameVersions: [GameVersion!]!
 }
 
