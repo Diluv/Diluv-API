@@ -2,6 +2,7 @@ package com.diluv.api.v1.games;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -349,8 +350,15 @@ public class GamesAPI {
                     }
                     throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond());
                 }
+
+                // TODO Move to DB
+                final List<DataSlugName> filters = new ArrayList<>();
+                if ("minecraft".equalsIgnoreCase(gameSlug)) {
+                    filters.add(new DataSlugName("snapshot", "Snapshot"));
+                }
                 final List<DataSlugName> loaders = projectType.getProjectTypeLoaders().stream().map(p -> new DataSlugName(p.getSlug(), p.getName())).collect(Collectors.toList());
-                return ResponseUtil.successResponse(new DataUploadType(loaders, Validator.VALID_RELEASE_TYPES, Validator.VALID_CLASSIFIERS));
+                final List<DataGameVersion> gameVersions = projectType.getGame().getGameVersions().stream().map(DataGameVersion::new).collect(Collectors.toList());
+                return ResponseUtil.successResponse(new DataUploadType(loaders, Validator.VALID_RELEASE_TYPES, Validator.VALID_CLASSIFIERS, gameVersions, filters));
             }
             catch (ResponseException e) {
                 return e.getResponse();

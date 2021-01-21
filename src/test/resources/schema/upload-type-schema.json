@@ -33,12 +33,33 @@
                     "type": "string"
                 }
             ]
+        },
+        "gameVersions": {
+            "$ref": "data/game_versions.json"
+        },
+        "filters": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "slug": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
         }
     },
     "required": [
         "loaders",
         "releaseTypes",
-        "classifiers"
+        "classifiers",
+        "gameVersions",
+        "filters"
     ],
     "additionalProperties": false
 }
