@@ -353,7 +353,7 @@ public class GamesAPI {
 
                 // TODO Move to DB
                 final List<DataSlugName> filters = new ArrayList<>();
-                if ("minecraft".equalsIgnoreCase(gameSlug)) {
+                if ("minecraft-je".equalsIgnoreCase(gameSlug)) {
                     filters.add(new DataSlugName("snapshot", "Snapshot"));
                 }
                 final List<DataSlugName> loaders = projectType.getProjectTypeLoaders().stream().map(p -> new DataSlugName(p.getSlug(), p.getName())).collect(Collectors.toList());
