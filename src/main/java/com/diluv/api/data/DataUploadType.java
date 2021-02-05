@@ -11,7 +11,7 @@ public class DataUploadType {
     private final List<DataSlugName> loaders;
 
     @Expose
-    private final Set<String> releaseTypes;
+    private final Set<DataSlugName> releaseTypes;
 
     @Expose
     private final Set<String> classifiers;
@@ -22,7 +22,7 @@ public class DataUploadType {
     @Expose
     private final List<DataSlugName> filters;
 
-    public DataUploadType (List<DataSlugName> loaders, Set<String> releaseTypes, Set<String> classifiers, List<DataGameVersion> gameVersions, List<DataSlugName> filters) {
+    public DataUploadType (List<DataSlugName> loaders, Set<DataSlugName> releaseTypes, Set<String> classifiers, List<DataGameVersion> gameVersions, List<DataSlugName> filters) {
 
         this.loaders = loaders;
         this.releaseTypes = releaseTypes;

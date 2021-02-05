@@ -17,6 +17,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import eu.medsea.util.StringUtil;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.Query;
@@ -358,7 +361,7 @@ public class GamesAPI {
                 }
                 final List<DataSlugName> loaders = projectType.getProjectTypeLoaders().stream().map(p -> new DataSlugName(p.getSlug(), p.getName())).collect(Collectors.toList());
                 final List<DataGameVersion> gameVersions = projectType.getGame().getGameVersions().stream().map(DataGameVersion::new).collect(Collectors.toList());
-                return ResponseUtil.successResponse(new DataUploadType(loaders, Validator.VALID_RELEASE_TYPES, Validator.VALID_CLASSIFIERS, gameVersions, filters));
+                return ResponseUtil.successResponse(new DataUploadType(loaders, Validator.VALID_RELEASE_TYPES.stream().map(releaseType -> new DataSlugName(releaseType, StringUtils.capitalize(releaseType))).collect(Collectors.toSet()), Validator.VALID_CLASSIFIERS, gameVersions, filters));
             }
             catch (ResponseException e) {
                 return e.getResponse();
