@@ -60,6 +60,22 @@
                     }
                 }
             ]
+        },
+        "dependencyTypes": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "slug": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
         }
     },
     "required": [
@@ -67,7 +83,8 @@
         "releaseTypes",
         "classifiers",
         "gameVersions",
-        "filters"
+        "filters",
+        "dependencyTypes"
     ],
     "additionalProperties": false
 }
