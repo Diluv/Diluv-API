@@ -22,12 +22,16 @@ public class DataUploadType {
     @Expose
     private final List<DataSlugName> filters;
 
-    public DataUploadType (List<DataSlugName> loaders, Set<DataSlugName> releaseTypes, Set<String> classifiers, List<DataGameVersion> gameVersions, List<DataSlugName> filters) {
+    @Expose
+    private final Set<DataSlugName> dependencyTypes;
+
+    public DataUploadType (List<DataSlugName> loaders, Set<DataSlugName> releaseTypes, Set<String> classifiers, List<DataGameVersion> gameVersions, List<DataSlugName> filters, Set<DataSlugName> dependencyTypes) {
 
         this.loaders = loaders;
         this.releaseTypes = releaseTypes;
         this.classifiers = classifiers;
         this.gameVersions = gameVersions;
         this.filters = filters;
+        this.dependencyTypes = dependencyTypes;
     }
 }
