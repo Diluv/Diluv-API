@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
@@ -361,7 +362,10 @@ public class GamesAPI {
                 }
                 final List<DataSlugName> loaders = projectType.getProjectTypeLoaders().stream().map(p -> new DataSlugName(p.getSlug(), p.getName())).collect(Collectors.toList());
                 final List<DataGameVersion> gameVersions = projectType.getGame().getGameVersions().stream().map(DataGameVersion::new).collect(Collectors.toList());
-                return ResponseUtil.successResponse(new DataUploadType(loaders, Validator.VALID_RELEASE_TYPES.stream().map(releaseType -> new DataSlugName(releaseType, StringUtils.capitalize(releaseType))).collect(Collectors.toSet()), Validator.VALID_CLASSIFIERS, gameVersions, filters));
+                Set<DataSlugName> releaseTypes = Validator.VALID_RELEASE_TYPES.stream().map(releaseType -> new DataSlugName(releaseType, StringUtils.capitalize(releaseType))).collect(Collectors.toSet());
+                Set<DataSlugName> dependencyTypes = Validator.DEP_TYPES.stream().map(depType -> new DataSlugName(depType, StringUtils.capitalize(depType))).collect(Collectors.toSet());
+
+                return ResponseUtil.successResponse(new DataUploadType(loaders, releaseTypes, Validator.VALID_CLASSIFIERS, gameVersions, filters, dependencyTypes));
             }
             catch (ResponseException e) {
                 return e.getResponse();

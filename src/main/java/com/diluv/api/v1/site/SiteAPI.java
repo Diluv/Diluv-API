@@ -215,8 +215,13 @@ public class SiteAPI {
 
             final List<GameVersionsEntity> gameVersionRecords = projectFile.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
             final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
-
-            return ResponseUtil.successResponse(new DataSiteProjectFilePage(new DataBaseProject(project), new DataSiteProjectFileDisplay(projectFile, gameVersions)));
+            try {
+                DataBaseProject dataProject = ProjectService.getBaseDataProject(project, token);
+                return ResponseUtil.successResponse(new DataSiteProjectFilePage(dataProject, new DataSiteProjectFileDisplay(projectFile, gameVersions)));
+            }
+            catch (ResponseException e) {
+                return e.getResponse();
+            }
         });
     }
 

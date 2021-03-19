@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.diluv.api.graphql.data.SlugName;
+
 import org.apache.commons.validator.GenericValidator;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.hibernate.Session;
@@ -27,11 +29,7 @@ import com.diluv.confluencia.database.record.TagsEntity;
 
 public class Validator {
 
-    /**
-     * A RegEx pattern for matching valid semantic versions according to the https://semver.org guidelines.
-     */
-    private static final Pattern SEM_VER = Pattern.compile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$");
-    private static final List<String> DEP_TYPES = Arrays.asList("required", "optional", "incompatible");
+    public static final List<String> DEP_TYPES = Arrays.asList("required", "optional", "incompatible");
 
     public static boolean validateEmail (String email) {
 
@@ -163,7 +161,7 @@ public class Validator {
 
     public static boolean validateVersion (String version) {
 
-        return version != null && version.length() <= 20 && SEM_VER.matcher(version).matches();
+        return version != null && version.length() <= 20;
     }
 
     public static List<ProjectTypeLoadersEntity> validateProjectTypeLoaders (ProjectTypesEntity projectType, Set<String> loaders) throws MismatchException {
