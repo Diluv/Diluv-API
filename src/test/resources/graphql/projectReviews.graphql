@@ -5,7 +5,7 @@ query {
         slug
         summary
         description
-        cachedDownloads
+        downloads
         review
         released
         createdAt

@@ -53,7 +53,7 @@ public class JWTUtil {
         }
 
         if (!JWTUtil.isBearerToken(rawToken)) {
-            return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond());
+            return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN);
         }
 
         String token = rawToken.substring(JWTUtil.BEARER.length());
@@ -63,7 +63,7 @@ public class JWTUtil {
             return Confluencia.getTransaction(session -> {
                 APITokensEntity record = Confluencia.SECURITY.findAPITokensByToken(session, getSha512UUID(uuid));
                 if (record == null) {
-                    return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
+                    return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN,"API token not found");
                 }
                 long userId = record.getUser().getId();
                 return new Token(userId, true, ProjectPermissions.getAllPermissions());
@@ -76,7 +76,7 @@ public class JWTUtil {
             ConfigurableJWTProcessor<SecurityContext> processor = Constants.JWT_PROCESSOR;
             if (processor == null) {
                 DiluvAPIServer.LOGGER.error("Processor is null.");
-                return new ErrorToken(ErrorMessage.THROWABLE.respond());
+                return new ErrorToken(ErrorMessage.THROWABLE);
             }
             try {
                 JWTClaimsSet claimsSet = processor.process(jwt, null);
@@ -86,11 +86,11 @@ public class JWTUtil {
             }
             catch (JOSEException | BadJOSEException | NumberFormatException | ParseException e) {
                 DiluvAPIServer.LOGGER.catching(e);
-                return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond("Invalid token format"));
+                return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN,"Invalid token format");
             }
         }
 
-        return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN.respond());
+        return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN);
     }
 
     public static boolean isBearerToken (String token) {

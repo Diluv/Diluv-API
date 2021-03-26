@@ -7,7 +7,7 @@
                 "url": "http://localhost:4567/v1/admin/graphql",
                 "headers": {
                     "user-agent": "JS GraphQL",
-                    "authorization": "Bearer r_lN-_POwYxBjf5J2O9Jn889jcpG1QumCs4K3BJ6rFs"
+                    "Authorization": "Bearer f0f9c173-2092-48b8-b9de-79242bd684a9"
                 },
                 "introspect": true
             }

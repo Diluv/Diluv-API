@@ -1,25 +1,8 @@
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
 schema {
     query: Query
     mutation: Mutation
-}
-
-type Query {
-    games(page: Int = 1, limit: Int = 20, sort: String = "new"): [Game!]!
-    game(gameSlug: String!): Game
-    projectType(gameSlug: String!, projectTypeSlug: String!): ProjectType
-    projectReviews(page: Long = 1, limit: Int = 20): [Project!]!
-    projects(gameSlug: String!, projectTypeSlug: String!, page: Long, limit: Int, sort: String): [Project!]!
-    project(gameSlug: String!, projectTypeSlug: String!, projectSlug: String!): Project
-    projectById(id: Long!): Project
-    projectFile(id: Long!): ProjectFile
-}
-
-type Mutation {
-    addProjectType(gameSlug: String!, projectTypeSlug: String!, projectTypeName: String!, isDefault: Boolean!, maxFileSize: Long): ProjectType!
-    updateProjectType(gameSlug: String!, projectTypeSlug: String!, projectTypeName: String, isDefault: Boolean, maxFileSize: Long): ProjectType!
-    reviewed (projectId: ID!, requestChange: Boolean!, reason: String): Project!
-    addTag(gameSlug: String!, projectTypeSlug: String!, tagSlug: String!, tagName: String!): ProjectType
-    addLoader(gameSlug: String!, projectTypeSlug: String!, loaderSlug: String!, loaderName: String!): ProjectType
 }
 
 type Author {
@@ -28,81 +11,26 @@ type Author {
 }
 
 type Game {
-    slug: ID!
-    name: String!
-    defaultProjectType: String!
-    projectTypes: [ProjectType!]!
-    gameVersions: [GameVersion!]!
     createdAt: String!
-    url: String!
+    defaultProjectType: String!
+    gameVersions: [GameVersion!]!
     logo: Image!
-}
-
-type SlugName{
-    slug: String!
     name: String!
-}
-type Project {
-    id: ID!
-    slug: String!
-    name: String!
-    summary: String!
-    description: String!
-    downloads: Long!
-    review: Boolean!
-    released: Boolean!
-    updatedAt: Long!
-    createdAt: Long!
-    authors: [Author!]!
-    projectType: ProjectType!
-    game: Game!
-    tags: [SlugName!]!
-    logo: String!
-    files: [ProjectFile!]!
-}
-
-type ProjectType {
-    slug: String!
-    name: String!
-    maxFileSize: Long!
-    tags: [SlugName!]!
-    game: Game!
-    loaders: [ProjectTypeLoader!]!
+    projectTypes: [ProjectType!]!
+    slug: ID!
+    url: String!
 }
 
 type GameVersion {
     id: Long!
-    version: String!
-    type: String!
     releasedAt: String!
+    type: String!
+    version: String!
 }
 
-type ProjectTypeLoader {
-    id: ID!
-    slug: String!
-    name: String!
-    projectType: ProjectType!
-}
-
-type User {
-    id: ID!
-    createdAt: Long!
-    displayName: String!
-    username: String!
-}
-
-type ProjectFile {
-    id: ID!
-    name: String!
-    size: Long!
-    changelog: String!
-    downloads: Long!
-    released: Boolean!
-    releaseType: String!
-    classifier:String!
-    createdAt: Long!
-    downloadURL: String!
-    gameVersions: [GameVersion!]!
+type Image {
+    fallback: ImageSource!
+    sources: [ImageSource!]!
 }
 
 type ImageSource {
@@ -110,9 +38,85 @@ type ImageSource {
     type: String!
 }
 
-type Image {
-    fallback: ImageSource!
-    sources: [ImageSource!]!
+type Mutation {
+    addLoader(gameSlug: String!, loaderName: String!, loaderSlug: String!, projectTypeSlug: String!): ProjectType
+    addProjectType(gameSlug: String!, isDefault: Boolean!, maxFileSize: Long, projectTypeName: String!, projectTypeSlug: String!): ProjectType!
+    addTag(gameSlug: String!, projectTypeSlug: String!, tagName: String!, tagSlug: String!): ProjectType
+    reviewed(projectId: ID!, reason: String, requestChange: Boolean!): Project!
+    updateProjectType(gameSlug: String!, isDefault: Boolean, maxFileSize: Long, projectTypeName: String, projectTypeSlug: String!): ProjectType!
 }
+
+type Project {
+    authors: [Author!]!
+    createdAt: Long!
+    description: String!
+    downloads: Long!
+    files: [ProjectFile!]!
+    game: Game!
+    id: ID!
+    logo: String!
+    name: String!
+    projectType: ProjectType!
+    released: Boolean!
+    review: Boolean!
+    slug: String!
+    summary: String!
+    tags: [SlugName!]!
+    updatedAt: Long!
+}
+
+type ProjectFile {
+    changelog: String!
+    classifier: String!
+    createdAt: Long!
+    downloadURL: String!
+    downloads: Long!
+    gameVersions: [GameVersion!]!
+    id: ID!
+    name: String!
+    releaseType: String!
+    released: Boolean!
+    size: Long!
+}
+
+type ProjectType {
+    game: Game!
+    loaders: [ProjectTypeLoader!]!
+    maxFileSize: Long!
+    name: String!
+    slug: String!
+    tags: [SlugName!]!
+}
+
+type ProjectTypeLoader {
+    id: ID!
+    name: String!
+    projectType: ProjectType!
+    slug: String!
+}
+
+type Query {
+    game(gameSlug: String!): Game
+    games(limit: Int = 20, page: Int = 1, sort: String = "new"): [Game!]!
+    project(gameSlug: String!, projectSlug: String!, projectTypeSlug: String!): Project
+    projectById(id: Long!): Project
+    projectFile(id: Long!): ProjectFile
+    projectReviews(limit: Int = 20, page: Long = 1): [Project!]!
+    projectType(gameSlug: String!, projectTypeSlug: String!): ProjectType
+    projects(gameSlug: String!, projectTypeSlug: String!, limit: Int, page: Long, sort: String): [Project!]!
+}
+
+type SlugName {
+    name: String!
+    slug: String!
+}
+
+type User {
+    createdAt: Long!
+    displayName: String!
+    id: ID!
+    username: String!
+}
+
 
 scalar Long

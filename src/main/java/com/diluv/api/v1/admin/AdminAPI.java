@@ -2,12 +2,7 @@ package com.diluv.api.v1.admin;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -16,7 +11,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -25,16 +19,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.jboss.resteasy.spi.CorsHeaders;
 
 import com.diluv.api.data.DataGame;
-import com.diluv.api.graphql.GameResolver;
-import com.diluv.api.graphql.LoaderResolver;
-import com.diluv.api.graphql.Mutation;
-import com.diluv.api.graphql.ProjectFileResolver;
-import com.diluv.api.graphql.ProjectResolver;
-import com.diluv.api.graphql.ProjectTypeResolver;
-import com.diluv.api.graphql.Query;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.ImageUtil;
@@ -49,42 +35,11 @@ import com.diluv.confluencia.database.record.GamesEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
-import graphql.Scalars;
-import graphql.kickstart.servlet.GraphQLHttpServlet;
-import graphql.kickstart.tools.SchemaParser;
-import graphql.kickstart.tools.SchemaParserOptions;
-import graphql.schema.GraphQLSchema;
 
 @GZIP
 @Path("/admin")
 @Produces(MediaType.APPLICATION_JSON)
 public class AdminAPI {
-
-    private static HttpServlet delegateServlet;
-
-    public static void init () {
-
-        SchemaParserOptions options = SchemaParserOptions
-            .newOptions()
-//            .fieldVisibility(DefaultGraphqlFieldVisibility.DEFAULT_FIELD_VISIBILITY)
-            .build();
-
-        GraphQLSchema schema = SchemaParser.newParser()
-            .file("diluv.graphqls")
-            .resolvers(new Query(),
-                new Mutation(),
-                new ProjectTypeResolver(),
-                new ProjectResolver(),
-                new ProjectFileResolver(),
-                new LoaderResolver(),
-                new GameResolver())
-            .scalars(Scalars.GraphQLLong)
-            .options(options)
-            .build()
-            .makeExecutableSchema();
-
-        delegateServlet = GraphQLHttpServlet.with(schema);
-    }
 
     @POST
     @Path("/games")
@@ -247,20 +202,20 @@ public class AdminAPI {
         return Response.ok(stream).header("content-disposition", "attachment; filename=\"" + rs.getName() + "\"").build();
     }
 
-    @GET
-    @Path("/graphql")
-    public Response getGraphQL (@HeaderParam("Authorization") Token token, @Context HttpServletRequest req, @Context HttpServletResponse resp) {
-
-        return request(token, req, resp);
-    }
-
-    @POST
-    @Path("/graphql")
-    public Response postGraphQL (@HeaderParam("Authorization") Token token, @Context HttpServletRequest req, @Context HttpServletResponse resp) {
-
-        return request(token, req, resp);
-    }
-
+    //    @GET
+//    @Path("/graphql")
+//    public Response getGraphQL (@HeaderParam("Authorization") Token token, @Context HttpServletRequest req, @Context HttpServletResponse resp) {
+//
+//        return request(token, req, resp);
+//    }
+//
+//    @POST
+//    @Path("/graphql")
+//    public Response postGraphQL (@HeaderParam("Authorization") Token token, @Context HttpServletRequest req, @Context HttpServletResponse resp) {
+//
+//        return request(token, req, resp);
+//    }
+//
     public Response hasPermission (Token token) {
 
         if (token == null) {
@@ -277,29 +232,6 @@ public class AdminAPI {
 
         if (!UserPermissions.hasPermission(token, UserPermissions.VIEW_ADMIN)) {
             return ErrorMessage.USER_NOT_AUTHORIZED.respond();
-        }
-
-        return null;
-    }
-
-    public Response request (Token token, HttpServletRequest req, HttpServletResponse resp) {
-
-        Response permission = hasPermission(token);
-        if (permission != null) {
-            return permission;
-        }
-        try {
-
-            resp.addHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, req.getHeader(CorsHeaders.ORIGIN));
-            resp.addHeader(CorsHeaders.VARY, CorsHeaders.ORIGIN);
-            resp.addHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-            delegateServlet.service(req, resp);
-        }
-        catch (ServletException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
         }
 
         return null;
