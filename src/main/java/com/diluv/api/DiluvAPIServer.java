@@ -5,17 +5,14 @@ import java.io.File;
 import javax.servlet.MultipartConfigElement;
 import javax.ws.rs.core.Application;
 
-import com.diluv.api.graphql.CustomGraphQLHttpServlet;
-import io.undertow.servlet.api.ServletInfo;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jboss.resteasy.core.ResteasyDeploymentImpl;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 
+import com.diluv.api.graphql.CustomGraphQLHttpServlet;
 import com.diluv.api.v1.APIV1;
-import com.diluv.api.v1.admin.AdminAPI;
 import io.undertow.Undertow;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
@@ -73,7 +70,6 @@ public class DiluvAPIServer {
         File uploadDirectory = new File(System.getProperty("java.io.tmpdir"));
         info.setDefaultMultipartConfig(new MultipartConfigElement(uploadDirectory.getAbsolutePath()));
         info.addListener(Servlets.listener(org.jboss.weld.environment.servlet.Listener.class));
-
         info.addServlet(Servlets.servlet("graphql", CustomGraphQLHttpServlet.class).addMapping("/admin/graphql"));
 
         this.server.deploy(info);
