@@ -3,6 +3,7 @@ package com.diluv.api.v1;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import org.jboss.resteasy.plugins.interceptors.CorsFilter;
@@ -14,6 +15,7 @@ import com.diluv.api.provider.GsonProvider;
 import com.diluv.api.provider.NotFoundExceptionMapper;
 import com.diluv.api.provider.ParameterProviderV1;
 import com.diluv.api.provider.ResponseExceptionMapper;
+import com.diluv.api.provider.ValidationExceptionMapper;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.v1.admin.AdminAPI;
 import com.diluv.api.v1.featured.FeaturedAPI;
@@ -24,6 +26,7 @@ import com.diluv.api.v1.projects.ProjectsAPI;
 import com.diluv.api.v1.site.SiteAPI;
 import com.diluv.api.v1.users.UsersAPI;
 
+@ApplicationPath("v1")
 public class APIV1 extends Application {
 
     @Override
@@ -48,8 +51,8 @@ public class APIV1 extends Application {
 
         // Enables exception handler
         classes.add(GenericExceptionMapper.class);
-
         classes.add(ResponseExceptionMapper.class);
+        classes.add(ValidationExceptionMapper.class);
 
         classes.add(AdminAPI.class);
         classes.add(FeaturedAPI.class);

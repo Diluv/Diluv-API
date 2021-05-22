@@ -10,6 +10,8 @@ public enum ErrorMessage {
 
     // User Errors
     USER_INVALID_TOKEN(UNAUTHORIZED, "invalid_token", "The token is invalid."),
+    USER_INVALID_API_TOKEN(UNAUTHORIZED, "invalid_token", "Can't use an API token for this request"),
+
     USER_REQUIRED_TOKEN(UNAUTHORIZED, "required_token", "A token is required for this request."),
     USER_NOT_AUTHORIZED(UNAUTHORIZED, "user_unauthorized", "The user is not authorized to make this request."),
     USER_INVALID_DISPLAY_NAME(BAD_REQUEST, "invalid_display_name", "The display name for the user is not valid. Can only change the case of the username"),

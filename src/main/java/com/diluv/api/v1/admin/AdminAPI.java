@@ -3,6 +3,8 @@ package com.diluv.api.v1.admin;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -15,6 +17,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.diluv.api.utils.auth.RequireToken;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
@@ -24,7 +28,6 @@ import com.diluv.api.data.DataGame;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.ImageUtil;
-import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.UserPermissions;
@@ -36,6 +39,7 @@ import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
 
+@ApplicationScoped
 @GZIP
 @Path("/admin")
 @Produces(MediaType.APPLICATION_JSON)
@@ -44,13 +48,9 @@ public class AdminAPI {
     @POST
     @Path("/games")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postGames (@HeaderParam("Authorization") Token token, @MultipartForm AdminGameForm form) {
+    public Response postGames (@RequireToken (apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token, @MultipartForm AdminGameForm form) {
 
         return Confluencia.getTransaction(session -> {
-            Response permission = hasPermission(token);
-            if (permission != null) {
-                return permission;
-            }
 
             if (form.data == null) {
                 return ErrorMessage.INVALID_DATA.respond();
@@ -122,14 +122,9 @@ public class AdminAPI {
     @PATCH
     @Path("/games")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response patchGames (@HeaderParam("Authorization") Token token, @MultipartForm AdminGameForm form) {
+    public Response patchGames (@RequireToken (apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN})  @HeaderParam("Authorization") Token token, @MultipartForm AdminGameForm form) {
 
         return Confluencia.getTransaction(session -> {
-            Response permission = hasPermission(token);
-            if (permission != null) {
-                return permission;
-            }
-
             if (form.data == null) {
                 return ErrorMessage.INVALID_DATA.respond();
             }
@@ -176,12 +171,8 @@ public class AdminAPI {
 
     @GET
     @Path("/files/{fileId}")
-    public Response getProjectFile (@HeaderParam("Authorization") Token token, @PathParam("fileId") long fileId) {
+    public Response getProjectFile (@RequireToken (apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token, @PathParam("fileId") long fileId) {
 
-        Response permission = hasPermission(token);
-        if (permission != null) {
-            return permission;
-        }
         ProjectFilesEntity rs = Confluencia.getTransaction(session -> {
             return Confluencia.FILE.findOneById(session, fileId);
         });
@@ -200,40 +191,5 @@ public class AdminAPI {
 
         StreamingOutput stream = os -> FileUtils.copyFile(destination, os);
         return Response.ok(stream).header("content-disposition", "attachment; filename=\"" + rs.getName() + "\"").build();
-    }
-
-    //    @GET
-//    @Path("/graphql")
-//    public Response getGraphQL (@HeaderParam("Authorization") Token token, @Context HttpServletRequest req, @Context HttpServletResponse resp) {
-//
-//        return request(token, req, resp);
-//    }
-//
-//    @POST
-//    @Path("/graphql")
-//    public Response postGraphQL (@HeaderParam("Authorization") Token token, @Context HttpServletRequest req, @Context HttpServletResponse resp) {
-//
-//        return request(token, req, resp);
-//    }
-//
-    public Response hasPermission (Token token) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token instanceof ErrorToken) {
-            return ((ErrorToken) token).getResponse();
-        }
-
-        if (token.isApiToken()) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond("Can't use an API token for this request");
-        }
-
-        if (!UserPermissions.hasPermission(token, UserPermissions.VIEW_ADMIN)) {
-            return ErrorMessage.USER_NOT_AUTHORIZED.respond();
-        }
-
-        return null;
     }
 }

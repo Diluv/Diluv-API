@@ -1,14 +1,7 @@
 package com.diluv.api.utils.auth;
 
-import java.text.ParseException;
-import java.util.UUID;
-
-import org.apache.commons.codec.digest.DigestUtils;
-import org.bouncycastle.util.encoders.Hex;
-
 import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.utils.Constants;
-import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
@@ -21,6 +14,14 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.bouncycastle.util.encoders.Hex;
+
+import javax.ws.rs.WebApplicationException;
+
+import java.text.ParseException;
+import java.util.UUID;
 
 public class JWTUtil {
 
@@ -53,7 +54,7 @@ public class JWTUtil {
         }
 
         if (!JWTUtil.isBearerToken(rawToken)) {
-            return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN);
+            throw new WebApplicationException(ErrorMessage.USER_INVALID_TOKEN.respond());
         }
 
         String token = rawToken.substring(JWTUtil.BEARER.length());
@@ -63,7 +64,7 @@ public class JWTUtil {
             return Confluencia.getTransaction(session -> {
                 APITokensEntity record = Confluencia.SECURITY.findAPITokensByToken(session, getSha512UUID(uuid));
                 if (record == null) {
-                    return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN,"API token not found");
+                    throw new WebApplicationException(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
                 }
                 long userId = record.getUser().getId();
                 return new Token(userId, true, ProjectPermissions.getAllPermissions());
@@ -76,7 +77,7 @@ public class JWTUtil {
             ConfigurableJWTProcessor<SecurityContext> processor = Constants.JWT_PROCESSOR;
             if (processor == null) {
                 DiluvAPIServer.LOGGER.error("Processor is null.");
-                return new ErrorToken(ErrorMessage.THROWABLE);
+                throw new WebApplicationException(ErrorMessage.THROWABLE.respond());
             }
             try {
                 JWTClaimsSet claimsSet = processor.process(jwt, null);
@@ -86,11 +87,11 @@ public class JWTUtil {
             }
             catch (JOSEException | BadJOSEException | NumberFormatException | ParseException e) {
                 DiluvAPIServer.LOGGER.catching(e);
-                return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN,"Invalid token format");
+                throw new WebApplicationException(ErrorMessage.USER_INVALID_TOKEN.respond("Invalid token format"));
             }
         }
 
-        return new ErrorToken(ErrorMessage.USER_INVALID_TOKEN);
+        throw new WebApplicationException(ErrorMessage.USER_INVALID_TOKEN.respond());
     }
 
     public static boolean isBearerToken (String token) {

@@ -3,6 +3,7 @@ package com.diluv.api.v1.site;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -57,6 +58,7 @@ import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 
+@ApplicationScoped
 @GZIP
 @Path("/site")
 @Produces(MediaType.APPLICATION_JSON)

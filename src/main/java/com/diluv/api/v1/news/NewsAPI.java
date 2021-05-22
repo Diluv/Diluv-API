@@ -3,6 +3,7 @@ package com.diluv.api.v1.news;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -23,6 +24,7 @@ import com.diluv.confluencia.database.record.NewsEntity;
 import com.diluv.confluencia.database.sort.NewsSort;
 import com.diluv.confluencia.database.sort.Sort;
 
+@ApplicationScoped
 @GZIP
 @Path("/news")
 @Produces(MediaType.APPLICATION_JSON)

@@ -1,16 +1,18 @@
 package com.diluv.api.endpoints.v1;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.v1.games.ProjectCreate;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.equalTo;
 
 public class GameTest {
 
@@ -124,21 +126,28 @@ public class GameTest {
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid", multiPart, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, ErrorMessage.PROJECT_TAKEN_SLUG);
 
-//        multiPart.put("name", "Bookshelf3");
-//        multiPart.put("tags", "invalid,magic");
-//        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, 400, ErrorMessage.PROJECT_INVALID_TAGS);
+        data.name = "Bookshelf3";
+        data.tags.add("invalid");
+        data.tags.add("magic");
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, ErrorMessage.PROJECT_INVALID_TAGS);
 
         // Ok
         data.name = "Bookshelf2";
         data.tags.clear();
-        multiPart.put("data", data);
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, "schema/project-schema.json");
 
         data.name = "Bookshelf3";
         data.tags.add("tech");
         data.tags.add("magic");
-        multiPart.put("data", data);
         Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, "schema/project-schema.json");
+        Request.postErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/minecraft-je/mods", multiPart, ErrorMessage.USER_INVALID_TOKEN);
+
+
+        data.name = "ABC";
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, ErrorMessage.PROJECT_INVALID_NAME);
+        Request.postErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/minecraft-je/mods", multiPart, ErrorMessage.USER_INVALID_TOKEN);
+
+
     }
 
     @Test

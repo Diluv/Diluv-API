@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -35,8 +37,8 @@ import com.diluv.api.data.DataProjectList;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.AuthUtilities;
 import com.diluv.api.utils.auth.JWTUtil;
+import com.diluv.api.utils.auth.RequireToken;
 import com.diluv.api.utils.auth.Validator;
-import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.query.ProjectQuery;
@@ -53,6 +55,7 @@ import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.warrenstrange.googleauth.KeyRepresentation;
 
+@ApplicationScoped
 @GZIP
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
@@ -68,15 +71,7 @@ public class UsersAPI {
 
     @GET
     @Path("/self")
-    public Response getSelf (@HeaderParam("Authorization") Token token) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token instanceof ErrorToken) {
-            return ((ErrorToken) token).getResponse();
-        }
+    public Response getSelf (@RequireToken @HeaderParam("Authorization") Token token) {
 
         return Confluencia.getTransaction(session -> {
             final UsersEntity userRecord = Confluencia.USER.findOneByUserId(session, token.getUserId());
@@ -92,15 +87,7 @@ public class UsersAPI {
 
     @PATCH
     @Path("/self")
-    public Response patchSelf (@HeaderParam("Authorization") Token token, @MultipartForm UserUpdateForm form) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token instanceof ErrorToken) {
-            return ((ErrorToken) token).getResponse();
-        }
+    public Response patchSelf (@RequireToken @HeaderParam("Authorization") Token token, @MultipartForm UserUpdateForm form) {
 
         return Confluencia.getTransaction(session -> {
             final UsersEntity user = Confluencia.USER.findOneByUserId(session, token.getUserId());
@@ -177,15 +164,7 @@ public class UsersAPI {
 
     @PATCH
     @Path("/self/mfa")
-    public Response patchSelfMFA (@HeaderParam("Authorization") Token token, @MultipartForm User2FAForm form) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token instanceof ErrorToken) {
-            return ((ErrorToken) token).getResponse();
-        }
+    public Response patchSelfMFA (@RequireToken @HeaderParam("Authorization") Token token, @MultipartForm User2FAForm form) {
 
         return Confluencia.getTransaction(session -> {
             final UsersEntity user = Confluencia.USER.findOneByUserId(session, token.getUserId());
@@ -291,19 +270,7 @@ public class UsersAPI {
 
     @GET
     @Path("/self/token")
-    public Response getTokens (@HeaderParam("Authorization") Token token) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token instanceof ErrorToken) {
-            return ((ErrorToken) token).getResponse();
-        }
-
-        if (token.isApiToken()) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond("API Token can't be used for this request.");
-        }
+    public Response getTokens (@RequireToken(apiToken = false) @HeaderParam("Authorization") Token token) {
 
         final List<APITokensEntity> tokens = Confluencia.getTransaction(session -> {
             return Confluencia.SECURITY.findAPITokensByUserId(session, new UsersEntity(token.getUserId()));
@@ -316,19 +283,7 @@ public class UsersAPI {
 
     @POST
     @Path("/self/token")
-    public Response postToken (@HeaderParam("Authorization") Token token, @QueryParam("name") String queryName) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token instanceof ErrorToken) {
-            return ((ErrorToken) token).getResponse();
-        }
-
-        if (token.isApiToken()) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond("API Token can't be used for this request.");
-        }
+    public Response postToken (@RequireToken(apiToken = false) @HeaderParam("Authorization") Token token, @QueryParam("name") String queryName) {
 
         final String name = queryName == null ? null : queryName.trim();
         if (name == null || name.length() > 50) {
@@ -350,19 +305,7 @@ public class UsersAPI {
 
     @DELETE
     @Path("/self/token/{id}")
-    public Response deleteToken (@HeaderParam("Authorization") Token token, @PathParam("id") Long id) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token instanceof ErrorToken) {
-            return ((ErrorToken) token).getResponse();
-        }
-
-        if (token.isApiToken()) {
-            return ErrorMessage.USER_INVALID_TOKEN.respond("API Token can't be used for this request.");
-        }
+    public Response deleteToken (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("id") Long id) {
 
         return Confluencia.getTransaction(session -> {
             APITokensEntity entity = Confluencia.SECURITY.findAPITokensById(session, id);

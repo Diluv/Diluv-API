@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -17,6 +19,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import com.diluv.api.utils.auth.RequireToken;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -35,7 +39,6 @@ import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.FileUtil;
 import com.diluv.api.utils.MismatchException;
 import com.diluv.api.utils.auth.Validator;
-import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
@@ -57,6 +60,7 @@ import com.diluv.confluencia.database.sort.Sort;
 
 import static com.diluv.api.v1.games.GamesAPI.PROJECT_FILE_SORTS;
 
+@ApplicationScoped
 @GZIP
 @Path("/projects")
 @Produces(MediaType.APPLICATION_JSON)
@@ -81,15 +85,7 @@ public class ProjectsAPI {
     @POST
     @Path("/{id}/files")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postProjectFile (@HeaderParam("Authorization") Token token, @PathParam("id") Long projectId, @MultipartForm ProjectFileUploadForm form) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token instanceof ErrorToken) {
-            return ((ErrorToken) token).getResponse();
-        }
+    public Response postProjectFile (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("id") Long projectId, @MultipartForm ProjectFileUploadForm form) {
 
         if (form.data == null) {
             return ErrorMessage.INVALID_DATA.respond();
@@ -263,15 +259,7 @@ public class ProjectsAPI {
     @POST
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postProjectFile (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectFileUploadForm form) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token instanceof ErrorToken) {
-            return ((ErrorToken) token).getResponse();
-        }
+    public Response postProjectFile (@RequireToken  @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectFileUploadForm form) {
 
         if (form.data == null) {
             return ErrorMessage.INVALID_DATA.respond();

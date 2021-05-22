@@ -3,6 +3,7 @@ package com.diluv.api.v1.featured;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -17,6 +18,7 @@ import com.diluv.api.data.DataGame;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.confluencia.Confluencia;
 
+@ApplicationScoped
 @GZIP
 @Path("/featured")
 @Produces(MediaType.APPLICATION_JSON)

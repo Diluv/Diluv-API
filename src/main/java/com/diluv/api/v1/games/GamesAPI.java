@@ -1,40 +1,6 @@
 package com.diluv.api.v1.games;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import eu.medsea.util.StringUtil;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.GenericValidator;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-
-import com.diluv.api.data.DataBaseProject;
-import com.diluv.api.data.DataGame;
-import com.diluv.api.data.DataGameList;
-import com.diluv.api.data.DataGameVersion;
-import com.diluv.api.data.DataProject;
-import com.diluv.api.data.DataProjectList;
-import com.diluv.api.data.DataProjectType;
-import com.diluv.api.data.DataSlugName;
-import com.diluv.api.data.DataUploadType;
+import com.diluv.api.data.*;
 import com.diluv.api.data.feed.FeedProjectFiles;
 import com.diluv.api.data.feed.FeedProjects;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;
@@ -42,8 +8,8 @@ import com.diluv.api.data.site.DataSiteProjectFilesPage;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
+import com.diluv.api.utils.auth.RequireToken;
 import com.diluv.api.utils.auth.Validator;
-import com.diluv.api.utils.auth.tokens.ErrorToken;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.error.ErrorType;
@@ -61,6 +27,27 @@ import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 import com.github.slugify.Slugify;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.GenericValidator;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@ApplicationScoped
 @GZIP
 @Path("/games")
 @Produces(MediaType.APPLICATION_JSON)
@@ -207,15 +194,7 @@ public class GamesAPI {
 
     @PATCH
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
-    public Response patchProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectForm form) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token instanceof ErrorToken) {
-            return ((ErrorToken) token).getResponse();
-        }
+    public Response patchProject (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectForm form) {
 
         return Confluencia.getTransaction(session -> {
 
@@ -423,15 +402,7 @@ public class GamesAPI {
     @POST
     @Path("/{gameSlug}/{projectTypeSlug}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @MultipartForm ProjectForm form) {
-
-        if (token == null) {
-            return ErrorMessage.USER_REQUIRED_TOKEN.respond();
-        }
-
-        if (token instanceof ErrorToken) {
-            return ((ErrorToken) token).getResponse();
-        }
+    public Response postProject (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Valid @MultipartForm ProjectForm form) {
 
         return Confluencia.getTransaction(session -> {
 
@@ -442,18 +413,6 @@ public class GamesAPI {
                     return ErrorMessage.NOT_FOUND_GAME.respond();
                 }
                 return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
-            }
-
-            if (!Validator.validateProjectName(form.data.name)) {
-                return ErrorMessage.PROJECT_INVALID_NAME.respond();
-            }
-
-            if (!Validator.validateProjectSummary(form.data.summary)) {
-                return ErrorMessage.PROJECT_INVALID_SUMMARY.respond();
-            }
-
-            if (!Validator.validateProjectDescription(form.data.description)) {
-                return ErrorMessage.PROJECT_INVALID_DESCRIPTION.respond();
             }
 
             List<String> tags = form.data.tags;

@@ -4,6 +4,7 @@ package com.diluv.api.v1.internal;
 import java.io.IOException;
 import java.time.Instant;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -21,6 +22,7 @@ import com.diluv.confluencia.database.record.NodeCDNCommitsEntity;
 import com.diluv.schoomp.Webhook;
 import com.diluv.schoomp.message.Message;
 
+@ApplicationScoped
 @GZIP
 @Path("/internal")
 @Produces(MediaType.APPLICATION_JSON)
