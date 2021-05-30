@@ -1,9 +1,12 @@
 package com.diluv.api.v1.users;
 
+import javax.validation.constraints.NotBlank;
+
 import com.google.gson.annotations.Expose;
 
 public class User2FAForm {
 
+    @NotBlank(message = "USER_INVALID_PASSWORD")
     @Expose
     public String password;
 

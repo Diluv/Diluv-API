@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -16,8 +15,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-
-import com.diluv.api.utils.auth.RequireToken;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.validator.GenericValidator;
@@ -32,6 +29,7 @@ import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.UserPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.api.utils.validator.RequireToken;
 import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GamesEntity;
@@ -48,7 +46,7 @@ public class AdminAPI {
     @POST
     @Path("/games")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postGames (@RequireToken (apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token, @MultipartForm AdminGameForm form) {
+    public Response postGames (@RequireToken(apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token, @MultipartForm AdminGameForm form) {
 
         return Confluencia.getTransaction(session -> {
 
@@ -78,20 +76,20 @@ public class AdminAPI {
                 return ErrorMessage.INVALID_DATA.respond();
             }
 
-            if (form.logoPNG == null) {
+            if (form.logo == null) {
                 return ErrorMessage.REQUIRES_IMAGE.respond();
             }
 
-            final BufferedImage imagePNG = ImageUtil.isValidImage(form.logoPNG, 1000000L);
+            final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
 
-            if (imagePNG == null) {
+            if (image == null) {
                 return ErrorMessage.INVALID_IMAGE.respond();
             }
 
             File logoPath = new File(Constants.CDN_FOLDER, "games/" + data.slug);
             logoPath.mkdirs();
 
-            if (!ImageUtil.savePNG(imagePNG, new File(logoPath, "logo.png"))) {
+            if (!ImageUtil.savePNG(image, new File(logoPath, "logo.png"))) {
                 // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
                 return ErrorMessage.THROWABLE.respond();
             }
@@ -122,7 +120,7 @@ public class AdminAPI {
     @PATCH
     @Path("/games")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response patchGames (@RequireToken (apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN})  @HeaderParam("Authorization") Token token, @MultipartForm AdminGameForm form) {
+    public Response patchGames (@RequireToken(apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token, @MultipartForm AdminGameForm form) {
 
         return Confluencia.getTransaction(session -> {
             if (form.data == null) {
@@ -151,13 +149,14 @@ public class AdminAPI {
             File logoPath = new File(Constants.CDN_FOLDER, "games/" + data.slug);
             logoPath.mkdirs();
 
-            if (form.logoPNG != null) {
-                final BufferedImage imagePNG = ImageUtil.isValidImage(form.logoPNG, 1000000L);
+            if (form.logo != null) {
+                final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
 
-                if (imagePNG == null) {
+                if (image == null) {
                     return ErrorMessage.INVALID_IMAGE.respond();
                 }
-                if (!ImageUtil.savePNG(imagePNG, new File(logoPath, "logo.png"))) {
+
+                if (!ImageUtil.savePNG(image, new File(logoPath, "logo.png"))) {
                     // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
                     return ErrorMessage.THROWABLE.respond();
                 }
@@ -171,7 +170,7 @@ public class AdminAPI {
 
     @GET
     @Path("/files/{fileId}")
-    public Response getProjectFile (@RequireToken (apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token, @PathParam("fileId") long fileId) {
+    public Response getProjectFile (@RequireToken(apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token, @PathParam("fileId") long fileId) {
 
         ProjectFilesEntity rs = Confluencia.getTransaction(session -> {
             return Confluencia.FILE.findOneById(session, fileId);

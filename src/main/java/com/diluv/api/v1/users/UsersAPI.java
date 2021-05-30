@@ -37,12 +37,12 @@ import com.diluv.api.data.DataProjectList;
 import com.diluv.api.data.DataUser;
 import com.diluv.api.utils.AuthUtilities;
 import com.diluv.api.utils.auth.JWTUtil;
-import com.diluv.api.utils.auth.RequireToken;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.api.utils.validator.RequireToken;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.APITokensEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
@@ -87,28 +87,23 @@ public class UsersAPI {
 
     @PATCH
     @Path("/self")
-    public Response patchSelf (@RequireToken @HeaderParam("Authorization") Token token, @MultipartForm UserUpdateForm form) {
+    public Response patchSelf (@RequireToken @HeaderParam("Authorization") Token token, @NotNull @MultipartForm UserUpdateForm form) {
 
         return Confluencia.getTransaction(session -> {
             final UsersEntity user = Confluencia.USER.findOneByUserId(session, token.getUserId());
 
             if (user == null) {
-
                 return ErrorMessage.NOT_FOUND_USER.respond();
             }
 
             if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.currentPassword.toCharArray())) {
-
                 return ErrorMessage.USER_INVALID_PASSWORD.respond();
             }
 
             if (!GenericValidator.isBlankOrNull(form.displayName)) {
-
                 String displayName = form.displayName.trim();
                 if (!displayName.equals(user.getDisplayName())) {
-
                     if (!Validator.validateUserDisplayName(user.getUsername(), displayName)) {
-
                         return ErrorMessage.USER_INVALID_DISPLAY_NAME.respond();
                     }
                     user.setDisplayName(displayName);
@@ -116,26 +111,13 @@ public class UsersAPI {
             }
 
             if (!GenericValidator.isBlankOrNull(form.newPassword)) {
-
                 String password = form.newPassword.trim();
-                if (!Validator.validatePassword(password)) {
-
-                    return ErrorMessage.USER_INVALID_NEW_PASSWORD.respond();
-                }
-
                 user.setPassword(AuthUtilities.getBcrypt(password.toCharArray()));
             }
 
             if (!GenericValidator.isBlankOrNull(form.email)) {
-
                 String email = form.email.trim();
                 if (!user.getEmail().equalsIgnoreCase(email)) {
-
-                    if (!Validator.validateEmail(email)) {
-
-                        return ErrorMessage.USER_INVALID_EMAIL.respond();
-                    }
-
                     if (Confluencia.USER.existsByEmail(session, email) || Confluencia.USER.existsTempUserByEmail(session, email)) {
 
                         return ErrorMessage.USER_TAKEN_EMAIL.respond();

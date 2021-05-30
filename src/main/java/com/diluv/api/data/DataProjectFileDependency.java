@@ -1,9 +1,9 @@
 package com.diluv.api.data;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.diluv.confluencia.database.record.ProjectFileDependenciesEntity;
 import com.google.gson.annotations.Expose;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Represents a file uploaded to a project.

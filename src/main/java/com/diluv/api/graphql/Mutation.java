@@ -80,6 +80,7 @@ public class Mutation implements GraphQLMutationResolver {
 
         return Confluencia.getTransaction(session -> {
             ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(session, projectId);
+
             if (project == null) {
                 throw new GraphQLException("Project doesn't exists");
             }

@@ -19,7 +19,7 @@ public class ParameterProviderV1 implements ParamConverterProvider {
 
         if (rawType == Token.class) {
 
-            return ParamConverterAccessToken.INSTANCE;
+            return (ParamConverter<T>) ParamConverterAccessToken.INSTANCE;
         }
 
         return null;

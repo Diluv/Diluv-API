@@ -1,12 +1,13 @@
-package com.diluv.api.utils.auth;
+package com.diluv.api.utils.validator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import com.diluv.api.utils.auth.tokens.Token;
+import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.UserPermissions;
 
-public class TokenValidator implements ConstraintValidator<RequireToken, Token> {
+public class RequireTokenValidator implements ConstraintValidator<RequireToken, Token> {
 
     private boolean apiToken;
     private UserPermissions[] userPermissions;
@@ -23,12 +24,12 @@ public class TokenValidator implements ConstraintValidator<RequireToken, Token> 
 
         if (token == null) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("USER_REQUIRED_TOKEN").addConstraintViolation();
+            context.buildConstraintViolationWithTemplate(ErrorMessage.USER_REQUIRED_TOKEN.name()).addConstraintViolation();
             return false;
         }
         if (token.isApiToken() && !this.apiToken) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("USER_INVALID_API_TOKEN").addConstraintViolation();
+            context.buildConstraintViolationWithTemplate(ErrorMessage.USER_INVALID_API_TOKEN.name()).addConstraintViolation();
             return false;
         }
 
@@ -36,7 +37,7 @@ public class TokenValidator implements ConstraintValidator<RequireToken, Token> 
             for (UserPermissions permission : this.userPermissions) {
                 if (!UserPermissions.hasPermission(token, permission)) {
                     context.disableDefaultConstraintViolation();
-                    context.buildConstraintViolationWithTemplate("USER_NOT_AUTHORIZED").addConstraintViolation();
+                    context.buildConstraintViolationWithTemplate(ErrorMessage.USER_NOT_AUTHORIZED.name()).addConstraintViolation();
                     return false;
                 }
             }

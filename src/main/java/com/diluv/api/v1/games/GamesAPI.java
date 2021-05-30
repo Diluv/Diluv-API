@@ -1,6 +1,40 @@
 package com.diluv.api.v1.games;
 
-import com.diluv.api.data.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.GenericValidator;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+
+import com.diluv.api.data.DataBaseProject;
+import com.diluv.api.data.DataGame;
+import com.diluv.api.data.DataGameList;
+import com.diluv.api.data.DataGameVersion;
+import com.diluv.api.data.DataProject;
+import com.diluv.api.data.DataProjectList;
+import com.diluv.api.data.DataProjectType;
+import com.diluv.api.data.DataSlugName;
+import com.diluv.api.data.DataUploadType;
 import com.diluv.api.data.feed.FeedProjectFiles;
 import com.diluv.api.data.feed.FeedProjects;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;
@@ -8,7 +42,6 @@ import com.diluv.api.data.site.DataSiteProjectFilesPage;
 import com.diluv.api.provider.ResponseException;
 import com.diluv.api.utils.Constants;
 import com.diluv.api.utils.ImageUtil;
-import com.diluv.api.utils.auth.RequireToken;
 import com.diluv.api.utils.auth.Validator;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -18,6 +51,7 @@ import com.diluv.api.utils.query.GameQuery;
 import com.diluv.api.utils.query.ProjectFileQuery;
 import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
+import com.diluv.api.utils.validator.RequireToken;
 import com.diluv.api.v1.utilities.ProjectService;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.*;
@@ -26,26 +60,6 @@ import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 import com.github.slugify.Slugify;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.GenericValidator;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 @GZIP
@@ -186,7 +200,6 @@ public class GamesAPI {
                 return ResponseUtil.successResponse(project);
             }
             catch (ResponseException e) {
-                e.printStackTrace();
                 return e.getResponse();
             }
         });
@@ -194,108 +207,87 @@ public class GamesAPI {
 
     @PATCH
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
-    public Response patchProject (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectForm form) {
+    public Response patchProject (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @Valid @MultipartForm ProjectPatchForm form) {
 
         return Confluencia.getTransaction(session -> {
 
-            if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
-                return ErrorMessage.NOT_FOUND_GAME.respond();
-            }
+            try {
+                ProjectsEntity project = ProjectService.getProject(session, gameSlug, projectTypeSlug, projectSlug, token);
 
-            if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
-                return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
-            }
+                if (!ProjectPermissions.hasPermission(project, token, ProjectPermissions.PROJECT_EDIT)) {
 
-            ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
-            if (project == null) {
-                return ErrorMessage.NOT_FOUND_PROJECT.respond();
-            }
+                    return ErrorMessage.USER_NOT_AUTHORIZED.respond();
+                }
 
-            if (!ProjectPermissions.hasPermission(project, token, ProjectPermissions.PROJECT_EDIT)) {
-
-                return ErrorMessage.USER_NOT_AUTHORIZED.respond();
-            }
-
-            if (form.data == null) {
-                return ErrorMessage.INVALID_DATA.respond();
-            }
-
-            if (!GenericValidator.isBlankOrNull(form.data.name)) {
-                String name = form.data.name.trim();
-                if (!name.equals(project.getName())) {
-                    if (!Validator.validateProjectName(name)) {
-                        return ErrorMessage.PROJECT_INVALID_NAME.respond();
+                if (form.data != null) {
+                    if (!GenericValidator.isBlankOrNull(form.data.name)) {
+                        String name = form.data.name.trim();
+                        if (!name.equals(project.getName())) {
+                            project.setName(name);
+                        }
                     }
 
-                    project.setName(name);
-                }
-            }
-
-            if (!GenericValidator.isBlankOrNull(form.data.summary)) {
-                String summary = form.data.summary.trim();
-                if (!summary.equals(project.getSummary())) {
-                    if (!Validator.validateProjectSummary(summary)) {
-                        return ErrorMessage.PROJECT_INVALID_SUMMARY.respond();
+                    if (!GenericValidator.isBlankOrNull(form.data.summary)) {
+                        String summary = form.data.summary.trim();
+                        if (!summary.equals(project.getSummary())) {
+                            project.setSummary(summary);
+                        }
                     }
 
-                    project.setSummary(summary);
-                }
-            }
-
-            if (!GenericValidator.isBlankOrNull(form.data.description)) {
-                String description = form.data.description.trim();
-                if (!description.equals(project.getDescription())) {
-                    if (!Validator.validateProjectDescription(description)) {
-                        return ErrorMessage.PROJECT_INVALID_DESCRIPTION.respond();
+                    if (!GenericValidator.isBlankOrNull(form.data.description)) {
+                        String description = form.data.description.trim();
+                        if (!description.equals(project.getDescription())) {
+                            project.setDescription(description);
+                        }
                     }
 
-                    project.setDescription(description);
-                }
-            }
+                    List<String> tags = form.data.tags;
+                    if (!tags.isEmpty()) {
+                        List<TagsEntity> tagRecords = Validator.validateTags(project.getProjectType(), tags);
+                        if (tagRecords.size() != tags.size()) {
+                            return ErrorMessage.PROJECT_INVALID_TAGS.respond();
+                        }
 
-            List<String> tags = form.data.tags;
-            if (!tags.isEmpty()) {
-                List<TagsEntity> tagRecords = Validator.validateTags(project.getProjectType(), tags);
-                if (tagRecords.size() != tags.size()) {
-                    return ErrorMessage.PROJECT_INVALID_TAGS.respond();
-                }
+                        project.getTags().removeIf(p -> !tagRecords.contains(p.getTag()));
 
-                project.getTags().removeIf(p -> !tagRecords.contains(p.getTag()));
-
-                for (TagsEntity tag : tagRecords) {
-                    if (project.getTags().stream().noneMatch(t -> t.getTag() == tag)) {
-                        ProjectTagsEntity tagsEntity = new ProjectTagsEntity();
-                        tagsEntity.setTag(tag);
-                        project.addTag(tagsEntity);
+                        for (TagsEntity tag : tagRecords) {
+                            if (project.getTags().stream().noneMatch(t -> t.getTag() == tag)) {
+                                ProjectTagsEntity tagsEntity = new ProjectTagsEntity();
+                                tagsEntity.setTag(tag);
+                                project.addTag(tagsEntity);
+                            }
+                        }
                     }
                 }
 
-            }
-
-            for (ProjectReviewEntity review : project.getReviews()) {
-                if (!review.isCompleted()) {
-                    project.setReview(true);
-                    review.setCompleted(true);
-                }
-            }
-
-            session.update(project);
-
-            if (form.logo != null) {
-                final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
-
-                if (image == null) {
-                    return ErrorMessage.INVALID_IMAGE.respond();
+                for (ProjectReviewEntity review : project.getReviews()) {
+                    if (!review.isCompleted()) {
+                        project.setReview(true);
+                        review.setCompleted(true);
+                    }
                 }
 
-                final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, project.getId()));
-                if (!ImageUtil.savePNG(image, file)) {
-                    // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
-                    return ErrorMessage.THROWABLE.respond();
-                }
-            }
+                session.update(project);
 
-            return ResponseUtil.noContent();
+                if (form.logo != null) {
+                    final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
+
+                    if (image == null) {
+                        return ErrorMessage.INVALID_IMAGE.respond();
+                    }
+
+                    final File file = new File(Constants.CDN_FOLDER, String.format("games/%s/%s/%d/logo.png", gameSlug, projectTypeSlug, project.getId()));
+                    if (!ImageUtil.savePNG(image, file)) {
+                        // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
+                        return ErrorMessage.THROWABLE.respond();
+                    }
+                }
+
+                return ResponseUtil.noContent();
+            }
+            catch (ResponseException e) {
+                return e.getResponse();
+            }
         });
     }
 
@@ -305,18 +297,20 @@ public class GamesAPI {
     public Response getProjectFileFeed (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
 
         return Confluencia.getTransaction(session -> {
-            final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
-            if (project == null) {
+            try {
+                final ProjectsEntity project = ProjectService.getProject(session, gameSlug, projectTypeSlug, projectSlug, null);
+
+                final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(session, project, false, 1, 25, ProjectFileSort.NEW, null, "");
+
+                final String baseUrl = String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
+                FeedProjectFiles feed = new FeedProjectFiles(baseUrl, project.getName());
+                projectFiles.forEach(feed::addFile);
+
+                return Response.ok(feed).build();
+            }
+            catch (ResponseException e) {
                 return Response.status(ErrorType.NOT_FOUND.getCode()).build();
             }
-
-            final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(session, project, false, 1, 25, ProjectFileSort.NEW, null, "");
-
-            final String baseUrl = String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
-            FeedProjectFiles feed = new FeedProjectFiles(baseUrl, project.getName());
-            projectFiles.forEach(feed::addFile);
-
-            return Response.ok(feed).build();
         });
     }
 
@@ -364,19 +358,8 @@ public class GamesAPI {
 
         return Confluencia.getTransaction(session -> {
             try {
-                final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
-                if (project == null) {
-                    if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
-                        throw new ResponseException(ErrorMessage.NOT_FOUND_GAME.respond());
-                    }
-
-                    if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
-                        throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond());
-                    }
-
-                    throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
-                }
-                DataBaseProject dataProject = ProjectService.getBaseDataProject(project, token);
+                final ProjectsEntity project = ProjectService.getProject(session, gameSlug, projectTypeSlug, projectSlug, token);
+                final DataBaseProject dataProject = ProjectService.getBaseDataProject(project, token);
 
                 boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
                 final List<ProjectFilesEntity> projectFileRecords = Confluencia.FILE.findAllByProject(session, project, authorized, page, limit, sort, gameVersion, search);
@@ -402,7 +385,7 @@ public class GamesAPI {
     @POST
     @Path("/{gameSlug}/{projectTypeSlug}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postProject (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Valid @MultipartForm ProjectForm form) {
+    public Response postProject (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Valid @MultipartForm ProjectCreateForm form) {
 
         return Confluencia.getTransaction(session -> {
 
@@ -421,10 +404,6 @@ public class GamesAPI {
                 return ErrorMessage.PROJECT_INVALID_TAGS.respond();
             }
 
-            if (form.logo == null) {
-                return ErrorMessage.INVALID_IMAGE.respond();
-            }
-
             final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
 
             if (image == null) {
@@ -439,7 +418,6 @@ public class GamesAPI {
 
             if (Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug) != null) {
                 return ErrorMessage.PROJECT_TAKEN_SLUG.respond();
-
             }
 
             ProjectsEntity project = new ProjectsEntity();

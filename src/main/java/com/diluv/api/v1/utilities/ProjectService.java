@@ -90,13 +90,7 @@ public class ProjectService {
         return new DataBaseProject(project);
     }
 
-    public static ProjectsEntity getProject (Session session, long projectId, Token token) throws ResponseException {
-
-        final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(session, projectId);
-
-        if (project == null) {
-            throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
-        }
+    public static ProjectsEntity getProject (ProjectsEntity project, Token token) throws ResponseException {
 
         if (token == null) {
             if (!project.isReleased()) {
@@ -117,5 +111,37 @@ public class ProjectService {
         }
 
         return project;
+    }
+
+    public static ProjectsEntity getProject (Session session, long projectId, Token token) throws ResponseException {
+
+        final ProjectsEntity project = Confluencia.PROJECT.findOneProjectByProjectId(session, projectId);
+
+        if (project == null) {
+            throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
+        }
+
+        return ProjectService.getProject(project, token);
+    }
+
+    public static ProjectsEntity getProject (Session session, String gameSlug, String projectTypeSlug, String projectSlug, Token token) throws ResponseException {
+
+        final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
+
+        if (project == null) {
+
+            if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
+
+                throw new ResponseException(ErrorMessage.NOT_FOUND_GAME.respond());
+            }
+
+            if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
+
+                throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond());
+            }
+            throw new ResponseException(ErrorMessage.NOT_FOUND_PROJECT.respond());
+        }
+
+        return ProjectService.getProject(project, token);
     }
 }

@@ -5,6 +5,8 @@ import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.v1.games.ProjectCreate;
 
+import com.diluv.api.v1.games.ProjectPatch;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -146,8 +148,6 @@ public class GameTest {
         data.name = "ABC";
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods", multiPart, ErrorMessage.PROJECT_INVALID_NAME);
         Request.postErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/minecraft-je/mods", multiPart, ErrorMessage.USER_INVALID_TOKEN);
-
-
     }
 
     @Test
@@ -156,7 +156,7 @@ public class GameTest {
         final ClassLoader classLoader = this.getClass().getClassLoader();
         final File logo = new File(classLoader.getResource("logo.png").getFile());
 
-        ProjectCreate data = new ProjectCreate();
+        ProjectPatch data = new ProjectPatch();
         data.name = "Bookshelf";
         data.summary = "Bookshelf summary aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
         data.description = "Bookshelf descriptionaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -178,7 +178,7 @@ public class GameTest {
         Request.patchOkMultipartWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/dark-elevators", multiPart);
 
         multiPart.clear();
-        multiPart.put("data", new ProjectCreate());
+        multiPart.put("data", new ProjectPatch());
         Request.patchOkMultipartWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/get-ya-tanks-here", multiPart);
 
 //        multiPart.put("name", "Dark Elevators New");

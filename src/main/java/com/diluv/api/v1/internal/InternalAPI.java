@@ -43,14 +43,13 @@ public class InternalAPI {
             entity.setCompleted(true);
             session.update(entity);
 
-            int i = Confluencia.FILE.updateAllForRelease(session, entity.getCreatedAt());
-            if (i == -1) {
+            if (Confluencia.FILE.updateAllForRelease(session, entity.getCreatedAt()) == -1) {
                 System.out.println("FAILED_UPDATE_PROJECT_FILE");
                 // return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();
                 return ErrorMessage.THROWABLE.respond();
             }
 
-            i = Confluencia.MISC.updateAllImagesForRelease(session, entity.getCreatedAt());
+            int i = Confluencia.MISC.updateAllImagesForRelease(session, entity.getCreatedAt());
             if (i == -1) {
                 System.out.println("FAILED_UPDATE_PROJECT_FILE");
                 // return ErrorMessage.FAILED_UPDATE_PROJECT_FILE.respond();

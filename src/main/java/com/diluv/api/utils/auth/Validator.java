@@ -6,13 +6,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.diluv.api.graphql.data.SlugName;
-
-import org.apache.commons.validator.GenericValidator;
-import org.apache.commons.validator.routines.EmailValidator;
 import org.hibernate.Session;
 
 import com.diluv.api.utils.MismatchException;
@@ -30,48 +25,17 @@ import com.diluv.confluencia.database.record.TagsEntity;
 public class Validator {
 
     public static final List<String> DEP_TYPES = Arrays.asList("required", "optional", "incompatible");
-
-    public static boolean validateEmail (String email) {
-
-        return EmailValidator.getInstance().isValid(email);
-    }
-
-    public static boolean validatePassword (String password) {
-
-        return !GenericValidator.isBlankOrNull(password) && password.length() <= 70 && password.length() >= 8;
-    }
-
-    public static boolean validateProjectName (String name) {
-
-        return !GenericValidator.isBlankOrNull(name) && name.length() <= 50 && name.length() >= 5;
-    }
-
-    public static boolean validateProjectSummary (String summary) {
-
-        return !GenericValidator.isBlankOrNull(summary) && summary.length() <= 250 && summary.length() >= 10;
-    }
-
-    public static boolean validateProjectDescription (String description) {
-
-        return !GenericValidator.isBlankOrNull(description) && description.length() <= 10000 && description.length() >= 50;
-    }
-
-    public static boolean validateProjectFileChangelog (String changelog) {
-
-        return changelog == null || changelog.length() <= 2000;
-    }
-
     public static final Set<String> VALID_RELEASE_TYPES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("release", "beta", "alpha")));
     public static final Set<String> VALID_CLASSIFIERS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("binary")));
 
     public static boolean validateReleaseType (String releaseType) {
 
-        return releaseType != null && VALID_RELEASE_TYPES.contains(releaseType.toLowerCase());
+        return VALID_RELEASE_TYPES.contains(releaseType.toLowerCase());
     }
 
     public static boolean validateClassifier (String classifier) {
 
-        return classifier != null && VALID_CLASSIFIERS.contains(classifier.toLowerCase());
+        return VALID_CLASSIFIERS.contains(classifier.toLowerCase());
     }
 
     public static List<GameVersionsEntity> validateGameVersions (GamesEntity game, Set<String> gameVersions) throws MismatchException {
@@ -159,10 +123,6 @@ public class Validator {
         return mfa != null && mfa >= 0 && mfa <= 99999999;
     }
 
-    public static boolean validateVersion (String version) {
-
-        return version != null && version.length() <= 20;
-    }
 
     public static List<ProjectTypeLoadersEntity> validateProjectTypeLoaders (ProjectTypesEntity projectType, Set<String> loaders) throws MismatchException {
 

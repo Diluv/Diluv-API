@@ -45,7 +45,7 @@ public class CustomAtomFeedProvider extends AtomFeedProvider {
         if (finder == null) {
             throw new JAXBUnmarshalException(Messages.MESSAGES.unableToFindJAXBContext(mediaType));
         }
-        HashSet<Class> set = new HashSet<Class>();
+        HashSet<Class<?>> set = new HashSet<>();
         set.add(Feed.class);
         for (Entry entry : feed.getEntries()) {
             if (entry.getAnyOtherJAXBObject() != null) {
@@ -56,9 +56,10 @@ public class CustomAtomFeedProvider extends AtomFeedProvider {
             }
         }
         try {
-            JAXBContext ctx = finder.findCacheContext(mediaType, annotations, set.toArray(new Class[set.size()]));
+            JAXBContext ctx = finder.findCacheContext(mediaType, annotations, set.toArray(new Class[0]));
             Marshaller marshaller = ctx.createMarshaller();
             NamespacePrefixMapper mapper = new NamespacePrefixMapper() {
+                @Override
                 public String getPreferredPrefix (String namespace, String s1, boolean b) {
 
                     return s1;

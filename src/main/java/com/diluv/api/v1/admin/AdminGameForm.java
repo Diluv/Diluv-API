@@ -13,6 +13,6 @@ public class AdminGameForm {
     @PartType(value = MediaType.APPLICATION_JSON)
     public AdminGameData data;
 
-    @FormParam("logoPNG")
-    public InputStream logoPNG;
+    @FormParam("logo")
+    public InputStream logo;
 }

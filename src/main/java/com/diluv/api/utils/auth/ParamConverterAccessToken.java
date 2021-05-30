@@ -6,11 +6,7 @@ import com.diluv.api.utils.auth.tokens.Token;
 
 public class ParamConverterAccessToken implements ParamConverter<Token> {
 
-    public static final ParamConverter INSTANCE = new ParamConverterAccessToken();
-
-    private ParamConverterAccessToken () {
-
-    }
+    public static final ParamConverter<Token> INSTANCE = new ParamConverterAccessToken();
 
     @Override
     public Token fromString (String param) {

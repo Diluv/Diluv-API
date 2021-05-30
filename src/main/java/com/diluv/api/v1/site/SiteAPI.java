@@ -190,35 +190,25 @@ public class SiteAPI {
     public Response getProjectFile (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @PathParam("fileId") long fileId, @Query ProjectFileQuery query) throws ResponseException {
 
         return Confluencia.getTransaction(session -> {
-            final ProjectsEntity project = Confluencia.PROJECT.findOneProject(session, gameSlug, projectTypeSlug, projectSlug);
-            if (project == null) {
-
-                if (Confluencia.GAME.findOneBySlug(session, gameSlug) == null) {
-                    return ErrorMessage.NOT_FOUND_GAME.respond();
-                }
-
-                if (Confluencia.PROJECT.findOneProjectTypeByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug) == null) {
-                    return ErrorMessage.NOT_FOUND_PROJECT_TYPE.respond();
-                }
-
-                return ErrorMessage.NOT_FOUND_PROJECT.respond();
-            }
-
-            boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
-
-            final ProjectFilesEntity projectFile = Confluencia.FILE.findOneById(session, fileId);
-
-            if (projectFile == null) {
-                return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
-            }
-            if (!projectFile.isReleased() && !authorized) {
-                return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
-            }
-
-            final List<GameVersionsEntity> gameVersionRecords = projectFile.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
-            final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
             try {
-                DataBaseProject dataProject = ProjectService.getBaseDataProject(project, token);
+                final ProjectsEntity project = ProjectService.getProject(session, gameSlug, projectTypeSlug, projectSlug, token);
+
+                boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
+
+                if (!authorized) {
+                    return ErrorMessage.USER_NOT_AUTHORIZED.respond();
+                }
+
+                final ProjectFilesEntity projectFile = Confluencia.FILE.findOneById(session, fileId);
+
+                if (projectFile == null) {
+                    return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
+                }
+
+                final List<GameVersionsEntity> gameVersionRecords = projectFile.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
+                final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
+
+                final DataBaseProject dataProject = ProjectService.getBaseDataProject(project, token);
                 return ResponseUtil.successResponse(new DataSiteProjectFilePage(dataProject, new DataSiteProjectFileDisplay(projectFile, gameVersions)));
             }
             catch (ResponseException e) {
