@@ -74,8 +74,13 @@ public class CustomGraphQLHttpServlet extends GraphQLHttpServlet {
     private void setAccessControlHeaders (HttpServletRequest req, HttpServletResponse resp) {
 
         resp.setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, req.getHeader(CorsHeaders.ORIGIN));
-        resp.addHeader(CorsHeaders.VARY, CorsHeaders.ORIGIN);
-        resp.addHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+        resp.setHeader(CorsHeaders.VARY, CorsHeaders.ORIGIN);
+        resp.setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+
+        String requestMethods = req.getHeader(CorsHeaders.ACCESS_CONTROL_REQUEST_METHOD);
+        if (requestMethods != null) {
+            resp.setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, requestMethods);
+        }
     }
 
     public ErrorResponse hasPermission (Token token) {
