@@ -19,6 +19,7 @@ import org.jboss.resteasy.spi.CorsHeaders;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.WebApplicationException;
 
 import java.io.IOException;
 
@@ -51,11 +52,12 @@ public class CustomGraphQLHttpServlet extends GraphQLHttpServlet {
 
     @Override
     protected void service (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
         setAccessControlHeaders(req, resp);
 
-        if(!req.getMethod().equalsIgnoreCase("OPTIONS")){
+        if (!req.getMethod().equalsIgnoreCase("OPTIONS")) {
             //TODO broken?
-            ErrorResponse permission = hasPermission(JWTUtil.getToken(req.getHeader("Authorization")));
+            ErrorResponse permission = hasPermission(req.getHeader("Authorization"));
             if (permission != null) {
                 resp.setHeader("Content-Type", "application/json");
                 resp.getWriter().println(this.getGsonInstance().toJson(permission));
@@ -83,28 +85,34 @@ public class CustomGraphQLHttpServlet extends GraphQLHttpServlet {
         if (requestMethods != null) {
             resp.setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, requestMethods);
         }
+
+        String allowHeaders = req.getHeader(CorsHeaders.ACCESS_CONTROL_REQUEST_HEADERS);
+        if (allowHeaders != null) {
+            resp.setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS, allowHeaders);
+        }
     }
 
-    public ErrorResponse hasPermission (Token token) {
+    public ErrorResponse hasPermission (String rawToken) {
 
-        if (token == null) {
-            ErrorMessage errorMessage = ErrorMessage.USER_REQUIRED_TOKEN;
-            return new ErrorResponse(errorMessage.getType().getError(), errorMessage.getUniqueId(), errorMessage.getMessage());
+        try {
+            Token token = JWTUtil.getToken(rawToken);
+            if (token == null) {
+                ErrorMessage errorMessage = ErrorMessage.USER_REQUIRED_TOKEN;
+                return new ErrorResponse(errorMessage.getType().getError(), errorMessage.getUniqueId(), errorMessage.getMessage());
+            }
+
+            if (token.isApiToken()) {
+                ErrorMessage errorMessage = ErrorMessage.USER_INVALID_TOKEN;
+                return new ErrorResponse(errorMessage.getType().getError(), errorMessage.getUniqueId(), "Can't use an API token for this request");
+            }
+
+            if (!UserPermissions.hasPermission(token, UserPermissions.VIEW_ADMIN)) {
+                ErrorMessage errorMessage = ErrorMessage.USER_NOT_AUTHORIZED;
+                return new ErrorResponse(errorMessage.getType().getError(), errorMessage.getUniqueId(), errorMessage.getMessage());
+            }
         }
-
-//        if (token instanceof ErrorToken) {
-//            ErrorMessage errorMessage = ((ErrorToken) token).getErrorMessage();
-//            return new ErrorResponse(errorMessage.getType().getError(), errorMessage.getUniqueId(), errorMessage.getMessage());
-//        }
-
-        if (token.isApiToken()) {
-            ErrorMessage errorMessage = ErrorMessage.USER_INVALID_TOKEN;
-            return new ErrorResponse(errorMessage.getType().getError(), errorMessage.getUniqueId(), "Can't use an API token for this request");
-        }
-
-        if (!UserPermissions.hasPermission(token, UserPermissions.VIEW_ADMIN)) {
-            ErrorMessage errorMessage = ErrorMessage.USER_NOT_AUTHORIZED;
-            return new ErrorResponse(errorMessage.getType().getError(), errorMessage.getUniqueId(), errorMessage.getMessage());
+        catch (WebApplicationException e) {
+            return (ErrorResponse) e.getResponse().getEntity();
         }
 
         return null;
