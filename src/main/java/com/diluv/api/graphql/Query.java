@@ -7,6 +7,7 @@ import com.diluv.api.graphql.data.Game;
 import com.diluv.api.graphql.data.Project;
 import com.diluv.api.graphql.data.ProjectFile;
 import com.diluv.api.graphql.data.ProjectType;
+import com.diluv.api.graphql.data.Stats;
 import com.diluv.api.utils.query.PaginationQuery;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.sort.ProjectSort;
@@ -15,7 +16,7 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 
 public class Query implements GraphQLQueryResolver {
 
-    public List<Game> games (long page, int limit, String sort) {
+    public List<Game> games (int limit, long page, String sort) {
 
         return Confluencia.getTransaction(session -> {
             return Confluencia.GAME.findAll(session, page, limit, getSortOrDefault(sort, ProjectSort.LIST, ProjectSort.NEW), "").stream().map(Game::new).collect(Collectors.toList());
@@ -64,7 +65,7 @@ public class Query implements GraphQLQueryResolver {
         });
     }
 
-    public List<Project> projects (String gameSlug, String projectTypeSlug, Long page, Integer limit, String sort) {
+    public List<Project> projects (String gameSlug, String projectTypeSlug, int limit, long page, String sort) {
 
         long p = PaginationQuery.getPage(page);
         int l = PaginationQuery.getLimit(limit);
@@ -74,12 +75,25 @@ public class Query implements GraphQLQueryResolver {
         });
     }
 
-    public List<Project> projectReviews (Long page, Integer limit) {
+    public List<Project> projectReviews (int limit, long page) {
 
         long p = PaginationQuery.getPage(page);
         int l = PaginationQuery.getLimit(limit);
         return Confluencia.getTransaction(session -> {
             return Confluencia.PROJECT.findAllByReview(session, p, l).stream().map(Project::new).collect(Collectors.toList());
+        });
+    }
+
+    public Stats stats () {
+
+        return Confluencia.getTransaction(session -> {
+            long gameCount = Confluencia.GAME.countAllBySearch(session, "");
+            long projectCount = Confluencia.PROJECT.countAll(session, true);
+            long unreleasedProjectCount = Confluencia.PROJECT.countAll(session, false);
+            long userCount = Confluencia.USER.countAll(session);
+            long tempUserCount = Confluencia.USER.countAllTempUsers(session);
+
+            return new Stats(gameCount, projectCount, unreleasedProjectCount, userCount, tempUserCount);
         });
     }
 
