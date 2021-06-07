@@ -51,16 +51,18 @@ public class CustomGraphQLHttpServlet extends GraphQLHttpServlet {
 
     @Override
     protected void service (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //TODO broken?
-        ErrorResponse permission = hasPermission(JWTUtil.getToken(req.getHeader("Authorization")));
-        if (permission != null) {
-            resp.setHeader("Content-Type", "application/json");
-            resp.getWriter().println(this.getGsonInstance().toJson(permission));
-            resp.setStatus(401);
-            return;
-        }
-
         setAccessControlHeaders(req, resp);
+
+        if(!req.getMethod().equalsIgnoreCase("OPTIONS")){
+            //TODO broken?
+            ErrorResponse permission = hasPermission(JWTUtil.getToken(req.getHeader("Authorization")));
+            if (permission != null) {
+                resp.setHeader("Content-Type", "application/json");
+                resp.getWriter().println(this.getGsonInstance().toJson(permission));
+                resp.setStatus(401);
+                return;
+            }
+        }
         super.service(req, resp);
     }
 
