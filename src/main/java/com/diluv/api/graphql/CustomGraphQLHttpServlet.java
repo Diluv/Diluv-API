@@ -1,13 +1,5 @@
 package com.diluv.api.graphql;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.jboss.resteasy.spi.CorsHeaders;
-
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -21,6 +13,14 @@ import graphql.kickstart.servlet.GraphQLHttpServlet;
 import graphql.kickstart.tools.SchemaParser;
 import graphql.kickstart.tools.SchemaParserOptions;
 import graphql.schema.GraphQLSchema;
+
+import org.jboss.resteasy.spi.CorsHeaders;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
 
 public class CustomGraphQLHttpServlet extends GraphQLHttpServlet {
 
@@ -60,10 +60,22 @@ public class CustomGraphQLHttpServlet extends GraphQLHttpServlet {
             return;
         }
 
-        resp.addHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, req.getHeader(CorsHeaders.ORIGIN));
+        setAccessControlHeaders(req, resp);
+        super.service(req, resp);
+    }
+
+    @Override
+    protected void doOptions (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        super.doOptions(req, resp);
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    private void setAccessControlHeaders (HttpServletRequest req, HttpServletResponse resp) {
+
+        resp.setHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, req.getHeader(CorsHeaders.ORIGIN));
         resp.addHeader(CorsHeaders.VARY, CorsHeaders.ORIGIN);
         resp.addHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-        super.service(req, resp);
     }
 
     public ErrorResponse hasPermission (Token token) {
