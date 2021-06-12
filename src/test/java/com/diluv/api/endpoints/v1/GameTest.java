@@ -1,20 +1,17 @@
 package com.diluv.api.endpoints.v1;
 
-import com.diluv.api.utils.Request;
-import com.diluv.api.utils.TestUtil;
-import com.diluv.api.utils.error.ErrorMessage;
-import com.diluv.api.v1.games.ProjectCreate;
-
-import com.diluv.api.v1.games.ProjectPatch;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.equalTo;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import com.diluv.api.utils.Request;
+import com.diluv.api.utils.TestUtil;
+import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.v1.games.ProjectCreate;
+import com.diluv.api.v1.games.ProjectPatch;
 
 public class GameTest {
 
@@ -78,6 +75,14 @@ public class GameTest {
 
         Request.getOk(URL + "/minecraft-je/mods/bookshelf", "schema/project-schema.json");
         Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/bookshelf", "schema/project-schema.json");
+    }
+
+    @Test
+    public void deleteProject () {
+
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_JARED, URL + "/minecraft-je/mods/bookshelf", ErrorMessage.USER_NOT_AUTHORIZED);
+        Request.deleteOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/musica");
+        Request.getError(URL + "/minecraft-je/mods/musica", ErrorMessage.NOT_FOUND_PROJECT);
     }
 
     @Test

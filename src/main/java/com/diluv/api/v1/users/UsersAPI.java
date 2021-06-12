@@ -144,6 +144,23 @@ public class UsersAPI {
         });
     }
 
+    @DELETE
+    @Path("/self")
+    public Response deleteSelf (@RequireToken @HeaderParam("Authorization") Token token) {
+
+        return Confluencia.getTransaction(session -> {
+            final UsersEntity user = Confluencia.USER.findOneByUserId(session, token.getUserId());
+
+            if (user == null) {
+                return ErrorMessage.NOT_FOUND_USER.respond();
+            }
+
+            session.delete(user);
+
+            return ResponseUtil.noContent();
+        });
+    }
+
     @PATCH
     @Path("/self/mfa")
     public Response patchSelfMFA (@RequireToken @HeaderParam("Authorization") Token token, @MultipartForm User2FAForm form) {

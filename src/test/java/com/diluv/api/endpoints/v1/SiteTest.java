@@ -1,9 +1,7 @@
 package com.diluv.api.endpoints.v1;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
-import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 
 public class SiteTest {

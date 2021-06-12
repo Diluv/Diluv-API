@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PATCH;
@@ -52,6 +53,7 @@ import com.diluv.api.utils.query.ProjectFileQuery;
 import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.utils.validator.RequireToken;
+import com.diluv.api.v1.utilities.ProjectFileService;
 import com.diluv.api.v1.utilities.ProjectService;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.*;
@@ -198,6 +200,27 @@ public class GamesAPI {
             try {
                 final DataBaseProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
                 return ResponseUtil.successResponse(project);
+            }
+            catch (ResponseException e) {
+                return e.getResponse();
+            }
+        });
+    }
+
+    @DELETE
+    @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
+    public Response deleteProject (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
+
+        return Confluencia.getTransaction(session -> {
+            try {
+                final ProjectsEntity project = ProjectService.getProject(session, gameSlug, projectTypeSlug, projectSlug, token);
+                if (project.getOwner().getId() == token.getUserId()) {
+                    session.delete(project);
+                    return ResponseUtil.noContent();
+                }
+                else {
+                    return ErrorMessage.USER_NOT_AUTHORIZED.respond();
+                }
             }
             catch (ResponseException e) {
                 return e.getResponse();
@@ -383,9 +406,25 @@ public class GamesAPI {
     }
 
     @POST
+    @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response uploadProjectFile (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectFileUploadForm form) {
+
+        return Confluencia.getTransaction(session -> {
+            try {
+                ProjectsEntity project = ProjectService.getProject(session, gameSlug, projectTypeSlug, projectSlug, token);
+                return ProjectFileService.postProjectFile(session, project, token, form);
+            }
+            catch (ResponseException e) {
+                return e.getResponse();
+            }
+        });
+    }
+
+    @POST
     @Path("/{gameSlug}/{projectTypeSlug}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postProject (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Valid @MultipartForm ProjectCreateForm form) {
+    public Response createProject (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @Valid @MultipartForm ProjectCreateForm form) {
 
         return Confluencia.getTransaction(session -> {
 

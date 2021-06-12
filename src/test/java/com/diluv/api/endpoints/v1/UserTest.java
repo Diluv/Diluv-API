@@ -59,6 +59,12 @@ public class UserTest {
     }
 
     @Test
+    public void deleteSelf () {
+
+        Request.deleteOkWithAuth("7517d424-ccf3-4966-ac4f-d58b59508718", URL + "/self");
+    }
+
+    @Test
     public void patchSelfMFA () {
 
         final String secret = new Base64().encodeToString("12345678".getBytes());
@@ -135,16 +141,14 @@ public class UserTest {
     @Test
     public void deleteToken () {
 
-        Map<String, Object> multiPart = new HashMap<>();
-
-        Request.deleteErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self/token/3", multiPart, ErrorMessage.USER_INVALID_TOKEN);
-        Request.deleteErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token/2", multiPart, ErrorMessage.TOKEN_INVALID_ID);
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self/token/3", ErrorMessage.USER_INVALID_TOKEN);
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token/2", ErrorMessage.TOKEN_INVALID_ID);
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + TestUtil.TOKEN_DARKHAX);
-        Request.deleteRequest(URL + "/self/token/3", headers, multiPart, 204, null);
+        Request.deleteRequest(URL + "/self/token/3", headers, 204, null);
 
-        Request.deleteErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token/3", multiPart, ErrorMessage.TOKEN_INVALID_ID);
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token/3", ErrorMessage.TOKEN_INVALID_ID);
 
     }
 }

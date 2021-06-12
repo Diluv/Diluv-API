@@ -180,21 +180,9 @@ public class Request {
         patchRequest(url, headers, body, statusCode, null);
     }
 
-    public static ValidatableResponse deleteRequest (String url, Map<String, String> headers, Map<String, Object> multiPart, int status, String schema) {
+    public static ValidatableResponse deleteRequest (String url, Map<String, String> headers, int status, String schema) {
 
         RequestSpecification request = given().headers(headers);
-        for (String key : multiPart.keySet()) {
-            Object o = multiPart.get(key);
-            if (o instanceof File) {
-                request = request.multiPart(key, (File) o);
-            }
-            else if (o instanceof String) {
-                request = request.multiPart(key, (String) o);
-            }
-            else {
-                request = request.multiPart(key, GSON.toJson(o), "application/json");
-            }
-        }
         ValidatableResponse response = request
             .delete(url)
             .then()
@@ -207,18 +195,18 @@ public class Request {
         return response.body(matchesJsonSchemaInClasspath(schema));
     }
 
-    public static void deleteOkWithAuth (String token, String url, Map<String, Object> multiPart, String schema) {
+    public static void deleteOkWithAuth (String token, String url) {
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
-        deleteRequest(url, headers, multiPart, 200, schema);
+        deleteRequest(url, headers, 204, null);
     }
 
-    public static void deleteErrorWithAuth (String token, String url, Map<String, Object> multiPart, ErrorMessage error) {
+    public static void deleteErrorWithAuth (String token, String url, ErrorMessage error) {
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
-        deleteRequest(url, headers, multiPart, error.getType().getCode(), "schema/error-schema.json")
+        deleteRequest(url, headers, error.getType().getCode(), "schema/error-schema.json")
             .body("error", equalTo(error.getUniqueId()));
     }
 }

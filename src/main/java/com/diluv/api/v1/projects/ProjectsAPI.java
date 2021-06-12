@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -68,15 +69,20 @@ public class ProjectsAPI {
         });
     }
 
-    @POST
-    @Path("/{id}/files")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postProjectFile (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("id") Long projectId, @Valid @MultipartForm ProjectFileUploadForm form) {
+    @DELETE
+    @Path("/{id}")
+    public Response deleteProject (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("id") Long id) {
 
         return Confluencia.getTransaction(session -> {
             try {
-                ProjectsEntity project = ProjectService.getProject(session, projectId, token);
-                return ProjectFileService.postProjectFile(session, project, token, form);
+                final ProjectsEntity project = ProjectService.getProject(session, id, token);
+                if (project.getOwner().getId() == token.getUserId()) {
+                    session.delete(project);
+                    return ResponseUtil.noContent();
+                }
+                else {
+                    return ErrorMessage.USER_NOT_AUTHORIZED.respond();
+                }
             }
             catch (ResponseException e) {
                 return e.getResponse();
@@ -85,13 +91,13 @@ public class ProjectsAPI {
     }
 
     @POST
-    @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
+    @Path("/{id}/files")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response postProjectFile (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug, @MultipartForm ProjectFileUploadForm form) {
+    public Response postProjectFile (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("id") Long projectId, @Valid @MultipartForm ProjectFileUploadForm form) {
 
         return Confluencia.getTransaction(session -> {
             try {
-                ProjectsEntity project = ProjectService.getProject(session, gameSlug, projectTypeSlug, projectSlug, token);
+                ProjectsEntity project = ProjectService.getProject(session, projectId, token);
                 return ProjectFileService.postProjectFile(session, project, token, form);
             }
             catch (ResponseException e) {
@@ -121,6 +127,32 @@ public class ProjectsAPI {
             final List<DataGameVersion> gameVersions = gameVersionRecords.stream().map(DataGameVersion::new).collect(Collectors.toList());
 
             return ResponseUtil.successResponse(new DataSiteProjectFileDisplay(projectFile, gameVersions));
+        });
+    }
+
+    @DELETE
+    @Path("/files/{fileId}")
+    public Response deleteProjectFile (@HeaderParam("Authorization") Token token, @PathParam("fileId") long fileId) {
+
+        return Confluencia.getTransaction(session -> {
+            final ProjectFilesEntity projectFile = Confluencia.FILE.findOneById(session, fileId);
+
+            if (projectFile == null) {
+                return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
+            }
+            final ProjectsEntity project = projectFile.getProject();
+            boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_DELETE);
+
+            if (!authorized) {
+                if (!projectFile.isReleased()) {
+                    return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
+                }
+                return ErrorMessage.USER_NOT_AUTHORIZED.respond();
+            }
+
+            session.delete(projectFile);
+
+            return ResponseUtil.noContent();
         });
     }
 

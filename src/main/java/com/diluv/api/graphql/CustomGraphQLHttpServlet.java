@@ -1,5 +1,14 @@
 package com.diluv.api.graphql;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.WebApplicationException;
+
+import org.jboss.resteasy.spi.CorsHeaders;
+
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
@@ -13,15 +22,6 @@ import graphql.kickstart.servlet.GraphQLHttpServlet;
 import graphql.kickstart.tools.SchemaParser;
 import graphql.kickstart.tools.SchemaParserOptions;
 import graphql.schema.GraphQLSchema;
-
-import org.jboss.resteasy.spi.CorsHeaders;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.WebApplicationException;
-
-import java.io.IOException;
 
 public class CustomGraphQLHttpServlet extends GraphQLHttpServlet {
 

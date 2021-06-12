@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +23,7 @@ public class ProjectTest {
 
     @BeforeAll
     public static void setup () {
+
         try {
             FileUtils.deleteDirectory(new File(Constants.PROCESSING_FOLDER));
         }
@@ -40,6 +40,15 @@ public class ProjectTest {
 
         Request.getOk(URL + "/1", "schema/project-schema.json");
         Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/1", "schema/project-schema.json");
+    }
+
+    @Test
+    public void deleteProjectById () {
+
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_JARED, URL + "/1", ErrorMessage.USER_NOT_AUTHORIZED);
+        Request.deleteOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/17");
+        Request.getError(URL + "/17", ErrorMessage.NOT_FOUND_PROJECT);
+        Request.getError(URL + "/files/17", ErrorMessage.NOT_FOUND_PROJECT_FILE);
     }
 
     @Test
@@ -133,5 +142,13 @@ public class ProjectTest {
     public void getProjectFile () {
 
         Request.getOk(URL + "/files/1", "schema/project-files-schema.json");
+    }
+
+    @Test
+    public void deleteProjectFile () {
+
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_JARED, URL + "/files/1", ErrorMessage.USER_NOT_AUTHORIZED);
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_JARED, URL + "/files/19", ErrorMessage.NOT_FOUND_PROJECT_FILE);
+        Request.deleteOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files/19");
     }
 }

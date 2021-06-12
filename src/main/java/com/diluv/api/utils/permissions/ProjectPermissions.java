@@ -16,6 +16,7 @@ public enum ProjectPermissions {
 
     PROJECT_EDIT("project.edit"),
     FILE_EDIT("file.edit"),
+    FILE_DELETE("file.delete"),
     FILE_UPLOAD("file.upload"),
     ;
 
