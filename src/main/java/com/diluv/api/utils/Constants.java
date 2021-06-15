@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.validator.GenericValidator;
 
@@ -33,6 +36,8 @@ import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 
 public final class Constants {
+
+    private static Gson gson;
 
     public static final String ENV = getValueOrDefault("ENVIRONMENT", "PRODUCTION");
 
@@ -267,5 +272,15 @@ public final class Constants {
     public static String getFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) {
 
         return String.format("%s/games/%s/%s/%d/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName);
+    }
+
+    public static Gson getGsonInstance () {
+
+        if (gson == null) {
+
+            gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        }
+
+        return gson;
     }
 }

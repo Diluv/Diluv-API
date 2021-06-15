@@ -7,12 +7,15 @@ import com.diluv.api.graphql.data.Game;
 import com.diluv.api.graphql.data.Project;
 import com.diluv.api.graphql.data.ProjectFile;
 import com.diluv.api.graphql.data.ProjectType;
+import com.diluv.api.graphql.data.RegistrationCodes;
 import com.diluv.api.graphql.data.Stats;
 import com.diluv.api.utils.query.PaginationQuery;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
+import graphql.GraphQLContext;
 import graphql.kickstart.tools.GraphQLQueryResolver;
+import graphql.schema.DataFetchingEnvironment;
 
 public class Query implements GraphQLQueryResolver {
 
@@ -94,6 +97,15 @@ public class Query implements GraphQLQueryResolver {
             long tempUserCount = Confluencia.USER.countAllTempUsers(session);
 
             return new Stats(gameCount, projectCount, unreleasedProjectCount, userCount, tempUserCount);
+        });
+    }
+
+    public List<RegistrationCodes> registrationCodes (DataFetchingEnvironment env) {
+
+        GraphQLContext context = env.getContext();
+        long userId = context.get("userId");
+        return Confluencia.getTransaction(session -> {
+            return Confluencia.MISC.findAllRegistrationCodesByUser(session, userId).stream().map(RegistrationCodes::new).collect(Collectors.toList());
         });
     }
 

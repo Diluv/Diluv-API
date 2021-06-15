@@ -2,6 +2,7 @@ package com.diluv.api.v1.admin;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.Consumes;
@@ -12,6 +13,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -36,6 +38,7 @@ import com.diluv.confluencia.database.record.GamesEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
+import graphql.GraphQLContext;
 
 @ApplicationScoped
 @GZIP
@@ -190,5 +193,35 @@ public class AdminAPI {
 
         StreamingOutput stream = os -> FileUtils.copyFile(destination, os);
         return Response.ok(stream).header("content-disposition", "attachment; filename=\"" + rs.getName() + "\"").build();
+    }
+
+    @GET
+    @Path("/graphql")
+    public Response getGraphQL (@RequireToken(apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token, @QueryParam("query") String query, @QueryParam("variables") String variables, @QueryParam("operationName") String operationName) {
+
+        Map<String, Object> variablesMap = Constants.getGsonInstance().fromJson(variables, Map.class);
+        return GraphQLUtil.getResponse(new GraphQLRequest(query, operationName, variablesMap), new GraphQLContext.Builder().of("userId", token.getUserId()).build());
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/graphql")
+    public Response postGraphQL (@RequireToken(apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token, GraphQLRequest request) {
+
+        return GraphQLUtil.getResponse(request, new GraphQLContext.Builder().of("userId", token.getUserId()).build());
+    }
+
+    @GET
+    @Path("/graphql/schema.json")
+    public Response getIntrospection (@RequireToken(apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token) {
+
+        return GraphQLUtil.getIntrospection();
+    }
+
+    @POST
+    @Path("/graphql/schema.json")
+    public Response postIntrospection (@RequireToken(apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token) {
+
+        return GraphQLUtil.getIntrospection();
     }
 }

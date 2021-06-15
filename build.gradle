@@ -33,12 +33,11 @@ dependencies {
     implementation group: 'com.wildbit.java', name: 'postmark', version: '1.7'
 
     implementation group: "com.github.spotbugs", name: "spotbugs-annotations", version: "4.2.3"
-    implementation group: 'com.graphql-java-kickstart', name: 'graphql-java-servlet', version: '11.1.1'
     implementation group: 'com.graphql-java-kickstart', name: 'graphql-java-tools', version: '11.0.1'
+    implementation group: 'com.graphql-java', name: 'graphql-java', version: '16.2'
 
     implementation group: 'org.jboss.resteasy', name: 'resteasy-undertow', version: '4.6.0.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-multipart-provider', version: '4.6.0.Final'
-    implementation group: 'org.jboss.resteasy', name: 'resteasy-servlet-initializer', version: '4.6.0.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-atom-provider', version: '4.6.0.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-cdi', version: '4.6.0.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-validator-provider', version: '4.6.0.Final'

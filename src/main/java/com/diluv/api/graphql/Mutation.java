@@ -1,9 +1,12 @@
 package com.diluv.api.graphql;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import com.diluv.api.graphql.data.Project;
 import com.diluv.api.graphql.data.ProjectType;
-import com.diluv.api.utils.auth.JWTUtil;
-import com.diluv.api.utils.auth.tokens.Token;
+import com.diluv.api.graphql.data.RegistrationCodes;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GamesEntity;
 import com.diluv.confluencia.database.record.ProjectRequestChangeEntity;
@@ -11,10 +14,11 @@ import com.diluv.confluencia.database.record.ProjectReviewEntity;
 import com.diluv.confluencia.database.record.ProjectTypeLoadersEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.diluv.confluencia.database.record.RegistrationCodesEntity;
 import com.diluv.confluencia.database.record.TagsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
+import graphql.GraphQLContext;
 import graphql.GraphQLException;
-import graphql.kickstart.servlet.context.DefaultGraphQLServletContext;
 import graphql.kickstart.tools.GraphQLMutationResolver;
 import graphql.schema.DataFetchingEnvironment;
 
@@ -85,11 +89,12 @@ public class Mutation implements GraphQLMutationResolver {
                 throw new GraphQLException("Project doesn't exists");
             }
 
-            DefaultGraphQLServletContext context = env.getContext();
-            Token token = JWTUtil.getToken(context.getHttpServletRequest().getHeader("Authorization"));
+            //TODO
+            GraphQLContext context = env.getContext();
+            long userId = context.get("userId");
 
             ProjectReviewEntity review = new ProjectReviewEntity();
-            review.setReviewedBy(new UsersEntity(token.getUserId()));
+            review.setReviewedBy(new UsersEntity(userId));
             if (requestChange) {
                 review.setProjectRequestChange(new ProjectRequestChangeEntity(reason));
             }
@@ -139,6 +144,22 @@ public class Mutation implements GraphQLMutationResolver {
             session.save(tag);
 
             return new ProjectType(projectType);
+        });
+    }
+
+    public List<RegistrationCodes> registrationCodes (int count, DataFetchingEnvironment env) {
+
+        GraphQLContext context = env.getContext();
+        long userId = context.get("userId");
+        return Confluencia.getTransaction(session -> {
+            List<RegistrationCodes> codes = new ArrayList<>();
+
+            for (int i = 0; i < count; i++) {
+                RegistrationCodesEntity entity = new RegistrationCodesEntity(UUID.randomUUID().toString(), new UsersEntity(userId));
+                session.save(entity);
+                codes.add(new RegistrationCodes(entity));
+            }
+            return codes;
         });
     }
 }

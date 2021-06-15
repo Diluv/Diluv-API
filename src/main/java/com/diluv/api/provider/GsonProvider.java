@@ -17,8 +17,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.diluv.api.utils.Constants;
 import com.google.gson.JsonSyntaxException;
 
 @Provider
@@ -37,7 +36,7 @@ public class GsonProvider implements MessageBodyWriter<Object>, MessageBodyReade
 
         try (InputStreamReader reader = new InputStreamReader(entityStream, StandardCharsets.UTF_8)) {
 
-            return this.getGsonInstance().fromJson(reader, genericType);
+            return Constants.getGsonInstance().fromJson(reader, genericType);
         }
 
         catch (final JsonSyntaxException e) {
@@ -58,19 +57,7 @@ public class GsonProvider implements MessageBodyWriter<Object>, MessageBodyReade
 
         try (OutputStreamWriter out = new OutputStreamWriter(entityStream, StandardCharsets.UTF_8)) {
 
-            this.getGsonInstance().toJson(object, out);
+            Constants.getGsonInstance().toJson(object, out);
         }
-    }
-
-    private Gson gson;
-
-    private Gson getGsonInstance () {
-
-        if (this.gson == null) {
-
-            this.gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        }
-
-        return this.gson;
     }
 }

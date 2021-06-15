@@ -13,14 +13,7 @@ type Query {
     projectType(gameSlug: String!, projectTypeSlug: String!): ProjectType
     projects(gameSlug: String!, projectTypeSlug: String!, limit: Int, page: Long, sort: String): [Project!]!
     stats: Stats!
-}
-
-type Stats {
-    gameCount: Long!
-    projectCount: Long!
-    unreleasedProjectCount: Long!
-    userCount: Long!
-    tempUserCount: Long!
+    registrationCodes: [RegistrationCodes!]!
 }
 
 type Mutation {
@@ -29,6 +22,7 @@ type Mutation {
     addTag(gameSlug: String!, projectTypeSlug: String!, tagName: String!, tagSlug: String!): ProjectType
     reviewed(projectId: ID!, reason: String, requestChange: Boolean!): Project!
     updateProjectType(gameSlug: String!, isDefault: Boolean, maxFileSize: Long, projectTypeName: String, projectTypeSlug: String!): ProjectType!
+    registrationCodes(count: Int! = 5): [RegistrationCodes!]!
 }
 
 type Author {
@@ -125,5 +119,18 @@ type User {
     username: String!
 }
 
+type Stats {
+    gameCount: Long!
+    projectCount: Long!
+    unreleasedProjectCount: Long!
+    userCount: Long!
+    tempUserCount: Long!
+}
+
+type RegistrationCodes {
+    code: String!
+    createdAt: Long!
+    user: User!
+}
 
 scalar Long
