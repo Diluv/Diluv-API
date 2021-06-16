@@ -192,7 +192,7 @@ public class AdminAPI {
         }
 
         StreamingOutput stream = os -> FileUtils.copyFile(destination, os);
-        return Response.ok(stream).header("content-disposition", "attachment; filename=\"" + rs.getName() + "\"").build();
+        return Response.ok(stream).header("content-disposition", "attachment; filename=\"" + rs.getDisplayName() + "\"").build();
     }
 
     @GET

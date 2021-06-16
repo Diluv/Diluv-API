@@ -109,8 +109,8 @@ public class DataProjectFile {
     public DataProjectFile (ProjectFilesEntity rs, String gameSlug, String projectTypeSlug, String projectSlug) {
 
         this.id = rs.getId();
-        this.name = rs.getName();
-        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
+        this.name = rs.getDisplayName();
+        this.downloadURL = Constants.getFileURL(gameSlug, projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getDisplayName());
         this.size = rs.getSize();
         this.changelog = rs.getChangelog();
         this.sha512 = rs.getSha512();

@@ -36,6 +36,7 @@ public enum ErrorMessage {
     PROJECT_FILE_INVALID_DEPENDENCY_TYPE(BAD_REQUEST, "invalid_dependency_type", "Dependency type must be required, optional or incompatible"),
     PROJECT_FILE_INVALID_CHANGELOG(BAD_REQUEST, "invalid_changelog", "The changelog is not valid, must be null or below 2000 characters."),
     PROJECT_FILE_INVALID_FILENAME(BAD_REQUEST, "invalid_filename", "The file name is invalid, must be allowed by the project type"),
+    PROJECT_FILE_INVALID_DISPLAY_NAME(BAD_REQUEST, "invalid_display_name", "The display name is invalid."),
     PROJECT_FILE_INVALID_FILE(BAD_REQUEST, "invalid_file", "File is invalid, cannot be null"),
     PROJECT_FILE_INVALID_RELEASE_TYPE(BAD_REQUEST, "invalid_release_type", "Must be release, beta or alpha"),
     PROJECT_FILE_INVALID_CLASSIFIER(BAD_REQUEST, "invalid_classifier", "Must be binary"),

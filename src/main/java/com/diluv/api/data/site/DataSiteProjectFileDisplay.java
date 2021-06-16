@@ -107,11 +107,11 @@ public class DataSiteProjectFileDisplay {
     public DataSiteProjectFileDisplay (ProjectFilesEntity rs, List<DataGameVersion> gameVersions) {
 
         this.id = rs.getId();
-        this.name = rs.getName();
+        this.name = rs.getDisplayName();
         this.gameSlug = rs.getProject().getGame().getSlug();
         this.projectTypeSlug = rs.getProject().getProjectType().getSlug();
         this.projectSlug = rs.getProject().getSlug();
-        this.downloadURL = Constants.getFileURL(this.gameSlug, this.projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getName());
+        this.downloadURL = Constants.getFileURL(this.gameSlug, this.projectTypeSlug, rs.getProject().getId(), rs.getId(), rs.getDisplayName());
         this.size = rs.getSize();
         this.sha512 = rs.getSha512();
         this.downloads = rs.getDownloads();

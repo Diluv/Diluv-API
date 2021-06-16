@@ -2,6 +2,7 @@ package com.diluv.api.endpoints.v1;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.v1.games.FileDependency;
 import com.diluv.api.v1.games.ProjectFileUpload;
+import com.diluv.api.v1.projects.ProjectFilePatch;
 
 public class ProjectTest {
 
@@ -142,6 +144,21 @@ public class ProjectTest {
     public void getProjectFile () {
 
         Request.getOk(URL + "/files/1", "schema/project-files-schema.json");
+    }
+
+    @Test
+    public void editProjectFile () {
+
+        ProjectFilePatch data = new ProjectFilePatch();
+        Map<String, Object> multiPart = new HashMap<>();
+        multiPart.put("data", data);
+
+        data.dependencies = new ArrayList<>();
+        Request.patchOkMultipartWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files/1", multiPart);
+
+        data.dependencies = null;
+        data.displayName = "newDisplayName.jar";
+        Request.patchOkMultipartWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files/1", multiPart);
     }
 
     @Test

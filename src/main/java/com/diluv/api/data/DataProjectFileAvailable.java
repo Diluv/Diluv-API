@@ -14,9 +14,9 @@ public class DataProjectFileAvailable extends DataProjectFile {
     @Expose
     private final long updatedAt;
 
-    public DataProjectFileAvailable (ProjectFilesEntity rs, String projectSlug, String projectTypeSlug, String gameSlug) {
+    public DataProjectFileAvailable (ProjectFilesEntity rs, String gameSlug, String projectTypeSlug, String projectSlug) {
 
-        super(rs, projectSlug, projectTypeSlug, gameSlug);
+        super(rs, gameSlug, projectTypeSlug, projectSlug);
         this.updatedAt = rs.getUpdatedAt().getTime();
     }
 }

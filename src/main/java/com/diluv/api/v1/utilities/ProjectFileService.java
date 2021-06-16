@@ -2,7 +2,6 @@ package com.diluv.api.v1.utilities;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -95,6 +94,7 @@ public class ProjectFileService {
 
         ProjectFilesEntity projectFile = new ProjectFilesEntity();
         projectFile.setName(fileName);
+        projectFile.setDisplayName(fileName);
         projectFile.setVersion(form.data.version);
         projectFile.setSize(tempFile.length());
         projectFile.setChangelog(form.data.changelog);
@@ -105,34 +105,28 @@ public class ProjectFileService {
         projectFile.setUser(new UsersEntity(token.getUserId()));
 
         if (!gameVersionRecords.isEmpty()) {
-            List<ProjectFileGameVersionsEntity> gameVersions = new ArrayList<>();
             for (GameVersionsEntity version : gameVersionRecords) {
                 ProjectFileGameVersionsEntity gameVersionsEntity = new ProjectFileGameVersionsEntity();
                 gameVersionsEntity.setProjectFile(projectFile);
                 gameVersionsEntity.setGameVersion(version);
-                gameVersions.add(gameVersionsEntity);
+                projectFile.addGameVersion(gameVersionsEntity);
             }
-            projectFile.setGameVersions(gameVersions);
         }
 
         if (!projectTypeLoaders.isEmpty()) {
-            List<ProjectFileLoadersEntity> loaders = new ArrayList<>();
             for (ProjectTypeLoadersEntity loader : projectTypeLoaders) {
                 ProjectFileLoadersEntity fileLoadersEntity = new ProjectFileLoadersEntity();
                 fileLoadersEntity.setProjectFile(projectFile);
                 fileLoadersEntity.setLoader(loader);
-                loaders.add(fileLoadersEntity);
+                projectFile.addLoader(fileLoadersEntity);
             }
-            projectFile.setLoaders(loaders);
         }
 
         if (!dependencyRecords.isEmpty()) {
-            List<ProjectFileDependenciesEntity> dependencies = new ArrayList<>();
             for (ProjectFileDependenciesEntity dependency : dependencyRecords) {
                 dependency.setProjectFile(projectFile);
-                dependencies.add(dependency);
+                projectFile.addDependencies(dependency);
             }
-            projectFile.setDependencies(dependencies);
         }
 
         session.save(projectFile);

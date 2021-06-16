@@ -29,7 +29,7 @@ public class FeedProjectFiles extends Feed {
         content.setText(file.getChangelog());
         Entry entry = new Entry();
         entry.setId(URI.create(baseUrl + "/files/" + file.getId()));
-        entry.setTitle(file.getName());
+        entry.setTitle(file.getDisplayName());
         entry.setUpdated(file.getUpdatedAt());
         entry.setContent(content);
         entry.getAuthors().add(new Person(file.getUser().getDisplayName()));

@@ -405,6 +405,7 @@ public class GamesAPI {
         });
     }
 
+    @Deprecated
     @POST
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}/files")
     @Consumes(MediaType.MULTIPART_FORM_DATA)

@@ -20,7 +20,7 @@ public class ProjectFile {
     public ProjectFile (ProjectFilesEntity rs) {
 
         this.id = rs.getId();
-        this.name = rs.getName();
+        this.name = rs.getDisplayName();
         this.size = rs.getSize();
         this.changelog = rs.getChangelog();
         this.sha512 = rs.getSha512();
