@@ -125,6 +125,7 @@ type Stats {
     unreleasedProjectCount: Long!
     userCount: Long!
     tempUserCount: Long!
+    fileSize: Long!
 }
 
 type RegistrationCodes {

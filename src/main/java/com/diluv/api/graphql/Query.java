@@ -95,8 +95,9 @@ public class Query implements GraphQLQueryResolver {
             long unreleasedProjectCount = Confluencia.PROJECT.countAll(session, false);
             long userCount = Confluencia.USER.countAll(session);
             long tempUserCount = Confluencia.USER.countAllTempUsers(session);
+            long fileSize = Confluencia.FILE.countAllFileSize(session);
 
-            return new Stats(gameCount, projectCount, unreleasedProjectCount, userCount, tempUserCount);
+            return new Stats(gameCount, projectCount, unreleasedProjectCount, userCount, tempUserCount, fileSize);
         });
     }
 
