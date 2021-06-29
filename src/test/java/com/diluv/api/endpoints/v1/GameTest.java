@@ -1,17 +1,17 @@
 package com.diluv.api.endpoints.v1;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.v1.games.ProjectCreate;
 import com.diluv.api.v1.games.ProjectPatch;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GameTest {
 
@@ -169,8 +169,8 @@ public class GameTest {
         Map<String, Object> multiPart = new HashMap<>();
         multiPart.put("data", data);
         multiPart.put("logo", logo);
-        Request.patchMultipartErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/invalid/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_GAME);
-        Request.patchMultipartErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/invalid/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_GAME);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/invalid/invalid", multiPart, 400, ErrorMessage.NOT_FOUND_PROJECT_TYPE);
 
 //        multiPart.put("name", "Dark Elevators New");
 //        multiPart.put("tags", "invalid,magic");
@@ -180,14 +180,34 @@ public class GameTest {
         data.name = "Dark Elevators New";
         data.tags.clear();
         multiPart.put("data", data);
-        Request.patchOkMultipartWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/dark-elevators", multiPart);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/dark-elevators", multiPart);
 
         multiPart.clear();
         multiPart.put("data", new ProjectPatch());
-        Request.patchOkMultipartWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/get-ya-tanks-here", multiPart);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/get-ya-tanks-here", multiPart);
 
-//        multiPart.put("name", "Dark Elevators New");
-//        multiPart.put("tags", "tech,magic");
-//        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/dark-elevators", multiPart, "schema/project-schema.json");
+        data = new ProjectPatch();
+        data.ownerId = 2L;
+        multiPart.clear();
+        multiPart.put("data", data);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/get-ya-tanks-here", multiPart);
+
+        data = new ProjectPatch();
+        data.ownerId = 9999L;
+        multiPart.clear();
+        multiPart.put("data", data);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/get-ya-tanks-here", multiPart, ErrorMessage.USER_NOT_AUTHORIZED);
+
+        data = new ProjectPatch();
+        data.resolveReview = true;
+        multiPart.clear();
+        multiPart.put("data", data);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/waila-inhibitors", multiPart);
+
+        data = new ProjectPatch();
+        data.ownerId = 9999L;
+        multiPart.clear();
+        multiPart.put("data", data);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/waila-inhibitors", multiPart, ErrorMessage.PROJECT_USER_NOT_FOUND);
     }
 }

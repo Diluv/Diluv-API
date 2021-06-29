@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -96,12 +97,16 @@ public class UsersAPI {
                 return ErrorMessage.NOT_FOUND_USER.respond();
             }
 
-            if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.currentPassword.toCharArray())) {
+            if (form.data == null) {
+                return ErrorMessage.INVALID_DATA.respond();
+            }
+
+            if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.data.currentPassword.toCharArray())) {
                 return ErrorMessage.USER_INVALID_PASSWORD.respond();
             }
 
-            if (!GenericValidator.isBlankOrNull(form.displayName)) {
-                String displayName = form.displayName.trim();
+            if (!GenericValidator.isBlankOrNull(form.data.displayName)) {
+                String displayName = form.data.displayName.trim();
                 if (!displayName.equals(user.getDisplayName())) {
                     if (!Validator.validateUserDisplayName(user.getUsername(), displayName)) {
                         return ErrorMessage.USER_INVALID_DISPLAY_NAME.respond();
@@ -110,13 +115,13 @@ public class UsersAPI {
                 }
             }
 
-            if (!GenericValidator.isBlankOrNull(form.newPassword)) {
-                String password = form.newPassword.trim();
+            if (!GenericValidator.isBlankOrNull(form.data.newPassword)) {
+                String password = form.data.newPassword.trim();
                 user.setPassword(AuthUtilities.getBcrypt(password.toCharArray()));
             }
 
-            if (!GenericValidator.isBlankOrNull(form.email)) {
-                String email = form.email.trim();
+            if (!GenericValidator.isBlankOrNull(form.data.email)) {
+                String email = form.data.email.trim();
                 if (!user.getEmail().equalsIgnoreCase(email)) {
                     if (Confluencia.USER.existsByEmail(session, email) || Confluencia.USER.existsTempUserByEmail(session, email)) {
 
@@ -163,7 +168,7 @@ public class UsersAPI {
 
     @PATCH
     @Path("/self/mfa")
-    public Response patchSelfMFA (@RequireToken @HeaderParam("Authorization") Token token, @MultipartForm User2FAForm form) {
+    public Response patchSelfMFA (@RequireToken @HeaderParam("Authorization") Token token, @Valid @MultipartForm User2FAForm form) {
 
         return Confluencia.getTransaction(session -> {
             final UsersEntity user = Confluencia.USER.findOneByUserId(session, token.getUserId());
@@ -173,20 +178,20 @@ public class UsersAPI {
                 return ErrorMessage.NOT_FOUND_USER.respond();
             }
 
-            if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.password.toCharArray())) {
+            if (!OpenBSDBCrypt.checkPassword(user.getPassword(), form.data.password.toCharArray())) {
                 return ErrorMessage.USER_INVALID_PASSWORD.respond();
             }
 
-            if ("enable".equalsIgnoreCase(form.mfaStatus)) {
-                if (!Validator.validateMFA(form.mfa)) {
+            if ("enable".equalsIgnoreCase(form.data.mfaStatus)) {
+                if (!Validator.validateMFA(form.data.mfa)) {
                     return ErrorMessage.USER_INVALID_MFA.respond();
                 }
 
-                if (GenericValidator.isBlankOrNull(form.mfaSecret) || !Base64.isBase64(form.mfaSecret)) {
+                if (GenericValidator.isBlankOrNull(form.data.mfaSecret) || !Base64.isBase64(form.data.mfaSecret)) {
                     return ErrorMessage.USER_INVALID_MFA_SECRET.respond();
                 }
 
-                if (!gAuth.authorize(form.mfaSecret, form.mfa)) {
+                if (!gAuth.authorize(form.data.mfaSecret, form.data.mfa)) {
                     return ErrorMessage.USER_INVALID_MFA_AND_MFA_SECRET.respond();
                 }
 
@@ -200,12 +205,12 @@ public class UsersAPI {
                     session.save(new UserMfaRecoveryEntity(user, code));
                 }
 
-                user.setMfaSecret(form.mfaSecret);
+                user.setMfaSecret(form.data.mfaSecret);
                 user.setMfa(true);
 
                 session.update(user);
             }
-            else if ("disable".equalsIgnoreCase(form.mfaStatus)) {
+            else if ("disable".equalsIgnoreCase(form.data.mfaStatus)) {
                 user.setMfa(false);
                 user.setMfaSecret(null);
 
@@ -217,7 +222,7 @@ public class UsersAPI {
                 session.update(user);
             }
 
-            return ResponseUtil.successResponse(new DataAuthorizedUser(user));
+            return ResponseUtil.noContent();
         });
     }
 

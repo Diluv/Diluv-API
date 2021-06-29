@@ -1,21 +1,15 @@
 package com.diluv.api.v1.users;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.Valid;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.core.MediaType;
 
-import com.google.gson.annotations.Expose;
+import org.jboss.resteasy.annotations.providers.multipart.PartType;
 
 public class User2FAForm {
 
-    @NotBlank(message = "USER_INVALID_PASSWORD")
-    @Expose
-    public String password;
-
-    @Expose
-    public String mfaStatus;
-
-    @Expose
-    public String mfaSecret;
-
-    @Expose
-    public Integer mfa;
+    @Valid
+    @FormParam("data")
+    @PartType(value = MediaType.APPLICATION_JSON)
+    public User2FA data;
 }

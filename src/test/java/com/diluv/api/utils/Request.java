@@ -1,15 +1,15 @@
 package com.diluv.api.utils;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.diluv.api.utils.error.ErrorMessage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
@@ -106,24 +106,7 @@ public class Request {
             .body("error", equalTo(error.getUniqueId()));
     }
 
-    public static ValidatableResponse patchRequest (String url, Map<String, String> headers, Object body, int status, String schema) {
-
-        RequestSpecification request = given().headers(headers);
-        ValidatableResponse response = request
-            .body(GSON.toJson(body))
-            .contentType(ContentType.JSON)
-            .patch(url)
-            .then()
-            .assertThat()
-            .statusCode(status);
-
-        if (schema == null) {
-            return response;
-        }
-        return response.body(matchesJsonSchemaInClasspath(schema));
-    }
-
-    public static ValidatableResponse patchMultiPartRequest (String url, Map<String, String> headers, Map<String, Object> multiPart, int status, String schema) {
+    public static ValidatableResponse patchRequest (String url, Map<String, String> headers, Map<String, Object> multiPart, int status, String schema) {
 
         RequestSpecification request = given().headers(headers);
         for (String key : multiPart.keySet()) {
@@ -150,34 +133,27 @@ public class Request {
         return response.body(matchesJsonSchemaInClasspath(schema));
     }
 
-    public static void patchErrorWithAuth (String token, String url, Object body, ErrorMessage error) {
+    public static void patchErrorWithAuth (String token, String url, Map<String, Object> multiPart, ErrorMessage error) {
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
-        patchRequest(url, headers, body, error.getType().getCode(), "schema/error-schema.json")
+        patchRequest(url, headers, multiPart, error.getType().getCode(), "schema/error-schema.json")
             .body("message", equalTo(error.getMessage()));
     }
 
-    public static void patchMultipartErrorWithAuth (String token, String url, Map<String, Object> multiPart, int status, ErrorMessage error) {
+    public static void patchErrorWithAuth (String token, String url, Map<String, Object> multiPart, int status, ErrorMessage error) {
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
-        patchMultiPartRequest(url, headers, multiPart, status, "schema/error-schema.json")
+        patchRequest(url, headers, multiPart, status, "schema/error-schema.json")
             .body("message", equalTo(error.getMessage()));
     }
 
-    public static void patchOkMultipartWithAuth (String token, String url, Map<String, Object> multiPart) {
+    public static void patchOkWithAuth (String token, String url, Map<String, Object> multiPart) {
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
-        patchMultiPartRequest(url, headers, multiPart, 204, null);
-    }
-
-    public static void patchOkWithAuth (String token, String url, int statusCode, Object body) {
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Bearer " + token);
-        patchRequest(url, headers, body, statusCode, null);
+        patchRequest(url, headers, multiPart, 204, null);
     }
 
     public static ValidatableResponse deleteRequest (String url, Map<String, String> headers, int status, String schema) {

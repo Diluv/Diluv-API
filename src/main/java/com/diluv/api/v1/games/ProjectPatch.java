@@ -23,4 +23,10 @@ public class ProjectPatch {
 
     @Expose
     public List<String> tags = new ArrayList<>();
+
+    @Expose
+    public Long ownerId;
+
+    @Expose
+    public boolean resolveReview;
 }

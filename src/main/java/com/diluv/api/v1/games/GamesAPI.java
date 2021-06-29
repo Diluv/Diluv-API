@@ -1,41 +1,6 @@
 package com.diluv.api.v1.games;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.GenericValidator;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-
-import com.diluv.api.data.DataBaseProject;
-import com.diluv.api.data.DataGame;
-import com.diluv.api.data.DataGameList;
-import com.diluv.api.data.DataGameVersion;
-import com.diluv.api.data.DataProject;
-import com.diluv.api.data.DataProjectList;
-import com.diluv.api.data.DataProjectType;
-import com.diluv.api.data.DataSlugName;
-import com.diluv.api.data.DataUploadType;
+import com.diluv.api.data.*;
 import com.diluv.api.data.feed.FeedProjectFiles;
 import com.diluv.api.data.feed.FeedProjects;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;
@@ -62,6 +27,25 @@ import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 import com.github.slugify.Slugify;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.GenericValidator;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.validation.Valid;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 @GZIP
@@ -281,12 +265,26 @@ public class GamesAPI {
                             }
                         }
                     }
-                }
 
-                for (ProjectReviewEntity review : project.getReviews()) {
-                    if (!review.isCompleted()) {
-                        project.setReview(true);
-                        review.setCompleted(true);
+                    if (form.data.ownerId != null) {
+                        if (form.data.ownerId != project.getOwner().getId()) {
+                            UsersEntity usersEntity = Confluencia.USER.findOneByUserId(session, form.data.ownerId);
+                            if (usersEntity == null) {
+                                return ErrorMessage.PROJECT_USER_NOT_FOUND.respond();
+                            }
+                            project.getAuthors().stream().filter(entity -> form.data.ownerId == entity.getUser().getId()).findFirst().ifPresent(oldAuthor -> project.getAuthors().remove(oldAuthor));
+
+                            project.setOwner(usersEntity);
+                        }
+                    }
+
+                    if (form.data.resolveReview) {
+                        for (ProjectReviewEntity review : project.getReviews()) {
+                            if (!review.isCompleted()) {
+                                project.setReview(true);
+                                review.setCompleted(true);
+                            }
+                        }
                     }
                 }
 

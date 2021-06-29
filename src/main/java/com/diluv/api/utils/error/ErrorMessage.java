@@ -29,7 +29,8 @@ public enum ErrorMessage {
     PROJECT_INVALID_TAGS(BAD_REQUEST, "invalid_tags", null),
     PROJECT_INVALID_SUMMARY(BAD_REQUEST, "invalid_summary", "The summary must be less then 250 characters"),
     PROJECT_INVALID_DESCRIPTION(BAD_REQUEST, "invalid_description", "The description must be greater then 50 characters but less then 10000."),
-    PROJECT_TAKEN_SLUG(BAD_REQUEST, "project.taken.slug", ""),
+    PROJECT_TAKEN_SLUG(BAD_REQUEST, "project.taken.slug", "Project slug taken"),
+    PROJECT_USER_NOT_FOUND(BAD_REQUEST, "invalid_user", "The user was not found."),
 
     PROJECT_FILE_INVALID_DEPEND_SELF(BAD_REQUEST, "invalid_depend_self", "The file can't depend on itself."),
     PROJECT_FILE_INVALID_DEPENDENCY_ID(BAD_REQUEST, "invalid_dependency_id", null),

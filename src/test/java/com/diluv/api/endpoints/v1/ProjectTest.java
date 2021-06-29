@@ -154,11 +154,11 @@ public class ProjectTest {
         multiPart.put("data", data);
 
         data.dependencies = new ArrayList<>();
-        Request.patchOkMultipartWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files/1", multiPart);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files/1", multiPart);
 
         data.dependencies = null;
         data.displayName = "newDisplayName.jar";
-        Request.patchOkMultipartWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files/1", multiPart);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/files/1", multiPart);
     }
 
     @Test

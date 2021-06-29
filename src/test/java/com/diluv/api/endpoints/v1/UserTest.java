@@ -3,6 +3,8 @@ package com.diluv.api.endpoints.v1;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.diluv.api.v1.users.UserUpdate;
+
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -10,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
-import com.diluv.api.v1.users.User2FAForm;
+import com.diluv.api.v1.users.User2FA;
 import com.diluv.api.v1.users.UserUpdateForm;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
@@ -38,24 +40,28 @@ public class UserTest {
     @Test
     public void patchSelf () {
 
-        UserUpdateForm data = new UserUpdateForm();
+        Map<String, Object> multiPart = new HashMap<>();
+
+        UserUpdate data = new UserUpdate();
+        multiPart.put("data", data);
         data.currentPassword = "invalid";
         data.displayName = "ABC";
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", data, ErrorMessage.USER_INVALID_PASSWORD);
+
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", multiPart, ErrorMessage.USER_INVALID_PASSWORD);
 
         data.currentPassword = "password";
         data.displayName = "Darkhax";
         data.newPassword = "password1";
-        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", 204, data);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", multiPart);
 
         data.displayName = null;
         data.newPassword = null;
         data.currentPassword = "password1";
         data.email = "testing@diluv.com";
-        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", 204, data);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", multiPart);
 
         data.email = "lclc98@diluv.com";
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", data, ErrorMessage.USER_TAKEN_EMAIL);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self", multiPart, ErrorMessage.USER_TAKEN_EMAIL);
     }
 
     @Test
@@ -77,16 +83,17 @@ public class UserTest {
             .build();
         final GoogleAuthenticator gAuth = new GoogleAuthenticator(config);
 
-        User2FAForm data = new User2FAForm();
+        User2FA data = new User2FA();
         data.password = "invalid";
         data.mfaStatus = "enable";
         data.mfa = gAuth.getTotpPassword(secret);
         data.mfaSecret = secret;
-
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/mfa", data, ErrorMessage.USER_INVALID_PASSWORD);
+        Map<String, Object> multiPart = new HashMap<>();
+        multiPart.put("data", data);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/mfa", multiPart, ErrorMessage.USER_INVALID_PASSWORD);
 
         data.password = "password";
-        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/mfa", 200, data);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/mfa", multiPart);
     }
 
     @Test
