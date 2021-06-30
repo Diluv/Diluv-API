@@ -1,6 +1,7 @@
 package com.diluv.api.v1.site;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -122,8 +123,8 @@ public class SiteAPI {
         final Sort sort = query.getSort(ProjectSort.POPULAR);
         final String search = query.getSearch();
         final String versions = query.getVersions();
-        final String[] tags = query.getTags();
-        final String[] loaders = query.getLoaders();
+        final Set<String> tags = query.getTags();
+        final Set<String> loaders = query.getLoaders();
 
         return Confluencia.getTransaction(session -> {
             final List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByGameAndProjectType(session, gameSlug, projectTypeSlug, search, page, limit, sort, versions, tags, loaders);
@@ -176,7 +177,7 @@ public class SiteAPI {
         return Confluencia.getTransaction(session -> {
             try {
                 final DataBaseProject project = ProjectService.getDataProject(session, gameSlug, projectTypeSlug, projectSlug, token);
-                return ResponseUtil.successResponse(new DataSiteProjectSettings(project, Confluencia.PROJECT.findAllTagsByGameSlugAndProjectTypeSlug(session, new ProjectTypesEntity(new GamesEntity(gameSlug), projectTypeSlug)).stream().map(a -> new DataSlugName(a.getSlug(), a.getName())).collect(Collectors.toList())));
+                return ResponseUtil.successResponse(new DataSiteProjectSettings(project, Confluencia.PROJECT.findAllTagsByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug).stream().map(a -> new DataSlugName(a.getSlug(), a.getName())).collect(Collectors.toList())));
             }
             catch (ResponseException e) {
                 e.printStackTrace();
@@ -229,9 +230,9 @@ public class SiteAPI {
             }
 
             boolean authorized = token != null && token.getUserId() == userRecord.getId();
-            long projectCount = Confluencia.PROJECT.countAllByUsername(session, username, authorized);
+            long projectCount = Confluencia.PROJECT.countAllByUserId(session, userRecord.getId(), authorized);
 
-            List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByUsername(session, username, authorized, query.getPage(), query.getLimit(), query.getSort(ProjectFileSort.NEW));
+            List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByUserId(session, userRecord.getId(), authorized, query.getPage(), query.getLimit(), query.getSort(ProjectFileSort.NEW));
 
             if (authorized) {
                 List<DataProject> dataProjects = projects.stream().map(a -> new DataAuthorizedProject(a, ProjectPermissions.getAuthorizedUserPermissions(a, token))).collect(Collectors.toList());
@@ -250,8 +251,18 @@ public class SiteAPI {
     public Response createProject (@PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug) {
 
         return Confluencia.getTransaction(session -> {
-            List<TagsEntity> tags = Confluencia.PROJECT.findAllTagsByGameSlugAndProjectTypeSlug(session, new ProjectTypesEntity(new GamesEntity(gameSlug), projectTypeSlug));
+            List<TagsEntity> tags = Confluencia.PROJECT.findAllTagsByGameSlugAndProjectTypeSlug(session, gameSlug, projectTypeSlug);
             return ResponseUtil.successResponse(new DataCreateProject(tags.stream().map(a -> new DataSlugName(a.getSlug(), a.getName())).collect(Collectors.toList())));
+        });
+    }
+
+    @GET
+    @Path("/search/users/{search}")
+    public Response searchUsers (@PathParam("search") String search) {
+
+        return Confluencia.getTransaction(session -> {
+            List<UsersEntity> users = Confluencia.USER.findLimitBySearch(session, search);
+            return ResponseUtil.successResponse(users.stream().map(DataUser::new).collect(Collectors.toList()));
         });
     }
 }

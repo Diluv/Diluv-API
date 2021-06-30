@@ -12,9 +12,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.validator.GenericValidator;
 
@@ -22,6 +19,8 @@ import com.diluv.api.DiluvAPIServer;
 import com.diluv.api.data.DataImage;
 import com.diluv.api.data.DataImageSource;
 import com.diluv.confluencia.database.record.ProjectsEntity;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -269,9 +268,9 @@ public final class Constants {
         });
     }
 
-    public static String getFileURL (String gameSlug, String projectTypeSlug, long projectId, long fileId, String fileName) {
+    public static String getFileURL (String gameSlug, String projectTypeSlug, String projectSlug, long fileId, String displayName) {
 
-        return String.format("%s/games/%s/%s/%d/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectId, fileId, fileName);
+        return String.format("%s/games/%s/%s/%s/%d/%s", Constants.CDN_URL, gameSlug, projectTypeSlug, projectSlug, fileId, displayName);
     }
 
     public static Gson getGsonInstance () {

@@ -128,8 +128,8 @@ public class UsersAPI {
                         return ErrorMessage.USER_TAKEN_EMAIL.respond();
                     }
 
-                    if (Confluencia.USER.existUserChangeEmailByUser(session, user)) {
-                        if (!Confluencia.USER.deleteUserChangeEmail(session, user)) {
+                    if (Confluencia.USER.existUserChangeEmailByUser(session, token.getUserId())) {
+                        if (!Confluencia.USER.deleteUserChangeEmail(session, token.getUserId())) {
                             // TODO ERROR Internally
                             return ErrorMessage.THROWABLE.respond();
                         }
@@ -214,7 +214,7 @@ public class UsersAPI {
                 user.setMfa(false);
                 user.setMfaSecret(null);
 
-                if (!Confluencia.USER.deleteUserMFARecovery(session, user)) {
+                if (!Confluencia.USER.deleteUserMFARecovery(session, token.getUserId())) {
                     //return ErrorMessage.FAILED_DELETE_MFA_RECOVERY.respond();
                     return ErrorMessage.THROWABLE.respond();
                 }
@@ -266,7 +266,7 @@ public class UsersAPI {
                 authorized = userRecord.getUsername().equalsIgnoreCase(username);
             }
 
-            List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByUsername(session, username, authorized, page, limit, sort);
+            List<ProjectsEntity> projects = Confluencia.PROJECT.findAllByUserId(session, userRecord.getId(), authorized, page, limit, sort);
             List<DataBaseProject> dataProjects = projects.stream().map(DataProject::new).collect(Collectors.toList());
             return ResponseUtil.successResponse(new DataProjectList(dataProjects));
         });
@@ -277,7 +277,7 @@ public class UsersAPI {
     public Response getTokens (@RequireToken(apiToken = false) @HeaderParam("Authorization") Token token) {
 
         final List<APITokensEntity> tokens = Confluencia.getTransaction(session -> {
-            return Confluencia.SECURITY.findAPITokensByUserId(session, new UsersEntity(token.getUserId()));
+            return Confluencia.SECURITY.findAPITokensByUserId(session, token.getUserId());
         });
 
         final List<DataAPIToken> dataTokens = tokens.stream().map(DataAPIToken::new).collect(Collectors.toList());

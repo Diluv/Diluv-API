@@ -36,6 +36,11 @@ public class Project {
         this.entity = entity;
     }
 
+    public long getId () {
+
+        return this.id;
+    }
+
     public ProjectsEntity getEntity () {
 
         return this.entity;

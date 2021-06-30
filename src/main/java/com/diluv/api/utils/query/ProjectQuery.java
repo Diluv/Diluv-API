@@ -1,5 +1,8 @@
 package com.diluv.api.utils.query;
 
+import java.util.Collections;
+import java.util.Set;
+
 import javax.ws.rs.QueryParam;
 
 import org.apache.commons.validator.GenericValidator;
@@ -13,13 +16,13 @@ public class ProjectQuery extends PaginationQuery {
     private String versions;
 
     @QueryParam("tags")
-    private String[] tags;
+    private Set<String> tags;
 
     @QueryParam("search")
     private String search;
 
     @QueryParam("loaders")
-    private String[] loaders;
+    private Set<String> loaders;
 
     @Override
     public Sort getSort (Sort defaultSort) {
@@ -37,20 +40,20 @@ public class ProjectQuery extends PaginationQuery {
         return this.versions;
     }
 
-    public String[] getTags () {
+    public Set<String> getTags () {
 
         // Shouldn't happen but have it in case
         if (this.tags == null) {
-            return new String[0];
+            return Collections.emptySet();
         }
         return this.tags;
     }
 
-    public String[] getLoaders () {
+    public Set<String> getLoaders () {
 
         // Shouldn't happen but have it in case
         if (this.loaders == null) {
-            return new String[0];
+            return Collections.emptySet();
         }
         return this.loaders;
     }

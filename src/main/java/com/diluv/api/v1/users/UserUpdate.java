@@ -1,10 +1,10 @@
 package com.diluv.api.v1.users;
 
-import com.diluv.api.utils.validator.CustomEmail;
-import com.google.gson.annotations.Expose;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
+import com.diluv.api.utils.validator.CustomEmail;
+import com.google.gson.annotations.Expose;
 
 public class UserUpdate {
 

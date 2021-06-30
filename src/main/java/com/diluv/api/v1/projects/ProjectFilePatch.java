@@ -1,12 +1,12 @@
 package com.diluv.api.v1.projects;
 
-import com.diluv.api.v1.games.FileDependency;
-import com.google.gson.annotations.Expose;
+import java.util.List;
+import java.util.Set;
 
 import javax.validation.constraints.Size;
 
-import java.util.List;
-import java.util.Set;
+import com.diluv.api.v1.games.FileDependency;
+import com.google.gson.annotations.Expose;
 
 public class ProjectFilePatch {
 

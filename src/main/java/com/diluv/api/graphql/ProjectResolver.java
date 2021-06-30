@@ -46,7 +46,7 @@ public class ProjectResolver implements GraphQLResolver<Project> {
     public List<ProjectFile> files (Project project) {
 
         return Confluencia.getTransaction(session -> {
-            final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(session, project.getEntity(), true, 1, 25, ProjectFileSort.NEW, null, "");
+            final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(session, project.getId(), true, 1, 25, ProjectFileSort.NEW, null, "");
             return projectFiles.stream().map(ProjectFile::new).collect(Collectors.toList());
         });
     }

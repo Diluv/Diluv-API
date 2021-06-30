@@ -1,8 +1,8 @@
 package com.diluv.api.v1.users;
 
-import com.google.gson.annotations.Expose;
-
 import javax.validation.constraints.NotBlank;
+
+import com.google.gson.annotations.Expose;
 
 public class User2FA {
 

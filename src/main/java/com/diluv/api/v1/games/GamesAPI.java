@@ -1,6 +1,41 @@
 package com.diluv.api.v1.games;
 
-import com.diluv.api.data.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.GenericValidator;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+
+import com.diluv.api.data.DataBaseProject;
+import com.diluv.api.data.DataGame;
+import com.diluv.api.data.DataGameList;
+import com.diluv.api.data.DataGameVersion;
+import com.diluv.api.data.DataProject;
+import com.diluv.api.data.DataProjectList;
+import com.diluv.api.data.DataProjectType;
+import com.diluv.api.data.DataSlugName;
+import com.diluv.api.data.DataUploadType;
 import com.diluv.api.data.feed.FeedProjectFiles;
 import com.diluv.api.data.feed.FeedProjects;
 import com.diluv.api.data.site.DataSiteProjectFileDisplay;
@@ -27,25 +62,6 @@ import com.diluv.confluencia.database.sort.ProjectFileSort;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 import com.github.slugify.Slugify;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.GenericValidator;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.validation.Valid;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 @GZIP
@@ -129,8 +145,8 @@ public class GamesAPI {
         final Sort sort = query.getSort(ProjectSort.POPULAR);
         final String search = query.getSearch();
         final String versions = query.getVersions();
-        final String[] tags = query.getTags();
-        final String[] loaders = query.getLoaders();
+        final Set<String> tags = query.getTags();
+        final Set<String> loaders = query.getLoaders();
 
         return Confluencia.getTransaction(session -> {
 
@@ -321,7 +337,7 @@ public class GamesAPI {
             try {
                 final ProjectsEntity project = ProjectService.getProject(session, gameSlug, projectTypeSlug, projectSlug, null);
 
-                final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(session, project, false, 1, 25, ProjectFileSort.NEW, null, "");
+                final List<ProjectFilesEntity> projectFiles = Confluencia.FILE.findAllByProject(session, project.getId(), false, 1, 25, ProjectFileSort.NEW, null, "");
 
                 final String baseUrl = String.format("%s/games/%s/%s/%s", Constants.WEBSITE_URL, gameSlug, projectTypeSlug, projectSlug);
                 FeedProjectFiles feed = new FeedProjectFiles(baseUrl, project.getName());
@@ -383,7 +399,7 @@ public class GamesAPI {
                 final DataBaseProject dataProject = ProjectService.getBaseDataProject(project, token);
 
                 boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
-                final List<ProjectFilesEntity> projectFileRecords = Confluencia.FILE.findAllByProject(session, project, authorized, page, limit, sort, gameVersion, search);
+                final List<ProjectFilesEntity> projectFileRecords = Confluencia.FILE.findAllByProject(session, project.getId(), authorized, page, limit, sort, gameVersion, search);
 
                 final List<DataSiteProjectFileDisplay> projectFiles = projectFileRecords.stream().map(record -> {
                     final List<GameVersionsEntity> gameVersionRecords = record.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
@@ -393,7 +409,7 @@ public class GamesAPI {
                         new DataSiteProjectFileDisplay(record, gameVersions);
                 }).collect(Collectors.toList());
 
-                final long fileCount = Confluencia.FILE.countByProjectParams(session, project, authorized, gameVersion, search);
+                final long fileCount = Confluencia.FILE.countByProjectParams(session, project.getId(), authorized, gameVersion, search);
 
                 return ResponseUtil.successResponse(new DataSiteProjectFilesPage(dataProject, projectFiles, fileCount, PROJECT_FILE_SORTS));
             }
