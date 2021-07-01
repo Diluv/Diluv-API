@@ -36,7 +36,7 @@ dependencies {
     implementation group: 'com.graphql-java-kickstart', name: 'graphql-java-tools', version: '11.0.1'
     implementation group: 'com.graphql-java', name: 'graphql-java', version: '16.2'
 
-    implementation group: 'org.jboss.resteasy', name: 'resteasy-undertow', version: '4.6.0.Final'
+    implementation group: 'org.jboss.resteasy', name: 'resteasy-undertow', version: '4.6.1.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-multipart-provider', version: '4.6.0.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-atom-provider', version: '4.6.0.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-cdi', version: '4.6.0.Final'
