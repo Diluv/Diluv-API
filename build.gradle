@@ -38,7 +38,7 @@ dependencies {
 
     implementation group: 'org.jboss.resteasy', name: 'resteasy-undertow', version: '4.6.0.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-multipart-provider', version: '4.6.0.Final'
-    implementation group: 'org.jboss.resteasy', name: 'resteasy-atom-provider', version: '4.6.0.Final'
+    implementation group: 'org.jboss.resteasy', name: 'resteasy-atom-provider', version: '4.6.1.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-cdi', version: '4.6.0.Final'
     implementation group: 'org.jboss.resteasy', name: 'resteasy-validator-provider', version: '4.6.0.Final'
     implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.2.0.Final'
