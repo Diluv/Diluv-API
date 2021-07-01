@@ -25,5 +25,15 @@ public class DataProject extends DataBaseProject {
         super(project);
         this.description = project.getDescription();
         this.links = project.getLinks().stream().map(DataProjectLink::new).collect(Collectors.toList());
+        if (!project.getAuthors().isEmpty()) {
+            this.contributors.addAll(project.getAuthors().stream().map(DataProjectContributor::new).collect(Collectors.toList()));
+        }
+    }
+
+    public DataProject (ProjectsEntity project, List<DataProjectContributor> contributors) {
+
+        super(project, contributors);
+        this.description = project.getDescription();
+        this.links = project.getLinks().stream().map(DataProjectLink::new).collect(Collectors.toList());
     }
 }

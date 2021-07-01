@@ -22,6 +22,14 @@
                 },
                 "role": {
                     "type": "string"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": [
+                        {
+                            "type": "string"
+                        }
+                    ]
                 }
             },
             "required": [

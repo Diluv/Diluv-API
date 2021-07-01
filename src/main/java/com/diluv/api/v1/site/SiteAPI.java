@@ -256,6 +256,16 @@ public class SiteAPI {
         });
     }
 
+//    @GET
+//    @Path("/projects/permissions")
+//    public Response searchUsers (@PathParam("search") String search) {
+//
+//        return Confluencia.getTransaction(session -> {
+//            List<UsersEntity> users = Confluencia.USER.findLimitBySearch(session, search);
+//            return ResponseUtil.successResponse(users.stream().map(DataUser::new).collect(Collectors.toList()));
+//        });
+//    }
+
     @GET
     @Path("/search/users/{search}")
     public Response searchUsers (@PathParam("search") String search) {

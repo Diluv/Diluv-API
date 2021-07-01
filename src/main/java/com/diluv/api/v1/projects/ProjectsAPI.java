@@ -294,8 +294,8 @@ public class ProjectsAPI {
 
                 long projectId = rs.getProject().getId();
 
-                if (lastProject == null || lastProject.getId() != projectId) {
-                    lastProject = projectFileMap.keySet().stream().filter(a -> a.getId() == projectId).findAny().orElse(null);
+                if (lastProject == null || lastProject.id != projectId) {
+                    lastProject = projectFileMap.keySet().stream().filter(a -> a.id == projectId).findAny().orElse(null);
                 }
 
                 final List<GameVersionsEntity> gameVersionRecords = rs.getGameVersions().stream().map(ProjectFileGameVersionsEntity::getGameVersion).collect(Collectors.toList());
