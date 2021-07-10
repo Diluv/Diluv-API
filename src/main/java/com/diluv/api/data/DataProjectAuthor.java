@@ -5,23 +5,23 @@ import com.diluv.confluencia.database.record.UsersEntity;
 import com.google.gson.annotations.Expose;
 
 /**
- * Represents a user who contributed to a project.
+ * Represents a user who are authors to a project.
  */
-public class DataProjectContributor extends DataUser {
+public class DataProjectAuthor extends DataUser {
 
     /**
-     * The role the contributor played in the creation of the project.
+     * The role the author played in the creation of the project.
      */
     @Expose
     private final String role;
 
-    public DataProjectContributor (ProjectAuthorsEntity author) {
+    public DataProjectAuthor (ProjectAuthorsEntity author) {
 
         super(author.getUser());
         this.role = author.getRole();
     }
 
-    public DataProjectContributor (UsersEntity user, String role) {
+    public DataProjectAuthor (UsersEntity user, String role) {
 
         super(user);
         this.role = role;

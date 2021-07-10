@@ -20,25 +20,17 @@ public class DataProject extends DataBaseProject {
     @Expose
     private final List<DataProjectLink> links;
 
-    /**
-     * The users who contributed to the project.
-     */
-    @Expose
-    public final List<DataProjectContributor> contributors;
+    public DataProject (ProjectsEntity rs) {
 
-    public DataProject (ProjectsEntity project) {
-
-        super(project);
-        this.description = project.getDescription();
-        this.links = project.getLinks().stream().map(DataProjectLink::new).collect(Collectors.toList());
-        this.contributors = project.getAuthors().stream().map(DataProjectContributor::new).collect(Collectors.toList());
+        super(rs);
+        this.description = rs.getDescription();
+        this.links = rs.getLinks().stream().map(DataProjectLink::new).collect(Collectors.toList());
     }
 
-    public DataProject (ProjectsEntity project, DataUser owner, List<DataProjectContributor> contributors) {
+    public DataProject (ProjectsEntity rs, DataUser owner, List<DataProjectAuthor> authors) {
 
-        super(project, owner);
-        this.description = project.getDescription();
-        this.links = project.getLinks().stream().map(DataProjectLink::new).collect(Collectors.toList());
-        this.contributors = contributors;
+        super(rs, owner, authors);
+        this.description = rs.getDescription();
+        this.links = rs.getLinks().stream().map(DataProjectLink::new).collect(Collectors.toList());
     }
 }

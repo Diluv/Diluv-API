@@ -21,7 +21,7 @@
         "projectCount": {
             "type": "number"
         },
-        "contributorCount": {
+        "authorCount": {
             "type": "number"
         }
     },
@@ -29,6 +29,6 @@
         "games",
         "projects",
         "projectCount",
-        "contributorCount"
+        "authorCount"
     ]
 }

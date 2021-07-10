@@ -1,6 +1,5 @@
 package com.diluv.api.data;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +32,7 @@ public class DataAuthorizedProject extends DataProject {
 
     public DataAuthorizedProject (ProjectsEntity project, List<String> permissions) {
 
-        super(project, new DataAuthorizedProjectContributor(project.getOwner(), "owner", ProjectPermissions.getAllPermissions()), project.getAuthors().stream().map(DataAuthorizedProjectContributor::new).collect(Collectors.toList()));
+        super(project, new DataAuthorizedProjectAuthor(project.getOwner(), "owner", ProjectPermissions.getAllPermissions()), project.getAuthors().stream().map(DataAuthorizedProjectAuthor::new).collect(Collectors.toList()));
         this.released = project.isReleased();
         this.review = project.isReview();
         this.permissions = permissions;

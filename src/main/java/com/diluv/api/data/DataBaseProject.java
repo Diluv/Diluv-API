@@ -70,6 +70,12 @@ public class DataBaseProject extends DataSlugName {
     @Expose
     private final DataUser owner;
 
+    /**
+     * The users who are authors to the project.
+     */
+    @Expose
+    public final List<DataProjectAuthor> authors;
+
     public DataBaseProject (FeaturedProjectsEntity featuredProject) {
 
         this(featuredProject.getProject());
@@ -77,10 +83,10 @@ public class DataBaseProject extends DataSlugName {
 
     public DataBaseProject (ProjectsEntity rs) {
 
-        this(rs, new DataUser(rs.getOwner()));
+        this(rs, new DataUser(rs.getOwner()), rs.getAuthors().stream().map(DataProjectAuthor::new).collect(Collectors.toList()));
     }
 
-    public DataBaseProject (ProjectsEntity rs, DataUser owner) {
+    public DataBaseProject (ProjectsEntity rs, DataUser owner, List<DataProjectAuthor> authors) {
 
         super(rs.getSlug(), rs.getName());
         this.id = rs.getId();
@@ -93,5 +99,6 @@ public class DataBaseProject extends DataSlugName {
         this.game = new DataSlugName(rs.getGame().getSlug(), rs.getGame().getName());
         this.projectType = new DataSlugName(rs.getProjectType().getSlug(), rs.getProjectType().getName());
         this.owner = owner;
+        this.authors = authors;
     }
 }

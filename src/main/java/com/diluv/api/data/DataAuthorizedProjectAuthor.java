@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Represents a project contributor from the perspective of an authorized user.
+ * Represents a project author from the perspective of an authorized user.
  */
-public class DataAuthorizedProjectContributor extends DataProjectContributor {
+public class DataAuthorizedProjectAuthor extends DataProjectAuthor {
 
     /**
      * The permissions the auth has.
@@ -19,13 +19,13 @@ public class DataAuthorizedProjectContributor extends DataProjectContributor {
     @Expose
     private final List<String> permissions;
 
-    public DataAuthorizedProjectContributor (ProjectAuthorsEntity projectAuthor) {
+    public DataAuthorizedProjectAuthor (ProjectAuthorsEntity projectAuthor) {
 
         super(projectAuthor);
         this.permissions = projectAuthor.getPermissions().stream().map(ProjectAuthorPermissionsEntity::getPermission).collect(Collectors.toList());
     }
 
-    public DataAuthorizedProjectContributor (UsersEntity projectAuthor, String role, List<String> permissions) {
+    public DataAuthorizedProjectAuthor (UsersEntity projectAuthor, String role, List<String> permissions) {
 
         super(projectAuthor, role);
         this.permissions = permissions;

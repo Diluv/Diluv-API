@@ -13,7 +13,7 @@ public class DataSiteIndex {
     private final long projectCount;
 
     @Expose
-    private final long contributorCount;
+    private final long authorCount;
 
     @Expose
     private final long gameCount;
@@ -21,11 +21,11 @@ public class DataSiteIndex {
     @Expose
     private final long projectTypeCount;
 
-    public DataSiteIndex (List<DataSiteGame> featuredGames, long projectCount, long contributorCount, long gameCount, long projectTypeCount) {
+    public DataSiteIndex (List<DataSiteGame> featuredGames, long projectCount, long authorCount, long gameCount, long projectTypeCount) {
 
         this.featuredGames = featuredGames;
         this.projectCount = projectCount;
-        this.contributorCount = contributorCount;
+        this.authorCount = authorCount;
         this.gameCount = gameCount;
         this.projectTypeCount = projectTypeCount;
     }
