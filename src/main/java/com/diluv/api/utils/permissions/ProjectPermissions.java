@@ -1,16 +1,17 @@
 package com.diluv.api.utils.permissions;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.confluencia.database.record.ProjectAuthorPermissionsEntity;
 import com.diluv.confluencia.database.record.ProjectAuthorsEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
+
+import javax.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public enum ProjectPermissions {
 
@@ -20,6 +21,12 @@ public enum ProjectPermissions {
     FILE_UPLOAD("file.upload"),
     ;
 
+    private static final List<String> PERMISSION_LIST = new ArrayList<>();
+
+    static {
+        Arrays.stream(ProjectPermissions.values()).forEach(projectPermissions -> PERMISSION_LIST.add(projectPermissions.name));
+    }
+
     private final String name;
 
     ProjectPermissions (String name) {
@@ -27,7 +34,7 @@ public enum ProjectPermissions {
         this.name = name;
     }
 
-    private String getName () {
+    public String getName () {
 
         return this.name;
     }
@@ -77,5 +84,15 @@ public enum ProjectPermissions {
     public static List<String> getAllPermissions () {
 
         return Arrays.stream(ProjectPermissions.values()).map(ProjectPermissions::getName).collect(Collectors.toList());
+    }
+
+    public static boolean validatePermissions (List<String> permissions) {
+
+        for (String permission : permissions) {
+            if (!ProjectPermissions.PERMISSION_LIST.contains(permission)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

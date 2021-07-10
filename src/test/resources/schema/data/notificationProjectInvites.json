@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "text": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        },
+        "createdAt": {
+            "type": "integer"
+        },
+        "status": {
+            "type": "string"
+        },
+        "sender": {
+            "$ref": "user.json"
+        },
+        "projectId": {
+            "type": "number"
+        },
+        "updatedAt": {
+            "type": "number"
+        }
+    },
+    "required": [
+        "id",
+        "text",
+        "type",
+        "createdAt",
+        "status",
+        "sender",
+        "projectId",
+        "updatedAt"
+    ],
+    "additionalProperties": false
+}

@@ -1,14 +1,12 @@
 package com.diluv.api.data;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.FeaturedProjectsEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
 import com.google.gson.annotations.Expose;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Represents a subset of project info.
@@ -67,10 +65,10 @@ public class DataBaseProject extends DataSlugName {
     public final DataSlugName projectType;
 
     /**
-     * The users who contributed to the project.
+     * The users who owns the project.
      */
     @Expose
-    public final List<DataProjectContributor> contributors = new ArrayList<>();
+    private final DataUser owner;
 
     public DataBaseProject (FeaturedProjectsEntity featuredProject) {
 
@@ -79,10 +77,10 @@ public class DataBaseProject extends DataSlugName {
 
     public DataBaseProject (ProjectsEntity rs) {
 
-        this(rs, Collections.singletonList(new DataProjectContributor(rs.getOwner(), "owner")));
+        this(rs, new DataUser(rs.getOwner()));
     }
 
-    public DataBaseProject (ProjectsEntity rs, List<DataProjectContributor> contributors) {
+    public DataBaseProject (ProjectsEntity rs, DataUser owner) {
 
         super(rs.getSlug(), rs.getName());
         this.id = rs.getId();
@@ -94,6 +92,6 @@ public class DataBaseProject extends DataSlugName {
         this.tags = rs.getTags().stream().map(a -> new DataSlugName(a.getTag().getSlug(), a.getTag().getName())).collect(Collectors.toList());
         this.game = new DataSlugName(rs.getGame().getSlug(), rs.getGame().getName());
         this.projectType = new DataSlugName(rs.getProjectType().getSlug(), rs.getProjectType().getName());
-        this.contributors.addAll(contributors);
+        this.owner = owner;
     }
 }

@@ -35,8 +35,16 @@
         "projectType": {
             "$ref": "baseProjectType.json"
         },
-        "contributors": {
+        "owner": {
             "$ref": "contributors.json"
+        },
+        "contributors": {
+            "type": "array",
+            "items": [
+                {
+                    "$ref": "contributors.json"
+                }
+            ]
         }
     },
     "required": [
@@ -51,6 +59,6 @@
         "tags",
         "game",
         "projectType",
-        "contributors"
+        "owner"
     ]
 }

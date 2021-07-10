@@ -3,23 +3,25 @@
     "type": "object",
     "properties": {
         "id": {
-            "type": "number"
+            "type": "integer"
         },
-        "name": {
+        "text": {
+            "type": "string"
+        },
+        "type": {
             "type": "string"
         },
         "createdAt": {
-            "type": "number"
+            "type": "integer"
         },
-        "lastUsed": {
-            "type": "number"
+        "viewedAt": {
+            "type": "integer"
         }
     },
     "required": [
         "id",
-        "name",
-        "createdAt",
-        "lastUsed"
-    ],
-    "additionalProperties": false
+        "text",
+        "type",
+        "createdAt"
+    ]
 }

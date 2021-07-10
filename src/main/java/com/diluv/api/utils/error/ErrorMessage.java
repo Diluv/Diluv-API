@@ -1,8 +1,8 @@
 package com.diluv.api.utils.error;
 
-import javax.ws.rs.core.Response;
-
 import com.diluv.api.utils.response.ErrorResponse;
+
+import javax.ws.rs.core.Response;
 
 import static com.diluv.api.utils.error.ErrorType.*;
 
@@ -30,7 +30,9 @@ public enum ErrorMessage {
     PROJECT_INVALID_SUMMARY(BAD_REQUEST, "invalid_summary", "The summary must be less then 250 characters"),
     PROJECT_INVALID_DESCRIPTION(BAD_REQUEST, "invalid_description", "The description must be greater then 50 characters but less then 10000."),
     PROJECT_TAKEN_SLUG(BAD_REQUEST, "project.taken.slug", "Project slug taken"),
-    PROJECT_USER_NOT_FOUND(BAD_REQUEST, "invalid_user", "The user was not found."),
+    PROJECT_NOT_MEMBER(BAD_REQUEST, "project.not_member", "The user is not a member of the project."),
+    PROJECT_OWNER(BAD_REQUEST, "project.owner", "The user is the owner of the project."),
+    PROJECT_PENDING_INVITE(BAD_REQUEST, "project.pending_invite", "The user already has a pending invite for this project."),
 
     PROJECT_FILE_INVALID_DEPEND_SELF(BAD_REQUEST, "invalid_depend_self", "The file can't depend on itself."),
     PROJECT_FILE_INVALID_DEPENDENCY_ID(BAD_REQUEST, "invalid_dependency_id", null),
@@ -46,16 +48,22 @@ public enum ErrorMessage {
     PROJECT_FILE_INVALID_LOADER(BAD_REQUEST, "invalid_loader", null),
     PROJECT_FILE_TAKEN_VERSION(BAD_REQUEST, "project_file.taken.version", "The file version is taken, must be unique"),
 
+    INVALID_PROJECT_INVITE_STATUS(BAD_REQUEST, "invalid.project_invite.status", ""),
+
     NOT_FOUND_GAME(BAD_REQUEST, "notfound.game", "The game was the not found."),
     NOT_FOUND_PROJECT(BAD_REQUEST, "notfound.project", "The project was not found."),
     NOT_FOUND_PROJECT_FILE(BAD_REQUEST, "notfound.project_file", "The project file was not found."),
     NOT_FOUND_PROJECT_TYPE(BAD_REQUEST, "notfound.project_type", "The project type was not found."),
     NOT_FOUND_USER(BAD_REQUEST, "notfound.user", "The user was not found."),
-    NOT_FOUND_NEWS(BAD_REQUEST, "notfound.news", "The news post was not found"),
+    NOT_FOUND_NEWS(BAD_REQUEST, "notfound.news", "The news post was not found."),
+    NOT_FOUND_NOTIFICATION(BAD_REQUEST, "notfound.notification", "The notification was not found."),
+    NOT_FOUND_INVITE(BAD_REQUEST, "notfound.invite", "The invite was not found."),
 
     REQUIRES_IMAGE(BAD_REQUEST, "requires_image", "The image is required"),
 
     INVALID_DATA(BAD_REQUEST, "invalid_data", "The data is invalid."),
+    INVALID_ROLE(BAD_REQUEST, "invalid_role", "The role is not valid"),
+    INVALID_PERMISSION(BAD_REQUEST, "invalid_permission", "The permissions are not valid"),
 
     TOKEN_INVALID_NAME(BAD_REQUEST, "token_invalid_name", "The token has an invalid name."),
     TOKEN_INVALID_ID(BAD_REQUEST, "token_invalid_id", "The id is invalid."),

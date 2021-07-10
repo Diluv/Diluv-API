@@ -28,5 +28,8 @@ public class ProjectPatch {
     public Long ownerId;
 
     @Expose
+    public List<ProjectAuthors> authors = new ArrayList<>();
+
+    @Expose
     public boolean resolveReview;
 }

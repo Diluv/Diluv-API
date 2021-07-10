@@ -33,19 +33,9 @@ public class DataAuthorizedProject extends DataProject {
 
     public DataAuthorizedProject (ProjectsEntity project, List<String> permissions) {
 
-        super(project, getAuthorizedContributors(project));
+        super(project, new DataAuthorizedProjectContributor(project.getOwner(), "owner", ProjectPermissions.getAllPermissions()), project.getAuthors().stream().map(DataAuthorizedProjectContributor::new).collect(Collectors.toList()));
         this.released = project.isReleased();
         this.review = project.isReview();
         this.permissions = permissions;
-    }
-
-    public static List<DataProjectContributor> getAuthorizedContributors (ProjectsEntity rs) {
-
-        List<DataProjectContributor> contributors = new ArrayList<>();
-        contributors.add(new DataAuthorizedProjectContributor(rs.getOwner(), "owner", ProjectPermissions.getAllPermissions()));
-        if (!rs.getAuthors().isEmpty()) {
-            contributors.addAll(rs.getAuthors().stream().map(DataAuthorizedProjectContributor::new).collect(Collectors.toList()));
-        }
-        return contributors;
     }
 }

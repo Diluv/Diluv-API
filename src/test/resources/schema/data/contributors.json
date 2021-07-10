@@ -1,47 +1,40 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "array",
-    "items": [
-        {
-            "type": "object",
-            "properties": {
-                "userId": {
-                    "type": "number"
-                },
-                "username": {
+    "type": "object",
+    "properties": {
+        "userId": {
+            "type": "number"
+        },
+        "username": {
+            "type": "string"
+        },
+        "displayName": {
+            "type": "string"
+        },
+        "avatarURL": {
+            "type": "string"
+        },
+        "createdAt": {
+            "type": "number"
+        },
+        "role": {
+            "type": "string"
+        },
+        "permissions": {
+            "type": "array",
+            "items": [
+                {
                     "type": "string"
-                },
-                "displayName": {
-                    "type": "string"
-                },
-                "avatarURL": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "number"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "permissions": {
-                    "type": "array",
-                    "items": [
-                        {
-                            "type": "string"
-                        }
-                    ]
                 }
-            },
-            "required": [
-                "userId",
-                "username",
-                "displayName",
-                "avatarURL",
-                "createdAt",
-                "role"
-            ],
-            "additionalProperties": false
+            ]
         }
+    },
+    "required": [
+        "userId",
+        "username",
+        "displayName",
+        "avatarURL",
+        "createdAt"
     ],
     "additionalProperties": false
 }

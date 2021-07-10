@@ -22,6 +22,7 @@ import com.diluv.api.v1.featured.FeaturedAPI;
 import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.api.v1.internal.InternalAPI;
 import com.diluv.api.v1.news.NewsAPI;
+import com.diluv.api.v1.notifications.NotificationsAPI;
 import com.diluv.api.v1.projects.ProjectsAPI;
 import com.diluv.api.v1.site.SiteAPI;
 import com.diluv.api.v1.users.UsersAPI;
@@ -59,6 +60,7 @@ public class APIV1 extends Application {
         classes.add(GamesAPI.class);
         classes.add(InternalAPI.class);
         classes.add(NewsAPI.class);
+        classes.add(NotificationsAPI.class);
         classes.add(ProjectsAPI.class);
         classes.add(SiteAPI.class);
         classes.add(UsersAPI.class);

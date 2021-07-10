@@ -3,6 +3,7 @@ package com.diluv.api.v1.games;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -69,6 +70,7 @@ import com.github.slugify.Slugify;
 @Produces(MediaType.APPLICATION_JSON)
 public class GamesAPI {
 
+    private static final List<String> ROLES = Arrays.asList("Project Lead", "Artist", "Developer", "Mascot", "Documentation", "Translation");
     public static final List<DataSlugName> GAME_SORTS = GameSort.LIST.stream().map(a -> new DataSlugName(a.getSlug(), a.getDisplayName())).collect(Collectors.toList());
     public static final List<DataSlugName> PROJECT_SORTS = ProjectSort.LIST.stream().map(a -> new DataSlugName(a.getSlug(), a.getDisplayName())).collect(Collectors.toList());
     public static final List<DataSlugName> PROJECT_FILE_SORTS = ProjectFileSort.LIST.stream().map(a -> new DataSlugName(a.getSlug(), a.getDisplayName())).collect(Collectors.toList());
@@ -282,15 +284,88 @@ public class GamesAPI {
                         }
                     }
 
+                    if (!form.data.authors.isEmpty()) {
+                        List<Long> authorIds = form.data.authors.stream().map(projectAuthors -> projectAuthors.userId).collect(Collectors.toList());
+
+                        if (authorIds.contains(project.getOwner().getId())) {
+                            throw new ResponseException(ErrorMessage.PROJECT_OWNER.respond());
+                        }
+
+                        for (ProjectAuthors author : form.data.authors) {
+                            String authorRole = ROLES.stream().filter(role -> role.equalsIgnoreCase(author.role)).findFirst().orElse(null);
+
+                            if (authorRole == null) {
+                                throw new ResponseException(ErrorMessage.INVALID_ROLE.respond());
+                            }
+
+                            if (!author.permissions.isEmpty() && !ProjectPermissions.validatePermissions(author.permissions)) {
+                                throw new ResponseException(ErrorMessage.INVALID_PERMISSION.respond());
+                            }
+
+                            ProjectAuthorsEntity projectAuthorEntity = project.getAuthors().stream().filter(projectAuthorsEntity -> projectAuthorsEntity.getUser().getId() == author.userId).findAny().orElse(null);
+                            if (projectAuthorEntity == null) {
+                                UsersEntity user = Confluencia.USER.findOneByUserId(session, author.userId);
+                                if (user == null) {
+                                    throw new ResponseException(ErrorMessage.NOT_FOUND_USER.respond());
+                                }
+
+                                if (Confluencia.NOTIFICATION.existsProjectInviteWhereProjectIdAndUser(session, user.getId(), project.getId())) {
+                                    throw new ResponseException(ErrorMessage.PROJECT_PENDING_INVITE.respond());
+                                }
+
+                                UsersEntity sender = Confluencia.USER.findOneByUserId(session, token.getUserId());
+
+                                NotificationProjectInvitesEntity projectInvitesEntity = new NotificationProjectInvitesEntity();
+                                projectInvitesEntity.setText(sender.getDisplayName() + " has invited you to join " + project.getName());
+                                projectInvitesEntity.setUser(user);
+                                projectInvitesEntity.setProject(project);
+                                projectInvitesEntity.setStatus(NotificationProjectInvitesStatus.PENDING);
+                                projectInvitesEntity.setSender(sender);
+                                projectInvitesEntity.setRole(authorRole);
+                                if (!author.permissions.isEmpty()) {
+                                    author.permissions.forEach(projectInvitesEntity::addPermission);
+                                }
+                                session.persist(projectInvitesEntity);
+                            }
+                            else {
+                                if (!projectAuthorEntity.getRole().equalsIgnoreCase(authorRole)) {
+                                    projectAuthorEntity.setRole(authorRole);
+                                }
+
+                                if (!author.permissions.isEmpty()) {
+                                    List<ProjectAuthorPermissionsEntity> removePermissions = new ArrayList<>();
+                                    projectAuthorEntity.getPermissions().forEach(permissionsEntity -> {
+                                        if (author.permissions.contains(permissionsEntity.getPermission())) {
+                                            author.permissions.remove(permissionsEntity.getPermission());
+                                        }
+                                        else {
+                                            removePermissions.add(permissionsEntity);
+                                        }
+                                    });
+                                    projectAuthorEntity.getPermissions().removeAll(removePermissions);
+                                    author.permissions.forEach(projectAuthorEntity::addPermission);
+                                }
+                            }
+                        }
+                    }
+
                     if (form.data.ownerId != null) {
                         if (form.data.ownerId != project.getOwner().getId()) {
-                            UsersEntity usersEntity = Confluencia.USER.findOneByUserId(session, form.data.ownerId);
-                            if (usersEntity == null) {
-                                return ErrorMessage.PROJECT_USER_NOT_FOUND.respond();
+                            ProjectAuthorsEntity newOwner = project.getAuthors().stream().filter(entity -> form.data.ownerId == entity.getUser().getId()).findFirst().orElse(null);
+                            if (newOwner == null) {
+                                UsersEntity usersEntity = Confluencia.USER.findOneByUserId(session, form.data.ownerId);
+                                if (usersEntity == null) {
+                                    return ErrorMessage.NOT_FOUND_USER.respond();
+                                }
+                                return ErrorMessage.PROJECT_NOT_MEMBER.respond();
                             }
-                            project.getAuthors().stream().filter(entity -> form.data.ownerId == entity.getUser().getId()).findFirst().ifPresent(oldAuthor -> project.getAuthors().remove(oldAuthor));
 
-                            project.setOwner(usersEntity);
+                            ProjectAuthorsEntity oldOwner = new ProjectAuthorsEntity(project.getOwner(), "Retired");
+                            project.addAuthor(oldOwner);
+                            ProjectPermissions.getAllPermissions().forEach(oldOwner::addPermission);
+
+                            project.getAuthors().remove(newOwner);
+                            project.setOwner(newOwner.getUser());
                         }
                     }
 

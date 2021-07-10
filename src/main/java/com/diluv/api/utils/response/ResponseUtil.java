@@ -11,6 +11,6 @@ public final class ResponseUtil {
 
     public static Response noContent () {
 
-        return Response.status(Response.Status.NO_CONTENT).build();
+        return Response.noContent().build();
     }
 }

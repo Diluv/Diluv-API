@@ -19,6 +19,11 @@ import graphql.kickstart.tools.GraphQLResolver;
 
 public class ProjectResolver implements GraphQLResolver<Project> {
 
+    public User owner (Project project) {
+
+        return new User(project.getEntity().getOwner());
+    }
+
     public List<Author> authors (Project project) {
 
         List<Author> authors = new ArrayList<>();

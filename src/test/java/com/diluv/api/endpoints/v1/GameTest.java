@@ -3,6 +3,8 @@ package com.diluv.api.endpoints.v1;
 import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.utils.permissions.ProjectPermissions;
+import com.diluv.api.v1.games.ProjectAuthors;
 import com.diluv.api.v1.games.ProjectCreate;
 import com.diluv.api.v1.games.ProjectPatch;
 
@@ -196,7 +198,13 @@ public class GameTest {
         data.ownerId = 9999L;
         multiPart.clear();
         multiPart.put("data", data);
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/get-ya-tanks-here", multiPart, ErrorMessage.USER_NOT_AUTHORIZED);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/get-ya-tanks-here", multiPart, ErrorMessage.NOT_FOUND_USER);
+
+        data = new ProjectPatch();
+        data.ownerId = 2L;
+        multiPart.clear();
+        multiPart.put("data", data);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/cursed", multiPart, ErrorMessage.PROJECT_NOT_MEMBER);
 
         data = new ProjectPatch();
         data.resolveReview = true;
@@ -208,6 +216,54 @@ public class GameTest {
         data.ownerId = 9999L;
         multiPart.clear();
         multiPart.put("data", data);
-        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/waila-inhibitors", multiPart, ErrorMessage.PROJECT_USER_NOT_FOUND);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/waila-inhibitors", multiPart, ErrorMessage.NOT_FOUND_USER);
+
+        data = new ProjectPatch();
+        ProjectAuthors authors = new ProjectAuthors();
+        authors.userId = 2L;
+        authors.role = "INVALID";
+        data.authors.add(authors);
+        multiPart.put("data", data);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/waila-inhibitors", multiPart, ErrorMessage.INVALID_ROLE);
+
+        data = new ProjectPatch();
+        authors = new ProjectAuthors();
+        authors.userId = 2L;
+        authors.role = "Project lead";
+        data.authors.add(authors);
+        multiPart.put("data", data);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/waila-inhibitors", multiPart);
+
+        data = new ProjectPatch();
+        authors = new ProjectAuthors();
+        authors.userId = 2L;
+        authors.role = "Developer";
+        data.authors.add(authors);
+        multiPart.put("data", data);
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/waila-inhibitors", multiPart, ErrorMessage.PROJECT_PENDING_INVITE);
+
+        data = new ProjectPatch();
+        authors = new ProjectAuthors();
+        authors.userId = 2L;
+        authors.role = "Developer";
+        data.authors.add(authors);
+        multiPart.put("data", data);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/bookshelf", multiPart);
+
+        authors.permissions.add("INVALID");
+        Request.patchErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/bookshelf", multiPart, ErrorMessage.INVALID_PERMISSION);
+
+        authors.permissions.clear();
+        authors.permissions.add(ProjectPermissions.PROJECT_EDIT.getName());
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/bookshelf", multiPart);
+
+        data = new ProjectPatch();
+        authors = new ProjectAuthors();
+        authors.userId = 3L;
+        authors.role = "Developer";
+        authors.permissions.add(ProjectPermissions.PROJECT_EDIT.getName());
+        data.authors.add(authors);
+        multiPart.put("data", data);
+        Request.patchOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/minecraft-je/mods/waila-inhibitors", multiPart);
     }
 }

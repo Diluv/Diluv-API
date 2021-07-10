@@ -1,15 +1,14 @@
 package com.diluv.api.utils;
 
-import com.diluv.api.utils.error.ErrorMessage;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.restassured.http.ContentType;
-import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.diluv.api.utils.error.ErrorMessage;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.restassured.response.ValidatableResponse;
+import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
@@ -109,16 +108,18 @@ public class Request {
     public static ValidatableResponse patchRequest (String url, Map<String, String> headers, Map<String, Object> multiPart, int status, String schema) {
 
         RequestSpecification request = given().headers(headers);
-        for (String key : multiPart.keySet()) {
-            Object o = multiPart.get(key);
-            if (o instanceof File) {
-                request = request.multiPart(key, (File) o);
-            }
-            else if (o instanceof String) {
-                request = request.multiPart(key, (String) o);
-            }
-            else {
-                request = request.multiPart(key, GSON.toJson(o), "application/json");
+        if (multiPart != null) {
+            for (String key : multiPart.keySet()) {
+                Object o = multiPart.get(key);
+                if (o instanceof File) {
+                    request = request.multiPart(key, (File) o);
+                }
+                else if (o instanceof String) {
+                    request = request.multiPart(key, (String) o);
+                }
+                else {
+                    request = request.multiPart(key, GSON.toJson(o), "application/json");
+                }
             }
         }
         ValidatableResponse response = request
@@ -135,10 +136,15 @@ public class Request {
 
     public static void patchErrorWithAuth (String token, String url, Map<String, Object> multiPart, ErrorMessage error) {
 
+       patchErrorWithAuth(token, url, multiPart, error, error.getMessage());
+    }
+
+    public static void patchErrorWithAuth (String token, String url, Map<String, Object> multiPart, ErrorMessage error, String message) {
+
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
         patchRequest(url, headers, multiPart, error.getType().getCode(), "schema/error-schema.json")
-            .body("message", equalTo(error.getMessage()));
+            .body("message", equalTo(message));
     }
 
     public static void patchErrorWithAuth (String token, String url, Map<String, Object> multiPart, int status, ErrorMessage error) {
