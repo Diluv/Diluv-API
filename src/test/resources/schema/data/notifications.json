@@ -1,15 +1,18 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "https://json-schema.org/draft-07/schema",
     "type": "object",
     "properties": {
         "id": {
-            "type": "integer"
+            "type": "number"
         },
         "text": {
             "type": "string"
         },
         "type": {
-            "type": "string"
+            "enum": [
+                "GENERIC",
+                "PROJECT_INVITE"
+            ]
         },
         "createdAt": {
             "type": "string"
@@ -18,6 +21,45 @@
             "type": "integer"
         }
     },
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "type": {
+                        "const": "PROJECT_INVITE"
+                    }
+                }
+            },
+            "then": {
+                "properties": {
+                    "status": {
+                        "enum": [
+                            "PENDING",
+                            "CANCELLED",
+                            "ACCEPTED",
+                            "DECLINED",
+                            "EXPIRED"
+                        ]
+                    },
+                    "sender": {
+                        "$ref": "user.json"
+                    },
+                    "projectId": {
+                        "type": "number"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "status",
+                    "projectId",
+                    "updatedAt",
+                    "sender"
+                ]
+            }
+        }
+    ],
     "required": [
         "id",
         "text",

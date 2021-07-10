@@ -5,16 +5,13 @@
         "type": {
             "type": "string"
         },
-        "error": {
-            "type": "string"
-        },
-        "message": {
+        "url": {
             "type": "string"
         }
     },
     "required": [
         "type",
-        "error"
+        "url"
     ],
     "additionalProperties": false
 }

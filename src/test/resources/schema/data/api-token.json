@@ -2,19 +2,24 @@
     "$schema": "https://json-schema.org/draft-07/schema",
     "type": "object",
     "properties": {
-        "type": {
+        "id": {
+            "type": "number"
+        },
+        "name": {
             "type": "string"
         },
-        "error": {
+        "createdAt": {
             "type": "string"
         },
-        "message": {
+        "lastUsed": {
             "type": "string"
         }
     },
     "required": [
-        "type",
-        "error"
+        "id",
+        "name",
+        "createdAt",
+        "lastUsed"
     ],
     "additionalProperties": false
 }

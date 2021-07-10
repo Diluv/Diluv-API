@@ -10,8 +10,8 @@ import com.google.gson.GsonBuilder;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 
+import static com.diluv.api.utils.JsonMatch.matchesJsonSchemaInClasspath;
 import static io.restassured.RestAssured.given;
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.equalTo;
 
 public class Request {
@@ -136,7 +136,7 @@ public class Request {
 
     public static void patchErrorWithAuth (String token, String url, Map<String, Object> multiPart, ErrorMessage error) {
 
-       patchErrorWithAuth(token, url, multiPart, error, error.getMessage());
+        patchErrorWithAuth(token, url, multiPart, error, error.getMessage());
     }
 
     public static void patchErrorWithAuth (String token, String url, Map<String, Object> multiPart, ErrorMessage error, String message) {

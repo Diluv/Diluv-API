@@ -1,41 +1,6 @@
 package com.diluv.api.v1.users;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.validator.GenericValidator;
-import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
-import org.jboss.resteasy.annotations.GZIP;
-import org.jboss.resteasy.annotations.Query;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-
-import com.diluv.api.data.DataAPIToken;
-import com.diluv.api.data.DataAuthorizedUser;
-import com.diluv.api.data.DataBaseProject;
-import com.diluv.api.data.DataCreateAPIToken;
-import com.diluv.api.data.DataProject;
-import com.diluv.api.data.DataProjectList;
-import com.diluv.api.data.DataUser;
+import com.diluv.api.data.*;
 import com.diluv.api.utils.AuthUtilities;
 import com.diluv.api.utils.auth.JWTUtil;
 import com.diluv.api.utils.auth.Validator;
@@ -45,16 +10,29 @@ import com.diluv.api.utils.query.ProjectQuery;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.utils.validator.RequireToken;
 import com.diluv.confluencia.Confluencia;
-import com.diluv.confluencia.database.record.APITokensEntity;
-import com.diluv.confluencia.database.record.ProjectsEntity;
-import com.diluv.confluencia.database.record.UserChangeEmail;
-import com.diluv.confluencia.database.record.UserMfaRecoveryEntity;
-import com.diluv.confluencia.database.record.UsersEntity;
+import com.diluv.confluencia.database.record.*;
 import com.diluv.confluencia.database.sort.ProjectSort;
 import com.diluv.confluencia.database.sort.Sort;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.warrenstrange.googleauth.KeyRepresentation;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.validator.GenericValidator;
+import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
+import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.annotations.Query;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 @GZIP
@@ -274,6 +252,21 @@ public class UsersAPI {
 
     @GET
     @Path("/self/token")
+    public Response getToken (@RequireToken @HeaderParam("Authorization") Token token) {
+
+        return Confluencia.getTransaction(session -> {
+            if (token.isApiToken()) {
+                APITokensEntity apiToken = Confluencia.SECURITY.findAPITokensByToken(session, token.getToken());
+                return ResponseUtil.successResponse(new DataUserAPIToken(token, apiToken));
+            }
+
+            UsersEntity user = Confluencia.USER.findOneByUserId(session, token.getUserId());
+            return ResponseUtil.successResponse(new DataUserToken(user, token));
+        });
+    }
+
+    @GET
+    @Path("/self/tokens")
     public Response getTokens (@RequireToken(apiToken = false) @HeaderParam("Authorization") Token token) {
 
         final List<APITokensEntity> tokens = Confluencia.getTransaction(session -> {
@@ -286,7 +279,7 @@ public class UsersAPI {
     }
 
     @POST
-    @Path("/self/token")
+    @Path("/self/tokens")
     public Response postToken (@RequireToken(apiToken = false) @HeaderParam("Authorization") Token token, @QueryParam("name") String queryName) {
 
         final String name = queryName == null ? null : queryName.trim();
@@ -308,7 +301,7 @@ public class UsersAPI {
     }
 
     @DELETE
-    @Path("/self/token/{id}")
+    @Path("/self/tokens/{id}")
     public Response deleteToken (@RequireToken @HeaderParam("Authorization") Token token, @PathParam("id") Long id) {
 
         return Confluencia.getTransaction(session -> {

@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "https://json-schema.org/draft-07/schema",
     "type": "object",
     "properties": {
         "id": {
@@ -35,6 +35,14 @@
         "projectType": {
             "$ref": "baseProjectType.json"
         },
+        "links": {
+            "type": "array",
+            "items": [
+                {
+                    "$ref": "projectLinks.json"
+                }
+            ]
+        },
         "owner": {
             "$ref": "authors.json"
         },
@@ -43,6 +51,23 @@
             "items": [
                 {
                     "$ref": "authors.json"
+                }
+            ]
+        },
+        "description": {
+            "type": "string"
+        },
+        "released": {
+            "type": "boolean"
+        },
+        "review": {
+            "type": "boolean"
+        },
+        "permissions": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "string"
                 }
             ]
         }
@@ -61,5 +86,6 @@
         "projectType",
         "owner",
         "authors"
-    ]
+    ],
+    "additionalProperties": false
 }

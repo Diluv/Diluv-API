@@ -3,8 +3,6 @@ package com.diluv.api.endpoints.v1;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.diluv.api.v1.users.UserUpdate;
-
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,7 +11,7 @@ import com.diluv.api.utils.Request;
 import com.diluv.api.utils.TestUtil;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.v1.users.User2FA;
-import com.diluv.api.v1.users.UserUpdateForm;
+import com.diluv.api.v1.users.UserUpdate;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.warrenstrange.googleauth.KeyRepresentation;
@@ -130,32 +128,42 @@ public class UserTest {
     public void getToken () {
 
         Request.getError(URL + "/self/token", ErrorMessage.USER_REQUIRED_TOKEN);
+        Request.getErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self/token", ErrorMessage.USER_INVALID_TOKEN);
 
-        Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token", "schema/token-list-schema.json");
-        Request.getOkWithAuth(TestUtil.TOKEN_JARED, URL + "/self/token", "schema/token-list-schema.json");
+        Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token", "schema/token-schema.json");
+        Request.getOkWithAuth(TestUtil.TOKEN_JARED, URL + "/self/token", "schema/token-schema.json");
     }
 
     @Test
-    public void postToken () {
+    public void getTokens () {
+
+        Request.getError(URL + "/self/tokens", ErrorMessage.USER_REQUIRED_TOKEN);
+
+        Request.getOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/tokens", "schema/token-list-schema.json");
+        Request.getOkWithAuth(TestUtil.TOKEN_JARED, URL + "/self/tokens", "schema/token-list-schema.json");
+    }
+
+    @Test
+    public void postTokens () {
 
         Map<String, Object> multiPart = new HashMap<>();
-        Request.postErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self/token", multiPart, ErrorMessage.USER_INVALID_TOKEN);
-        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token", multiPart, ErrorMessage.TOKEN_INVALID_NAME);
+        Request.postErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self/tokens", multiPart, ErrorMessage.USER_INVALID_TOKEN);
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/tokens", multiPart, ErrorMessage.TOKEN_INVALID_NAME);
 
-        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token?name=Jenkins", multiPart, "schema/create-token-schema.json");
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/tokens?name=Jenkins", multiPart, "schema/create-token-schema.json");
     }
 
     @Test
-    public void deleteToken () {
+    public void deleteTokens () {
 
-        Request.deleteErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self/token/3", ErrorMessage.USER_INVALID_TOKEN);
-        Request.deleteErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token/2", ErrorMessage.TOKEN_INVALID_ID);
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self/tokens/3", ErrorMessage.USER_INVALID_TOKEN);
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/tokens/2", ErrorMessage.TOKEN_INVALID_ID);
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + TestUtil.TOKEN_DARKHAX);
-        Request.deleteRequest(URL + "/self/token/3", headers, 204, null);
+        Request.deleteRequest(URL + "/self/tokens/3", headers, 204, null);
 
-        Request.deleteErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/token/3", ErrorMessage.TOKEN_INVALID_ID);
+        Request.deleteErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/tokens/3", ErrorMessage.TOKEN_INVALID_ID);
 
     }
 }

@@ -1,9 +1,9 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "https://json-schema.org/draft-07/schema",
     "type": "object",
     "properties": {
         "project": {
-            "$ref": "project-schema.json"
+            "$ref": "data/projects.json"
         },
         "files": {
             "type": "array",

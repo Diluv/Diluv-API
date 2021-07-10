@@ -62,12 +62,13 @@ public class JWTUtil {
         UUID uuid = getUUID(token);
         if (uuid != null) {
             return Confluencia.getTransaction(session -> {
-                APITokensEntity record = Confluencia.SECURITY.findAPITokensByToken(session, getSha512UUID(uuid));
+                String tokenSha512 = getSha512UUID(uuid);
+                APITokensEntity record = Confluencia.SECURITY.findAPITokensByToken(session, tokenSha512);
                 if (record == null) {
                     throw new WebApplicationException(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
                 }
                 long userId = record.getUser().getId();
-                return new Token(userId, true, ProjectPermissions.getAllPermissions());
+                return new Token(tokenSha512, userId, true, ProjectPermissions.getAllPermissions());
             });
         }
 
@@ -82,7 +83,7 @@ public class JWTUtil {
             try {
                 JWTClaimsSet claimsSet = processor.process(jwt, null);
                 if (claimsSet != null) {
-                    return new Token(claimsSet.getLongClaim("userId"), false, ProjectPermissions.getAllPermissions());
+                    return new Token(token, claimsSet.getLongClaim("userId"), false, ProjectPermissions.getAllPermissions());
                 }
             }
             catch (JOSEException | BadJOSEException | NumberFormatException | ParseException e) {
