@@ -19,7 +19,7 @@ public class Game {
         this.name = entity.getName();
         this.defaultProjectType = entity.getDefaultProjectTypeSlug();
         this.url = entity.getUrl();
-        this.createdAt = entity.getCreatedAt().toLocalDateTime().toString();
+        this.createdAt = entity.getCreatedAt().toString();
         this.logo = new Image(Constants.getGameLogoURL(entity.getSlug()));
         this.entity = entity;
     }

@@ -12,7 +12,7 @@
                     "type": "string"
                 },
                 "releasedAt": {
-                    "type": "number"
+                    "type": "string"
                 }
             },
             "required": [

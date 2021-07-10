@@ -15,13 +15,13 @@ public class DataNotification {
     private final String type;
 
     @Expose
-    private final long createdAt;
+    private final String createdAt;
 
     public DataNotification (NotificationsEntity rs) {
 
         this.id = rs.getId();
         this.text = rs.getText();
         this.type = rs.getType().name();
-        this.createdAt = rs.getCreatedAt().getTime();
+        this.createdAt = rs.getCreatedAt().toString();
     }
 }

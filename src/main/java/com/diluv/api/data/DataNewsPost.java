@@ -34,7 +34,7 @@ public class DataNewsPost extends DataSlugName {
      * The date when the post was created.
      */
     @Expose
-    private final long createdAt;
+    private final String createdAt;
 
     public DataNewsPost (NewsEntity news) {
 
@@ -43,6 +43,6 @@ public class DataNewsPost extends DataSlugName {
         this.description = news.getDescription();
         this.username = news.getUser().getUsername();
         this.displayName = news.getUser().getDisplayName();
-        this.createdAt = news.getCreatedAt().getTime();
+        this.createdAt = news.getCreatedAt().toString();
     }
 }

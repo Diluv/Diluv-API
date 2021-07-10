@@ -68,7 +68,7 @@ public class DataProjectFile {
      * The time when the file was created.
      */
     @Expose
-    private final long createdAt;
+    private final String createdAt;
 
     /**
      * The list of the project ids the file depends on.
@@ -117,7 +117,7 @@ public class DataProjectFile {
         this.downloads = rs.getDownloads();
         this.releaseType = rs.getReleaseType();
         this.classifier = rs.getClassifier();
-        this.createdAt = rs.getCreatedAt().getTime();
+        this.createdAt = rs.getCreatedAt().toString();
         this.user = new DataUser(rs.getUser());
         this.dependencies = rs.getDependencies().stream().map(DataProjectFileDependency::new).collect(Collectors.toList());
         this.gameVersions = rs.getGameVersions().stream().map(a -> new DataGameVersion(a.getGameVersion())).collect(Collectors.toList());

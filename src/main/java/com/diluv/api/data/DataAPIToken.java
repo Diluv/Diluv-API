@@ -12,16 +12,16 @@ public class DataAPIToken {
     private final String name;
 
     @Expose
-    private final long createdAt;
+    private final String createdAt;
 
     @Expose
-    private final long lastUsed;
+    private final String lastUsed;
 
     public DataAPIToken (APITokensEntity rs) {
 
         this.id = rs.getId();
         this.name = rs.getName();
-        this.createdAt = rs.getCreatedAt().getTime();
-        this.lastUsed = rs.getLastUsed().getTime();
+        this.createdAt = rs.getCreatedAt().toString();
+        this.lastUsed = rs.getLastUsed().toString();
     }
 }

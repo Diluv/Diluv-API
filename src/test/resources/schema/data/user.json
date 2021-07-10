@@ -15,7 +15,7 @@
             "type": "string"
         },
         "createdAt": {
-            "type": "number"
+            "type": "string"
         },
         "email": {
             "type": "string"

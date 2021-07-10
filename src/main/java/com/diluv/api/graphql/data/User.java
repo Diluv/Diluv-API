@@ -7,13 +7,13 @@ public class User {
     private long id;
     private String username;
     private String displayName;
-    private long createdAt;
+    private String createdAt;
 
     public User (UsersEntity entity) {
 
         this.id = entity.getId();
         this.username = entity.getUsername();
         this.displayName = entity.getDisplayName();
-        this.createdAt = entity.getCreatedAt().getTime();
+        this.createdAt = entity.getCreatedAt().toString();
     }
 }

@@ -24,7 +24,7 @@
             "type": "number"
         },
         "createdAt": {
-            "type": "number"
+            "type": "string"
         },
         "dependencies": {
             "$ref": "dependency.json"
@@ -45,13 +45,13 @@
             "$ref": "user.json"
         },
         "updatedAt": {
-            "type": "number"
+            "type": "string"
         },
         "status": {
             "type": "string"
         },
         "lastStatusChanged": {
-            "type": "number"
+            "type": "string"
         },
         "classifier": {
             "type": "string"

@@ -13,8 +13,8 @@ public class Project {
     private final boolean review;
     private final boolean released;
     private final long downloads;
-    private final long createdAt;
-    private final long updatedAt;
+    private final String createdAt;
+    private final String updatedAt;
     private final String logo;
 
     private ProjectsEntity entity;
@@ -29,8 +29,8 @@ public class Project {
         this.downloads = entity.getCachedDownloads();
         this.review = entity.isReview();
         this.released = entity.isReleased();
-        this.createdAt = entity.getCreatedAt().getTime();
-        this.updatedAt = entity.getCreatedAt().getTime();
+        this.createdAt = entity.getCreatedAt().toString();
+        this.updatedAt = entity.getCreatedAt().toString();
         this.logo = Constants.getProjectLogo(entity);
 
         this.entity = entity;

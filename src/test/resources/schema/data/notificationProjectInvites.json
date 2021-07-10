@@ -12,7 +12,7 @@
             "type": "string"
         },
         "createdAt": {
-            "type": "integer"
+            "type": "string"
         },
         "status": {
             "type": "string"
@@ -24,7 +24,7 @@
             "type": "number"
         },
         "updatedAt": {
-            "type": "number"
+            "type": "string"
         }
     },
     "required": [

@@ -69,7 +69,7 @@ public class DataSiteProjectFileDisplay {
      * The time when the file was created.
      */
     @Expose
-    private final long createdAt;
+    private final String createdAt;
 
     /**
      * The list of game versions the file works with
@@ -118,7 +118,7 @@ public class DataSiteProjectFileDisplay {
         this.releaseType = rs.getReleaseType();
         this.classifier = rs.getClassifier();
         this.changelog = rs.getChangelog();
-        this.createdAt = rs.getCreatedAt().getTime();
+        this.createdAt = rs.getCreatedAt().toString();
         this.user = new DataUser(rs.getUser());
         this.gameVersions = gameVersions;
         this.dependencies = rs.getDependencies().stream().map(DataProjectFileDependency::new).collect(Collectors.toList());

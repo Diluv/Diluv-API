@@ -1,15 +1,11 @@
 package com.diluv.api.data.feed;
 
+import com.diluv.confluencia.database.record.ProjectFilesEntity;
+
+import org.jboss.resteasy.plugins.providers.atom.*;
+
 import java.net.URI;
 import java.util.Date;
-
-import org.jboss.resteasy.plugins.providers.atom.Content;
-import org.jboss.resteasy.plugins.providers.atom.Entry;
-import org.jboss.resteasy.plugins.providers.atom.Feed;
-import org.jboss.resteasy.plugins.providers.atom.Link;
-import org.jboss.resteasy.plugins.providers.atom.Person;
-
-import com.diluv.confluencia.database.record.ProjectFilesEntity;
 
 public class FeedProjectFiles extends Feed {
     private final String baseUrl;
@@ -30,7 +26,7 @@ public class FeedProjectFiles extends Feed {
         Entry entry = new Entry();
         entry.setId(URI.create(baseUrl + "/files/" + file.getId()));
         entry.setTitle(file.getDisplayName());
-        entry.setUpdated(file.getUpdatedAt());
+        entry.setUpdated(Date.from(file.getUpdatedAt()));
         entry.setContent(content);
         entry.getAuthors().add(new Person(file.getUser().getDisplayName()));
         this.getEntries().add(entry);

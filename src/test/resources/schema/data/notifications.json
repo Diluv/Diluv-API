@@ -12,7 +12,7 @@
             "type": "string"
         },
         "createdAt": {
-            "type": "integer"
+            "type": "string"
         },
         "viewedAt": {
             "type": "integer"

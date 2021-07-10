@@ -1,6 +1,6 @@
 package com.diluv.api.v1.notifications;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,7 +94,7 @@ public class NotificationsAPI {
                 return ErrorMessage.NOT_FOUND_NOTIFICATION.respond();
             }
             if (notification.getViewedAt() == null) {
-                notification.setViewedAt(new Timestamp(System.currentTimeMillis()));
+                notification.setViewedAt(Instant.now());
                 session.update(notification);
             }
             return ResponseUtil.noContent();
@@ -174,7 +174,7 @@ public class NotificationsAPI {
             }
 
             if (projectInvite.getViewedAt() == null) {
-                projectInvite.setViewedAt(new Timestamp(System.currentTimeMillis()));
+                projectInvite.setViewedAt(Instant.now());
             }
 
             projectInvite.setStatus(data.status);

@@ -15,12 +15,12 @@ public class DataGameVersion {
 
     //TODO
     @Expose
-    private final long releasedAt;
+    private final String releasedAt;
 
     public DataGameVersion (GameVersionsEntity rs) {
 
         this.version = rs.getVersion();
         this.type = rs.getType();
-        this.releasedAt = rs.getReleasedAt().getTime();
+        this.releasedAt = rs.getReleasedAt().toString();
     }
 }

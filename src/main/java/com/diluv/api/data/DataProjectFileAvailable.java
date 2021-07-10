@@ -12,11 +12,11 @@ public class DataProjectFileAvailable extends DataProjectFile {
      * The last time the file was updated.
      */
     @Expose
-    private final long updatedAt;
+    private final String updatedAt;
 
     public DataProjectFileAvailable (ProjectFilesEntity rs, String gameSlug, String projectTypeSlug, String projectSlug) {
 
         super(rs, gameSlug, projectTypeSlug, projectSlug);
-        this.updatedAt = rs.getUpdatedAt().getTime();
+        this.updatedAt = rs.getUpdatedAt().toString();
     }
 }

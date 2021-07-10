@@ -38,13 +38,13 @@ public class DataBaseProject extends DataSlugName {
      * The creation data of the project.
      */
     @Expose
-    public final long createdAt;
+    public final String createdAt;
 
     /**
      * The date when the project was last updated.
      */
     @Expose
-    public final long updatedAt;
+    public final String updatedAt;
 
     /**
      * The tags of the project to be found under.
@@ -87,8 +87,8 @@ public class DataBaseProject extends DataSlugName {
         this.summary = rs.getSummary();
         this.logo = Constants.getProjectLogo(rs);
         this.downloads = rs.getCachedDownloads();
-        this.createdAt = rs.getCreatedAt().getTime();
-        this.updatedAt = rs.getUpdatedAt().getTime();
+        this.createdAt = rs.getCreatedAt().toString();
+        this.updatedAt = rs.getUpdatedAt().toString();
         this.tags = rs.getTags().stream().map(a -> new DataSlugName(a.getTag().getSlug(), a.getTag().getName())).collect(Collectors.toList());
         this.game = new DataSlugName(rs.getGame().getSlug(), rs.getGame().getName());
         this.projectType = new DataSlugName(rs.getProjectType().getSlug(), rs.getProjectType().getName());

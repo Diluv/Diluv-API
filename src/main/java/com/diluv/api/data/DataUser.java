@@ -37,7 +37,7 @@ public class DataUser {
      * The date the user created their account.
      */
     @Expose
-    private final long createdAt;
+    private final String createdAt;
 
     public DataUser (UsersEntity userRecord) {
 
@@ -45,6 +45,6 @@ public class DataUser {
         this.username = userRecord.getUsername();
         this.displayName = userRecord.getDisplayName();
         this.avatarURL = Constants.getUserAvatar(userRecord.getUsername());
-        this.createdAt = userRecord.getCreatedAt().getTime();
+        this.createdAt = userRecord.getCreatedAt().toString();
     }
 }

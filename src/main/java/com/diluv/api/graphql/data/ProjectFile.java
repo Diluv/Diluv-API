@@ -12,7 +12,7 @@ public class ProjectFile {
     private final long downloads;
     private final String releaseType;
     private final String classifier;
-    private final long createdAt;
+    private final String createdAt;
     private final boolean released;
 
     private final ProjectFilesEntity entity;
@@ -27,7 +27,7 @@ public class ProjectFile {
         this.downloads = rs.getDownloads();
         this.releaseType = rs.getReleaseType();
         this.classifier = rs.getClassifier();
-        this.createdAt = rs.getCreatedAt().getTime();
+        this.createdAt = rs.getCreatedAt().toString();
         this.released = rs.isReleased();
 
         this.entity = rs;

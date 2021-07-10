@@ -15,7 +15,7 @@ public class GameVersion {
         this.id = entity.getId();
         this.version = entity.getVersion();
         this.type = entity.getType();
-        this.releasedAt = entity.getReleasedAt().toLocalDateTime().toString();
+        this.releasedAt = entity.getReleasedAt().toString();
         this.entity = entity;
     }
 
