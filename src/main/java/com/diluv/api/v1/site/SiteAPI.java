@@ -196,10 +196,6 @@ public class SiteAPI {
 
                 boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
 
-                if (!authorized) {
-                    return ErrorMessage.USER_NOT_AUTHORIZED.respond();
-                }
-
                 final ProjectFilesEntity projectFile = Confluencia.FILE.findOneById(session, fileId);
 
                 if (projectFile == null) {
