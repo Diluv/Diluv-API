@@ -194,15 +194,16 @@ public class SiteAPI {
             try {
                 final ProjectsEntity project = ProjectService.getProject(session, gameSlug, projectTypeSlug, projectSlug, token);
 
-                boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
-
-                if (!authorized) {
-                    return ErrorMessage.USER_NOT_AUTHORIZED.respond();
-                }
 
                 final ProjectFilesEntity projectFile = Confluencia.FILE.findOneById(session, fileId);
 
                 if (projectFile == null) {
+                    return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
+                }
+
+                boolean authorized = ProjectPermissions.hasPermission(project, token, ProjectPermissions.FILE_UPLOAD);
+
+                if (!authorized && !projectFile.isReleased()) {
                     return ErrorMessage.NOT_FOUND_PROJECT_FILE.respond();
                 }
 
