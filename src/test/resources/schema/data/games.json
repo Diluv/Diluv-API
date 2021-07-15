@@ -26,9 +26,6 @@
                 "$ref": "projectTypes.json"
             }
         },
-        "sort": {
-            "type": "array"
-        },
         "defaultProjectType": {
             "type": "string"
         }

@@ -116,7 +116,7 @@ public class AdminAPI {
             if (game == null) {
                 return ErrorMessage.NOT_FOUND_GAME.respond();
             }
-            return ResponseUtil.successResponse(new DataGame(game, GamesAPI.PROJECT_SORTS, 0L));
+            return ResponseUtil.successResponse(new DataGame(game, 0L));
         });
     }
 

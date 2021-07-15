@@ -10,15 +10,11 @@ public class DataGameList {
     private final List<DataSlugName> games;
 
     @Expose
-    private final List<DataSlugName> sort;
-
-    @Expose
     private final long gameCount;
 
-    public DataGameList (List<DataSlugName> games, List<DataSlugName> sort, long gameCount) {
+    public DataGameList (List<DataSlugName> games, long gameCount) {
 
         this.games = games;
-        this.sort = sort;
         this.gameCount = gameCount;
     }
 }

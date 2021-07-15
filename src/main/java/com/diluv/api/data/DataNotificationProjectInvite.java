@@ -18,6 +18,7 @@ public class DataNotificationProjectInvite extends DataNotification {
     private final String updatedAt;
 
     public DataNotificationProjectInvite (NotificationProjectInvitesEntity rs) {
+
         super(rs);
         this.status = rs.getStatus().name();
         this.sender = new DataUser(rs.getSender());

@@ -1,11 +1,15 @@
 package com.diluv.api.data.feed;
 
-import com.diluv.confluencia.database.record.ProjectsEntity;
-
-import org.jboss.resteasy.plugins.providers.atom.*;
-
 import java.net.URI;
 import java.util.Date;
+
+import org.jboss.resteasy.plugins.providers.atom.Content;
+import org.jboss.resteasy.plugins.providers.atom.Entry;
+import org.jboss.resteasy.plugins.providers.atom.Feed;
+import org.jboss.resteasy.plugins.providers.atom.Link;
+import org.jboss.resteasy.plugins.providers.atom.Person;
+
+import com.diluv.confluencia.database.record.ProjectsEntity;
 
 public class FeedProjects extends Feed {
     private final String baseUrl;

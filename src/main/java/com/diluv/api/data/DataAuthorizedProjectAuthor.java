@@ -1,12 +1,12 @@
 package com.diluv.api.data;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.diluv.confluencia.database.record.ProjectAuthorPermissionsEntity;
 import com.diluv.confluencia.database.record.ProjectAuthorsEntity;
 import com.diluv.confluencia.database.record.UsersEntity;
 import com.google.gson.annotations.Expose;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Represents a project author from the perspective of an authorized user.

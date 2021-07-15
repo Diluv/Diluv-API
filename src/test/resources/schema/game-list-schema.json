@@ -10,9 +10,6 @@
                 }
             ]
         },
-        "sort": {
-            "type": "array"
-        },
         "gameCount": {
             "type": "number"
         }

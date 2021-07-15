@@ -32,9 +32,6 @@ public class DataGame extends DataSlugName {
     private final List<DataGameVersion> versions;
 
     @Expose
-    private final List<DataSlugName> sort;
-
-    @Expose
     private final Long projectCount;
 
     @Expose
@@ -42,16 +39,15 @@ public class DataGame extends DataSlugName {
 
     public DataGame (GamesEntity rs) {
 
-        this(rs, null, null);
+        this(rs, null);
     }
 
     public DataGame (FeaturedGamesEntity rs) {
 
-        this(rs.getGame(), null, null);
+        this(rs.getGame(), null);
     }
 
     public DataGame (GamesEntity rs,
-                     List<DataSlugName> sort,
                      Long projectCount) {
 
         super(rs.getSlug(), rs.getName());
@@ -60,7 +56,6 @@ public class DataGame extends DataSlugName {
         this.projectTypes = rs.getProjectTypes().stream().map(DataProjectType::new).collect(Collectors.toList());
         this.versions = rs.getGameVersions().stream().map(DataGameVersion::new).collect(Collectors.toList());
         this.logoURL = Constants.getGameLogoURL(rs.getSlug());
-        this.sort = sort;
         this.projectCount = projectCount;
     }
 }

@@ -71,9 +71,6 @@ import com.github.slugify.Slugify;
 public class GamesAPI {
 
     private static final List<String> ROLES = Arrays.asList("Project Lead", "Artist", "Developer", "Mascot", "Documentation", "Translation");
-    public static final List<DataSlugName> GAME_SORTS = GameSort.LIST.stream().map(a -> new DataSlugName(a.getSlug(), a.getDisplayName())).collect(Collectors.toList());
-    public static final List<DataSlugName> PROJECT_SORTS = ProjectSort.LIST.stream().map(a -> new DataSlugName(a.getSlug(), a.getDisplayName())).collect(Collectors.toList());
-    public static final List<DataSlugName> PROJECT_FILE_SORTS = ProjectFileSort.LIST.stream().map(a -> new DataSlugName(a.getSlug(), a.getDisplayName())).collect(Collectors.toList());
 
     private final Slugify slugify = new Slugify();
 
@@ -94,7 +91,7 @@ public class GamesAPI {
 
             final long gameCount = Confluencia.GAME.countAllBySearch(session, search);
 
-            return ResponseUtil.successResponse(new DataGameList(games, GAME_SORTS, gameCount));
+            return ResponseUtil.successResponse(new DataGameList(games, gameCount));
         });
     }
 
@@ -112,7 +109,7 @@ public class GamesAPI {
 
             final long projectCount = Confluencia.PROJECT.countAllByGameSlug(session, gameSlug);
 
-            return ResponseUtil.successResponse(new DataGame(gameRecord, PROJECT_SORTS, projectCount));
+            return ResponseUtil.successResponse(new DataGame(gameRecord, projectCount));
         });
     }
 
@@ -196,7 +193,7 @@ public class GamesAPI {
 
     @GET
     @Path("/{gameSlug}/{projectTypeSlug}/{projectSlug}")
-    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) {
+    public Response getProject (@HeaderParam("Authorization") Token token, @PathParam("gameSlug") String gameSlug, @PathParam("projectTypeSlug") String projectTypeSlug, @PathParam("projectSlug") String projectSlug) throws ResponseException {
 
         return Confluencia.getTransaction(session -> {
             try {
@@ -486,7 +483,7 @@ public class GamesAPI {
 
                 final long fileCount = Confluencia.FILE.countByProjectParams(session, project.getId(), authorized, gameVersion, search);
 
-                return ResponseUtil.successResponse(new DataSiteProjectFilesPage(dataProject, projectFiles, fileCount, PROJECT_FILE_SORTS));
+                return ResponseUtil.successResponse(new DataSiteProjectFilesPage(dataProject, projectFiles, fileCount));
             }
             catch (ResponseException e) {
                 return e.getResponse();
