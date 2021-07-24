@@ -1,8 +1,8 @@
 package com.diluv.api.utils.error;
 
-import com.diluv.api.utils.response.ErrorResponse;
-
 import javax.ws.rs.core.Response;
+
+import com.diluv.api.utils.response.ErrorResponse;
 
 import static com.diluv.api.utils.error.ErrorType.*;
 
@@ -65,6 +65,7 @@ public enum ErrorMessage {
     INVALID_ROLE(BAD_REQUEST, "invalid_role", "The role is not valid"),
     INVALID_PERMISSION(BAD_REQUEST, "invalid_permission", "The permissions are not valid"),
 
+    TOKEN_INVALID_PERMISSIONS(BAD_REQUEST, "token_invalid_permissions", "The token has invalid permissions."),
     TOKEN_INVALID_NAME(BAD_REQUEST, "token_invalid_name", "The token has an invalid name."),
     TOKEN_INVALID_ID(BAD_REQUEST, "token_invalid_id", "The id is invalid."),
 

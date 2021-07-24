@@ -1,20 +1,22 @@
 package com.diluv.api.endpoints.v1;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.diluv.api.utils.Request;
+import com.diluv.api.utils.TestUtil;
+import com.diluv.api.utils.error.ErrorMessage;
+import com.diluv.api.v1.users.User2FA;
+import com.diluv.api.v1.users.UserToken;
+import com.diluv.api.v1.users.UserUpdate;
+import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
+import com.warrenstrange.googleauth.KeyRepresentation;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.diluv.api.utils.Request;
-import com.diluv.api.utils.TestUtil;
-import com.diluv.api.utils.error.ErrorMessage;
-import com.diluv.api.v1.users.User2FA;
-import com.diluv.api.v1.users.UserUpdate;
-import com.warrenstrange.googleauth.GoogleAuthenticator;
-import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
-import com.warrenstrange.googleauth.KeyRepresentation;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserTest {
     private static final String URL = "/v1/users";
@@ -148,9 +150,22 @@ public class UserTest {
 
         Map<String, Object> multiPart = new HashMap<>();
         Request.postErrorWithAuth(TestUtil.TOKEN_INVALID, URL + "/self/tokens", multiPart, ErrorMessage.USER_INVALID_TOKEN);
+
+        UserToken token = new UserToken();
+        multiPart.put("data", token);
+        token.name = "0123456789012345678901234567890123456789012345678901234567890123456789";
+        token.permissions = Collections.singletonList("project.edit");
         Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/tokens", multiPart, ErrorMessage.TOKEN_INVALID_NAME);
 
-        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/tokens?name=Jenkins", multiPart, "schema/create-token-schema.json");
+        token.name = "Jenkins";
+        token.permissions = null;
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/tokens", multiPart, ErrorMessage.TOKEN_INVALID_PERMISSIONS);
+
+        token.permissions = Collections.singletonList("invalid permission");
+        Request.postErrorWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/tokens", multiPart, ErrorMessage.TOKEN_INVALID_PERMISSIONS);
+
+        token.permissions = Collections.singletonList("project.edit");
+        Request.postOkWithAuth(TestUtil.TOKEN_DARKHAX, URL + "/self/tokens", multiPart, "schema/create-token-schema.json");
     }
 
     @Test
