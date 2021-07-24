@@ -6,7 +6,7 @@
             "type": "array",
             "items": [
                 {
-                    "$ref": "data/api-token.json"
+                    "$ref": "data/token.json"
                 }
             ]
         }

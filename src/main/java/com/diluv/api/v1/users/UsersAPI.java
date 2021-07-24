@@ -273,7 +273,11 @@ public class UsersAPI {
             return Confluencia.SECURITY.findAPITokensByUserId(session, token.getUserId());
         });
 
-        final List<DataAPIToken> dataTokens = tokens.stream().map(DataAPIToken::new).collect(Collectors.toList());
+        final List<DataUserAPIToken> dataTokens = new ArrayList<>();
+        for (APITokensEntity apiToken : tokens) {
+            List<String> permissions = apiToken.getPermissions().stream().map(APITokenPermissionsEntity::getPermission).collect(Collectors.toList());
+            dataTokens.add(new DataUserAPIToken(apiToken, permissions));
+        }
 
         return ResponseUtil.successResponse(Collections.singletonMap("tokens", dataTokens));
     }

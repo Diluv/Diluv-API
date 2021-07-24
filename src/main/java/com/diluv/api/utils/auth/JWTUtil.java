@@ -2,6 +2,7 @@ package com.diluv.api.utils.auth;
 
 import java.text.ParseException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
 
@@ -14,6 +15,7 @@ import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.ProjectPermissions;
 import com.diluv.confluencia.Confluencia;
+import com.diluv.confluencia.database.record.APITokenPermissionsEntity;
 import com.diluv.confluencia.database.record.APITokensEntity;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.proc.BadJOSEException;
@@ -68,7 +70,7 @@ public class JWTUtil {
                     throw new WebApplicationException(ErrorMessage.USER_INVALID_TOKEN.respond("API token not found"));
                 }
                 long userId = record.getUser().getId();
-                return new Token(tokenSha512, userId, true, ProjectPermissions.getAllPermissions());
+                return new Token(tokenSha512, userId, true, record.getPermissions().stream().map(APITokenPermissionsEntity::getPermission).collect(Collectors.toList()));
             });
         }
 

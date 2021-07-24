@@ -4,10 +4,9 @@ import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.confluencia.database.record.APITokensEntity;
 import com.google.gson.annotations.Expose;
 
-public class DataUserAPIToken extends DataUserToken {
+import java.util.List;
 
-    @Expose
-    private final long tokenId;
+public class DataUserAPIToken extends DataUserToken {
 
     @Expose
     private final String name;
@@ -21,7 +20,14 @@ public class DataUserAPIToken extends DataUserToken {
     public DataUserAPIToken (Token token, APITokensEntity apiToken) {
 
         super(apiToken.getUser(), token);
-        this.tokenId = apiToken.getId();
+        this.name = apiToken.getName();
+        this.createdAt = apiToken.getCreatedAt().toString();
+        this.lastUsed = apiToken.getLastUsed().toString();
+    }
+
+    public DataUserAPIToken (APITokensEntity apiToken, List<String> permissions) {
+
+        super(apiToken.getUser(), permissions);
         this.name = apiToken.getName();
         this.createdAt = apiToken.getCreatedAt().toString();
         this.lastUsed = apiToken.getLastUsed().toString();

@@ -35,4 +35,13 @@ public class DataUserToken {
 
         this.permissions = token.getGlobalProjectPermissions();
     }
+
+    public DataUserToken (UsersEntity user, List<String> permissions) {
+
+        this.userId = user.getId();
+        this.username = user.getUsername();
+        this.displayName = user.getDisplayName();
+        this.apiToken = true;
+        this.permissions = permissions;
+    }
 }
