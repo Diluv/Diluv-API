@@ -53,7 +53,7 @@ dependencies {
     testImplementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.57'
 
     testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.15.3'
-    testImplementation group: 'org.testcontainers', name: 'mariadb', version: '1.15.3'
+    testImplementation group: 'org.testcontainers', name: 'mariadb', version: '1.16.0'
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.15.3'
 }
 
