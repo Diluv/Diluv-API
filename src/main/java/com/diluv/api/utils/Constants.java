@@ -254,14 +254,29 @@ public final class Constants {
         return String.format("%s/games/%s/%s/%d/logo.png", Constants.CDN_URL, gameSlug, projectTypeSlug, project.getId());
     }
 
-    public static DataImage getGameLogoURL (String gameSlug) {
+    public static DataImage getGameLogoURL (String slug) {
+
+        return getGameLogoURL(slug, "logo");
+    }
+
+    public static DataImage getGameBackgroundURL (String slug) {
+
+        return getGameLogoURL(slug, "background");
+    }
+
+    public static DataImage getGameForegroundURL (String slug) {
+
+        return getGameLogoURL(slug, "foreground");
+    }
+
+    public static DataImage getGameLogoURL (String slug, String type) {
 
         if (isDevelopment()) {
             final String url = "https://images.placeholders.dev/?width=360&height=180";
-            return new DataImage(new DataImageSource(url + "&text=fallback", "image/png"), new DataImageSource[]{new DataImageSource(url + "&text=" + gameSlug, "image/svg+xml")});
+            return new DataImage(new DataImageSource(url + "&text=" + type, "image/png"), new DataImageSource[]{new DataImageSource(url + "&text=" + slug, "image/svg+xml")});
         }
 
-        final String baseURL = String.format("%s/games/%s/logo", Constants.CDN_URL, gameSlug);
+        final String baseURL = String.format("%s/games/%s/%s", Constants.CDN_URL, slug, type);
         final String pngURL = baseURL + ".png";
         return new DataImage(new DataImageSource(pngURL, "image/png"), new DataImageSource[]{
             new DataImageSource(baseURL + ".webp", "image/webp")

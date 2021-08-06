@@ -11,6 +11,9 @@
         "url": {
             "type": "string"
         },
+        "logoURLs": {
+            "$ref": "logoURL.json"
+        },
         "logoURL": {
             "$ref": "image.json"
         },
