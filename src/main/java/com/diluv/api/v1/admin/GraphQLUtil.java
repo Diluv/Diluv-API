@@ -19,6 +19,7 @@ import graphql.execution.ExecutionId;
 import graphql.introspection.IntrospectionQuery;
 import graphql.kickstart.tools.SchemaParser;
 import graphql.kickstart.tools.SchemaParserOptions;
+import graphql.scalars.ExtendedScalars;
 import graphql.schema.GraphQLSchema;
 
 public class GraphQLUtil {
@@ -45,7 +46,7 @@ public class GraphQLUtil {
                 new LoaderResolver(),
                 new GameResolver(),
                 new RegistrationCodesResolver())
-            .scalars(Scalars.GraphQLLong)
+            .scalars(ExtendedScalars.GraphQLLong)
             .options(options)
             .build()
             .makeExecutableSchema();
