@@ -31,7 +31,7 @@ public class DataUser {
      * A URL that points to their avatar image.
      */
     @Expose
-    private final DataImage avatarURL;
+    private final DataImage avatar;
 
     /**
      * The date the user created their account.
@@ -44,7 +44,7 @@ public class DataUser {
         this.userId = userRecord.getId();
         this.username = userRecord.getUsername();
         this.displayName = userRecord.getDisplayName();
-        this.avatarURL = Constants.getUserAvatar(userRecord.getUsername());
+        this.avatar = Constants.getUserAvatar(userRecord.getUsername());
         this.createdAt = userRecord.getCreatedAt().toString();
     }
 }

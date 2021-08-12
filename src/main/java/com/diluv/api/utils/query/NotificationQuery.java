@@ -3,9 +3,6 @@ package com.diluv.api.utils.query;
 import javax.ws.rs.QueryParam;
 
 import com.diluv.confluencia.database.record.NotificationType;
-
-import org.apache.commons.validator.GenericValidator;
-
 import com.diluv.confluencia.database.sort.NotificationSort;
 import com.diluv.confluencia.database.sort.Sort;
 

@@ -11,7 +11,7 @@
         "username": {
             "type": "string"
         },
-        "avatarURL": {
+        "avatar": {
             "$ref": "image.json"
         },
         "createdAt": {
@@ -28,7 +28,7 @@
         "userId",
         "username",
         "displayName",
-        "avatarURL",
+        "avatar",
         "createdAt"
     ],
     "additionalProperties": false

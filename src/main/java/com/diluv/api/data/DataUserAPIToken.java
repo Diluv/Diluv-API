@@ -1,10 +1,10 @@
 package com.diluv.api.data;
 
+import java.util.List;
+
 import com.diluv.api.utils.auth.tokens.Token;
 import com.diluv.confluencia.database.record.APITokensEntity;
 import com.google.gson.annotations.Expose;
-
-import java.util.List;
 
 public class DataUserAPIToken extends DataUserToken {
 

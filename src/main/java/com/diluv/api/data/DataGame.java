@@ -3,7 +3,6 @@ package com.diluv.api.data;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.FeaturedGamesEntity;
 import com.diluv.confluencia.database.record.GamesEntity;
 import com.google.gson.annotations.Expose;
@@ -23,7 +22,7 @@ public class DataGame extends DataSlugName {
      * A URL that links to the image of the game.
      */
     @Expose
-    private final DataGameLogos logoURL;
+    private final DataGameLogos logo;
 
     @Expose
     private final List<DataProjectType> projectTypes;
@@ -55,7 +54,7 @@ public class DataGame extends DataSlugName {
         this.defaultProjectType = rs.getDefaultProjectTypeSlug();
         this.projectTypes = rs.getProjectTypes().stream().map(DataProjectType::new).collect(Collectors.toList());
         this.versions = rs.getGameVersions().stream().map(DataGameVersion::new).collect(Collectors.toList());
-        this.logoURL = new DataGameLogos(rs.getSlug());
+        this.logo = new DataGameLogos(rs.getSlug());
         this.projectCount = projectCount;
     }
 }

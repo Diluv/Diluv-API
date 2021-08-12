@@ -1,13 +1,13 @@
 package com.diluv.api.provider;
 
-import com.diluv.api.utils.error.ErrorMessage;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
 import org.jboss.resteasy.api.validation.ResteasyConstraintViolation;
 import org.jboss.resteasy.api.validation.ResteasyViolationException;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import com.diluv.api.utils.error.ErrorMessage;
 
 @Provider
 public class ValidationExceptionMapper implements ExceptionMapper<ResteasyViolationException> {

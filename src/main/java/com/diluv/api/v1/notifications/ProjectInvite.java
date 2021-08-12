@@ -1,9 +1,9 @@
 package com.diluv.api.v1.notifications;
 
+import javax.validation.constraints.NotNull;
+
 import com.diluv.confluencia.database.record.NotificationProjectInvitesStatus;
 import com.google.gson.annotations.Expose;
-
-import javax.validation.constraints.NotNull;
 
 public class ProjectInvite {
 

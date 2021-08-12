@@ -10,7 +10,7 @@ public class Game {
     private String defaultProjectType;
     private String url;
     private String createdAt;
-    private Image logo;
+    private GameImages logo;
     private GamesEntity entity;
 
     public Game (GamesEntity entity) {
@@ -20,7 +20,7 @@ public class Game {
         this.defaultProjectType = entity.getDefaultProjectTypeSlug();
         this.url = entity.getUrl();
         this.createdAt = entity.getCreatedAt().toString();
-        this.logo = new Image(Constants.getGameLogoURL(entity.getSlug()));
+        this.logo = new GameImages(Constants.getGameLogoURL(entity.getSlug()), Constants.getGameBackgroundURL(entity.getSlug()), Constants.getGameForegroundURL(entity.getSlug()));
         this.entity = entity;
     }
 
