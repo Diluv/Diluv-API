@@ -26,7 +26,7 @@ public class DataBaseProject extends DataSlugName {
      * The logo url of the project.
      */
     @Expose
-    public final String logo;
+    public final DataImage logo;
 
     /**
      * The amount of downloads the project has.

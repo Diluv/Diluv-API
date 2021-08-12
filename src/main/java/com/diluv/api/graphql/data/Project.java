@@ -1,5 +1,6 @@
 package com.diluv.api.graphql.data;
 
+import com.diluv.api.data.DataImage;
 import com.diluv.api.utils.Constants;
 import com.diluv.confluencia.database.record.ProjectsEntity;
 
@@ -15,7 +16,7 @@ public class Project {
     private final long downloads;
     private final String createdAt;
     private final String updatedAt;
-    private final String logo;
+    private final DataImage logo;
 
     private ProjectsEntity entity;
 

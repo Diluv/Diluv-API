@@ -15,7 +15,7 @@
             "type": "string"
         },
         "logo": {
-            "type": "string"
+            "$ref": "image.json"
         },
         "downloads": {
             "type": "integer"

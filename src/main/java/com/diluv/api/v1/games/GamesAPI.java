@@ -22,6 +22,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.jboss.resteasy.annotations.GZIP;
@@ -379,7 +380,7 @@ public class GamesAPI {
                 session.update(project);
 
                 if (form.logo != null) {
-                    final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
+                    final BufferedImage image = ImageUtil.isValidImage(form.logo, FileUtils.ONE_MB);
 
                     if (image == null) {
                         return ErrorMessage.INVALID_IMAGE.respond();
@@ -530,7 +531,7 @@ public class GamesAPI {
                 return ErrorMessage.PROJECT_INVALID_TAGS.respond();
             }
 
-            final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
+            final BufferedImage image = ImageUtil.isValidImage(form.logo, FileUtils.ONE_MB);
 
             if (image == null) {
                 return ErrorMessage.REQUIRES_IMAGE.respond();

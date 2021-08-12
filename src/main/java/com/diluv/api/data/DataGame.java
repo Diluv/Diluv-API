@@ -23,14 +23,7 @@ public class DataGame extends DataSlugName {
      * A URL that links to the image of the game.
      */
     @Expose
-    private final DataGameLogos logoURLs;
-
-    /**
-     * A URL that links to the image of the game.
-     */
-    @Deprecated
-    @Expose
-    private final DataImage logoURL;
+    private final DataGameLogos logoURL;
 
     @Expose
     private final List<DataProjectType> projectTypes;
@@ -62,8 +55,7 @@ public class DataGame extends DataSlugName {
         this.defaultProjectType = rs.getDefaultProjectTypeSlug();
         this.projectTypes = rs.getProjectTypes().stream().map(DataProjectType::new).collect(Collectors.toList());
         this.versions = rs.getGameVersions().stream().map(DataGameVersion::new).collect(Collectors.toList());
-        this.logoURLs = new DataGameLogos(rs.getSlug());
-        this.logoURL = Constants.getGameLogoURL(rs.getSlug());
+        this.logoURL = new DataGameLogos(rs.getSlug());
         this.projectCount = projectCount;
     }
 }

@@ -90,7 +90,11 @@ public class Mutation implements GraphQLMutationResolver {
             }
 
             //TODO
-            GraphQLContext context = env.getContext();
+            GraphQLContext context = env.getGraphQlContext();
+            if (context == null) {
+                //TODO ERROR
+                return null;
+            }
             long userId = context.get("userId");
 
             ProjectReviewEntity review = new ProjectReviewEntity();
@@ -149,7 +153,11 @@ public class Mutation implements GraphQLMutationResolver {
 
     public List<RegistrationCodes> registrationCodes (int count, DataFetchingEnvironment env) {
 
-        GraphQLContext context = env.getContext();
+        GraphQLContext context = env.getGraphQlContext();
+        if (context == null) {
+            //TODO ERROR
+            return null;
+        }
         long userId = context.get("userId");
         return Confluencia.getTransaction(session -> {
             List<RegistrationCodes> codes = new ArrayList<>();

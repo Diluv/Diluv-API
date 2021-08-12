@@ -15,4 +15,10 @@ public class AdminGameForm {
 
     @FormParam("logo")
     public InputStream logo;
+
+    @FormParam("backgroundLogo")
+    public InputStream backgroundLogo;
+
+    @FormParam("foregroundLogo")
+    public InputStream foregroundLogo;
 }

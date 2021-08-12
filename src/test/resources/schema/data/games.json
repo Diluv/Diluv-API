@@ -11,11 +11,8 @@
         "url": {
             "type": "string"
         },
-        "logoURLs": {
-            "$ref": "logoURL.json"
-        },
         "logoURL": {
-            "$ref": "image.json"
+            "$ref": "logoURL.json"
         },
         "versions": {
             "$ref": "game_versions.json"

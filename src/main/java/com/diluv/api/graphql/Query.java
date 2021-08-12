@@ -103,7 +103,11 @@ public class Query implements GraphQLQueryResolver {
 
     public List<RegistrationCodes> registrationCodes (DataFetchingEnvironment env) {
 
-        GraphQLContext context = env.getContext();
+        GraphQLContext context = env.getGraphQlContext();
+        if (context == null) {
+            //TODO ERROR
+            return null;
+        }
         long userId = context.get("userId");
         return Confluencia.getTransaction(session -> {
             return Confluencia.MISC.findAllRegistrationCodesByUser(session, userId).stream().map(RegistrationCodes::new).collect(Collectors.toList());

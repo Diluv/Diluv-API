@@ -67,7 +67,7 @@ type Project {
     files: [ProjectFile!]!
     game: Game!
     id: ID!
-    logo: String!
+    logo: Image!
     name: String!
     projectType: ProjectType!
     released: Boolean!

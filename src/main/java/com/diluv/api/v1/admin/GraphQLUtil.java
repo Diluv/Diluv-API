@@ -1,5 +1,8 @@
 package com.diluv.api.v1.admin;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.ws.rs.core.Response;
 
 import com.diluv.api.graphql.GameResolver;
@@ -13,8 +16,6 @@ import com.diluv.api.graphql.RegistrationCodesResolver;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
-import graphql.GraphQLContext;
-import graphql.Scalars;
 import graphql.execution.ExecutionId;
 import graphql.introspection.IntrospectionQuery;
 import graphql.kickstart.tools.SchemaParser;
@@ -55,12 +56,12 @@ public class GraphQLUtil {
         return graphql = GraphQL.newGraphQL(schema).build();
     }
 
-    public static Response getResponse (GraphQLRequest request, GraphQLContext context) {
+    public static Response getResponse (GraphQLRequest request, Map<String, Object> context) {
 
         ExecutionResult s = getGraphQL().execute(ExecutionInput.newExecutionInput()
             .query(request.getQuery())
             .operationName(request.getOperationName())
-            .context(context)
+            .graphQLContext(context)
             .root(context)
             .variables(request.getVariables())
             .executionId(ExecutionId.generate())
@@ -71,6 +72,6 @@ public class GraphQLUtil {
 
     public static Response getIntrospection () {
 
-        return getResponse(new GraphQLRequest(IntrospectionQuery.INTROSPECTION_QUERY, "IntrospectionQuery"), new GraphQLContext.Builder().build());
+        return getResponse(new GraphQLRequest(IntrospectionQuery.INTROSPECTION_QUERY, "IntrospectionQuery"), new HashMap<>());
     }
 }

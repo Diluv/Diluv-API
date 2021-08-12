@@ -235,23 +235,35 @@ public final class Constants {
         return "DEVELOPMENT".equalsIgnoreCase(ENV);
     }
 
-    public static String getUserAvatar (String username) {
+    public static DataImage getUserAvatar (String username) {
 
         if (isDevelopment()) {
-            return "https://images.placeholders.dev/?width=512&height=512";
+            final String url = "https://images.placeholders.dev/?width=512&height=512";
+            return new DataImage(new DataImageSource(url + "&text=" + username, "image/png"), new DataImageSource[]{new DataImageSource(url + "&text=" + username, "image/svg+xml")});
         }
 
-        return String.format("%s/users/%s/avatar.png", Constants.CDN_URL, username);
+        final String baseURL = String.format("%s/users/%s/avatar", Constants.CDN_URL, username);
+
+        return new DataImage(new DataImageSource(baseURL + ".png", "image/png"), new DataImageSource[]{
+            new DataImageSource(baseURL + ".webp", "image/webp")
+        });
     }
 
-    public static String getProjectLogo (ProjectsEntity project) {
+    public static DataImage getProjectLogo (ProjectsEntity project) {
 
         if (isDevelopment()) {
-            return "https://images.placeholders.dev/?width=400&height=400";
+            final String url = "https://images.placeholders.dev/?width=400&height=400";
+            return new DataImage(new DataImageSource(url + "&text=" + project.getName(), "image/png"), new DataImageSource[]{new DataImageSource(url + "&text=" + project.getName(), "image/svg+xml")});
         }
+
         final String gameSlug = project.getGame().getSlug();
         final String projectTypeSlug = project.getProjectType().getSlug();
-        return String.format("%s/games/%s/%s/%d/logo.png", Constants.CDN_URL, gameSlug, projectTypeSlug, project.getId());
+
+        final String baseURL = String.format("%s/games/%s/%s/%d/logo", Constants.CDN_URL, gameSlug, projectTypeSlug, project.getId());
+
+        return new DataImage(new DataImageSource(baseURL + ".png", "image/png"), new DataImageSource[]{
+            new DataImageSource(baseURL + ".webp", "image/webp")
+        });
     }
 
     public static DataImage getGameLogoURL (String slug) {
@@ -261,12 +273,12 @@ public final class Constants {
 
     public static DataImage getGameBackgroundURL (String slug) {
 
-        return getGameLogoURL(slug, "background");
+        return getGameLogoURL(slug, "backgroundLogo");
     }
 
     public static DataImage getGameForegroundURL (String slug) {
 
-        return getGameLogoURL(slug, "foreground");
+        return getGameLogoURL(slug, "foregroundLogo");
     }
 
     public static DataImage getGameLogoURL (String slug, String type) {
@@ -277,8 +289,7 @@ public final class Constants {
         }
 
         final String baseURL = String.format("%s/games/%s/%s", Constants.CDN_URL, slug, type);
-        final String pngURL = baseURL + ".png";
-        return new DataImage(new DataImageSource(pngURL, "image/png"), new DataImageSource[]{
+        return new DataImage(new DataImageSource(baseURL + ".png", "image/png"), new DataImageSource[]{
             new DataImageSource(baseURL + ".webp", "image/webp")
         });
     }

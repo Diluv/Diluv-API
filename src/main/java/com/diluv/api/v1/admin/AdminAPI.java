@@ -2,6 +2,7 @@ package com.diluv.api.v1.admin;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -32,7 +33,6 @@ import com.diluv.api.utils.error.ErrorMessage;
 import com.diluv.api.utils.permissions.UserPermissions;
 import com.diluv.api.utils.response.ResponseUtil;
 import com.diluv.api.utils.validator.RequireToken;
-import com.diluv.api.v1.games.GamesAPI;
 import com.diluv.confluencia.Confluencia;
 import com.diluv.confluencia.database.record.GamesEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
@@ -79,20 +79,33 @@ public class AdminAPI {
                 return ErrorMessage.INVALID_DATA.respond();
             }
 
-            if (form.logo == null) {
+            if (form.logo == null || form.backgroundLogo == null || form.foregroundLogo == null) {
                 return ErrorMessage.REQUIRES_IMAGE.respond();
             }
 
-            final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
+            final BufferedImage imageLogo = ImageUtil.isValidImage(form.logo, FileUtils.ONE_MB);
+            final BufferedImage backgroundLogo = ImageUtil.isValidImage(form.backgroundLogo, FileUtils.ONE_MB);
+            final BufferedImage foregroundLogo = ImageUtil.isValidImage(form.foregroundLogo, FileUtils.ONE_MB);
 
-            if (image == null) {
+            if (imageLogo == null || backgroundLogo == null || foregroundLogo == null) {
                 return ErrorMessage.INVALID_IMAGE.respond();
             }
 
             File logoPath = new File(Constants.CDN_FOLDER, "games/" + data.slug);
+            //TODO response?
             logoPath.mkdirs();
 
-            if (!ImageUtil.savePNG(image, new File(logoPath, "logo.png"))) {
+            if (!ImageUtil.savePNG(imageLogo, new File(logoPath, "logo.png"))) {
+                // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
+                return ErrorMessage.THROWABLE.respond();
+            }
+
+            if (!ImageUtil.savePNG(backgroundLogo, new File(logoPath, "backgroundLogo.png"))) {
+                // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
+                return ErrorMessage.THROWABLE.respond();
+            }
+
+            if (!ImageUtil.savePNG(foregroundLogo, new File(logoPath, "foregroundLogo.png"))) {
                 // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
                 return ErrorMessage.THROWABLE.respond();
             }
@@ -153,7 +166,7 @@ public class AdminAPI {
             logoPath.mkdirs();
 
             if (form.logo != null) {
-                final BufferedImage image = ImageUtil.isValidImage(form.logo, 1000000L);
+                final BufferedImage image = ImageUtil.isValidImage(form.logo, FileUtils.ONE_MB);
 
                 if (image == null) {
                     return ErrorMessage.INVALID_IMAGE.respond();
@@ -200,7 +213,7 @@ public class AdminAPI {
     public Response getGraphQL (@RequireToken(apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token, @QueryParam("query") String query, @QueryParam("variables") String variables, @QueryParam("operationName") String operationName) {
 
         Map<String, Object> variablesMap = Constants.getGsonInstance().fromJson(variables, Map.class);
-        return GraphQLUtil.getResponse(new GraphQLRequest(query, operationName, variablesMap), new GraphQLContext.Builder().of("userId", token.getUserId()).build());
+        return GraphQLUtil.getResponse(new GraphQLRequest(query, operationName, variablesMap), Collections.singletonMap("userId", token.getUserId()));
     }
 
     @POST
@@ -208,7 +221,7 @@ public class AdminAPI {
     @Path("/graphql")
     public Response postGraphQL (@RequireToken(apiToken = false, userPermissions = {UserPermissions.VIEW_ADMIN}) @HeaderParam("Authorization") Token token, GraphQLRequest request) {
 
-        return GraphQLUtil.getResponse(request, new GraphQLContext.Builder().of("userId", token.getUserId()).build());
+        return GraphQLUtil.getResponse(request, Collections.singletonMap("userId", token.getUserId()));
     }
 
     @GET

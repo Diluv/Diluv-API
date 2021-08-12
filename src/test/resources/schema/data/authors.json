@@ -12,7 +12,7 @@
             "type": "string"
         },
         "avatarURL": {
-            "type": "string"
+            "$ref": "image.json"
         },
         "createdAt": {
             "type": "string"

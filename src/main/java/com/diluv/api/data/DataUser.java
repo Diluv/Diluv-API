@@ -31,7 +31,7 @@ public class DataUser {
      * A URL that points to their avatar image.
      */
     @Expose
-    private final String avatarURL;
+    private final DataImage avatarURL;
 
     /**
      * The date the user created their account.
