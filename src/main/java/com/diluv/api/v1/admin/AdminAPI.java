@@ -38,7 +38,6 @@ import com.diluv.confluencia.database.record.GamesEntity;
 import com.diluv.confluencia.database.record.ProjectFilesEntity;
 import com.diluv.confluencia.database.record.ProjectTypesEntity;
 import com.diluv.confluencia.database.record.ProjectsEntity;
-import graphql.GraphQLContext;
 
 @ApplicationScoped
 @GZIP
@@ -166,13 +165,39 @@ public class AdminAPI {
             logoPath.mkdirs();
 
             if (form.logo != null) {
-                final BufferedImage image = ImageUtil.isValidImage(form.logo, FileUtils.ONE_MB);
+                final BufferedImage imageLogo = ImageUtil.isValidImage(form.logo, FileUtils.ONE_MB);
 
-                if (image == null) {
+                if (imageLogo == null) {
                     return ErrorMessage.INVALID_IMAGE.respond();
                 }
 
-                if (!ImageUtil.savePNG(image, new File(logoPath, "logo.png"))) {
+                if (!ImageUtil.savePNG(imageLogo, new File(logoPath, "logo.png"))) {
+                    // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
+                    return ErrorMessage.THROWABLE.respond();
+                }
+            }
+
+            if (form.backgroundLogo != null) {
+                final BufferedImage backgroundLogo = ImageUtil.isValidImage(form.backgroundLogo, FileUtils.ONE_MB);
+
+                if (backgroundLogo == null) {
+                    return ErrorMessage.INVALID_IMAGE.respond();
+                }
+
+                if (!ImageUtil.savePNG(backgroundLogo, new File(logoPath, "backgroundLogo.png"))) {
+                    // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
+                    return ErrorMessage.THROWABLE.respond();
+                }
+            }
+
+            if (form.foregroundLogo != null) {
+                final BufferedImage foregroundLogo = ImageUtil.isValidImage(form.foregroundLogo, FileUtils.ONE_MB);
+
+                if (foregroundLogo == null) {
+                    return ErrorMessage.INVALID_IMAGE.respond();
+                }
+
+                if (!ImageUtil.savePNG(foregroundLogo, new File(logoPath, "foregroundLogo.png"))) {
                     // return ErrorMessage.ERROR_SAVING_IMAGE.respond();
                     return ErrorMessage.THROWABLE.respond();
                 }
