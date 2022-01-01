@@ -46,7 +46,7 @@ dependencies {
     implementation group: 'org.glassfish', name: 'javax.el', version: '3.0.0'
     implementation group: 'org.jboss.weld.servlet', name: 'weld-servlet', version: '2.4.8.Final'
 
-    compileOnly group: 'org.hibernate', name: 'hibernate-core', version: '5.5.6.Final'
+    compileOnly group: 'org.hibernate', name: 'hibernate-core', version: '5.6.3.Final'
 
     testImplementation project(path: ':Confluencia', configuration: 'testOutput')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.7.2'
